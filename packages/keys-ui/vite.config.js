@@ -25,7 +25,6 @@ export default defineConfig({
 
     // CSS processing
     css: {
-        extract: true,
         postcss: {
             plugins: []
         }

@@ -15,7 +15,6 @@ class Option extends Component
         public bool $disabled = false,
         public bool $selected = false
     ) {
-        // If no label provided, use value as fallback
         $this->label = $this->label ?? $this->value;
     }
 
@@ -116,7 +115,6 @@ class Option extends Component
 
     public function getDisplayLabel(): string
     {
-        // Priority: displayLabel -> label -> value
         return $this->displayLabel ?? $this->label ?? $this->value ?? '';
     }
 

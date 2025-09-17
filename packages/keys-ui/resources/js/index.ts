@@ -9,40 +9,37 @@ import { FormActions } from './FormActions';
 import { AlertActions } from './AlertActions';
 import { RadioActions } from './RadioActions';
 import { SelectActions } from './SelectActions';
+import { TabsActions } from './TabsActions';
 import { ModalActions } from './ModalActions';
 import { ToastActions } from './ToastActions';
 import { DropdownActions } from './DropdownActions';
+import { TableActions } from './TableActions';
 
-// Export classes for individual use
-export { FormActions, AlertActions, RadioActions, SelectActions, ModalActions, ToastActions, DropdownActions };
+export { FormActions, AlertActions, RadioActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions };
 
 /**
  * Initialize all Keys UI components
  * Call this function to automatically set up all interactive functionality
  */
 export function initializeKeysUI(): void {
-    // Initialize FormActions
     FormActions.getInstance().init();
 
-    // Initialize AlertActions
     AlertActions.getInstance().init();
 
-    // Initialize RadioActions
     RadioActions.getInstance().init();
 
-    // Initialize SelectActions
     SelectActions.getInstance().init();
 
-    // Initialize ModalActions
+    TabsActions.getInstance().init();
+
     ModalActions.getInstance().init();
 
-    // Initialize ToastActions
-    ToastActions.getInstance().discoverToasts();
+    ToastActions.getInstance().init();
 
-    // Initialize DropdownActions
     DropdownActions.getInstance().init();
 
-    console.log('Keys UI initialized');
+    TableActions.getInstance().init();
+
 }
 
 /**
@@ -53,8 +50,10 @@ export default {
     AlertActions: AlertActions.getInstance(),
     RadioActions: RadioActions.getInstance(),
     SelectActions: SelectActions.getInstance(),
+    TabsActions: TabsActions.getInstance(),
     ModalActions: ModalActions.getInstance(),
     ToastActions: ToastActions.getInstance(),
     DropdownActions: DropdownActions.getInstance(),
+    TableActions: TableActions.getInstance(),
     init: initializeKeysUI
 };

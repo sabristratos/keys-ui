@@ -15,7 +15,7 @@
         </ol>
     </nav>
 
-    {{-- Inline styles for breadcrumb enhancements --}}
+    
     <style>
         [data-breadcrumb-container] {
             color: var(--color-foreground);

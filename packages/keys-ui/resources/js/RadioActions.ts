@@ -30,41 +30,33 @@ export class RadioActions {
 
         this.bindEventListeners();
         this.initialized = true;
-        console.log('RadioActions initialized');
+
     }
 
     /**
      * Bind event listeners using event delegation
      */
     private bindEventListeners(): void {
-        // Handle radio label clicks for focus management
         document.addEventListener('click', (event) => {
             const target = event.target as Element;
 
-            // Check if the click is on a radio label or within a radio label
             const radioLabel = target.closest('label[for]') as HTMLLabelElement;
             if (!radioLabel) return;
 
-            // Check if this label is for a radio input
             const radioId = radioLabel.getAttribute('for');
             if (!radioId) return;
 
             const radioInput = document.getElementById(radioId) as HTMLInputElement;
             if (!radioInput || radioInput.type !== 'radio') return;
 
-            // Focus the radio input for better accessibility
-            // This ensures the radio gets keyboard focus when the card is clicked
             this.focusRadioInput(radioInput);
         });
 
-        // Handle keyboard navigation for radio groups
         document.addEventListener('keydown', (event) => {
             const target = event.target as HTMLInputElement;
 
-            // Only handle radio inputs
             if (!target || target.type !== 'radio') return;
 
-            // Handle arrow key navigation in radio groups
             if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
                 event.preventDefault();
                 this.focusNextRadio(target);
@@ -79,11 +71,9 @@ export class RadioActions {
      * Focus a radio input with proper timing
      */
     private focusRadioInput(radioInput: HTMLInputElement): void {
-        // Use setTimeout to ensure the focus happens after the click event is processed
         setTimeout(() => {
             radioInput.focus();
 
-            // Dispatch custom event for user callbacks
             this.dispatchFocusEvent(radioInput);
         }, 0);
     }
@@ -101,7 +91,6 @@ export class RadioActions {
             nextRadio.focus();
             nextRadio.checked = true;
 
-            // Trigger change event
             nextRadio.dispatchEvent(new Event('change', { bubbles: true }));
             this.dispatchFocusEvent(nextRadio);
         }
@@ -120,7 +109,6 @@ export class RadioActions {
             previousRadio.focus();
             previousRadio.checked = true;
 
-            // Trigger change event
             previousRadio.dispatchEvent(new Event('change', { bubbles: true }));
             this.dispatchFocusEvent(previousRadio);
         }
@@ -133,10 +121,8 @@ export class RadioActions {
         const name = radio.name;
         if (!name) return [radio];
 
-        // Find all radio inputs with the same name
         const radios = Array.from(document.querySelectorAll(`input[type="radio"][name="${name}"]`)) as HTMLInputElement[];
 
-        // Filter out disabled radios
         return radios.filter(r => !r.disabled);
     }
 
@@ -154,7 +140,6 @@ export class RadioActions {
             bubbles: true
         });
 
-        // Dispatch on both radio element and document for flexibility
         radioInput.dispatchEvent(event);
     }
 
@@ -178,10 +163,8 @@ export class RadioActions {
      */
     public destroy(): void {
         this.initialized = false;
-        // Event delegation handles cleanup automatically
-        console.log('RadioActions destroyed');
+
     }
 }
 
-// Export default instance
 export default RadioActions.getInstance();

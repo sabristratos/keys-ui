@@ -9,7 +9,15 @@ class Loading extends Component
     public function __construct(
         public string $animation = 'spinner',
         public string $size = 'md'
-    ) {}
+    ) {
+        if (!in_array($this->animation, ['spinner', 'dots', 'pulse'])) {
+            $this->animation = 'spinner';
+        }
+
+        if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
+            $this->size = 'md';
+        }
+    }
 
     public function sizeClasses(): string
     {

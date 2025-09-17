@@ -21,7 +21,11 @@
       "Bash(cmd /c dir:*)",
       "Bash(php artisan keys:build:*)",
       "Bash(cmd /c php artisan:*)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:stackoverflow.com)",
+      "Bash(dir)",
+      "Bash(move Empty.php EmptyState.php)",
+      "Bash(php artisan route:list:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

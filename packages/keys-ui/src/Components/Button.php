@@ -17,15 +17,25 @@ class Button extends Component
         public ?string $iconLeft = null,
         public ?string $iconRight = null,
         public string $loadingAnimation = 'spinner',
-        // Multi-state support
         public ?string $iconToggle = null,
         public ?string $iconSuccess = null,
         public ?string $labelToggle = null,
         public ?string $labelSuccess = null
     ) {
-        // Support both 'icon' and 'iconLeft' for backward compatibility
         if ($this->icon && !$this->iconLeft) {
             $this->iconLeft = $this->icon;
+        }
+
+        if (!in_array($this->variant, ['brand', 'danger', 'warning', 'success', 'info', 'neutral', 'ghost', 'outline'])) {
+            $this->variant = 'brand';
+        }
+
+        if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
+            $this->size = 'md';
+        }
+
+        if (!in_array($this->loadingAnimation, ['spinner', 'dots', 'pulse'])) {
+            $this->loadingAnimation = 'spinner';
         }
     }
 
@@ -113,9 +123,8 @@ class Button extends Component
         return ($this->disabled || $this->loading) ? 'cursor-not-allowed opacity-50' : '';
     }
 
-    public function isIconOnly(string $slotContent): bool
+    public function isIconOnly(string $slotContent = ''): bool
     {
-        // Remove sr-only elements and check if content is empty
         $contentWithoutSrOnly = preg_replace('/<[^>]*sr-only[^>]*>.*?<\/[^>]*>/s', '', $slotContent);
         $contentWithoutSrOnly = preg_replace('/<[^>]*sr-only[^>]*>/s', '', $contentWithoutSrOnly);
 

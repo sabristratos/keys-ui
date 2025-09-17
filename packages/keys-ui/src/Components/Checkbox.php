@@ -15,49 +15,40 @@ class Checkbox extends Component
         public bool $disabled = false,
         public bool $required = false,
         public bool $indeterminate = false,
-        // Styling
         public string $variant = 'standard',
         public string $color = 'brand',
         public string $size = 'md',
-        // Content
         public ?string $label = null,
         public ?string $description = null,
-        // Card variant specific
         public ?string $title = null,
         public ?string $icon = null,
-        // Layout
         public string $labelPosition = 'right',
-        // Validation
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
-        // Actions
         public array $actions = [],
         public string $actionVariant = 'ghost',
         public string $actionSize = 'xs',
-        // State
         public bool $hasError = false,
-        // Display
         public bool $showInput = true
     ) {
-        // Auto-generate ID if not provided - ensure uniqueness even with shared names
+
         $this->id = $this->id ?? ($this->name ? $this->name . '-' . $this->value . '-' . uniqid() : 'checkbox-' . uniqid());
 
-        // Auto-set hasError if errors are provided
+
         if (!$this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
 
-        // Validate variant
+
         if (!in_array($this->variant, ['standard', 'bordered', 'colored', 'card'])) {
             $this->variant = 'standard';
         }
 
-        // Validate color
+
         if (!in_array($this->color, ['brand', 'success', 'warning', 'danger', 'neutral'])) {
             $this->color = 'brand';
         }
 
-        // For card variant, ensure we have either label or title
         if ($this->variant === 'card' && !$this->title && $this->label) {
             $this->title = $this->label;
             $this->label = null;
@@ -94,7 +85,6 @@ class Checkbox extends Component
     {
         $baseClasses = 'border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
 
-        // Use smaller, refined sizes for all variants
         $sizeClasses = match ($this->size) {
             'sm' => 'h-3 w-3 text-xs',
             'md' => 'h-3.5 w-3.5 text-sm',
@@ -149,7 +139,6 @@ class Checkbox extends Component
 
     public function combinedClasses(): string
     {
-        // Adjust gap for pure card mode (no visible input)
         $gap = ($this->variant === 'card' && !$this->showInput) ? 'gap-0' : 'gap-3';
 
         $baseClasses = match ($this->variant) {
@@ -193,7 +182,6 @@ class Checkbox extends Component
 
     public function wrapperClasses(): string
     {
-        // Kept for backward compatibility, but now use combinedClasses()
         return $this->combinedClasses();
     }
 

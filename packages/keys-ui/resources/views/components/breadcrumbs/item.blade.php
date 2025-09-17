@@ -1,7 +1,6 @@
 @php
     $isIconOnly = $isIconOnly($slot->toHtml() ?? '');
 
-    // Build the link/span attributes
     $linkAttributes = $attributes->except(['class', 'separator']);
 
     if ($isLink()) {
@@ -42,7 +41,7 @@
         </span>
     @endif
 
-    {{-- Separator --}}
+    
     @if($showSeparator())
         <div class="{{ $computedSeparatorClasses }}" aria-hidden="true">
             @if($separatorIcon)

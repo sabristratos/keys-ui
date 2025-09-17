@@ -13,7 +13,6 @@
 
 <div {{ $elementAttributes }}>
     <div class="flex">
-        {{-- Icon --}}
         <div class="flex-shrink-0">
             <x-keys::icon
                 :name="$iconName()"
@@ -21,36 +20,30 @@
                 :class="$iconColor()" />
         </div>
 
-        {{-- Content --}}
         <div class="ml-3 flex-1">
-            {{-- Title --}}
-            @if($title || isset($title))
+            @if($title)
                 <div class="{{ $titleClasses() }}">
-                    {{ $title ?? $title }}
+                    {{ $title }}
                 </div>
             @endif
 
-            {{-- Main Content --}}
             <div class="{{ $contentClasses() }} {{ $title ? 'mt-1' : '' }}">
                 {{ $slot }}
             </div>
 
-            {{-- Actions --}}
             @isset($actions)
-                <div class="mt-3 flex space-x-2">
+                <div class="flex space-x-2 [&:not(:has(.hidden))]:mt-3">
                     {{ $actions }}
                 </div>
             @endisset
         </div>
 
-        {{-- Dismiss Button --}}
         @if($dismissible)
             <div class="ml-auto pl-3">
                 <x-keys::button
                     variant="ghost"
                     size="xs"
                     icon-left="heroicon-o-x-mark"
-                    :icon-only="true"
                     data-dismiss-alert
                     aria-label="Dismiss"
                     :class="$iconColor()"

@@ -1,14 +1,14 @@
-{{-- Left icon --}}
+
 @if($iconLeft)
     <div class="absolute {{ $computedIconPosition }} {{ $computedIconOffsets['left'] }} pointer-events-none">
         <x-keys::icon name="{{ $iconLeft }}" size="{{ $computedIconSize }}" class="text-neutral" />
     </div>
 @endif
 
-{{-- Input field --}}
+
 <input {{ $inputAttributes }} data-input-actions="{{ $hasActions() ? 'true' : 'false' }}" />
 
-{{-- Actions --}}
+
 @if($hasActions())
     <div class="absolute {{ $computedIconPosition }} right-2 flex gap-1">
         @foreach($computedActionData as $action)
@@ -41,7 +41,7 @@
     </div>
 @endif
 
-{{-- Right icon --}}
+
 @if($iconRight && !$hasActions())
     <div class="absolute {{ $computedIconPosition }} {{ $computedIconOffsets['right'] }} pointer-events-none">
         <x-keys::icon name="{{ $iconRight }}" size="{{ $computedIconSize }}" class="text-neutral" />

@@ -11,7 +11,6 @@
             'data-value' => is_array($value) ? json_encode($value) : $value,
         ], fn($value) => !is_null($value)));
 
-    // Hidden input for form submission
     $hiddenInputName = $multiple ? ($name . '[]') : $name;
 @endphp
 

@@ -14,23 +14,22 @@ class Modal extends Component
         public bool $centered = true,
         public bool $scrollable = false,
         public bool $animate = true,
-        // Livewire integration props
         public bool $lazy = false,
         public bool $persistent = false,
         public bool $trapFocus = true,
         public ?string $wireModel = null
     ) {
-        // Validate size
+
         if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl', 'full'])) {
             $this->size = 'md';
         }
 
-        // Validate closedby
+
         if (!in_array($this->closedby, ['any', 'closerequest', 'none'])) {
             $this->closedby = 'any';
         }
 
-        // Validate backdrop
+
         if (!in_array($this->backdrop, ['blur', 'dark', 'none'])) {
             $this->backdrop = 'blur';
         }
@@ -68,7 +67,6 @@ class Modal extends Component
     {
         $base = 'relative bg-surface border border-border shadow-xl rounded-lg';
 
-        // Size variants
         $sizeClasses = match ($this->size) {
             'xs' => 'max-w-xs',
             'sm' => 'max-w-sm',
@@ -79,7 +77,6 @@ class Modal extends Component
             default => 'max-w-md'
         };
 
-        // Scrollable support
         if ($this->scrollable && $this->size !== 'full') {
             $base .= ' max-h-[80vh] flex flex-col';
         }
@@ -176,12 +173,10 @@ class Modal extends Component
     {
         $attributes = [];
 
-        // Add wire:model if specified
         if ($wireModel = $this->getWireModelAttribute()) {
             $attributes['wire:model'] = $wireModel;
         }
 
-        // Add data attributes for Livewire integration
         if ($this->isLivewireEnabled()) {
             $attributes['data-modal-livewire'] = true;
         }
@@ -209,7 +204,6 @@ class Modal extends Component
             return $events;
         }
 
-        // Extract Livewire event listeners from attributes
         foreach (['open', 'close', 'escape', 'cancel'] as $event) {
             $wireEvent = $this->attributes->get("wire:{$event}");
             $alpineEvent = $this->attributes->get("@{$event}");

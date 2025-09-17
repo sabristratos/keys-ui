@@ -12,10 +12,10 @@ class Menu extends Component
         public ?string $ariaLabel = null,
         public ?string $ariaLabelledBy = null
     ) {
-        // Auto-generate ID if not provided
+
         $this->id = $this->id ?? 'menu-' . uniqid();
 
-        // Validate role
+
         if (!in_array($this->role, ['menu', 'listbox', 'group'])) {
             $this->role = 'menu';
         }

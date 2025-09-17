@@ -15,17 +15,14 @@ class Radio extends Component
         public bool $disabled = false,
         public ?string $icon = null,
         public string $color = 'brand',
-        // Form binding
         public ?string $wireModel = null,
-        // Validation
         public string|array|Collection|null $errors = null,
-        // Always keep dropdown open for form controls
         public bool $keepOpen = true
     ) {
-        // Auto-generate ID if not provided
+
         $this->id = $this->id ?? ($this->name ? $this->name . '-' . $this->value . '-' . uniqid() : 'menu-radio-' . uniqid());
 
-        // Validate color
+
         if (!in_array($this->color, ['brand', 'success', 'warning', 'danger', 'neutral'])) {
             $this->color = 'brand';
         }

@@ -11,7 +11,11 @@ class Icon extends Component
         public string $name,
         public string $size = 'md',
         public ?string $fallback = 'heroicon-o-question-mark-circle'
-    ) {}
+    ) {
+        if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
+            $this->size = 'md';
+        }
+    }
 
     public function sizeClasses(): string
     {

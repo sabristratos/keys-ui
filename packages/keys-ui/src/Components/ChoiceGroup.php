@@ -16,23 +16,21 @@ class ChoiceGroup extends Component
         public string $size = 'md',
         public bool $required = false,
         public bool $disabled = false,
-        // Validation
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
-        // State
         public bool $hasError = false
     ) {
-        // Auto-set hasError if errors are provided
+
         if (!$this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
 
-        // Validate type
+
         if (!in_array($this->type, ['checkbox', 'radio'])) {
             $this->type = 'checkbox';
         }
 
-        // Validate layout
+
         if (!in_array($this->layout, ['stacked', 'grid', 'inline'])) {
             $this->layout = 'stacked';
         }

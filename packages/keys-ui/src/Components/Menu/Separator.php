@@ -10,12 +10,12 @@ class Separator extends Component
         public string $variant = 'default',
         public ?string $label = null
     ) {
-        // Validate variant
+
         if (!in_array($this->variant, ['default', 'labeled'])) {
             $this->variant = 'default';
         }
 
-        // Auto-set variant to labeled if label is provided
+
         if ($this->label && $this->variant === 'default') {
             $this->variant = 'labeled';
         }

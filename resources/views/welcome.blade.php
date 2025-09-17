@@ -33,7 +33,7 @@
                 <header class="text-center mb-8">
                     <h1 class="text-3xl font-bold mb-3">Keys UI Components</h1>
                     <p class="text-foreground/60 mb-4">
-                        Avatar, Badge, Breadcrumbs, and Modal components showcase
+                        Avatar, Badge, Breadcrumbs, Modal, Toast, Table, and Tabs components showcase
                     </p>
                     <div class="flex justify-center gap-2 p-1 bg-surface rounded-lg border border-border">
                         <button
@@ -974,12 +974,805 @@
                                 </div>
                             </div>
                         </section>
+
+                        <!-- Tabs Components -->
+                        <section class="space-y-4">
+                            <h2 class="text-lg font-semibold border-b border-border pb-2">Tabs Components</h2>
+
+                            <div class="space-y-6">
+                                <!-- Basic Tabs -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Basic Tabs</h3>
+                                    <x-keys::tabs default-value="overview">
+                                        <x-keys::tabs.tab value="overview" label="Overview" />
+                                        <x-keys::tabs.tab value="details" label="Details" />
+                                        <x-keys::tabs.tab value="settings" label="Settings" />
+
+                                        <x-slot name="panels">
+                                            <x-keys::tabs.panel value="overview">
+                                                <div class="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-md">
+                                                    <h4 class="font-medium mb-2">Overview Content</h4>
+                                                    <p class="text-muted">This is the overview panel content. It contains general information about the product or feature.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="details">
+                                                <div class="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-md">
+                                                    <h4 class="font-medium mb-2">Details Content</h4>
+                                                    <p class="text-muted">Here you'll find detailed information, specifications, and technical details.</p>
+                                                    <ul class="list-disc list-inside mt-2 text-muted">
+                                                        <li>Feature A</li>
+                                                        <li>Feature B</li>
+                                                        <li>Feature C</li>
+                                                    </ul>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="settings">
+                                                <div class="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-md">
+                                                    <h4 class="font-medium mb-2">Settings Panel</h4>
+                                                    <p class="text-muted">Configure your preferences and options here.</p>
+                                                    <div class="mt-3 space-y-2">
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" class="mr-2"> Enable notifications
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" class="mr-2"> Auto-save changes
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </x-keys::tabs.panel>
+                                        </x-slot>
+                                    </x-keys::tabs>
+                                </div>
+
+                                <!-- Tabs with Icons -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Tabs with Icons</h3>
+                                    <x-keys::tabs default-value="dashboard">
+                                        <x-keys::tabs.tab value="dashboard" label="Dashboard" icon="heroicon-o-squares-2x2" />
+                                        <x-keys::tabs.tab value="analytics" label="Analytics" icon="heroicon-o-chart-bar" />
+                                        <x-keys::tabs.tab value="settings" label="Settings" icon="heroicon-o-cog-6-tooth" />
+                                        <x-keys::tabs.tab value="profile" label="Profile" icon="heroicon-o-user" />
+
+                                        <x-slot name="panels">
+                                            <x-keys::tabs.panel value="dashboard">
+                                                <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                                                    <h4 class="font-medium mb-2 text-blue-800 dark:text-blue-200">Dashboard</h4>
+                                                    <p class="text-blue-600 dark:text-blue-300">Welcome to your dashboard! Here's an overview of your account activity.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="analytics">
+                                                <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-md">
+                                                    <h4 class="font-medium mb-2 text-green-800 dark:text-green-200">Analytics</h4>
+                                                    <p class="text-green-600 dark:text-green-300">View detailed analytics and performance metrics here.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="settings">
+                                                <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-md">
+                                                    <h4 class="font-medium mb-2 text-purple-800 dark:text-purple-200">Settings</h4>
+                                                    <p class="text-purple-600 dark:text-purple-300">Manage your account settings and preferences.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="profile">
+                                                <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-md">
+                                                    <h4 class="font-medium mb-2 text-orange-800 dark:text-orange-200">Profile</h4>
+                                                    <p class="text-orange-600 dark:text-orange-300">Update your profile information and personal details.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+                                        </x-slot>
+                                    </x-keys::tabs>
+                                </div>
+
+                                <!-- Pills Variant -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Pills Variant</h3>
+                                    <x-keys::tabs variant="pills" default-value="home">
+                                        <x-keys::tabs.tab value="home" label="Home" icon="heroicon-o-home" />
+                                        <x-keys::tabs.tab value="projects" label="Projects" icon="heroicon-o-folder" />
+                                        <x-keys::tabs.tab value="team" label="Team" icon="heroicon-o-users" />
+
+                                        <x-slot name="panels">
+                                            <x-keys::tabs.panel value="home">
+                                                <div class="p-4 bg-surface border border-border rounded-md">
+                                                    <h4 class="font-medium mb-2">Home Panel</h4>
+                                                    <p class="text-muted">This is the home panel with pills-style tabs above.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="projects">
+                                                <div class="p-4 bg-surface border border-border rounded-md">
+                                                    <h4 class="font-medium mb-2">Projects Panel</h4>
+                                                    <p class="text-muted">View and manage your projects here.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="team">
+                                                <div class="p-4 bg-surface border border-border rounded-md">
+                                                    <h4 class="font-medium mb-2">Team Panel</h4>
+                                                    <p class="text-muted">Collaborate with your team members.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+                                        </x-slot>
+                                    </x-keys::tabs>
+                                </div>
+
+                                <!-- Vertical Tabs -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Vertical Orientation</h3>
+                                    <x-keys::tabs orientation="vertical" default-value="general">
+                                        <x-keys::tabs.tab value="general" label="General" icon="heroicon-o-cog-6-tooth" />
+                                        <x-keys::tabs.tab value="security" label="Security" icon="heroicon-o-shield-check" />
+                                        <x-keys::tabs.tab value="notifications" label="Notifications" icon="heroicon-o-bell" />
+                                        <x-keys::tabs.tab value="billing" label="Billing" icon="heroicon-o-credit-card" />
+
+                                        <x-slot name="panels">
+                                            <x-keys::tabs.panel value="general">
+                                                <div class="p-4 bg-surface border border-border rounded-md">
+                                                    <h4 class="font-medium mb-2">General Settings</h4>
+                                                    <p class="text-muted">Configure general application settings.</p>
+                                                    <div class="mt-3 space-y-2">
+                                                        <div>
+                                                            <label class="block text-sm font-medium mb-1">App Name</label>
+                                                            <input type="text" class="w-full px-3 py-2 border border-border rounded-md" value="My Application">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-sm font-medium mb-1">Description</label>
+                                                            <textarea class="w-full px-3 py-2 border border-border rounded-md" rows="3">Application description</textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="security">
+                                                <div class="p-4 bg-surface border border-border rounded-md">
+                                                    <h4 class="font-medium mb-2">Security Settings</h4>
+                                                    <p class="text-muted">Manage your security preferences.</p>
+                                                    <div class="mt-3 space-y-3">
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" class="mr-2" checked> Enable two-factor authentication
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" class="mr-2"> Require password for sensitive actions
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" class="mr-2"> Log out from all devices
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="notifications">
+                                                <div class="p-4 bg-surface border border-border rounded-md">
+                                                    <h4 class="font-medium mb-2">Notification Preferences</h4>
+                                                    <p class="text-muted">Choose how you want to be notified.</p>
+                                                    <div class="mt-3 space-y-3">
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" class="mr-2" checked> Email notifications
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" class="mr-2" checked> Push notifications
+                                                        </label>
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" class="mr-2"> SMS notifications
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="billing">
+                                                <div class="p-4 bg-surface border border-border rounded-md">
+                                                    <h4 class="font-medium mb-2">Billing Information</h4>
+                                                    <p class="text-muted">Manage your billing and subscription.</p>
+                                                    <div class="mt-3">
+                                                        <p class="text-sm"><strong>Current Plan:</strong> Pro Plan</p>
+                                                        <p class="text-sm"><strong>Next Billing:</strong> January 1, 2025</p>
+                                                        <p class="text-sm"><strong>Amount:</strong> $29.99/month</p>
+                                                    </div>
+                                                </div>
+                                            </x-keys::tabs.panel>
+                                        </x-slot>
+                                    </x-keys::tabs>
+                                </div>
+
+                                <!-- Size Variants -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Size Variants</h3>
+                                    <div class="space-y-4">
+                                        <!-- Small -->
+                                        <div>
+                                            <h4 class="text-sm font-medium mb-2">Small (sm)</h4>
+                                            <x-keys::tabs size="sm" default-value="tab1">
+                                                <x-keys::tabs.tab value="tab1" label="Tab 1" />
+                                                <x-keys::tabs.tab value="tab2" label="Tab 2" />
+                                                <x-keys::tabs.tab value="tab3" label="Tab 3" />
+
+                                                <x-slot name="panels">
+                                                    <x-keys::tabs.panel value="tab1">
+                                                        <div class="p-3 bg-surface border border-border rounded-md text-sm">Small tabs content</div>
+                                                    </x-keys::tabs.panel>
+                                                    <x-keys::tabs.panel value="tab2">
+                                                        <div class="p-3 bg-surface border border-border rounded-md text-sm">Second small tab</div>
+                                                    </x-keys::tabs.panel>
+                                                    <x-keys::tabs.panel value="tab3">
+                                                        <div class="p-3 bg-surface border border-border rounded-md text-sm">Third small tab</div>
+                                                    </x-keys::tabs.panel>
+                                                </x-slot>
+                                            </x-keys::tabs>
+                                        </div>
+
+                                        <!-- Large -->
+                                        <div>
+                                            <h4 class="text-sm font-medium mb-2">Large (lg)</h4>
+                                            <x-keys::tabs size="lg" default-value="large1">
+                                                <x-keys::tabs.tab value="large1" label="Large Tab 1" icon="heroicon-o-star" />
+                                                <x-keys::tabs.tab value="large2" label="Large Tab 2" icon="heroicon-o-heart" />
+
+                                                <x-slot name="panels">
+                                                    <x-keys::tabs.panel value="large1">
+                                                        <div class="p-4 bg-surface border border-border rounded-md">
+                                                            <h4 class="text-lg font-medium mb-2">Large Tab Content</h4>
+                                                            <p class="text-muted">This is a large tab with bigger text and spacing.</p>
+                                                        </div>
+                                                    </x-keys::tabs.panel>
+                                                    <x-keys::tabs.panel value="large2">
+                                                        <div class="p-4 bg-surface border border-border rounded-md">
+                                                            <h4 class="text-lg font-medium mb-2">Second Large Tab</h4>
+                                                            <p class="text-muted">Another large tab with generous spacing.</p>
+                                                        </div>
+                                                    </x-keys::tabs.panel>
+                                                </x-slot>
+                                            </x-keys::tabs>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Disabled Tab -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">With Disabled Tab</h3>
+                                    <x-keys::tabs default-value="available">
+                                        <x-keys::tabs.tab value="available" label="Available" icon="heroicon-o-check-circle" />
+                                        <x-keys::tabs.tab value="disabled" label="Coming Soon" icon="heroicon-o-clock" disabled />
+                                        <x-keys::tabs.tab value="beta" label="Beta" icon="heroicon-o-beaker" />
+
+                                        <x-slot name="panels">
+                                            <x-keys::tabs.panel value="available">
+                                                <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-md">
+                                                    <h4 class="font-medium mb-2 text-green-800 dark:text-green-200">Available Feature</h4>
+                                                    <p class="text-green-600 dark:text-green-300">This feature is fully available and ready to use.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="disabled">
+                                                <div class="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-md">
+                                                    <h4 class="font-medium mb-2">Coming Soon</h4>
+                                                    <p class="text-muted">This feature is not yet available.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+
+                                            <x-keys::tabs.panel value="beta">
+                                                <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
+                                                    <h4 class="font-medium mb-2 text-yellow-800 dark:text-yellow-200">Beta Feature</h4>
+                                                    <p class="text-yellow-600 dark:text-yellow-300">This feature is in beta testing.</p>
+                                                </div>
+                                            </x-keys::tabs.panel>
+                                        </x-slot>
+                                    </x-keys::tabs>
+                                </div>
+
+                                <!-- Feature Highlights -->
+                                <div class="mt-6 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-md">
+                                    <h4 class="text-sm font-medium mb-2">Tabs Features</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-muted">
+                                        <div>
+                                            <strong>Slot-Based Architecture:</strong> Nested tab and panel components using Laravel slots
+                                        </div>
+                                        <div>
+                                            <strong>Icon Support:</strong> Full Heroicon integration with auto icon-only detection
+                                        </div>
+                                        <div>
+                                            <strong>Accessibility First:</strong> ARIA attributes, keyboard navigation, focus management
+                                        </div>
+                                        <div>
+                                            <strong>Multiple Variants:</strong> Default, pills, and underline styling options
+                                        </div>
+                                        <div>
+                                            <strong>Responsive Design:</strong> Horizontal and vertical orientations with size variants
+                                        </div>
+                                        <div>
+                                            <strong>Progressive Enhancement:</strong> Works without JavaScript, enhanced with TypeScript
+                                        </div>
+                                        <div>
+                                            <strong>Keyboard Navigation:</strong> Arrow keys, Home, End, Enter, and Space key support
+                                        </div>
+                                        <div>
+                                            <strong>Dark Mode:</strong> Full support for light/dark theme switching
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Table Component Section -->
+                        <section class="space-y-6">
+                            <div class="bg-surface p-6 rounded-lg border border-border">
+                                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                                    <x-keys::icon name="heroicon-o-table-cells" class="text-brand" />
+                                    Table Component
+                                </h2>
+                                <p class="text-foreground/60 mb-6">
+                                    Data display component with sorting, pagination, striping, hover effects, and responsive design.
+                                </p>
+
+                                <div class="space-y-8">
+                                    <!-- Basic Table -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Basic Table</h3>
+                                        <x-keys::table>
+                                            <x-keys::table.head>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.header>Name</x-keys::table.header>
+                                                    <x-keys::table.header>Email</x-keys::table.header>
+                                                    <x-keys::table.header>Role</x-keys::table.header>
+                                                    <x-keys::table.header align="end">Actions</x-keys::table.header>
+                                                </x-keys::table.row>
+                                            </x-keys::table.head>
+                                            <x-keys::table.body>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.cell variant="strong">John Doe</x-keys::table.cell>
+                                                    <x-keys::table.cell>john@example.com</x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="success">Admin</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell align="end">
+                                                        <x-keys::button size="sm" variant="outline">Edit</x-keys::button>
+                                                    </x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.cell variant="strong">Jane Smith</x-keys::table.cell>
+                                                    <x-keys::table.cell>jane@example.com</x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="blue">Editor</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell align="end">
+                                                        <x-keys::button size="sm" variant="outline">Edit</x-keys::button>
+                                                    </x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.cell variant="strong">Bob Wilson</x-keys::table.cell>
+                                                    <x-keys::table.cell>bob@example.com</x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="neutral">Viewer</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell align="end">
+                                                        <x-keys::button size="sm" variant="outline">Edit</x-keys::button>
+                                                    </x-keys::table.cell>
+                                                </x-keys::table.row>
+                                            </x-keys::table.body>
+                                        </x-keys::table>
+                                    </div>
+
+                                    <!-- Striped and Hover Table -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Striped & Hover Effects</h3>
+                                        <x-keys::table striped hover bordered>
+                                            <x-keys::table.head>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.header>Product</x-keys::table.header>
+                                                    <x-keys::table.header>Category</x-keys::table.header>
+                                                    <x-keys::table.header align="end">Price</x-keys::table.header>
+                                                    <x-keys::table.header align="center">Status</x-keys::table.header>
+                                                </x-keys::table.row>
+                                            </x-keys::table.head>
+                                            <x-keys::table.body>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.cell variant="strong">MacBook Pro</x-keys::table.cell>
+                                                    <x-keys::table.cell variant="muted">Electronics</x-keys::table.cell>
+                                                    <x-keys::table.cell align="end" variant="strong">$2,399</x-keys::table.cell>
+                                                    <x-keys::table.cell align="center">
+                                                        <x-keys::badge color="success">In Stock</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.cell variant="strong">iPhone 15</x-keys::table.cell>
+                                                    <x-keys::table.cell variant="muted">Electronics</x-keys::table.cell>
+                                                    <x-keys::table.cell align="end" variant="strong">$999</x-keys::table.cell>
+                                                    <x-keys::table.cell align="center">
+                                                        <x-keys::badge color="warning">Low Stock</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.cell variant="strong">AirPods Pro</x-keys::table.cell>
+                                                    <x-keys::table.cell variant="muted">Electronics</x-keys::table.cell>
+                                                    <x-keys::table.cell align="end" variant="strong">$249</x-keys::table.cell>
+                                                    <x-keys::table.cell align="center">
+                                                        <x-keys::badge color="danger">Out of Stock</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                </x-keys::table.row>
+                                            </x-keys::table.body>
+                                        </x-keys::table>
+                                    </div>
+
+                                    <!-- Interactive Sortable Table -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Interactive Sortable Headers</h3>
+                                        <x-keys::table hover>
+                                            <x-keys::table.head>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.header sortable sorted direction="asc" sortKey="name">Name</x-keys::table.header>
+                                                    <x-keys::table.header sortable sortKey="date">Date Created</x-keys::table.header>
+                                                    <x-keys::table.header sortable sortKey="size">Size</x-keys::table.header>
+                                                    <x-keys::table.header>Type</x-keys::table.header>
+                                                </x-keys::table.row>
+                                            </x-keys::table.head>
+                                            <x-keys::table.body>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.cell variant="strong">document.pdf</x-keys::table.cell>
+                                                    <x-keys::table.cell variant="muted">Dec 15, 2024</x-keys::table.cell>
+                                                    <x-keys::table.cell>2.4 MB</x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="red">PDF</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.cell variant="strong">image.jpg</x-keys::table.cell>
+                                                    <x-keys::table.cell variant="muted">Dec 14, 2024</x-keys::table.cell>
+                                                    <x-keys::table.cell>856 KB</x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="green">Image</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.cell variant="strong">spreadsheet.xlsx</x-keys::table.cell>
+                                                    <x-keys::table.cell variant="muted">Dec 13, 2024</x-keys::table.cell>
+                                                    <x-keys::table.cell>1.2 MB</x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="blue">Excel</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                </x-keys::table.row>
+                                            </x-keys::table.body>
+                                        </x-keys::table>
+                                        <p class="text-xs text-muted mt-2">
+                                            <strong>Try:</strong> Click the sortable header icons to toggle sort direction
+                                        </p>
+                                    </div>
+
+                                    <!-- Row Selection Table -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Row Selection</h3>
+                                        <x-keys::table hover selectable>
+                                            <x-keys::table.head>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.header selectAll />
+                                                    <x-keys::table.header>User</x-keys::table.header>
+                                                    <x-keys::table.header>Status</x-keys::table.header>
+                                                    <x-keys::table.header>Role</x-keys::table.header>
+                                                </x-keys::table.row>
+                                            </x-keys::table.head>
+                                            <x-keys::table.body>
+                                                <x-keys::table.row selectable rowId="user-1">
+                                                    <x-keys::table.cell>
+                                                        <div class="flex items-center gap-3">
+                                                            <x-keys::avatar name="Alice Johnson" size="sm" color="brand" />
+                                                            <div>
+                                                                <div class="font-medium">Alice Johnson</div>
+                                                                <div class="text-xs text-muted">alice@company.com</div>
+                                                            </div>
+                                                        </div>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="success">Active</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell>Admin</x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row selectable rowId="user-2" selected>
+                                                    <x-keys::table.cell>
+                                                        <div class="flex items-center gap-3">
+                                                            <x-keys::avatar name="Bob Smith" size="sm" color="success" />
+                                                            <div>
+                                                                <div class="font-medium">Bob Smith</div>
+                                                                <div class="text-xs text-muted">bob@company.com</div>
+                                                            </div>
+                                                        </div>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="warning">Pending</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell>Editor</x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row selectable rowId="user-3">
+                                                    <x-keys::table.cell>
+                                                        <div class="flex items-center gap-3">
+                                                            <x-keys::avatar name="Carol Wilson" size="sm" color="purple" />
+                                                            <div>
+                                                                <div class="font-medium">Carol Wilson</div>
+                                                                <div class="text-xs text-muted">carol@company.com</div>
+                                                            </div>
+                                                        </div>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="neutral">Inactive</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell>Viewer</x-keys::table.cell>
+                                                </x-keys::table.row>
+                                            </x-keys::table.body>
+                                        </x-keys::table>
+                                        <p class="text-xs text-muted mt-2">
+                                            <strong>Try:</strong> Use checkboxes to select rows. The "Select All" checkbox supports indeterminate state.
+                                        </p>
+                                    </div>
+
+                                    <!-- Empty State Table -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Empty State</h3>
+                                        <x-keys::table bordered>
+                                            <x-keys::table.head>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.header>Product</x-keys::table.header>
+                                                    <x-keys::table.header>Price</x-keys::table.header>
+                                                    <x-keys::table.header>Stock</x-keys::table.header>
+                                                </x-keys::table.row>
+                                            </x-keys::table.head>
+                                            <x-keys::table.body>
+                                                <x-keys::table.empty-state
+                                                    title="No products found"
+                                                    description="Start by adding your first product to the inventory."
+                                                    icon="heroicon-o-cube"
+                                                    actionText="Add Product"
+                                                    actionUrl="#"
+                                                    variant="brand"
+                                                />
+                                            </x-keys::table.body>
+                                        </x-keys::table>
+                                    </div>
+
+                                    <!-- Loading State Table -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Loading State</h3>
+                                        <x-keys::table bordered>
+                                            <x-keys::table.head>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.header>Order ID</x-keys::table.header>
+                                                    <x-keys::table.header>Customer</x-keys::table.header>
+                                                    <x-keys::table.header>Status</x-keys::table.header>
+                                                    <x-keys::table.header>Total</x-keys::table.header>
+                                                </x-keys::table.row>
+                                            </x-keys::table.head>
+                                            <x-keys::table.body>
+                                                <x-keys::table.loading-state
+                                                    text="Loading orders..."
+                                                    animation="spinner"
+                                                    size="md"
+                                                    colspan="4"
+                                                />
+                                            </x-keys::table.body>
+                                        </x-keys::table>
+                                        <p class="text-xs text-muted mt-2">
+                                            <strong>Usage:</strong> Perfect for async data loading with Livewire integration
+                                        </p>
+                                    </div>
+
+                                    <!-- Clickable Rows -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Clickable Rows</h3>
+                                        <x-keys::table hover>
+                                            <x-keys::table.head>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.header>User</x-keys::table.header>
+                                                    <x-keys::table.header>Status</x-keys::table.header>
+                                                    <x-keys::table.header>Last Active</x-keys::table.header>
+                                                </x-keys::table.row>
+                                            </x-keys::table.head>
+                                            <x-keys::table.body>
+                                                <x-keys::table.row clickable href="/users/1">
+                                                    <x-keys::table.cell>
+                                                        <div class="flex items-center gap-3">
+                                                            <x-keys::avatar name="Alice Johnson" size="sm" color="brand" />
+                                                            <div>
+                                                                <div class="font-medium">Alice Johnson</div>
+                                                                <div class="text-xs text-muted">alice@company.com</div>
+                                                            </div>
+                                                        </div>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="success">Online</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell variant="muted">2 min ago</x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row clickable href="/users/2">
+                                                    <x-keys::table.cell>
+                                                        <div class="flex items-center gap-3">
+                                                            <x-keys::avatar name="Bob Smith" size="sm" color="success" />
+                                                            <div>
+                                                                <div class="font-medium">Bob Smith</div>
+                                                                <div class="text-xs text-muted">bob@company.com</div>
+                                                            </div>
+                                                        </div>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="warning">Away</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell variant="muted">1 hour ago</x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row clickable href="/users/3">
+                                                    <x-keys::table.cell>
+                                                        <div class="flex items-center gap-3">
+                                                            <x-keys::avatar name="Carol Wilson" size="sm" color="purple" />
+                                                            <div>
+                                                                <div class="font-medium">Carol Wilson</div>
+                                                                <div class="text-xs text-muted">carol@company.com</div>
+                                                            </div>
+                                                        </div>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="neutral">Offline</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell variant="muted">2 days ago</x-keys::table.cell>
+                                                </x-keys::table.row>
+                                            </x-keys::table.body>
+                                        </x-keys::table>
+                                    </div>
+
+                                    <!-- Size Variants -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Size Variants</h3>
+                                        <div class="space-y-4">
+                                            <!-- Small -->
+                                            <div>
+                                                <h4 class="text-sm font-medium mb-2">Small (sm)</h4>
+                                                <x-keys::table size="sm" bordered>
+                                                    <x-keys::table.head>
+                                                        <x-keys::table.row>
+                                                            <x-keys::table.header size="sm">Item</x-keys::table.header>
+                                                            <x-keys::table.header size="sm">Quantity</x-keys::table.header>
+                                                            <x-keys::table.header size="sm" align="end">Price</x-keys::table.header>
+                                                        </x-keys::table.row>
+                                                    </x-keys::table.head>
+                                                    <x-keys::table.body>
+                                                        <x-keys::table.row>
+                                                            <x-keys::table.cell size="sm">Coffee</x-keys::table.cell>
+                                                            <x-keys::table.cell size="sm">2</x-keys::table.cell>
+                                                            <x-keys::table.cell size="sm" align="end">$8.00</x-keys::table.cell>
+                                                        </x-keys::table.row>
+                                                        <x-keys::table.row>
+                                                            <x-keys::table.cell size="sm">Pastry</x-keys::table.cell>
+                                                            <x-keys::table.cell size="sm">1</x-keys::table.cell>
+                                                            <x-keys::table.cell size="sm" align="end">$3.50</x-keys::table.cell>
+                                                        </x-keys::table.row>
+                                                    </x-keys::table.body>
+                                                </x-keys::table>
+                                            </div>
+
+                                            <!-- Large -->
+                                            <div>
+                                                <h4 class="text-sm font-medium mb-2">Large (lg)</h4>
+                                                <x-keys::table size="lg" bordered>
+                                                    <x-keys::table.head>
+                                                        <x-keys::table.row>
+                                                            <x-keys::table.header size="lg">Project</x-keys::table.header>
+                                                            <x-keys::table.header size="lg">Description</x-keys::table.header>
+                                                            <x-keys::table.header size="lg" align="center">Status</x-keys::table.header>
+                                                        </x-keys::table.row>
+                                                    </x-keys::table.head>
+                                                    <x-keys::table.body>
+                                                        <x-keys::table.row>
+                                                            <x-keys::table.cell size="lg" variant="strong">Website Redesign</x-keys::table.cell>
+                                                            <x-keys::table.cell size="lg">Complete overhaul of company website with new branding</x-keys::table.cell>
+                                                            <x-keys::table.cell size="lg" align="center">
+                                                                <x-keys::badge color="success">Complete</x-keys::badge>
+                                                            </x-keys::table.cell>
+                                                        </x-keys::table.row>
+                                                        <x-keys::table.row>
+                                                            <x-keys::table.cell size="lg" variant="strong">Mobile App</x-keys::table.cell>
+                                                            <x-keys::table.cell size="lg">Development of iOS and Android applications</x-keys::table.cell>
+                                                            <x-keys::table.cell size="lg" align="center">
+                                                                <x-keys::badge color="warning">In Progress</x-keys::badge>
+                                                            </x-keys::table.cell>
+                                                        </x-keys::table.row>
+                                                    </x-keys::table.body>
+                                                </x-keys::table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Row States -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Row States</h3>
+                                        <x-keys::table hover>
+                                            <x-keys::table.head>
+                                                <x-keys::table.row>
+                                                    <x-keys::table.header>Task</x-keys::table.header>
+                                                    <x-keys::table.header>Priority</x-keys::table.header>
+                                                    <x-keys::table.header>Status</x-keys::table.header>
+                                                </x-keys::table.row>
+                                            </x-keys::table.head>
+                                            <x-keys::table.body>
+                                                <x-keys::table.row selected>
+                                                    <x-keys::table.cell variant="strong">Selected Task</x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="danger">High</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell variant="success">Active</x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row variant="success">
+                                                    <x-keys::table.cell variant="strong">Success Task</x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="success">Low</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell variant="success">Completed</x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row variant="warning">
+                                                    <x-keys::table.cell variant="strong">Warning Task</x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="warning">Medium</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell variant="warning">Needs Attention</x-keys::table.cell>
+                                                </x-keys::table.row>
+                                                <x-keys::table.row variant="danger">
+                                                    <x-keys::table.cell variant="strong">Error Task</x-keys::table.cell>
+                                                    <x-keys::table.cell>
+                                                        <x-keys::badge color="danger">Critical</x-keys::badge>
+                                                    </x-keys::table.cell>
+                                                    <x-keys::table.cell variant="danger">Failed</x-keys::table.cell>
+                                                </x-keys::table.row>
+                                            </x-keys::table.body>
+                                        </x-keys::table>
+                                    </div>
+
+                                    <!-- Feature Highlights -->
+                                    <div class="mt-6 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-md">
+                                        <h4 class="text-sm font-medium mb-2">Table Features</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-muted">
+                                            <div>
+                                                <strong>Nested Architecture:</strong> Table, Head, Body, Row, Cell, Header components
+                                            </div>
+                                            <div>
+                                                <strong>Sortable Headers:</strong> Sort icons with direction indicators and hover states
+                                            </div>
+                                            <div>
+                                                <strong>Row States:</strong> Selected, success, warning, danger variants
+                                            </div>
+                                            <div>
+                                                <strong>Cell Alignment:</strong> Start, center, end alignment options
+                                            </div>
+                                            <div>
+                                                <strong>Size Variants:</strong> Small, medium, large with consistent spacing
+                                            </div>
+                                            <div>
+                                                <strong>Interactive Sorting:</strong> Click headers to toggle sort direction with TypeScript integration
+                                            </div>
+                                            <div>
+                                                <strong>Row Selection:</strong> Checkbox-based selection with "select all" and indeterminate states
+                                            </div>
+                                            <div>
+                                                <strong>Empty States:</strong> Customizable empty state with actions and icons
+                                            </div>
+                                            <div>
+                                                <strong>Loading States:</strong> Built-in loading indicators with animation variants
+                                            </div>
+                                            <div>
+                                                <strong>Interactive Rows:</strong> Clickable rows with href navigation
+                                            </div>
+                                            <div>
+                                                <strong>Visual Effects:</strong> Striped rows, hover effects, bordered tables
+                                            </div>
+                                            <div>
+                                                <strong>Responsive Design:</strong> Overflow handling and flexible layouts
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
 
                 <footer class="text-center mt-8 text-sm text-muted">
-                    <p>This page demonstrates Keys UI Breadcrumbs, Avatar, Badge, Modal, and Toast components.</p>
-                    <p class="mt-1">Components: Breadcrumbs, Avatar/Stack, Badge with auto icon-only detection, Modal with native dialog features, Toast with server-side dispatching.</p>
+                    <p>This page demonstrates Keys UI Breadcrumbs, Avatar, Badge, Modal, Toast, Table, and Tabs components.</p>
+                    <p class="mt-1">Components: Breadcrumbs, Avatar/Stack, Badge with auto icon-only detection, Modal with native dialog features, Toast with server-side dispatching, Table with nested architecture and sortable headers, Tabs with slot-based architecture and keyboard navigation.</p>
                 </footer>
             </div>
         </div>

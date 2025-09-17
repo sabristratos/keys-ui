@@ -36,14 +36,12 @@ export class AlertActions {
 
         this.bindEventListeners();
         this.initialized = true;
-        console.log('AlertActions initialized');
     }
 
     /**
      * Bind event listeners using event delegation
      */
     private bindEventListeners(): void {
-        // Handle dismiss button clicks
         document.addEventListener('click', (event) => {
             const button = (event.target as Element)?.closest('[data-dismiss-alert]') as HTMLButtonElement;
             if (!button) return;
@@ -52,7 +50,6 @@ export class AlertActions {
             this.handleDismissClick(button);
         });
 
-        // Handle keyboard events for accessibility
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' || event.key === ' ') {
                 const button = event.target as HTMLButtonElement;
@@ -86,10 +83,8 @@ export class AlertActions {
      * Dismiss an alert with smooth animation
      */
     public dismissAlert(alert: HTMLElement): void {
-        // Add dismissing class for animation
         alert.classList.add('alert-dismissing');
 
-        // Apply exit animation styles
         alert.style.transition = 'all 0.3s ease-out';
         alert.style.opacity = '0';
         alert.style.transform = 'translateX(100%)';
@@ -98,7 +93,6 @@ export class AlertActions {
         alert.style.margin = '0';
         alert.style.overflow = 'hidden';
 
-        // Remove element after animation completes
         setTimeout(() => {
             if (alert.parentNode) {
                 alert.parentNode.removeChild(alert);
@@ -110,7 +104,6 @@ export class AlertActions {
      * Show an alert programmatically
      */
     public showAlert(alert: HTMLElement): void {
-        // Ensure alert is visible
         alert.style.display = 'block';
         alert.style.opacity = '1';
         alert.style.transform = 'translateX(0)';
@@ -138,7 +131,6 @@ export class AlertActions {
             container = document.body
         } = options;
 
-        // Create alert element
         const alert = document.createElement('div');
         alert.className = this.getAlertClasses(variant);
         alert.setAttribute('role', 'alert');
@@ -147,23 +139,18 @@ export class AlertActions {
             alert.setAttribute('data-dismissible', 'true');
         }
 
-        // Build alert content
         const alertContent = this.buildAlertContent(variant, title, message, dismissible);
         alert.innerHTML = alertContent;
 
-        // Add to container
         container.appendChild(alert);
 
-        // Initialize as hidden for entrance animation
         alert.style.opacity = '0';
         alert.style.transform = 'translateX(100%)';
 
-        // Trigger entrance animation
         setTimeout(() => {
             this.showAlert(alert);
         }, 10);
 
-        // Auto-dismiss if duration is set
         if (duration && duration > 0) {
             setTimeout(() => {
                 this.dismissAlert(alert);
@@ -279,7 +266,6 @@ export class AlertActions {
             bubbles: true
         });
 
-        // Dispatch on both alert and document for flexibility
         alert.dispatchEvent(event);
         document.dispatchEvent(event);
     }
@@ -321,10 +307,7 @@ export class AlertActions {
      */
     public destroy(): void {
         this.initialized = false;
-        // Event delegation handles cleanup automatically
-        console.log('AlertActions destroyed');
     }
 }
 
-// Export default instance
 export default AlertActions.getInstance();

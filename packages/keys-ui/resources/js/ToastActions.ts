@@ -7,6 +7,8 @@ export class ToastActions {
     private toasts: Map<string, HTMLElement> = new Map();
     private containers: Map<string, HTMLElement> = new Map();
     private timers: Map<string, number> = new Map();
+    private pausedTimers: Map<string, { remaining: number, startTime: number }> = new Map();
+    private toastCounter: number = 0;
 
     private constructor() {
         this.initializeGlobalListeners();
@@ -17,6 +19,13 @@ export class ToastActions {
             ToastActions.instance = new ToastActions();
         }
         return ToastActions.instance;
+    }
+
+    /**
+     * Initialize ToastActions and set up global listeners
+     */
+    public init(): void {
+        this.initializeGlobalListeners();
     }
 
     /**
@@ -31,14 +40,17 @@ export class ToastActions {
 
 
     /**
-     * Discover and register all toast elements
+     * Discover and register toast containers
      */
     public discoverToasts(): void {
-        const toastElements = document.querySelectorAll('[data-toast]');
+        const toastContainers = document.querySelectorAll('[data-toast-container]');
 
-        toastElements.forEach((toast) => {
-            if (toast instanceof HTMLElement && toast.id) {
-                this.registerToast(toast.id, toast);
+        toastContainers.forEach((container) => {
+            if (container instanceof HTMLElement) {
+                const position = container.getAttribute('data-toast-container');
+                if (position) {
+                    this.containers.set(position, container);
+                }
             }
         });
     }
@@ -57,32 +69,35 @@ export class ToastActions {
     private setupToastListeners(toast: HTMLElement): void {
         const toastId = toast.id;
 
-        // Handle dismiss button clicks
         toast.addEventListener('click', (event) => {
             const target = event.target as HTMLElement;
 
-            if (target.hasAttribute('data-toast-dismiss')) {
-                const dismissId = target.getAttribute('data-toast-dismiss');
+            const dismissButton = target.closest('[data-toast-dismiss]') as HTMLElement;
+            if (dismissButton) {
+                const dismissId = dismissButton.getAttribute('data-toast-dismiss');
                 if (dismissId) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     this.dismiss(dismissId);
                 }
+                return;
             }
 
-            // Handle action button clicks
-            if (target.hasAttribute('data-toast-action')) {
-                const action = target.getAttribute('data-toast-action');
+            const actionButton = target.closest('[data-toast-action]') as HTMLElement;
+            if (actionButton) {
+                const action = actionButton.getAttribute('data-toast-action');
                 if (action) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     this.dispatchToastEvent('toast:action', toastId, { action });
                 }
             }
         });
 
-        // Pause timer on hover
         toast.addEventListener('mouseenter', () => {
             this.pauseTimer(toastId);
         });
 
-        // Resume timer on mouse leave
         toast.addEventListener('mouseleave', () => {
             this.resumeTimer(toastId);
         });
@@ -93,7 +108,6 @@ export class ToastActions {
      */
     private setupLivewireListeners(): void {
         if (typeof window.Livewire !== 'undefined') {
-            // Listen for global toast control events
             window.Livewire.on('showToast', (data: any) => {
                 const variant = data.variant || 'info';
                 this.show(variant, data);
@@ -103,7 +117,6 @@ export class ToastActions {
                 if (data.id) {
                     this.dismiss(data.id);
                 } else {
-                    // Dismiss all toasts if no specific ID
                     this.dismissAll();
                 }
             });
@@ -115,26 +128,22 @@ export class ToastActions {
      */
     public show(variant: string, data: Record<string, any> = {}): boolean {
         const position = data.position || 'top-right';
-        const toastId = `toast-${variant}-${position}`;
-        const toast = document.getElementById(toastId);
+        const container = this.containers.get(position);
 
-        if (!toast) {
-            console.warn(`Toast element with ID "${toastId}" not found`);
+        if (!container) {
             return false;
         }
 
-        // Update toast content
-        this.updateToastContent(toast, data);
+        const toastId = `toast-${variant}-${position}-${++this.toastCounter}`;
 
-        // Show toast with animation
-        toast.style.display = 'block';
+        const toast = this.createToastElement(toastId, variant, position, data);
 
-        // Trigger animation
+        container.appendChild(toast);
+
         requestAnimationFrame(() => {
             toast.setAttribute('data-toast-visible', 'true');
         });
 
-        // Set up auto-dismiss timer
         const duration = data.duration || 5000;
         const persistent = data.persistent === true;
 
@@ -142,14 +151,102 @@ export class ToastActions {
             this.setTimer(toastId, duration);
         }
 
-        // Register for management
         this.toasts.set(toastId, toast);
         this.setupToastListeners(toast);
 
-        // Dispatch show event
         this.dispatchToastEvent('toast:show', toastId, data);
 
         return true;
+    }
+
+    /**
+     * Create a toast element dynamically
+     */
+    private createToastElement(toastId: string, variant: string, position: string, data: Record<string, any>): HTMLElement {
+        const alertVariant = variant === 'error' ? 'danger' : variant;
+
+        const toastElement = document.createElement('div');
+        toastElement.className = 'pointer-events-auto transform transition-all duration-300 ease-out opacity-0 scale-95 translate-y-2';
+        toastElement.setAttribute('data-toast', 'true');
+        toastElement.setAttribute('data-toast-variant', variant);
+        toastElement.setAttribute('data-toast-position', position);
+        toastElement.setAttribute('data-toast-visible', 'false');
+        toastElement.setAttribute('role', 'alert');
+        toastElement.setAttribute('aria-live', 'polite');
+        toastElement.id = toastId;
+
+        toastElement.innerHTML = `
+            <div class="rounded-lg border p-4 space-y-3 ${this.getVariantClasses(alertVariant)}" role="alert" data-dismissible="true">
+                <div class="flex">
+                    <div class="flex-shrink-0 mt-1">
+                        <svg class="w-5 h-5 ${this.getIconColor(alertVariant)}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            ${this.getIconPath(alertVariant)}
+                        </svg>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <div data-toast-title class="hidden font-medium text-base"></div>
+                        <div data-toast-message class="text-sm opacity-90"></div>
+                        <div class="flex space-x-2 [&:not(:has(.hidden))]:mt-3">
+                            <div data-toast-actions class="hidden"></div>
+                        </div>
+                    </div>
+                    <div class="ml-auto pl-3">
+                        <button type="button" class="inline-flex items-center justify-center rounded-md bg-transparent p-1.5 text-sm font-medium transition-colors hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${this.getIconColor(alertVariant)}" data-toast-dismiss="${toastId}" aria-label="Dismiss">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            <span class="sr-only">Dismiss</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        this.updateToastContent(toastElement, data);
+
+        return toastElement;
+    }
+
+    /**
+     * Get variant classes for alert styling
+     */
+    private getVariantClasses(variant: string): string {
+        const variants = {
+            'info': 'bg-info-100 border-info-200 text-info-foreground',
+            'success': 'bg-success-100 border-success-200 text-success-foreground',
+            'warning': 'bg-warning-100 border-warning-200 text-warning-foreground',
+            'danger': 'bg-danger-100 border-danger-200 text-danger-foreground',
+            'neutral': 'bg-neutral-100 border-neutral-200 text-neutral-foreground'
+        };
+        return variants[variant] || variants.info;
+    }
+
+    /**
+     * Get icon color for variant
+     */
+    private getIconColor(variant: string): string {
+        const colors = {
+            'info': 'text-info',
+            'success': 'text-success',
+            'warning': 'text-warning',
+            'danger': 'text-danger',
+            'neutral': 'text-neutral'
+        };
+        return colors[variant] || colors.info;
+    }
+
+    /**
+     * Get icon SVG path for variant
+     */
+    private getIconPath(variant: string): string {
+        const paths = {
+            'info': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+            'success': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+            'warning': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>',
+            'danger': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+            'neutral': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>'
+        };
+        return paths[variant] || paths.info;
     }
 
     /**
@@ -159,24 +256,23 @@ export class ToastActions {
         const toast = this.toasts.get(id);
 
         if (!toast) {
-            console.warn(`Toast with ID "${id}" not found`);
             return false;
         }
 
-        // Clear timer
         this.clearTimer(id);
+        this.pausedTimers.delete(id);
 
-        // Hide with animation
         toast.setAttribute('data-toast-visible', 'false');
+        toast.setAttribute('data-toast-exiting', 'true');
 
-        // Remove from DOM after animation
         setTimeout(() => {
             if (toast.parentNode) {
                 toast.parentNode.removeChild(toast);
             }
+
+            this.toasts.delete(id);
         }, 300);
 
-        // Dispatch dismiss event
         this.dispatchToastEvent('toast:dismiss', id);
 
         return true;
@@ -216,12 +312,10 @@ export class ToastActions {
      * Update toast content
      */
     private updateToastContent(toast: HTMLElement, data: Record<string, any>): void {
-        // Find title and message elements within the Alert component
         const titleElement = toast.querySelector('[data-toast-title]') as HTMLElement;
         const messageElement = toast.querySelector('[data-toast-message]') as HTMLElement;
         const actionsElement = toast.querySelector('[data-toast-actions]') as HTMLElement;
 
-        // Update title
         if (titleElement && data.title) {
             titleElement.textContent = data.title;
             titleElement.classList.remove('hidden');
@@ -229,18 +323,45 @@ export class ToastActions {
             titleElement.classList.add('hidden');
         }
 
-        // Update message
         if (messageElement && data.message) {
             messageElement.textContent = data.message;
         }
 
-        // Update actions
         if (actionsElement && data.actions) {
             actionsElement.innerHTML = data.actions;
             actionsElement.classList.remove('hidden');
         } else if (actionsElement) {
             actionsElement.classList.add('hidden');
         }
+
+        toast.setAttribute('data-toast-duration', String(data.duration || 5000));
+        toast.setAttribute('data-toast-persistent', String(data.persistent === true));
+    }
+
+    /**
+     * Reset toast content for reuse
+     */
+    private resetToastContent(toast: HTMLElement): void {
+        const titleElement = toast.querySelector('[data-toast-title]') as HTMLElement;
+        const messageElement = toast.querySelector('[data-toast-message]') as HTMLElement;
+        const actionsElement = toast.querySelector('[data-toast-actions]') as HTMLElement;
+
+        if (titleElement) {
+            titleElement.textContent = '';
+            titleElement.classList.add('hidden');
+        }
+
+        if (messageElement) {
+            messageElement.textContent = '';
+        }
+
+        if (actionsElement) {
+            actionsElement.innerHTML = '';
+            actionsElement.classList.add('hidden');
+        }
+
+        toast.removeAttribute('data-toast-duration');
+        toast.removeAttribute('data-toast-persistent');
     }
 
     /**
@@ -248,6 +369,11 @@ export class ToastActions {
      */
     private setTimer(id: string, duration: number): void {
         this.clearTimer(id);
+
+        const toast = this.toasts.get(id);
+        if (toast) {
+            toast.setAttribute('data-toast-start-time', String(Date.now()));
+        }
 
         const timer = window.setTimeout(() => {
             this.dismiss(id);
@@ -271,8 +397,22 @@ export class ToastActions {
      * Pause timer (on hover)
      */
     private pauseTimer(id: string): void {
-        // For now, just clear the timer - would need more complex logic for true pause/resume
-        this.clearTimer(id);
+        const timer = this.timers.get(id);
+        const toast = this.toasts.get(id);
+
+        if (timer && toast) {
+            const duration = parseInt(toast.getAttribute('data-toast-duration') || '5000');
+            const startTime = parseInt(toast.getAttribute('data-toast-start-time') || '0');
+            const elapsed = Date.now() - startTime;
+            const remaining = Math.max(0, duration - elapsed);
+
+            this.pausedTimers.set(id, {
+                remaining: remaining,
+                startTime: Date.now()
+            });
+
+            this.clearTimer(id);
+        }
     }
 
     /**
@@ -280,13 +420,21 @@ export class ToastActions {
      */
     private resumeTimer(id: string): void {
         const toast = this.toasts.get(id);
+        const pausedInfo = this.pausedTimers.get(id);
+
         if (toast) {
-            const duration = parseInt(toast.getAttribute('data-toast-duration') || '5000');
             const persistent = toast.getAttribute('data-toast-persistent') === 'true';
 
-            if (!persistent && duration > 0) {
-                // Resume with remaining time (simplified - just restart full duration)
-                this.setTimer(id, duration);
+            if (!persistent) {
+                if (pausedInfo && pausedInfo.remaining > 0) {
+                    this.setTimer(id, pausedInfo.remaining);
+                    this.pausedTimers.delete(id);
+                } else {
+                    const duration = parseInt(toast.getAttribute('data-toast-duration') || '5000');
+                    if (duration > 0) {
+                        this.setTimer(id, duration);
+                    }
+                }
             }
         }
     }
@@ -295,19 +443,16 @@ export class ToastActions {
      * Dispatch custom toast events
      */
     private dispatchToastEvent(eventName: string, toastId: string, data: Record<string, any> = {}): void {
-        // Dispatch DOM event
         const event = new CustomEvent(eventName, {
             detail: { id: toastId, toast: toastId, ...data }
         });
         document.dispatchEvent(event);
 
-        // Dispatch to specific toast element
         const toast = this.toasts.get(toastId);
         if (toast) {
             toast.dispatchEvent(event);
         }
 
-        // Dispatch Livewire event if available
         if (typeof window.Livewire !== 'undefined') {
             const livewireEventName = eventName.replace('toast:', 'toast');
             window.Livewire.dispatch(livewireEventName, { id: toastId, toast: toastId, ...data });
@@ -335,26 +480,31 @@ export class ToastActions {
      * Destroy ToastActions and clean up
      */
     public destroy(): void {
-        this.toasts.clear();
         this.timers.forEach(timer => clearTimeout(timer));
         this.timers.clear();
 
-        console.log('ToastActions destroyed');
+        this.pausedTimers.clear();
+
+        this.toasts.forEach((toast) => {
+            this.resetToastContent(toast);
+            toast.style.display = 'none';
+            toast.setAttribute('data-toast-visible', 'false');
+        });
+
+        this.toasts.clear();
+        this.containers.clear();
+
     }
 }
 
-// Global instance for direct access
 export const toastActions = ToastActions.getInstance();
 
-// Auto-initialize when script loads
 if (typeof window !== 'undefined') {
     toastActions.discoverToasts();
 
-    // Make available globally for debugging
     (window as any).ToastActions = ToastActions;
 }
 
-// Type declarations for Livewire integration
 declare global {
     interface Window {
         Livewire?: {

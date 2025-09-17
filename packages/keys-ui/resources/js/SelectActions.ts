@@ -52,7 +52,7 @@ export class SelectActions {
         this.bindEventListeners();
         this.initializeSelects();
         this.initialized = true;
-        console.log('SelectActions initialized');
+
     }
 
     /**
@@ -73,7 +73,6 @@ export class SelectActions {
 
         let selectedValues: string[] = [];
 
-        // Parse initial value from data-value attribute
         if (initialValue) {
             try {
                 selectedValues = isMultiple ? JSON.parse(initialValue) : [initialValue];
@@ -100,9 +99,7 @@ export class SelectActions {
      * Bind global event listeners using event delegation
      */
     private bindEventListeners(): void {
-        // Handle clicks with proper event order
         document.addEventListener('click', (event) => {
-            // Handle chip removal FIRST (highest priority)
             const chipRemove = (event.target as Element)?.closest('[data-remove-chip]') as HTMLElement;
             if (chipRemove) {
                 event.preventDefault();
@@ -111,13 +108,12 @@ export class SelectActions {
                 const chipValue = chipRemove.dataset.removeChip;
                 const select = chipRemove.closest('[data-select="true"]') as HTMLElement;
                 if (select && chipValue) {
-                    console.log('Chip remove clicked:', chipValue);
+
                     this.removeChip(select, chipValue);
                 }
                 return;
             }
 
-            // Handle clear button SECOND
             const clearButton = (event.target as Element)?.closest('[data-select-clear]') as HTMLElement;
             if (clearButton) {
                 event.preventDefault();
@@ -129,7 +125,6 @@ export class SelectActions {
                 return;
             }
 
-            // Handle option clicks THIRD
             const option = (event.target as Element)?.closest('[data-select-option]') as HTMLElement;
             if (option) {
                 event.preventDefault();
@@ -141,7 +136,6 @@ export class SelectActions {
                 return;
             }
 
-            // Handle trigger clicks FOURTH (lowest priority)
             const trigger = (event.target as Element)?.closest('[data-select-trigger]') as HTMLElement;
             if (trigger) {
                 event.preventDefault();
@@ -153,25 +147,21 @@ export class SelectActions {
                 return;
             }
 
-            // Handle search input clicks - prevent dropdown close
             const searchInput = (event.target as Element)?.closest('[data-select-search]') as HTMLElement;
             if (searchInput) {
                 event.stopPropagation();
                 return; // Don't close dropdown when clicking search input
             }
 
-            // Handle clicks within search input container
             const searchContainer = (event.target as Element)?.closest('[data-select-search]')?.parentElement;
             if (searchContainer && searchContainer.querySelector('[data-select-search]')) {
                 event.stopPropagation();
                 return; // Don't close dropdown when clicking search container
             }
 
-            // Click outside to close dropdowns
             this.closeAllDropdowns();
         });
 
-        // Handle search input
         document.addEventListener('input', (event) => {
             const searchInput = event.target as HTMLInputElement;
             if (searchInput?.matches('[data-select-search]')) {
@@ -182,7 +172,6 @@ export class SelectActions {
             }
         });
 
-        // Handle keyboard navigation
         document.addEventListener('keydown', (event) => {
             const select = (event.target as Element)?.closest('[data-select="true"]') as HTMLElement;
             if (select) {
@@ -190,21 +179,17 @@ export class SelectActions {
             }
         });
 
-        // Handle focus events
         document.addEventListener('focusin', (event) => {
             const select = (event.target as Element)?.closest('[data-select="true"]') as HTMLElement;
             if (select && !this.isOpen(select)) {
-                // Focus moved into select, but dropdown is closed - do nothing special
             }
         });
 
-        // Handle window resize
         window.addEventListener('resize', () => {
             this.repositionDropdowns();
         });
 
 
-        // Initialize selects when DOM changes
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
@@ -248,7 +233,6 @@ export class SelectActions {
         const state = this.selectStates.get(select);
         if (!state || this.isDisabled(select)) return;
 
-        // Close other dropdowns first
         this.closeAllDropdowns();
 
         state.isOpen = true;
@@ -271,15 +255,12 @@ export class SelectActions {
             }
         }
 
-        // Focus search input if available
         if (searchInput && select.dataset.searchable === 'true') {
             setTimeout(() => searchInput.focus(), 10);
         }
 
-        // Update filtered options
         this.updateFilteredOptions(select);
 
-        // Dispatch custom event
         this.dispatchSelectEvent(select, 'select:open');
     }
 
@@ -315,10 +296,8 @@ export class SelectActions {
             searchInput.value = '';
         }
 
-        // Clear search and show all options
         this.handleSearch(select, '');
 
-        // Dispatch custom event
         this.dispatchSelectEvent(select, 'select:close');
     }
 
@@ -347,7 +326,6 @@ export class SelectActions {
         const isMultiple = select.dataset.multiple === 'true';
 
         if (isMultiple) {
-            // Toggle selection in multiple mode
             const index = state.selectedValues.indexOf(optionValue);
             if (index > -1) {
                 state.selectedValues.splice(index, 1);
@@ -355,7 +333,6 @@ export class SelectActions {
                 state.selectedValues.push(optionValue);
             }
         } else {
-            // Replace selection in single mode
             state.selectedValues = [optionValue];
             this.closeDropdown(select);
         }
@@ -365,7 +342,6 @@ export class SelectActions {
         this.updateHiddenInputs(select);
         this.updateOptionsSelectedState(select);
 
-        // Dispatch custom event
         this.dispatchSelectEvent(select, 'select:change', {
             value: isMultiple ? state.selectedValues : optionValue,
             selectedValues: state.selectedValues
@@ -387,7 +363,6 @@ export class SelectActions {
             this.updateHiddenInputs(select);
             this.updateOptionsSelectedState(select);
 
-            // Dispatch custom event
             this.dispatchSelectEvent(select, 'select:change', {
                 value: state.selectedValues,
                 selectedValues: state.selectedValues
@@ -409,7 +384,6 @@ export class SelectActions {
         this.updateHiddenInputs(select);
         this.updateOptionsSelectedState(select);
 
-        // Dispatch custom event
         this.dispatchSelectEvent(select, 'select:change', {
             value: select.dataset.multiple === 'true' ? [] : '',
             selectedValues: []
@@ -475,7 +449,6 @@ export class SelectActions {
             }
         });
 
-        // Show/hide no results message
         if (noResultsElement) {
             if (visibleCount === 0 && state.searchTerm) {
                 noResultsElement.classList.remove('hidden');
@@ -551,7 +524,6 @@ export class SelectActions {
         const optionCount = state.filteredOptions.length;
         if (optionCount === 0) return;
 
-        // Update focused index
         if (state.focusedIndex === -1) {
             state.focusedIndex = direction > 0 ? 0 : optionCount - 1;
         } else {
@@ -612,22 +584,18 @@ export class SelectActions {
         const chipsContainer = select.querySelector('[data-select-chips]') as HTMLElement;
         if (!chipsContainer) return;
 
-        // Clear existing chips
         chipsContainer.innerHTML = '';
 
         if (state.selectedValues.length === 0) {
-            // Show placeholder
             const placeholderText = select.dataset.placeholder || 'Select options...';
             chipsContainer.innerHTML = `<span class="text-neutral-500 select-placeholder">${placeholderText}</span>`;
         } else {
-            // Create Badge button chips for selected values
             state.selectedValues.forEach(value => {
                 const option = this.findOptionByValue(select, value);
                 const label = option ? option.displayLabel : value;
                 const isClearable = select.dataset.clearable === 'true' && !this.isDisabled(select);
                 const chipId = `select-chip-${this.generateChipId(value)}`;
 
-                // Create chip button element with semantic styling
                 const chip = document.createElement('button');
                 chip.type = 'button';
                 chip.className = 'inline-flex items-center gap-1 font-medium cursor-pointer transition-colors px-1.5 py-0.5 text-xs rounded-sm';
@@ -642,7 +610,6 @@ export class SelectActions {
                 chip.setAttribute('aria-label', 'Remove badge');
                 chip.id = chipId;
 
-                // Add hover styles
                 chip.addEventListener('mouseenter', () => {
                     chip.style.backgroundColor = 'var(--color-brand-100)';
                 });
@@ -655,7 +622,6 @@ export class SelectActions {
                 chip.appendChild(chipContent);
 
                 if (isClearable) {
-                    // Add simple text-based dismiss symbol
                     const dismissText = document.createElement('span');
                     dismissText.className = 'text-brand-600 hover:text-brand-700 ml-1 flex-shrink-0 font-bold leading-none';
                     dismissText.textContent = '×';
@@ -707,11 +673,9 @@ export class SelectActions {
         const name = select.dataset.name;
         if (!name) return;
 
-        // Remove existing hidden inputs
         const existingInputs = select.querySelectorAll('.select-hidden-input');
         existingInputs.forEach(input => input.remove());
 
-        // Create new hidden inputs
         if (isMultiple) {
             state.selectedValues.forEach(value => {
                 const input = document.createElement('input');
@@ -746,7 +710,6 @@ export class SelectActions {
 
             option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
 
-            // Update visual state
             if (isSelected) {
                 option.classList.add('bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/20', 'dark:text-brand-300');
                 const checkmark = option.querySelector('.text-brand-600');
@@ -785,7 +748,6 @@ export class SelectActions {
         return Array.from(optionElements).map(element => {
             const optionEl = element as HTMLElement;
 
-            // Get display label - use explicit display-label or fall back to full text content
             const displayLabel = optionEl.dataset.displayLabel || optionEl.textContent?.trim() || '';
 
             return {
@@ -821,19 +783,16 @@ export class SelectActions {
         const viewportHeight = window.innerHeight;
         const viewportWidth = window.innerWidth;
 
-        // Use relative positioning
         const spaceBelow = viewportHeight - rect.bottom;
         const spaceAbove = rect.top;
         const dropdownHeight = dropdownRect.height || 240;
 
         if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
-            // Open upward
             dropdown.style.bottom = '100%';
             dropdown.style.top = 'auto';
             dropdown.style.marginBottom = '4px';
             dropdown.style.marginTop = '0';
         } else {
-            // Open downward (default)
             dropdown.style.top = '100%';
             dropdown.style.bottom = 'auto';
             dropdown.style.marginTop = '4px';
@@ -923,9 +882,8 @@ export class SelectActions {
     public destroy(): void {
         this.selectStates.clear();
         this.initialized = false;
-        console.log('SelectActions destroyed');
+
     }
 }
 
-// Export default instance
 export default SelectActions.getInstance();

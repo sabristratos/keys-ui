@@ -12,24 +12,24 @@ class Stack extends Component
         public string $spacing = 'default',
         public string $direction = 'ltr'
     ) {
-        // Validate max (minimum 1, maximum 10 for reasonable UI)
+
         if ($this->max < 1) {
             $this->max = 1;
         } elseif ($this->max > 10) {
             $this->max = 10;
         }
 
-        // Validate size
+
         if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
             $this->size = 'md';
         }
 
-        // Validate spacing
+
         if (!in_array($this->spacing, ['tight', 'default', 'loose'])) {
             $this->spacing = 'default';
         }
 
-        // Validate direction
+
         if (!in_array($this->direction, ['ltr', 'rtl'])) {
             $this->direction = 'ltr';
         }

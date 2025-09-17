@@ -32,9 +32,20 @@ use Keys\UI\Components\Modal;
 use Keys\UI\Components\Radio;
 use Keys\UI\Components\Select;
 use Keys\UI\Components\Select\Option;
+use Keys\UI\Components\Tabs;
+use Keys\UI\Components\Tabs\Tab;
+use Keys\UI\Components\Tabs\Panel;
 use Keys\UI\Components\Textarea;
 use Keys\UI\Components\Toast;
 use Keys\UI\Components\Toggle;
+use Keys\UI\Components\Table;
+use Keys\UI\Components\Table\Head;
+use Keys\UI\Components\Table\Body;
+use Keys\UI\Components\Table\Row;
+use Keys\UI\Components\Table\Cell;
+use Keys\UI\Components\Table\Header;
+use Keys\UI\Components\Table\EmptyState as TableEmpty;
+use Keys\UI\Components\Table\Loading as TableLoading;
 use Keys\UI\Services\AssetManager;
 use Keys\UI\Services\KeysManager;
 use Keys\UI\Services\ModalManager;
@@ -52,22 +63,18 @@ class KeysUiServiceProvider extends ServiceProvider
             'keys-ui'
         );
 
-        // Register the AssetManager service
         $this->app->singleton(AssetManager::class, function ($app) {
             return new AssetManager();
         });
 
-        // Register the ModalManager service
         $this->app->singleton(ModalManager::class, function ($app) {
             return new ModalManager();
         });
 
-        // Register the ToastManager service
         $this->app->singleton(ToastManager::class, function ($app) {
             return new ToastManager();
         });
 
-        // Register the unified KeysManager service
         $this->app->singleton(KeysManager::class, function ($app) {
             return new KeysManager();
         });
@@ -117,6 +124,9 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::alert', Alert::class);
         Blade::component('keys::select', Select::class);
         Blade::component('keys::select.option', Option::class);
+        Blade::component('keys::tabs', Tabs::class);
+        Blade::component('keys::tabs.tab', Tab::class);
+        Blade::component('keys::tabs.panel', Panel::class);
         Blade::component('keys::toggle', Toggle::class);
         Blade::component('keys::avatar', Avatar::class);
         Blade::component('keys::avatar.stack', Stack::class);
@@ -132,11 +142,17 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::menu.radio', MenuRadio::class);
         Blade::component('keys::menu.separator', MenuSeparator::class);
         Blade::component('keys::menu.submenu', MenuSubmenu::class);
+        Blade::component('keys::table', Table::class);
+        Blade::component('keys::table.head', Head::class);
+        Blade::component('keys::table.body', Body::class);
+        Blade::component('keys::table.row', Row::class);
+        Blade::component('keys::table.cell', Cell::class);
+        Blade::component('keys::table.header', Header::class);
+        Blade::component('keys::table.empty-state', TableEmpty::class);
+        Blade::component('keys::table.loading-state', TableLoading::class);
 
-        // Register the Keys facade alias
         $this->app->alias(KeysManager::class, 'keys');
 
-        // Register asset injection directives
         $this->registerAssetDirectives();
     }
 
@@ -145,22 +161,18 @@ class KeysUiServiceProvider extends ServiceProvider
      */
     protected function registerAssetDirectives(): void
     {
-        // @keysAssets() - Inject both CSS and JS assets
         Blade::directive('keysAssets', function () {
             return "<?php echo app('Keys\\UI\\Services\\AssetManager')->renderAssets(); ?>";
         });
 
-        // @keysStyles() - Inject only CSS assets
         Blade::directive('keysStyles', function () {
             return "<?php echo app('Keys\\UI\\Services\\AssetManager')->renderStyles(); ?>";
         });
 
-        // @keysScripts() - Inject only JS assets
         Blade::directive('keysScripts', function () {
             return "<?php echo app('Keys\\UI\\Services\\AssetManager')->renderScripts(); ?>";
         });
 
-        // @keysTranslations() - Inject translations for JavaScript
         Blade::directive('keysTranslations', function () {
             return "<?php echo app('Keys\\UI\\Services\\AssetManager')->renderTranslations(); ?>";
         });

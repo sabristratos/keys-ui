@@ -1,4 +1,4 @@
-{{-- Select Component Styles --}}
+
 <style>
 [data-select="true"] [data-select-dropdown] {
     z-index: 50;
@@ -101,7 +101,7 @@
 }
 </style>
 
-{{-- Hidden inputs for form submission --}}
+
 @if($multiple)
     @foreach($getSelectedValues() as $selectedValue)
         <input type="hidden" name="{{ $name }}[]" value="{{ $selectedValue }}" class="select-hidden-input">
@@ -110,7 +110,7 @@
     <input type="hidden" name="{{ $name }}" value="{{ is_array($value) ? '' : $value }}" class="select-hidden-input">
 @endif
 
-{{-- Select trigger --}}
+
 <div
     role="button"
     tabindex="0"
@@ -123,15 +123,15 @@
 >
     <div class="flex items-center justify-between">
         <div class="flex items-center flex-1 min-w-0">
-            {{-- Selected value display --}}
+            
             <div class="select-display flex justify-start flex-1">
                 @if($multiple)
-                    {{-- Multiple selection chips - managed by JavaScript --}}
+                    
                     <div class="flex flex-wrap gap-1" data-select-chips>
                         <span class="text-neutral-500 select-placeholder">{{ $placeholder ?? 'Select options...' }}</span>
                     </div>
                 @else
-                    {{-- Single selection display --}}
+                    
                     <span class="select-value truncate">
                         @if($value)
                             {{ $value }}
@@ -143,7 +143,7 @@
             </div>
         </div>
 
-        {{-- Dropdown arrow and clear button --}}
+        
         <div class="flex items-center gap-1 ml-2">
             @if($clearable && !empty($getSelectedValues()) && !$disabled)
                 <button type="button" class="p-1 hover:text-danger-500" data-select-clear>
@@ -159,9 +159,9 @@
     </div>
 </div>
 
-{{-- Dropdown panel --}}
+
 <div class="{{ $computedDropdownClasses }} hidden p-2" data-select-dropdown>
-    {{-- Search input --}}
+    
     @if($searchable)
         <div class="mb-2">
             <x-keys::input
@@ -174,12 +174,12 @@
         </div>
     @endif
 
-    {{-- Options container --}}
+    
     <div class="max-h-48 overflow-y-auto overflow-x-hidden" data-select-options>
         {{ $slot }}
     </div>
 
-    {{-- No results message --}}
+    
     <div class="px-3 py-2 text-sm text-neutral-500 text-left hidden" data-select-no-results>
         No options found
     </div>

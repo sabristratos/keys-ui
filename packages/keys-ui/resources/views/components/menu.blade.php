@@ -1,4 +1,4 @@
-{{-- Menu Container --}}
+
 <div
     class="{{ $computedMenuClasses }}"
     id="{{ $id }}"

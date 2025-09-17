@@ -18,23 +18,20 @@ class Select extends Component
         public string $size = 'md',
         public bool $disabled = false,
         public bool $required = false,
-        // Shorthand mode props
         public ?string $label = null,
         public bool $optional = false,
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
-        // State
         public bool $hasError = false
     ) {
-        // Auto-generate ID if not provided but name is available
+
         $this->id = $this->id ?? $this->name;
 
-        // Ensure value is array for multiple selects
         if ($this->multiple && !is_array($this->value)) {
             $this->value = $this->value ? [$this->value] : [];
         }
 
-        // Auto-set hasError if errors are provided
+
         if (!$this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }

@@ -1,4 +1,4 @@
-{{-- Menu Radio Component --}}
+
 <label {{ $attributes->merge($computedLabelAttributes)->merge($computedDataAttributes) }}>
     @if($hasIcon())
         <x-keys::icon :name="$icon" :size="$iconSize()" class="{{ $computedIconClasses }}" />

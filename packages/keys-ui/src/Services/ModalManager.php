@@ -120,7 +120,6 @@ class ModalInstance
         $this->data = array_merge($this->data, $data);
         $this->isOpen = true;
 
-        // Dispatch Livewire event to show modal
         $this->dispatchEvent('openModal', [
             'id' => $this->id,
             'modal' => $this->id,
@@ -138,7 +137,6 @@ class ModalInstance
     {
         $this->isOpen = false;
 
-        // Dispatch Livewire event to close modal
         $this->dispatchEvent('closeModal', [
             'id' => $this->id,
             'modal' => $this->id,
@@ -298,8 +296,6 @@ class ModalInstance
      */
     private function dispatchEvent(string $event, array $data): void
     {
-        // In a real Livewire context, this would dispatch to the current component
-        // For now, we'll store the event data for JavaScript to pick up
         if (function_exists('dispatch')) {
             dispatch($event, $data);
         }

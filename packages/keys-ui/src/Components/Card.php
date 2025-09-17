@@ -76,7 +76,6 @@ class Card extends Component
 
     public function shadowClasses(): string
     {
-        // Only elevated variant gets shadows by default
         if ($this->variant === 'elevated') {
             $baseShadow = match ($this->shadow) {
                 'none' => '',
@@ -91,7 +90,6 @@ class Card extends Component
             return $this->shadow === 'none' ? '' : ($baseShadow ?: 'shadow-sm');
         }
 
-        // Other variants only get shadows if explicitly set (not 'none')
         if ($this->shadow !== 'none' && $this->shadow !== 'sm') {
             return match ($this->shadow) {
                 'xs' => 'shadow-xs',

@@ -3,7 +3,7 @@
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:model');
 @endphp
 
-{{-- Make label be the wrapper for full clickability --}}
+
 <label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $combinedClasses()]) }}>
     @if($showInput)
         <input
@@ -19,7 +19,7 @@
             {{ $checkboxAttributes }}
         />
     @else
-        {{-- Hidden input for form submission when showInput is false --}}
+        
         <input
             type="checkbox"
             id="{{ $id }}"
@@ -39,7 +39,7 @@
             <div class="flex items-start justify-between">
                 <div class="flex-1 min-w-0">
                     @if($isCard())
-                        {{-- Card variant content layout --}}
+                        
                         @if($icon)
                             <div class="flex items-center gap-2 mb-1">
                                 <x-keys::icon :name="$icon" :size="$iconSize()" class="shrink-0" />
@@ -65,7 +65,7 @@
                             <p class="text-sm text-muted">{{ $description }}</p>
                         @endif
                     @else
-                        {{-- Standard, bordered, and colored variants content --}}
+                        
                         @if($label)
                             <span class="{{ $labelClasses() }}">
                                 {{ $label }}

@@ -13,7 +13,7 @@ class Item extends Component
         public bool $truncate = false,
         public ?string $maxWidth = null
     ) {
-        // Validate separator
+
         if (!in_array($this->separator, ['chevron', 'slash', 'none'])) {
             $this->separator = 'chevron';
         }
@@ -43,12 +43,10 @@ class Item extends Component
     {
         $base = 'inline-flex items-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 rounded-sm min-w-0 whitespace-nowrap';
 
-        // Add truncation if enabled
         if ($this->truncate) {
             $base .= ' max-w-32 sm:max-w-48 md:max-w-64';
         }
 
-        // Add custom max-width if provided
         if ($this->maxWidth) {
             $base .= ' ' . $this->maxWidth;
         }

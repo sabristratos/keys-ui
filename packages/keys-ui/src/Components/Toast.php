@@ -9,7 +9,6 @@ class Toast extends Component
     public function __construct(
         public string $position = 'top-right'
     ) {
-        // Validate position
         if (!in_array($this->position, ['top-left', 'top-right', 'top-center', 'bottom-left', 'bottom-right', 'bottom-center'])) {
             $this->position = 'top-right';
         }
@@ -37,35 +36,11 @@ class Toast extends Component
         return 'pointer-events-auto transform transition-all duration-300 ease-out opacity-0 scale-95 translate-y-2';
     }
 
-    public function getToastData(string $variant): array
-    {
-        return [
-            'data-toast' => 'true',
-            'data-toast-variant' => $variant,
-            'data-toast-position' => $this->position,
-            'data-toast-visible' => 'false',
-            'style' => 'display: none;',
-            'aria-live' => 'polite',
-            'role' => 'alert'
-        ];
-    }
-
-    public function getAnimationClasses(string $position): string
-    {
-        // Position-specific animation classes
-        return match ($position) {
-            'top-left', 'top-right', 'top-center' => 'data-[toast-visible=true]:translate-y-0 data-[toast-visible=true]:opacity-100 data-[toast-visible=true]:scale-100',
-            'bottom-left', 'bottom-right', 'bottom-center' => 'translate-y-2 data-[toast-visible=true]:translate-y-0 data-[toast-visible=true]:opacity-100 data-[toast-visible=true]:scale-100',
-            default => 'data-[toast-visible=true]:translate-y-0 data-[toast-visible=true]:opacity-100 data-[toast-visible=true]:scale-100'
-        };
-    }
-
     public function render()
     {
         return view('keys::components.toast', [
             'computedContainerClasses' => $this->containerClasses(),
             'computedToastClasses' => $this->toastClasses(),
-            'computedAnimationClasses' => $this->getAnimationClasses($this->position),
         ]);
     }
 }

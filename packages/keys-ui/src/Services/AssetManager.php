@@ -38,10 +38,8 @@ class AssetManager
         $html = '';
 
         if ($this->isDevelopmentMode() && $this->isViteDevServerRunning()) {
-            // Development mode with Vite dev server
             $html .= $this->renderViteDevStyles();
         } else {
-            // Production mode or fallback
             $html .= $this->renderProductionStyles();
         }
 
@@ -60,10 +58,8 @@ class AssetManager
         $html = '';
 
         if ($this->isDevelopmentMode() && $this->isViteDevServerRunning()) {
-            // Development mode with Vite dev server
             $html .= $this->renderViteDevScripts();
         } else {
-            // Production mode or fallback
             $html .= $this->renderProductionScripts();
         }
 
@@ -134,7 +130,11 @@ class AssetManager
     {
         $devServerUrl = $this->config['vite']['dev_server_url'] ?? 'http://localhost:5173';
         $html = '<script type="module" src="' . $devServerUrl . '/@vite/client"></script>' . "\n";
-        $html .= '<script type="module" src="' . $devServerUrl . '/packages/keys-ui/resources/js/index.ts"></script>';
+        $html .= '<script type="module" src="' . $devServerUrl . '/packages/keys-ui/resources/js/index.ts"></script>' . "\n";
+        $html .= '<script type="module">' . "\n";
+        $html .= 'import { initializeKeysUI } from "' . $devServerUrl . '/packages/keys-ui/resources/js/index.ts";' . "\n";
+        $html .= 'document.addEventListener("DOMContentLoaded", initializeKeysUI);' . "\n";
+        $html .= '</script>';
         return $html;
     }
 
@@ -163,7 +163,15 @@ class AssetManager
         }
 
         $url = $this->shouldUseVersioning() ? $this->addVersionHash($jsPath) : $jsPath;
-        return '<script src="' . asset($url) . '" defer></script>';
+        $html = '<script src="' . asset($url) . '" defer></script>' . "\n";
+        $html .= '<script defer>' . "\n";
+        $html .= 'document.addEventListener("DOMContentLoaded", function() {' . "\n";
+        $html .= '  if (typeof KeysUI !== "undefined" && KeysUI.init) {' . "\n";
+        $html .= '    KeysUI.init();' . "\n";
+        $html .= '  }' . "\n";
+        $html .= '});' . "\n";
+        $html .= '</script>';
+        return $html;
     }
 
     /**
@@ -171,7 +179,6 @@ class AssetManager
      */
     protected function getAssetPath(string $type): ?string
     {
-        // Try to get from Vite manifest first
         $manifestPath = public_path($this->config['vite']['manifest_path'] ?? 'build/manifest.json');
 
         if (File::exists($manifestPath)) {
@@ -185,7 +192,6 @@ class AssetManager
             }
         }
 
-        // Fallback to configured paths
         $publicPath = $this->config['paths']['public_path'] ?? 'vendor/keys-ui';
         $fileName = $this->config['paths'][$type] ?? ($type === 'css' ? 'css/keys-ui.css' : 'js/keys-ui.js');
 

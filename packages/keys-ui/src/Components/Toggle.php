@@ -14,44 +14,33 @@ class Toggle extends Component
         public bool $checked = false,
         public bool $disabled = false,
         public bool $required = false,
-        // Styling
         public string $color = 'brand',
         public string $size = 'md',
-        // Content
         public ?string $label = null,
         public ?string $description = null,
-        // Layout
         public string $labelPosition = 'right',
-        // Validation
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
-        // Actions
         public array $actions = [],
         public string $actionVariant = 'ghost',
         public string $actionSize = 'xs',
-        // State
         public bool $hasError = false
     ) {
-        // Auto-generate ID if not provided
         $this->id = $this->id ?? ($this->name ? $this->name . '-toggle-' . uniqid() : 'toggle-' . uniqid());
 
-        // Auto-set hasError if errors are provided
         if (!$this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
 
-        // Validate color - support both semantic and specific colors
         $validColors = ['brand', 'success', 'warning', 'danger', 'neutral', 'red', 'green', 'purple', 'yellow', 'teal', 'orange'];
         if (!in_array($this->color, $validColors)) {
             $this->color = 'brand';
         }
 
-        // Validate size
         if (!in_array($this->size, ['sm', 'md', 'lg'])) {
             $this->size = 'md';
         }
 
-        // Validate label position
         if (!in_array($this->labelPosition, ['left', 'right'])) {
             $this->labelPosition = 'right';
         }
@@ -92,7 +81,6 @@ class Toggle extends Component
 
     public function trackClasses(): string
     {
-        // Base track styling
         $sizeClasses = match ($this->size) {
             'sm' => 'w-9 h-5',
             'md' => 'w-11 h-6',
@@ -102,16 +90,12 @@ class Toggle extends Component
 
         $baseClasses = "relative {$sizeClasses} bg-neutral-200 rounded-full peer dark:bg-neutral-700 transition-all duration-200";
 
-        // Focus ring classes
         $focusClasses = $this->getFocusClasses();
 
-        // Checked state classes
         $checkedClasses = $this->getCheckedClasses();
 
-        // Thumb classes (after pseudo-element)
         $thumbClasses = $this->getThumbClasses();
 
-        // Disabled state
         $disabledClasses = $this->disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
 
         return trim("{$baseClasses} {$focusClasses} {$checkedClasses} {$thumbClasses} {$disabledClasses}");
@@ -159,7 +143,6 @@ class Toggle extends Component
 
     public function getThumbClasses(): string
     {
-        // Thumb size based on toggle size
         $thumbSize = match ($this->size) {
             'sm' => 'after:h-4 after:w-4',
             'md' => 'after:h-5 after:w-5',
@@ -167,16 +150,13 @@ class Toggle extends Component
             default => 'after:h-5 after:w-5'
         };
 
-        // Calculate translate distance based on size
-        // Formula: container_width - thumb_width - left_padding - right_padding = travel_distance
         $translateDistance = match ($this->size) {
-            'sm' => 'peer-checked:after:translate-x-4',       // 36px - 16px - 2px - 2px = 16px
-            'md' => 'peer-checked:after:translate-x-5',       // 44px - 20px - 2px - 2px = 20px
-            'lg' => 'peer-checked:after:translate-x-7',       // 56px - 24px - 2px - 2px = 28px
+            'sm' => 'peer-checked:after:translate-x-4',
+            'md' => 'peer-checked:after:translate-x-5',
+            'lg' => 'peer-checked:after:translate-x-7',
             default => 'peer-checked:after:translate-x-5'
         };
 
-        // Base thumb classes with proper positioning - matches working Tailwind example
         $baseThumbClasses = "after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full {$thumbSize} after:transition-all dark:border-neutral-600 peer-checked:after:border-white";
 
         return "{$translateDistance} rtl:peer-checked:after:-translate-x-full {$baseThumbClasses}";

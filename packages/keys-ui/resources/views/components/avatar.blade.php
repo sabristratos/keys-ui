@@ -11,7 +11,7 @@
             {{ $getInitials() }}
         </span>
     @else
-        {{-- Fallback icon if no image or initials --}}
+        
         <span class="{{ $initialsClasses() }}">
             <x-keys::icon name="heroicon-o-user" :size="$size === 'xs' ? 'xs' : ($size === 'sm' ? 'sm' : 'md')" />
         </span>

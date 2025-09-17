@@ -1,8 +1,8 @@
-{{-- Menu Item Component --}}
+
 <{{ $elementType }} class="{{ $computedItemClasses }}" {{ $attributes->merge($computedElementAttributes) }}>
     @if($hasIcon())
         @if($isMultiState())
-            {{-- Multi-state icon rendering --}}
+            
             <x-keys::icon
                 :name="$icon"
                 :size="$iconSize()"
@@ -25,7 +25,7 @@
                 />
             @endif
         @else
-            {{-- Single state icon --}}
+            
             <x-keys::icon :name="$icon" :size="$iconSize()" class="{{ $computedIconClasses }}" />
         @endif
     @endif

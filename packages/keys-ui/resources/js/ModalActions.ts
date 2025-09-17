@@ -47,7 +47,7 @@ export class ModalActions {
         this.initializeModals();
         this.setupLivewireIntegration();
         this.initialized = true;
-        console.log('ModalActions initialized');
+
     }
 
     /**
@@ -74,7 +74,6 @@ export class ModalActions {
 
         this.modalStates.set(modal, state);
 
-        // Listen for native dialog events
         modal.addEventListener('close', () => {
             this.handleModalClose(modal);
         });
@@ -88,7 +87,6 @@ export class ModalActions {
      * Bind event listeners for enhanced modal functionality
      */
     private bindEventListeners(): void {
-        // Handle command invoker clicks for focus tracking
         document.addEventListener('click', (event) => {
             const trigger = (event.target as Element)?.closest('[commandfor]') as HTMLElement;
             if (trigger) {
@@ -103,7 +101,6 @@ export class ModalActions {
                 }
             }
 
-            // Handle data-modal-close attributes for custom close buttons
             const closeButton = (event.target as Element)?.closest('[data-modal-close]') as HTMLElement;
             if (closeButton) {
                 const modal = closeButton.closest('dialog[data-modal]') as HTMLDialogElement;
@@ -113,7 +110,6 @@ export class ModalActions {
             }
         });
 
-        // Watch for new modals being added to the DOM
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
@@ -141,14 +137,11 @@ export class ModalActions {
         const state = this.modalStates.get(modal);
         if (!state) return;
 
-        // Store the trigger element for focus restoration
         state.lastFocusedElement = trigger || document.activeElement as HTMLElement;
         this.modalStates.set(modal, state);
 
-        // Dispatch custom open event
         this.dispatchModalEvent(modal, 'modal:open', { trigger });
 
-        // Enhanced focus management
         setTimeout(() => {
             this.setInitialFocus(modal);
         }, 50); // Small delay to ensure modal is fully rendered
@@ -161,17 +154,14 @@ export class ModalActions {
         const state = this.modalStates.get(modal);
         if (!state) return;
 
-        // Restore focus to the trigger element
         if (state.lastFocusedElement && document.contains(state.lastFocusedElement)) {
             state.lastFocusedElement.focus();
         }
 
-        // Reset state
         state.lastFocusedElement = null;
         state.isAnimating = false;
         this.modalStates.set(modal, state);
 
-        // Dispatch custom close event
         this.dispatchModalEvent(modal, 'modal:close');
     }
 
@@ -179,7 +169,6 @@ export class ModalActions {
      * Handle modal cancel event (ESC key)
      */
     private handleModalCancel(modal: HTMLDialogElement, event: Event): void {
-        // Allow default behavior but dispatch custom event
         this.dispatchModalEvent(modal, 'modal:cancel', { originalEvent: event });
     }
 
@@ -187,14 +176,12 @@ export class ModalActions {
      * Set initial focus when modal opens
      */
     private setInitialFocus(modal: HTMLDialogElement): void {
-        // Look for autofocus element first
         const autofocusElement = modal.querySelector('[autofocus]') as HTMLElement;
         if (autofocusElement) {
             autofocusElement.focus();
             return;
         }
 
-        // Look for first focusable element
         const focusableElements = modal.querySelectorAll(
             'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
         );
@@ -240,18 +227,15 @@ export class ModalActions {
      * Set up Livewire integration if available
      */
     private setupLivewireIntegration(): void {
-        // Check if Livewire is available
         if (typeof window.Livewire === 'undefined') {
             return;
         }
 
-        // Listen for Livewire modal control events
         window.Livewire.on('openModal', (data: any) => {
             const modalId = data.id || data.modal;
             if (modalId) {
                 this.openModal(modalId);
 
-                // Update wire:model if specified
                 if (data.wireModel) {
                     this.updateWireModel(modalId, true);
                 }
@@ -263,12 +247,10 @@ export class ModalActions {
             if (modalId) {
                 this.closeModal(modalId);
 
-                // Update wire:model if specified
                 if (data.wireModel) {
                     this.updateWireModel(modalId, false);
                 }
             } else {
-                // Close all modals if no specific ID
                 this.closeAllModals();
             }
         });
@@ -280,7 +262,7 @@ export class ModalActions {
             }
         });
 
-        console.log('Livewire modal integration initialized');
+
     }
 
     /**
@@ -292,7 +274,6 @@ export class ModalActions {
 
         const wireModel = modal.getAttribute('wire:model');
         if (wireModel && typeof window.Livewire !== 'undefined' && window.Livewire.find) {
-            // Find the Livewire component and update the model
             const component = window.Livewire.find(modal.closest('[wire\\:id]')?.getAttribute('wire:id'));
             if (component) {
                 component.set(wireModel, isOpen);
@@ -341,7 +322,6 @@ export class ModalActions {
         this.handleModalOpen(modal, trigger);
         modal.showModal();
 
-        // Dispatch Livewire event if available
         this.dispatchLivewireEvent('modalOpened', { id: modalId, modal: modalId });
 
         return true;
@@ -359,7 +339,6 @@ export class ModalActions {
 
         modal.close();
 
-        // Dispatch Livewire event if available
         this.dispatchLivewireEvent('modalClosed', { id: modalId, modal: modalId });
 
         return true;
@@ -381,26 +360,21 @@ export class ModalActions {
         const state = this.modalStates.get(modal);
         if (!state) return;
 
-        // Update wire:model if present
         const wireModel = modal.getAttribute('wire:model');
         if (wireModel) {
             this.updateWireModel(modal.id, false);
         }
 
-        // Restore focus to the trigger element
         if (state.lastFocusedElement && document.contains(state.lastFocusedElement)) {
             state.lastFocusedElement.focus();
         }
 
-        // Reset state
         state.lastFocusedElement = null;
         state.isAnimating = false;
         this.modalStates.set(modal, state);
 
-        // Dispatch custom close event
         this.dispatchModalEvent(modal, 'modal:close');
 
-        // Dispatch Livewire event
         this.dispatchLivewireEvent('modalClosed', { id: modal.id, modal: modal.id });
     }
 
@@ -411,23 +385,18 @@ export class ModalActions {
         const state = this.modalStates.get(modal);
         if (!state) return;
 
-        // Update wire:model if present
         const wireModel = modal.getAttribute('wire:model');
         if (wireModel) {
             this.updateWireModel(modal.id, true);
         }
 
-        // Store the trigger element for focus restoration
         state.lastFocusedElement = trigger || document.activeElement as HTMLElement;
         this.modalStates.set(modal, state);
 
-        // Dispatch custom open event
         this.dispatchModalEvent(modal, 'modal:open', { trigger });
 
-        // Dispatch Livewire event
         this.dispatchLivewireEvent('modalOpened', { id: modal.id, modal: modal.id });
 
-        // Enhanced focus management
         setTimeout(() => {
             this.setInitialFocus(modal);
         }, 50); // Small delay to ensure modal is fully rendered
@@ -439,11 +408,10 @@ export class ModalActions {
     public destroy(): void {
         this.modalStates.clear();
         this.initialized = false;
-        console.log('ModalActions destroyed');
+
     }
 }
 
-// Type declarations for Livewire integration
 declare global {
     interface Window {
         Livewire?: {
@@ -454,5 +422,4 @@ declare global {
     }
 }
 
-// Export default instance
 export default ModalActions.getInstance();

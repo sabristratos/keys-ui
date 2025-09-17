@@ -42,7 +42,7 @@ export class DropdownActions {
         this.bindEventListeners();
         this.initializeDropdowns();
         this.initialized = true;
-        console.log('DropdownActions initialized');
+
     }
 
     /**
@@ -65,7 +65,6 @@ export class DropdownActions {
             children: []
         };
 
-        // Check if this is a nested dropdown (submenu)
         const parentSubmenu = dropdownElement.closest('[data-submenu="true"]');
         if (parentSubmenu && parentSubmenu !== dropdownElement) {
             state.parent = parentSubmenu as HTMLElement;
@@ -99,9 +98,7 @@ export class DropdownActions {
      * Bind global event listeners using event delegation
      */
     private bindEventListeners(): void {
-        // Handle clicks with smart closing logic
         document.addEventListener('click', (event) => {
-            // Handle submenu trigger clicks FIRST
             const submenuTrigger = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-submenu-trigger]') as HTMLElement;
             if (submenuTrigger) {
                 event.preventDefault();
@@ -113,7 +110,6 @@ export class DropdownActions {
                 return;
             }
 
-            // Handle dropdown trigger clicks SECOND
             const trigger = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-dropdown-trigger]') as HTMLElement;
             if (trigger) {
                 event.preventDefault();
@@ -125,12 +121,10 @@ export class DropdownActions {
                 return;
             }
 
-            // Handle menu item clicks SECOND
             const menuItem = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-menu-item]') as HTMLElement;
             if (menuItem) {
                 const dropdown = menuItem.closest('[data-dropdown="true"]') as HTMLElement;
                 if (dropdown) {
-                    // Check if this item should keep dropdown open
                     const keepOpen = menuItem.dataset.keepOpen === 'true';
                     if (!keepOpen) {
                         this.closeDropdown(dropdown);
@@ -139,11 +133,9 @@ export class DropdownActions {
                 return;
             }
 
-            // Handle form control clicks (checkboxes, radios) THIRD
             const formControl = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-menu-checkbox], [data-menu-radio]') as HTMLElement;
             if (formControl) {
                 event.stopPropagation();
-                // Form controls always keep dropdown open by default
                 const keepOpen = formControl.dataset.keepOpen !== 'false';
                 if (!keepOpen) {
                     const dropdown = formControl.closest('[data-dropdown="true"]') as HTMLElement;
@@ -154,26 +146,21 @@ export class DropdownActions {
                 return;
             }
 
-            // Handle clicks within dropdown panel (prevent closing)
             const dropdownPanel = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-dropdown-panel], [data-submenu-panel]') as HTMLElement;
             if (dropdownPanel) {
                 event.stopPropagation();
                 return;
             }
 
-            // Click outside to close dropdowns
             this.closeAllDropdowns();
         });
 
-        // Handle hover for submenu interactions (desktop only)
         document.addEventListener('mouseenter', (event) => {
             const submenuTrigger = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-submenu-trigger]') as HTMLElement;
             if (submenuTrigger && !this.isMobile()) {
                 const submenu = submenuTrigger.closest('[data-submenu="true"]') as HTMLElement;
                 if (submenu && !this.isDisabled(submenu)) {
-                    // Close siblings before opening this one
                     this.closeSiblingSubmenus(submenu);
-                    // Small delay to prevent accidental hovers
                     setTimeout(() => {
                         if (submenuTrigger.matches(':hover')) {
                             this.openSubmenu(submenu);
@@ -188,7 +175,6 @@ export class DropdownActions {
             if (submenu && !this.isMobile()) {
                 const state = this.dropdownStates.get(submenu);
                 if (state?.isOpen) {
-                    // Small delay to allow moving to submenu panel
                     setTimeout(() => {
                         if (!submenu.matches(':hover')) {
                             this.closeSubmenu(submenu);
@@ -198,7 +184,6 @@ export class DropdownActions {
             }
         }, true);
 
-        // Handle keyboard navigation
         document.addEventListener('keydown', (event) => {
             const dropdown = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-dropdown="true"]') as HTMLElement;
             if (dropdown) {
@@ -206,12 +191,10 @@ export class DropdownActions {
             }
         });
 
-        // Handle window resize
         window.addEventListener('resize', () => {
             this.repositionDropdowns();
         });
 
-        // Initialize dropdowns when DOM changes
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
@@ -255,7 +238,6 @@ export class DropdownActions {
         const state = this.dropdownStates.get(dropdown);
         if (!state || this.isDisabled(dropdown)) return;
 
-        // Only close unrelated dropdowns (not parent/child relationships)
         this.closeSiblingDropdowns(dropdown);
 
         state.isOpen = true;
@@ -274,10 +256,8 @@ export class DropdownActions {
             trigger.setAttribute('aria-expanded', 'true');
         }
 
-        // Update menu items for keyboard navigation
         this.updateMenuItems(dropdown);
 
-        // Dispatch custom event
         this.dispatchDropdownEvent(dropdown, 'dropdown:open');
     }
 
@@ -304,10 +284,8 @@ export class DropdownActions {
             trigger.setAttribute('aria-expanded', 'true');
         }
 
-        // Update menu items for keyboard navigation
         this.updateMenuItems(submenu);
 
-        // Dispatch custom event
         this.dispatchDropdownEvent(submenu, 'submenu:open');
     }
 
@@ -318,7 +296,6 @@ export class DropdownActions {
         const state = this.dropdownStates.get(dropdown);
         if (!state || !state.isOpen) return;
 
-        // Close all child submenus first
         this.closeChildSubmenus(dropdown);
 
         state.isOpen = false;
@@ -336,7 +313,6 @@ export class DropdownActions {
             trigger.setAttribute('aria-expanded', 'false');
         }
 
-        // Dispatch custom event
         this.dispatchDropdownEvent(dropdown, 'dropdown:close');
     }
 
@@ -347,7 +323,6 @@ export class DropdownActions {
         const state = this.dropdownStates.get(submenu);
         if (!state || !state.isOpen) return;
 
-        // Close all child submenus first
         this.closeChildSubmenus(submenu);
 
         state.isOpen = false;
@@ -365,7 +340,6 @@ export class DropdownActions {
             trigger.setAttribute('aria-expanded', 'false');
         }
 
-        // Dispatch custom event
         this.dispatchDropdownEvent(submenu, 'submenu:close');
     }
 
@@ -375,7 +349,6 @@ export class DropdownActions {
     private closeAllDropdowns(): void {
         this.dropdownStates.forEach((state, dropdown) => {
             if (state.isOpen) {
-                // Only close top-level dropdowns (not submenus)
                 if (!state.parent) {
                     this.closeDropdown(dropdown);
                 }
@@ -391,7 +364,6 @@ export class DropdownActions {
 
         this.dropdownStates.forEach((otherState, otherDropdown) => {
             if (otherDropdown !== dropdown && otherState.isOpen) {
-                // Don't close if it's a parent or child of the current dropdown
                 const isParent = state?.parent === otherDropdown;
                 const isChild = otherState.parent === dropdown;
 
@@ -517,7 +489,6 @@ export class DropdownActions {
         const itemCount = state.menuItems.length;
         if (itemCount === 0) return;
 
-        // Update focused index
         if (state.focusedIndex === -1) {
             state.focusedIndex = direction > 0 ? 0 : itemCount - 1;
         } else {
@@ -557,7 +528,6 @@ export class DropdownActions {
         const state = this.dropdownStates.get(dropdown);
         if (!state) return;
 
-        // Get all focusable menu items including submenu triggers
         const items = dropdown.querySelectorAll('[data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-submenu-trigger]');
         state.menuItems = Array.from(items).filter(item => {
             const element = item as HTMLElement;
@@ -585,13 +555,11 @@ export class DropdownActions {
         const align = dropdown.dataset.align || 'start';
         const offset = parseInt(dropdown.dataset.offset || '8');
 
-        // Reset positioning
         panel.style.top = '';
         panel.style.bottom = '';
         panel.style.left = '';
         panel.style.right = '';
 
-        // Calculate positioning based on available space
         const spaceBelow = viewportHeight - rect.bottom;
         const spaceAbove = rect.top;
         const spaceRight = viewportWidth - rect.left;
@@ -600,14 +568,12 @@ export class DropdownActions {
         let finalPosition = position;
         let finalAlign = align;
 
-        // Auto-adjust position if not enough space
         if (position === 'bottom' && spaceBelow < panelRect.height && spaceAbove > panelRect.height) {
             finalPosition = 'top';
         } else if (position === 'top' && spaceAbove < panelRect.height && spaceBelow > panelRect.height) {
             finalPosition = 'bottom';
         }
 
-        // Apply positioning
         switch (finalPosition) {
             case 'top':
                 panel.style.bottom = '100%';
@@ -627,7 +593,6 @@ export class DropdownActions {
                 break;
         }
 
-        // Apply alignment
         if (finalPosition === 'top' || finalPosition === 'bottom') {
             switch (finalAlign) {
                 case 'start':
@@ -675,14 +640,12 @@ export class DropdownActions {
         const align = submenu.dataset.align || 'start';
         const offset = parseInt(submenu.dataset.offset || '4');
 
-        // Reset positioning
         panel.style.top = '';
         panel.style.bottom = '';
         panel.style.left = '';
         panel.style.right = '';
         panel.style.transform = '';
 
-        // Calculate positioning based on available space
         const spaceRight = viewportWidth - rect.right;
         const spaceLeft = rect.left;
         const spaceBelow = viewportHeight - rect.bottom;
@@ -690,14 +653,12 @@ export class DropdownActions {
 
         let finalPosition = position;
 
-        // Auto-adjust position if not enough space
         if (position === 'right' && spaceRight < panelRect.width && spaceLeft > panelRect.width) {
             finalPosition = 'left';
         } else if (position === 'left' && spaceLeft < panelRect.width && spaceRight > panelRect.width) {
             finalPosition = 'right';
         }
 
-        // Apply positioning
         switch (finalPosition) {
             case 'right':
                 panel.style.left = '100%';
@@ -709,7 +670,6 @@ export class DropdownActions {
                 break;
         }
 
-        // Apply alignment
         switch (align) {
             case 'start':
                 panel.style.top = '0';
@@ -723,7 +683,6 @@ export class DropdownActions {
                 break;
         }
 
-        // Ensure submenu doesn't go off-screen vertically
         const finalPanelRect = panel.getBoundingClientRect();
         if (finalPanelRect.bottom > viewportHeight) {
             const overflow = finalPanelRect.bottom - viewportHeight + 8;
@@ -740,7 +699,6 @@ export class DropdownActions {
     private repositionDropdowns(): void {
         this.dropdownStates.forEach((state, dropdown) => {
             if (state.isOpen) {
-                // Check if it's a submenu or regular dropdown
                 if (dropdown.hasAttribute('data-submenu')) {
                     this.positionSubmenu(dropdown);
                 } else {
@@ -777,9 +735,8 @@ export class DropdownActions {
     public destroy(): void {
         this.dropdownStates.clear();
         this.initialized = false;
-        console.log('DropdownActions destroyed');
+
     }
 }
 
-// Export default instance
 export default DropdownActions.getInstance();

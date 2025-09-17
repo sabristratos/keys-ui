@@ -15,20 +15,20 @@ class Dropdown extends Component
         public bool $modal = false,
         public string $size = 'md'
     ) {
-        // Auto-generate ID if not provided
+
         $this->id = $this->id ?? 'dropdown-' . uniqid();
 
-        // Validate position
+
         if (!in_array($this->position, ['top', 'bottom', 'left', 'right'])) {
             $this->position = 'bottom';
         }
 
-        // Validate align
+
         if (!in_array($this->align, ['start', 'center', 'end'])) {
             $this->align = 'start';
         }
 
-        // Validate size
+
         if (!in_array($this->size, ['sm', 'md', 'lg'])) {
             $this->size = 'md';
         }
@@ -49,7 +49,6 @@ class Dropdown extends Component
     {
         $base = 'absolute z-50 min-w-48 bg-surface border border-border rounded-lg shadow-lg hidden';
 
-        // Size variants
         $sizeClasses = match ($this->size) {
             'sm' => 'min-w-40 p-1',
             'md' => 'min-w-48 p-2',
@@ -57,7 +56,6 @@ class Dropdown extends Component
             default => 'min-w-48 p-2'
         };
 
-        // Position classes (will be dynamically adjusted by JavaScript)
         $positionClasses = match ($this->position) {
             'top' => 'bottom-full mb-' . ($this->offset / 4),
             'bottom' => 'top-full mt-' . ($this->offset / 4),
@@ -66,7 +64,6 @@ class Dropdown extends Component
             default => 'top-full mt-2'
         };
 
-        // Align classes
         $alignClasses = match ($this->align) {
             'start' => match ($this->position) {
                 'left', 'right' => 'top-0',

@@ -16,33 +16,28 @@ class Textarea extends Component
         public bool $disabled = false,
         public bool $readonly = false,
         public bool $required = false,
-        // Textarea-specific props
         public int $rows = 4,
         public ?int $cols = null,
         public string $resize = 'vertical',
         public bool $autoResize = false,
-        // Shorthand mode props
         public ?string $label = null,
         public bool $optional = false,
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
-        // Icon support
         public ?string $iconLeft = null,
         public ?string $iconRight = null,
-        // Action support
         public array $actions = [],
         public bool $clearable = false,
         public bool $copyable = false,
         public ?string $externalUrl = null,
         public string $actionVariant = 'ghost',
         public string $actionSize = 'xs',
-        // State
         public bool $hasError = false
     ) {
-        // Auto-generate ID if not provided but name is available
+
         $this->id = $this->id ?? $this->name;
 
-        // Auto-set hasError if errors are provided
+
         if (!$this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
@@ -133,7 +128,6 @@ class Textarea extends Component
         $leftPadding = '';
         $rightPadding = '';
 
-        // Left padding for left icon
         if ($this->iconLeft) {
             $leftPadding = match ($this->size) {
                 'sm' => 'pl-8',
@@ -143,7 +137,6 @@ class Textarea extends Component
             };
         }
 
-        // Right padding for right icon or actions
         if ($this->iconRight || $this->hasActions()) {
             $padding = $this->hasActions() ? $this->actionPadding() : match ($this->size) {
                 'sm' => 'pr-8',
@@ -256,7 +249,6 @@ class Textarea extends Component
                 'is_multi_state' => isset($action['icon_toggle']) || isset($action['icon_success']),
                 'data_action' => $action['type'],
                 'data_icon_default' => $action['icon'],
-                // Always set these values (null if not present) to avoid Blade errors
                 'icon_toggle' => $action['icon_toggle'] ?? null,
                 'icon_success' => $action['icon_success'] ?? null,
                 'label_toggle' => $action['label_toggle'] ?? null,

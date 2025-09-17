@@ -1,95 +1,14 @@
-{{-- Toast Container with positioning --}}
 <div class="{{ $computedContainerClasses }}" data-toast-container="{{ $position }}">
-    {{-- Pre-rendered toast variants using Alert component --}}
-
-    {{-- Success Toast --}}
-    <div class="{{ $computedToastClasses }} {{ $computedAnimationClasses }}"
-         data-toast="true"
-         data-toast-variant="success"
-         data-toast-position="{{ $position }}"
-         data-toast-visible="false"
-         style="display: none;"
-         role="alert"
-         aria-live="polite"
-         id="toast-success-{{ $position }}">
-        <x-keys::alert variant="success" dismissible>
-            <x-slot name="content">
-                <div data-toast-title class="hidden font-medium"></div>
-                <div data-toast-message></div>
-            </x-slot>
-            <x-slot name="actions">
-                <div data-toast-actions class="hidden"></div>
-            </x-slot>
-        </x-keys::alert>
-    </div>
-
-    {{-- Error Toast --}}
-    <div class="{{ $computedToastClasses }} {{ $computedAnimationClasses }}"
-         data-toast="true"
-         data-toast-variant="error"
-         data-toast-position="{{ $position }}"
-         data-toast-visible="false"
-         style="display: none;"
-         role="alert"
-         aria-live="polite"
-         id="toast-error-{{ $position }}">
-        <x-keys::alert variant="danger" dismissible>
-            <x-slot name="content">
-                <div data-toast-title class="hidden font-medium"></div>
-                <div data-toast-message></div>
-            </x-slot>
-            <x-slot name="actions">
-                <div data-toast-actions class="hidden"></div>
-            </x-slot>
-        </x-keys::alert>
-    </div>
-
-    {{-- Warning Toast --}}
-    <div class="{{ $computedToastClasses }} {{ $computedAnimationClasses }}"
-         data-toast="true"
-         data-toast-variant="warning"
-         data-toast-position="{{ $position }}"
-         data-toast-visible="false"
-         style="display: none;"
-         role="alert"
-         aria-live="polite"
-         id="toast-warning-{{ $position }}">
-        <x-keys::alert variant="warning" dismissible>
-            <x-slot name="content">
-                <div data-toast-title class="hidden font-medium"></div>
-                <div data-toast-message></div>
-            </x-slot>
-            <x-slot name="actions">
-                <div data-toast-actions class="hidden"></div>
-            </x-slot>
-        </x-keys::alert>
-    </div>
-
-    {{-- Info Toast --}}
-    <div class="{{ $computedToastClasses }} {{ $computedAnimationClasses }}"
-         data-toast="true"
-         data-toast-variant="info"
-         data-toast-position="{{ $position }}"
-         data-toast-visible="false"
-         style="display: none;"
-         role="alert"
-         aria-live="polite"
-         id="toast-info-{{ $position }}">
-        <x-keys::alert variant="info" dismissible>
-            <x-slot name="content">
-                <div data-toast-title class="hidden font-medium"></div>
-                <div data-toast-message></div>
-            </x-slot>
-            <x-slot name="actions">
-                <div data-toast-actions class="hidden"></div>
-            </x-slot>
-        </x-keys::alert>
-    </div>
 </div>
-
-{{-- Animation Styles --}}
 <style>
-/* Toast container animations */
+/* Toast container base */
+[data-toast-container] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Default toast state (invisible) */
 [data-toast-container] [data-toast] {
     transform: scale(0.95) translateY(-1rem);
     opacity: 0;
@@ -113,14 +32,10 @@
     pointer-events: auto;
 }
 
-/* Stacking animation for multiple toasts */
-[data-toast-container] [data-toast][data-toast-visible="true"]:not(:last-child) {
-    margin-bottom: 0.75rem;
-}
-
-/* Hover effects */
-[data-toast-container] [data-toast]:hover {
-    transform: scale(1.02) translateY(0);
+/* Hover effects for visible toasts */
+[data-toast-container] [data-toast][data-toast-visible="true"]:hover {
+    transform: translateY(0) translateZ(0);
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Exit animation */
@@ -130,10 +45,26 @@
     pointer-events: none;
 }
 
+/* Stacking improvements for multiple toasts */
+[data-toast-container] [data-toast] + [data-toast] {
+    margin-top: 0; /* Reset margins, use container gap instead */
+}
+
 /* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
-    [data-toast-container] [data-toast] {
+    [data-toast-container] [data-toast]:not(:hover) {
         backdrop-filter: blur(8px);
     }
+
+    [data-toast-container] [data-toast]:hover {
+        box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Ensure proper z-index stacking for newer toasts */
+[data-toast-container] [data-toast] {
+    position: relative;
+    z-index: 1;
+    transform: translateZ(0); /* GPU acceleration for smoother animations */
 }
 </style>

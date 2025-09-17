@@ -12,7 +12,15 @@ class Alert extends Component
         public ?string $icon = null,
         public ?string $title = null,
         public bool $dismissible = false
-    ) {}
+    ) {
+        if (!in_array($this->variant, ['info', 'success', 'warning', 'danger', 'neutral'])) {
+            $this->variant = 'info';
+        }
+
+        if (!in_array($this->size, ['sm', 'md', 'lg'])) {
+            $this->size = 'md';
+        }
+    }
 
     public function baseClasses(): string
     {
@@ -22,12 +30,12 @@ class Alert extends Component
     public function variantClasses(): string
     {
         return match ($this->variant) {
-            'info' => 'bg-info/5 border-info/20 text-info-foreground',
-            'success' => 'bg-success/5 border-success/20 text-success-foreground',
-            'warning' => 'bg-warning/5 border-warning/20 text-warning-foreground',
-            'danger' => 'bg-danger/5 border-danger/20 text-danger-foreground',
-            'neutral' => 'bg-neutral/5 border-neutral/20 text-neutral-foreground',
-            default => 'bg-info/5 border-info/20 text-info-foreground'
+            'info' => 'bg-info-100 border-info-200 text-info-foreground',
+            'success' => 'bg-success-100 border-success-200 text-success-foreground',
+            'warning' => 'bg-warning-100 border-warning-200 text-warning-foreground',
+            'danger' => 'bg-danger-100 border-danger-200 text-danger-foreground',
+            'neutral' => 'bg-neutral-100 border-neutral-200 text-neutral-foreground',
+            default => 'bg-info-100 border-info-200 text-info-foreground'
         };
     }
 

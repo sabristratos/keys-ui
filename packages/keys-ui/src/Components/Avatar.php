@@ -17,28 +17,28 @@ class Avatar extends Component
         public bool $border = false,
         public bool $lazy = true
     ) {
-        // Auto-generate alt text if not provided
+
         if (!$this->alt && $this->name) {
             $this->alt = "Avatar for {$this->name}";
         }
 
-        // Validate size
+
         if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
             $this->size = 'md';
         }
 
-        // Validate shape
+
         if (!in_array($this->shape, ['circle', 'square'])) {
             $this->shape = 'circle';
         }
 
-        // Validate color
+
         $validColors = ['brand', 'success', 'warning', 'danger', 'neutral', 'red', 'green', 'blue', 'purple', 'yellow', 'teal', 'orange'];
         if (!in_array($this->color, $validColors)) {
             $this->color = 'neutral';
         }
 
-        // Validate status
+
         if ($this->status && !in_array($this->status, ['online', 'offline', 'away', 'busy'])) {
             $this->status = null;
         }

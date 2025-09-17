@@ -1,4 +1,4 @@
-{{-- Menu Separator Component --}}
+
 @if($isLabeled() && $hasLabel())
     <div class="{{ $computedSeparatorClasses }}" {{ $attributes->merge($computedDataAttributes) }}>
         <div class="{{ $computedLineClasses }}"></div>

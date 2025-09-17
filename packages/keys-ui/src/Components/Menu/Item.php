@@ -14,13 +14,12 @@ class Item extends Component
         public bool $disabled = false,
         public bool $keepOpen = false,
         public ?string $target = null,
-        // Multi-state support like Button component
         public ?string $iconToggle = null,
         public ?string $iconSuccess = null,
         public ?string $labelToggle = null,
         public ?string $labelSuccess = null
     ) {
-        // Validate variant
+
         if (!in_array($this->variant, ['default', 'brand', 'danger', 'success', 'warning', 'info'])) {
             $this->variant = 'default';
         }

@@ -8,8 +8,6 @@ class Breadcrumbs extends Component
 {
     public function __construct()
     {
-        // Simple container component - no props needed for now
-        // Future enhancements could add separator customization at container level
     }
 
     public function containerClasses(): string

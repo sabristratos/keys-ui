@@ -13,7 +13,6 @@
             'required' => $required,
         ], fn($value) => !is_null($value)));
 
-    // All data is now precomputed and passed from component
 @endphp
 
 @if($isShorthand())

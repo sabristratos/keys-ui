@@ -18,7 +18,6 @@
         ]);
     }
 
-    // Add multi-state data attributes
     $elementAttributes = $elementAttributes->merge($getDataAttributes());
 @endphp
 
@@ -27,7 +26,6 @@
         <x-keys::loading :animation="$loadingAnimation" :size="$iconSize()" class="mr-2" />
     @elseif($iconLeft && !$loading)
         @if($isMultiState())
-            {{-- Multi-state icon rendering --}}
             <x-keys::icon
                 :name="$iconLeft"
                 :size="$iconSize()"
@@ -50,7 +48,6 @@
                 />
             @endif
         @else
-            {{-- Single state icon --}}
             <x-keys::icon :name="$iconLeft" :size="$iconSize()" class="{{ $isIconOnly ? '' : 'mr-2' }}" />
         @endif
     @endif

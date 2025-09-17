@@ -14,22 +14,18 @@ class Badge extends Component
         public bool $dismissible = false,
         public ?string $id = null
     ) {
-        // Auto-generate ID if dismissible and not provided
         if ($this->dismissible && !$this->id) {
             $this->id = 'badge-' . uniqid();
         }
 
-        // Validate variant
         if (!in_array($this->variant, ['simple', 'chip'])) {
             $this->variant = 'simple';
         }
 
-        // Validate size
         if (!in_array($this->size, ['xs', 'sm', 'md'])) {
             $this->size = 'sm';
         }
 
-        // Validate color - support both semantic and specific colors
         $validColors = [
             'brand', 'success', 'warning', 'danger', 'neutral',
             'blue', 'gray', 'red', 'green', 'yellow', 'indigo', 'purple', 'pink'
@@ -38,7 +34,6 @@ class Badge extends Component
             $this->color = 'blue';
         }
 
-        // Auto-enable chip variant for dismissible badges
         if ($this->dismissible && $this->variant === 'simple') {
             $this->variant = 'chip';
         }

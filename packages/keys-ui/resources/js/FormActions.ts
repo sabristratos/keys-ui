@@ -23,7 +23,6 @@ interface FormActionEvent {
     value: string;
 }
 
-// Translation helper function
 function t(key: string, fallback: string = ''): string {
     const translations = (window as any).KeysUITranslations;
     if (!translations) {
@@ -67,14 +66,13 @@ export class FormActions {
 
         this.bindEventListeners();
         this.initialized = true;
-        console.log('FormActions initialized');
+
     }
 
     /**
      * Bind event listeners using event delegation
      */
     private bindEventListeners(): void {
-        // Handle action button clicks
         document.addEventListener('click', (event) => {
             const button = (event.target as Element)?.closest('.input-action') as HTMLButtonElement;
             if (!button) return;
@@ -83,7 +81,6 @@ export class FormActions {
             this.handleActionClick(button);
         });
 
-        // Handle keyboard events for accessibility
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' || event.key === ' ') {
                 const button = event.target as HTMLButtonElement;
@@ -99,7 +96,6 @@ export class FormActions {
      * Handle action button click
      */
     private async handleActionClick(button: HTMLButtonElement): Promise<void> {
-        // Get the wrapper div that contains the data attributes
         const wrapper = button.closest('.input-action') as HTMLElement;
         const action = wrapper?.dataset.action;
         if (!action) return;
@@ -125,7 +121,6 @@ export class FormActions {
                 break;
         }
 
-        // Dispatch custom event for user callbacks
         this.dispatchActionEvent(element, action);
     }
 
@@ -141,10 +136,8 @@ export class FormActions {
      * Swap the icon using CSS classes and data attributes
      */
     private async swapButtonIcon(button: HTMLButtonElement, iconName: string): Promise<void> {
-        // Store the current icon name in a data attribute
         button.setAttribute('data-current-icon', iconName);
 
-        // Add a CSS class to indicate the icon state
         this.updateButtonIconState(button, iconName);
     }
 
@@ -152,17 +145,14 @@ export class FormActions {
      * Update button icon state using Tailwind classes
      */
     private updateButtonIconState(button: HTMLButtonElement, iconName: string): void {
-        // Get icon elements within the button (new structure)
         const defaultIcon = button.querySelector('.button-icon-default') as HTMLElement;
         const toggleIcon = button.querySelector('.button-icon-toggle') as HTMLElement;
         const successIcon = button.querySelector('.button-icon-success') as HTMLElement;
 
-        // Get icon names for comparison from button data attributes
         const defaultIconName = button.dataset.iconDefault;
         const toggleIconName = button.dataset.iconToggle;
         const successIconName = button.dataset.iconSuccess;
 
-        // Reset all icons to hidden state first
         if (defaultIcon) {
             defaultIcon.classList.remove('opacity-100');
             defaultIcon.classList.add('opacity-0');
@@ -176,7 +166,6 @@ export class FormActions {
             successIcon.classList.add('opacity-0');
         }
 
-        // Show the appropriate icon based on iconName
         if (iconName === defaultIconName && defaultIcon) {
             defaultIcon.classList.remove('opacity-0');
             defaultIcon.classList.add('opacity-100');
@@ -193,7 +182,6 @@ export class FormActions {
      * Animate icon success feedback using Tailwind classes
      */
     private animateIconSuccess(button: HTMLButtonElement): void {
-        // Scale animation for success feedback
         button.classList.add('scale-110');
 
         setTimeout(() => {
@@ -213,7 +201,6 @@ export class FormActions {
         element.value = '';
         element.focus();
 
-        // Trigger input event for reactive frameworks
         element.dispatchEvent(new Event('input', { bubbles: true }));
         element.dispatchEvent(new Event('change', { bubbles: true }));
     }
@@ -228,12 +215,10 @@ export class FormActions {
             await navigator.clipboard.writeText(element.value);
             this.showFeedback(element, t('feedback.copied_clipboard', 'Copied to clipboard'), 'success');
 
-            // Show visual feedback with icon change
             if (copyButton) {
                 await this.showCopySuccess(copyButton, wrapper);
             }
         } catch (error) {
-            // Fallback for older browsers
             this.fallbackCopyToClipboard(element, wrapper);
         }
     }
@@ -253,7 +238,6 @@ export class FormActions {
             document.execCommand('copy');
             this.showFeedback(element, t('feedback.copied_clipboard', 'Copied to clipboard'), 'success');
 
-            // Show visual feedback with icon change
             if (copyButton) {
                 this.showCopySuccess(copyButton, wrapper);
             }
@@ -272,15 +256,12 @@ export class FormActions {
         const labelElement = button.querySelector('.sr-only');
 
         if (successIcon && defaultIcon) {
-            // Change to success icon
             await this.swapButtonIcon(button, successIcon);
 
-            // Update label if available
             if (successLabel && labelElement) {
                 const originalLabel = labelElement.textContent;
                 labelElement.textContent = successLabel;
 
-                // Revert to original icon and label after 2 seconds
                 setTimeout(async () => {
                     await this.swapButtonIcon(button, defaultIcon);
                     if (originalLabel && labelElement) {
@@ -288,7 +269,6 @@ export class FormActions {
                     }
                 }, 2000);
             } else {
-                // Just revert icon after 2 seconds
                 setTimeout(async () => {
                     await this.swapButtonIcon(button, defaultIcon);
                 }, 2000);
@@ -303,20 +283,16 @@ export class FormActions {
         const isPassword = input.type === 'password';
         const newType = isPassword ? 'text' : 'password';
 
-        // Get the icon names from button data attributes
         const defaultIcon = button.dataset.iconDefault;
         const toggleIcon = button.dataset.iconToggle;
         const defaultLabel = button.querySelector('.sr-only')?.textContent;
         const toggleLabel = button.dataset.labelToggle;
 
-        // Toggle input type
         input.type = newType;
 
-        // Update button icon and label based on current state
         const labelElement = button.querySelector('.sr-only');
 
         if (isPassword) {
-            // Showing password (was hidden)
             if (toggleIcon) {
                 await this.swapButtonIcon(button, toggleIcon);
             }
@@ -325,7 +301,6 @@ export class FormActions {
             }
             button.setAttribute('aria-label', toggleLabel || 'Hide password');
         } else {
-            // Hiding password (was visible)
             if (defaultIcon) {
                 await this.swapButtonIcon(button, defaultIcon);
             }
@@ -353,8 +328,7 @@ export class FormActions {
      * Handle custom actions
      */
     private handleCustomAction(element: HTMLInputElement | HTMLTextAreaElement, action: string): void {
-        // Custom actions can be handled by listening to the dispatched event
-        console.log(`Custom action "${action}" triggered for element:`, element);
+
     }
 
     /**
@@ -370,7 +344,6 @@ export class FormActions {
             bubbles: true
         });
 
-        // Dispatch on both element and document for flexibility
         element.dispatchEvent(event);
     }
 
@@ -378,7 +351,6 @@ export class FormActions {
      * Show temporary feedback message
      */
     private showFeedback(element: HTMLInputElement | HTMLTextAreaElement, message: string, type: 'success' | 'error' = 'success'): void {
-        // Create feedback element
         const feedback = document.createElement('div');
         feedback.className = `absolute top-full left-0 mt-1 px-2 py-1 text-xs rounded shadow-lg z-10 pointer-events-none ${
             type === 'success'
@@ -387,12 +359,10 @@ export class FormActions {
         }`;
         feedback.textContent = message;
 
-        // Add to element container
         const container = element.closest('.relative');
         if (container) {
             container.appendChild(feedback);
 
-            // Remove after 2 seconds
             setTimeout(() => {
                 if (feedback.parentNode) {
                     feedback.parentNode.removeChild(feedback);
@@ -418,10 +388,8 @@ export class FormActions {
      */
     public destroy(): void {
         this.initialized = false;
-        // Event delegation handles cleanup automatically
-        console.log('FormActions destroyed');
+
     }
 }
 
-// Export default instance
 export default FormActions.getInstance();

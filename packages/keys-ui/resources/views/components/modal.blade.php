@@ -9,31 +9,29 @@
         ])
         ->merge($livewireAttributes);
 
-    // Add animation data attribute if enabled
     if ($animate) {
         $dialogAttributes = $dialogAttributes->merge(['data-modal-animate' => true]);
     }
 
-    // Merge event attributes
     $dialogAttributes = $dialogAttributes->merge($eventAttributes);
 @endphp
 
 <dialog {{ $dialogAttributes }}>
     <div class="{{ $computedContainerClasses }}">
         <div class="{{ $computedModalClasses }}" role="document">
-            {{-- Header --}}
+            
             @isset($header)
                 <header class="{{ $computedHeaderClasses }}">
                     {{ $header }}
                 </header>
             @endisset
 
-            {{-- Body --}}
+            
             <main class="{{ $computedBodyClasses }}">
                 {{ $slot }}
             </main>
 
-            {{-- Footer --}}
+            
             @isset($footer)
                 <footer class="{{ $computedFooterClasses }}">
                     {{ $footer }}
@@ -42,7 +40,7 @@
         </div>
     </div>
 
-    {{-- Inline styles for modal enhancements --}}
+    
     <style>
         dialog[data-modal] {
             color: var(--color-foreground);
@@ -139,16 +137,14 @@
 
     </style>
 
-    {{-- Livewire event listeners --}}
+    
     @if($isLivewireEnabled())
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const modal = document.getElementById('{{ $id }}');
                 if (!modal) return;
 
-                // Listen for Livewire events to control modal
                 if (typeof Livewire !== 'undefined') {
-                    // Listen for global modal events
                     Livewire.on('openModal', (data) => {
                         if (data.id === '{{ $id }}' || data.modal === '{{ $id }}') {
                             modal.showModal();
@@ -161,7 +157,6 @@
                         }
                     });
 
-                    // Dispatch Livewire events on native modal events
                     modal.addEventListener('close', () => {
                         @if($getWireModelAttribute())
                             @this.set('{{ $getWireModelAttribute() }}', false);
@@ -169,12 +164,10 @@
 
                         Livewire.dispatch('modalClosed', { id: '{{ $id }}' });
 
-                        // Execute @close event if provided
                         @if($eventAttributes['@close'] ?? false)
                             {{ $eventAttributes['@close'] }};
                         @endif
 
-                        // Execute wire:close if provided
                         @if($eventAttributes['wire:close'] ?? false)
                             @this.{{ $eventAttributes['wire:close'] }};
                         @endif
@@ -183,35 +176,28 @@
                     modal.addEventListener('cancel', (event) => {
                         Livewire.dispatch('modalCancelled', { id: '{{ $id }}' });
 
-                        // Execute @escape event if provided
                         @if($eventAttributes['@escape'] ?? false)
                             {{ $eventAttributes['@escape'] }};
                         @endif
 
-                        // Execute wire:escape if provided
                         @if($eventAttributes['wire:escape'] ?? false)
                             @this.{{ $eventAttributes['wire:escape'] }};
                         @endif
 
-                        // Execute @cancel event if provided (alias for escape)
                         @if($eventAttributes['@cancel'] ?? false)
                             {{ $eventAttributes['@cancel'] }};
                         @endif
 
-                        // Execute wire:cancel if provided
                         @if($eventAttributes['wire:cancel'] ?? false)
                             @this.{{ $eventAttributes['wire:cancel'] }};
                         @endif
                     });
 
-                    // Custom open event handler
                     modal.addEventListener('modal:open', () => {
-                        // Execute @open event if provided
                         @if($eventAttributes['@open'] ?? false)
                             {{ $eventAttributes['@open'] }};
                         @endif
 
-                        // Execute wire:open if provided
                         @if($eventAttributes['wire:open'] ?? false)
                             @this.{{ $eventAttributes['wire:open'] }};
                         @endif

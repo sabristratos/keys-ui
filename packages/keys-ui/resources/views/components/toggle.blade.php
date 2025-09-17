@@ -3,9 +3,9 @@
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:model');
 @endphp
 
-{{-- Make label be the wrapper for full clickability --}}
+
 <label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $combinedClasses()]) }}>
-    {{-- Hidden checkbox input for accessibility and form submission --}}
+    
     <input
         type="checkbox"
         id="{{ $id }}"
@@ -18,10 +18,10 @@
         {{ $toggleAttributes }}
     />
 
-    {{-- Toggle track with thumb --}}
+    
     <div class="{{ $trackClasses() }}"></div>
 
-    {{-- Content section (label, description, actions) --}}
+    
     @if($hasContent())
         <div class="flex-1 min-w-0">
             <div class="flex items-start justify-between">

@@ -1,4 +1,4 @@
-{{-- Avatar Stack Container --}}
+
 <div {{ $attributes->merge(['class' => $stackClasses]) }}>
     {{--
         The slot content will contain individual Avatar components.
