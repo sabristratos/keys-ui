@@ -1,0 +1,44 @@
+{
+    "name": "keys/ui",
+    "description": "A modern Blade components library for Laravel 12 and Tailwind v4",
+    "version": "1.0.0",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Keys Team",
+            "email": "hello@keys.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^12.0",
+        "illuminate/view": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Keys\\UI\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Keys\\UI\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Keys\\UI\\KeysUiServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
