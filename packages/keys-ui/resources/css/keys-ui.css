@@ -1,3 +1,7 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --radius-base: 0.5rem;
   --radius-sm: calc(var(--radius-base) * 0.25);
@@ -6,6 +10,15 @@
   --radius-xl: calc(var(--radius-base) * 1.5);
   --radius-2xl: calc(var(--radius-base) * 2);
   --radius-3xl: calc(var(--radius-base) * 3);
+
+  /* Subtler shadow system */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.025);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
 
   --color-brand-50: oklch(0.98 0.013 70.64);
   --color-brand-100: oklch(0.95 0.04 70.1);
@@ -81,193 +94,204 @@
 }
 
 :root {
-  --brand: var(--color-brand-500);
-  --brand-hover: var(--color-brand-600);
-  --brand-active: var(--color-brand-700);
-  --brand-disabled: var(--color-neutral-300);
-  --on-brand: var(--color-neutral-50);
+  /* Enable automatic light/dark mode detection */
+  color-scheme: light dark;
 
-  --danger: var(--color-danger-500);
-  --danger-hover: var(--color-danger-600);
-  --danger-active: var(--color-danger-700);
-  --danger-disabled: var(--color-neutral-300);
-  --on-danger: var(--color-neutral-50);
+  /* Core Layout Colors - Modern light-dark() approach */
+  --surface: light-dark(white, var(--color-neutral-900));
+  --body: light-dark(var(--color-neutral-50), var(--color-neutral-950));
+  --foreground: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+  --border: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+  --input: light-dark(var(--color-neutral-50), var(--color-neutral-950));
+  --muted: light-dark(var(--color-neutral-600), var(--color-neutral-400));
 
-  --warning: var(--color-warning-500);
-  --warning-hover: var(--color-warning-600);
-  --warning-active: var(--color-warning-700);
-  --warning-disabled: var(--color-neutral-300);
-  --on-warning: var(--color-neutral-900);
+  /* Semantic Colors - Responsive to color scheme */
+  --brand: light-dark(var(--color-brand-500), var(--color-brand-400));
+  --brand-hover: light-dark(var(--color-brand-600), var(--color-brand-300));
+  --brand-active: light-dark(var(--color-brand-700), var(--color-brand-200));
+  --brand-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  --foreground-brand: white;
 
-  --success: var(--color-success-500);
-  --success-hover: var(--color-success-600);
-  --success-active: var(--color-success-700);
-  --success-disabled: var(--color-neutral-300);
-  --on-success: var(--color-neutral-50);
+  --danger: light-dark(var(--color-danger-500), var(--color-danger-400));
+  --danger-hover: light-dark(var(--color-danger-600), var(--color-danger-300));
+  --danger-active: light-dark(var(--color-danger-700), var(--color-danger-200));
+  --danger-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  --foreground-danger: white;
 
-  --info: var(--color-info-500);
-  --info-hover: var(--color-info-600);
-  --info-active: var(--color-info-700);
-  --info-disabled: var(--color-neutral-300);
-  --on-info: var(--color-neutral-50);
+  --warning: light-dark(var(--color-warning-500), var(--color-warning-400));
+  --warning-hover: light-dark(var(--color-warning-600), var(--color-warning-300));
+  --warning-active: light-dark(var(--color-warning-700), var(--color-warning-200));
+  --warning-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  --foreground-warning: light-dark(var(--color-neutral-900), var(--color-neutral-900));
 
-  --neutral: var(--color-neutral-500);
-  --neutral-hover: var(--color-neutral-600);
-  --neutral-active: var(--color-neutral-700);
-  --neutral-disabled: var(--color-neutral-300);
-  --on-neutral: var(--color-neutral-50);
+  --success: light-dark(var(--color-success-500), var(--color-success-400));
+  --success-hover: light-dark(var(--color-success-600), var(--color-success-300));
+  --success-active: light-dark(var(--color-success-700), var(--color-success-200));
+  --success-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  --foreground-success: white;
 
-  --surface-brand: var(--color-brand-50);
-  --on-surface-brand: var(--color-brand-900);
-  --surface-danger: var(--color-danger-50);
-  --on-surface-danger: var(--color-danger-900);
-  --surface-warning: var(--color-warning-50);
-  --on-surface-warning: var(--color-warning-900);
-  --surface-success: var(--color-success-50);
-  --on-surface-success: var(--color-success-900);
-  --surface-info: var(--color-info-50);
-  --on-surface-info: var(--color-info-900);
-  --surface-neutral: var(--color-neutral-50);
-  --on-surface-neutral: var(--color-neutral-900);
+  --info: light-dark(var(--color-info-500), var(--color-info-400));
+  --info-hover: light-dark(var(--color-info-600), var(--color-info-300));
+  --info-active: light-dark(var(--color-info-700), var(--color-info-200));
+  --info-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  --foreground-info: white;
 
-  --background-brand: var(--color-brand-100);
-  --on-background-brand: var(--color-brand-800);
-  --background-danger: var(--color-danger-100);
-  --on-background-danger: var(--color-danger-800);
-  --background-warning: var(--color-warning-100);
-  --on-background-warning: var(--color-warning-800);
-  --background-success: var(--color-success-100);
-  --on-background-success: var(--color-success-800);
-  --background-info: var(--color-info-100);
-  --on-background-info: var(--color-info-800);
-  --background-neutral: var(--color-neutral-100);
-  --on-background-neutral: var(--color-neutral-800);
-}
+  --neutral: light-dark(var(--color-neutral-500), var(--color-neutral-400));
+  --neutral-hover: light-dark(var(--color-neutral-600), var(--color-neutral-300));
+  --neutral-active: light-dark(var(--color-neutral-700), var(--color-neutral-200));
+  --neutral-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  --foreground-neutral: white;
 
-.dark {
-  --brand: var(--color-brand-400);
-  --brand-hover: var(--color-brand-300);
-  --brand-active: var(--color-brand-200);
-  --brand-disabled: var(--color-neutral-700);
-  --on-brand: var(--color-neutral-900);
 
-  --danger: var(--color-danger-400);
-  --danger-hover: var(--color-danger-300);
-  --danger-active: var(--color-danger-200);
-  --danger-disabled: var(--color-neutral-700);
-  --on-danger: var(--color-neutral-900);
-
-  --warning: var(--color-warning-400);
-  --warning-hover: var(--color-warning-300);
-  --warning-active: var(--color-warning-200);
-  --warning-disabled: var(--color-neutral-700);
-  --on-warning: var(--color-neutral-900);
-
-  --success: var(--color-success-400);
-  --success-hover: var(--color-success-300);
-  --success-active: var(--color-success-200);
-  --success-disabled: var(--color-neutral-700);
-  --on-success: var(--color-neutral-900);
-
-  --info: var(--color-info-400);
-  --info-hover: var(--color-info-300);
-  --info-active: var(--color-info-200);
-  --info-disabled: var(--color-neutral-700);
-  --on-info: var(--color-neutral-900);
-
-  --neutral: var(--color-neutral-400);
-  --neutral-hover: var(--color-neutral-300);
-  --neutral-active: var(--color-neutral-200);
-  --neutral-disabled: var(--color-neutral-700);
-  --on-neutral: var(--color-neutral-900);
-
-  --surface-brand: var(--color-brand-950);
-  --on-surface-brand: var(--color-brand-100);
-  --surface-danger: var(--color-danger-950);
-  --on-surface-danger: var(--color-danger-100);
-  --surface-warning: var(--color-warning-950);
-  --on-surface-warning: var(--color-warning-100);
-  --surface-success: var(--color-success-950);
-  --on-surface-success: var(--color-success-100);
-  --surface-info: var(--color-info-950);
-  --on-surface-info: var(--color-info-100);
-  --surface-neutral: var(--color-neutral-950);
-  --on-surface-neutral: var(--color-neutral-100);
-
-  --background-brand: var(--color-brand-900);
-  --on-background-brand: var(--color-brand-200);
-  --background-danger: var(--color-danger-900);
-  --on-background-danger: var(--color-danger-200);
-  --background-warning: var(--color-warning-900);
-  --on-background-warning: var(--color-warning-200);
-  --background-success: var(--color-success-900);
-  --on-background-success: var(--color-success-200);
-  --background-info: var(--color-info-900);
-  --on-background-info: var(--color-info-200);
-  --background-neutral: var(--color-neutral-900);
-  --on-background-neutral: var(--color-neutral-200);
 }
 
 @theme inline {
+  /* Core Layout Colors */
+  --color-surface: var(--surface);
+  --color-body: var(--body);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+
+  /* Semantic Colors */
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-active: var(--brand-active);
   --color-brand-disabled: var(--brand-disabled);
-  --color-on-brand: var(--on-brand);
+  --color-foreground-brand: var(--foreground-brand);
 
   --color-danger: var(--danger);
   --color-danger-hover: var(--danger-hover);
   --color-danger-active: var(--danger-active);
   --color-danger-disabled: var(--danger-disabled);
-  --color-on-danger: var(--on-danger);
+  --color-foreground-danger: var(--foreground-danger);
 
   --color-warning: var(--warning);
   --color-warning-hover: var(--warning-hover);
   --color-warning-active: var(--warning-active);
   --color-warning-disabled: var(--warning-disabled);
-  --color-on-warning: var(--on-warning);
+  --color-foreground-warning: var(--foreground-warning);
 
   --color-success: var(--success);
   --color-success-hover: var(--success-hover);
   --color-success-active: var(--success-active);
   --color-success-disabled: var(--success-disabled);
-  --color-on-success: var(--on-success);
+  --color-foreground-success: var(--foreground-success);
 
   --color-info: var(--info);
   --color-info-hover: var(--info-hover);
   --color-info-active: var(--info-active);
   --color-info-disabled: var(--info-disabled);
-  --color-on-info: var(--on-info);
+  --color-foreground-info: var(--foreground-info);
 
   --color-neutral: var(--neutral);
   --color-neutral-hover: var(--neutral-hover);
   --color-neutral-active: var(--neutral-active);
   --color-neutral-disabled: var(--neutral-disabled);
-  --color-on-neutral: var(--on-neutral);
+  --color-foreground-neutral: var(--foreground-neutral);
 
-  --color-surface-brand: var(--surface-brand);
-  --color-on-surface-brand: var(--on-surface-brand);
-  --color-surface-danger: var(--surface-danger);
-  --color-on-surface-danger: var(--on-surface-danger);
-  --color-surface-warning: var(--surface-warning);
-  --color-on-surface-warning: var(--on-surface-warning);
-  --color-surface-success: var(--surface-success);
-  --color-on-surface-success: var(--on-surface-success);
-  --color-surface-info: var(--surface-info);
-  --color-on-surface-info: var(--on-surface-info);
-  --color-surface-neutral: var(--surface-neutral);
-  --color-on-surface-neutral: var(--on-surface-neutral);
-
-  --color-background-brand: var(--background-brand);
-  --color-on-background-brand: var(--on-background-brand);
-  --color-background-danger: var(--background-danger);
-  --color-on-background-danger: var(--on-background-danger);
-  --color-background-warning: var(--background-warning);
-  --color-on-background-warning: var(--on-background-warning);
-  --color-background-success: var(--background-success);
-  --color-on-background-success: var(--on-background-success);
-  --color-background-info: var(--background-info);
-  --color-on-background-info: var(--on-background-info);
-  --color-background-neutral: var(--background-neutral);
-  --color-on-background-neutral: var(--on-background-neutral);
+  /* Muted Color */
+  --color-muted: var(--muted);
 }
+
+/* Custom Scrollbar Implementation */
+/* Modern browsers with cross-browser compatibility */
+
+/* Base scrollbar styling - applies to all scrollable elements */
+* {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: light-dark(var(--color-neutral-300), var(--color-neutral-600)) transparent;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: light-dark(var(--color-neutral-300), var(--color-neutral-600));
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: light-dark(var(--color-neutral-500), var(--color-neutral-400));
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Thin scrollbar variant for Select components and small containers */
+.scrollbar-thin,
+[data-select-options] {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: light-dark(var(--color-neutral-400), var(--color-neutral-500)) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar,
+[data-select-options]::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb,
+[data-select-options]::-webkit-scrollbar-thumb {
+  background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover,
+[data-select-options]::-webkit-scrollbar-thumb:hover {
+  background: light-dark(var(--color-neutral-500), var(--color-neutral-400));
+}
+
+/* Hide scrollbar variant */
+.scrollbar-hide {
+  /* Firefox */
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Thick scrollbar variant for large content areas */
+.scrollbar-thick {
+  /* Firefox */
+  scrollbar-width: auto;
+  scrollbar-color: light-dark(var(--color-neutral-300), var(--color-neutral-600)) light-dark(var(--color-neutral-100), var(--color-neutral-800));
+}
+
+.scrollbar-thick::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.scrollbar-thick::-webkit-scrollbar-track {
+  background: light-dark(var(--color-neutral-100), var(--color-neutral-800));
+  border-radius: 6px;
+}
+
+.scrollbar-thick::-webkit-scrollbar-thumb {
+  background: light-dark(var(--color-neutral-300), var(--color-neutral-600));
+  border-radius: 6px;
+  border: 2px solid light-dark(var(--color-neutral-100), var(--color-neutral-800));
+}
+
+.scrollbar-thick::-webkit-scrollbar-thumb:hover {
+  background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+}
+

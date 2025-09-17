@@ -1,0 +1,63 @@
+{
+  "name": "@keys/ui",
+  "version": "1.0.0",
+  "description": "Modern Blade components library for Laravel",
+  "type": "module",
+  "main": "dist/keys-ui.umd.js",
+  "module": "dist/keys-ui.es.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "resources",
+    "src",
+    "config"
+  ],
+  "scripts": {
+    "dev": "vite --port 5174",
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "preview": "vite preview --port 5174",
+    "build:css": "postcss resources/css/keys-ui.css -o dist/keys-ui.css",
+    "watch:css": "postcss resources/css/keys-ui.css -o dist/keys-ui.css --watch",
+    "build:js": "vite build",
+    "watch:js": "vite build --watch",
+    "build:all": "npm run build:css && npm run build:js",
+    "watch:all": "concurrently \"npm run watch:css\" \"npm run watch:js\"",
+    "publish:assets": "php ../../artisan vendor:publish --tag=keys-ui-assets --force",
+    "publish:config": "php ../../artisan vendor:publish --tag=keys-ui-config --force",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "autoprefixer": "^10.4.0",
+    "concurrently": "^8.2.0",
+    "postcss": "^8.4.0",
+    "postcss-cli": "^11.0.0",
+    "rimraf": "^5.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
+  },
+  "keywords": [
+    "laravel",
+    "blade",
+    "components",
+    "ui",
+    "tailwind",
+    "keys-ui"
+  ],
+  "author": "Keys UI Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keys-ui/keys-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/keys-ui/keys-ui/issues"
+  },
+  "homepage": "https://github.com/keys-ui/keys-ui#readme"
+}

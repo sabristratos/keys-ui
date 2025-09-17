@@ -9,7 +9,7 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
-                'packages/src/index.ts'
+                'packages/keys-ui/resources/js/index.ts'
             ],
             refresh: true,
         }),
@@ -25,17 +25,8 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 app: 'resources/js/app.js',
-                css: 'resources/css/app.css',
-                'keyui': 'packages/src/index.ts'
-            },
-            output: {
-                entryFileNames: (chunk) => {
-                    if (chunk.name === 'keyui') {
-                        return 'assets/keyui-[hash].js';
-                    }
-                    return 'assets/[name]-[hash].js';
-                },
-            },
+                css: 'resources/css/app.css'
+            }
         },
     },
 });

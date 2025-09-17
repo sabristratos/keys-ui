@@ -1,5 +1,5 @@
 @if($iconExists())
-    @svg($iconName(), $attributes->merge(['class' => $sizeClasses()]))
+    <x-dynamic-component :component="$iconName()" {{ $attributes->merge(['class' => $sizeClasses()]) }} />
 @else
-    @svg($fallback, $attributes->merge(['class' => $sizeClasses()]))
+    <x-dynamic-component :component="$fallback" {{ $attributes->merge(['class' => $sizeClasses()]) }} />
 @endif

@@ -1,0 +1,1852 @@
+function M(T, t = "") {
+  const e = window.KeysUITranslations;
+  if (!e)
+    return t;
+  const s = T.split(".");
+  let i = e;
+  for (const n of s)
+    if (i = i == null ? void 0 : i[n], i === void 0)
+      return t;
+  return i || t;
+}
+const g = class g {
+  constructor() {
+    this.initialized = !1;
+  }
+  /**
+   * Get singleton instance
+   */
+  static getInstance() {
+    return g.instance || (g.instance = new g()), g.instance;
+  }
+  /**
+   * Initialize FormActions for all form elements with actions
+   */
+  init() {
+    this.initialized || (this.bindEventListeners(), this.initialized = !0, console.log("FormActions initialized"));
+  }
+  /**
+   * Bind event listeners using event delegation
+   */
+  bindEventListeners() {
+    document.addEventListener("click", (t) => {
+      var s;
+      const e = (s = t.target) == null ? void 0 : s.closest(".input-action");
+      e && (t.preventDefault(), this.handleActionClick(e));
+    }), document.addEventListener("keydown", (t) => {
+      if (t.key === "Enter" || t.key === " ") {
+        const e = t.target;
+        e != null && e.classList.contains("input-action") && (t.preventDefault(), this.handleActionClick(e));
+      }
+    });
+  }
+  /**
+   * Handle action button click
+   */
+  async handleActionClick(t) {
+    const e = t.closest(".input-action"), s = e == null ? void 0 : e.dataset.action;
+    if (!s) return;
+    const i = this.findFormElementForAction(t);
+    if (i) {
+      switch (s) {
+        case "clear":
+          this.clearValue(i);
+          break;
+        case "copy":
+          await this.copyToClipboard(i, e);
+          break;
+        case "toggle-password":
+          await this.togglePasswordVisibility(i, t, e);
+          break;
+        case "external":
+          this.openExternalUrl(t.dataset.url);
+          break;
+        default:
+          this.handleCustomAction(i, s);
+          break;
+      }
+      this.dispatchActionEvent(i, s);
+    }
+  }
+  /**
+   * Find the form element (input or textarea) associated with an action button
+   */
+  findFormElementForAction(t) {
+    const e = t.closest(".relative");
+    return (e == null ? void 0 : e.querySelector("input, textarea")) || null;
+  }
+  /**
+   * Swap the icon using CSS classes and data attributes
+   */
+  async swapButtonIcon(t, e) {
+    t.setAttribute("data-current-icon", e), this.updateButtonIconState(t, e);
+  }
+  /**
+   * Update button icon state using Tailwind classes
+   */
+  updateButtonIconState(t, e) {
+    const s = t.querySelector(".button-icon-default"), i = t.querySelector(".button-icon-toggle"), n = t.querySelector(".button-icon-success"), o = t.dataset.iconDefault, r = t.dataset.iconToggle, a = t.dataset.iconSuccess;
+    s && (s.classList.remove("opacity-100"), s.classList.add("opacity-0")), i && (i.classList.remove("opacity-100", "scale-110", "scale-90"), i.classList.add("opacity-0")), n && (n.classList.remove("opacity-100", "scale-110", "scale-90"), n.classList.add("opacity-0")), e === o && s ? (s.classList.remove("opacity-0"), s.classList.add("opacity-100")) : e === r && i ? (i.classList.remove("opacity-0"), i.classList.add("opacity-100")) : e === a && n && (n.classList.remove("opacity-0"), n.classList.add("opacity-100", "scale-110"));
+  }
+  /**
+   * Animate icon success feedback using Tailwind classes
+   */
+  animateIconSuccess(t) {
+    t.classList.add("scale-110"), setTimeout(() => {
+      t.classList.remove("scale-110"), t.classList.add("scale-90"), setTimeout(() => {
+        t.classList.remove("scale-90");
+      }, 150);
+    }, 150);
+  }
+  /**
+   * Clear form element value
+   */
+  clearValue(t) {
+    t.value = "", t.focus(), t.dispatchEvent(new Event("input", { bubbles: !0 })), t.dispatchEvent(new Event("change", { bubbles: !0 }));
+  }
+  /**
+   * Copy form element value to clipboard
+   */
+  async copyToClipboard(t, e) {
+    const s = e.querySelector("button");
+    try {
+      await navigator.clipboard.writeText(t.value), this.showFeedback(t, M("feedback.copied_clipboard", "Copied to clipboard"), "success"), s && await this.showCopySuccess(s, e);
+    } catch {
+      this.fallbackCopyToClipboard(t, e);
+    }
+  }
+  /**
+   * Fallback copy method for older browsers
+   */
+  fallbackCopyToClipboard(t, e) {
+    const s = e.querySelector("button");
+    t.select(), t instanceof HTMLInputElement && t.setSelectionRange(0, 99999);
+    try {
+      document.execCommand("copy"), this.showFeedback(t, M("feedback.copied_clipboard", "Copied to clipboard"), "success"), s && this.showCopySuccess(s, e);
+    } catch {
+      this.showFeedback(t, "Copy failed", "error");
+    }
+  }
+  /**
+   * Show copy success visual feedback
+   */
+  async showCopySuccess(t, e) {
+    const s = t.dataset.iconSuccess, i = t.dataset.labelSuccess, n = t.dataset.iconDefault, o = t.querySelector(".sr-only");
+    if (s && n)
+      if (await this.swapButtonIcon(t, s), i && o) {
+        const r = o.textContent;
+        o.textContent = i, setTimeout(async () => {
+          await this.swapButtonIcon(t, n), r && o && (o.textContent = r);
+        }, 2e3);
+      } else
+        setTimeout(async () => {
+          await this.swapButtonIcon(t, n);
+        }, 2e3);
+  }
+  /**
+   * Toggle password visibility
+   */
+  async togglePasswordVisibility(t, e, s) {
+    var u;
+    const i = t.type === "password", n = i ? "text" : "password", o = e.dataset.iconDefault, r = e.dataset.iconToggle, a = (u = e.querySelector(".sr-only")) == null ? void 0 : u.textContent, l = e.dataset.labelToggle;
+    t.type = n;
+    const c = e.querySelector(".sr-only");
+    i ? (r && await this.swapButtonIcon(e, r), l && c && (c.textContent = l), e.setAttribute("aria-label", l || "Hide password")) : (o && await this.swapButtonIcon(e, o), a && c && (c.textContent = a), e.setAttribute("aria-label", a || "Show password"));
+  }
+  /**
+   * Open external URL in new tab
+   */
+  openExternalUrl(t) {
+    if (t)
+      try {
+        window.open(t, "_blank", "noopener,noreferrer");
+      } catch (e) {
+        console.error("Failed to open external URL:", e);
+      }
+  }
+  /**
+   * Handle custom actions
+   */
+  handleCustomAction(t, e) {
+    console.log(`Custom action "${e}" triggered for element:`, t);
+  }
+  /**
+   * Dispatch custom event for action
+   */
+  dispatchActionEvent(t, e) {
+    const s = new CustomEvent("form-action", {
+      detail: {
+        element: t,
+        action: e,
+        value: t.value
+      },
+      bubbles: !0
+    });
+    t.dispatchEvent(s);
+  }
+  /**
+   * Show temporary feedback message
+   */
+  showFeedback(t, e, s = "success") {
+    const i = document.createElement("div");
+    i.className = `absolute top-full left-0 mt-1 px-2 py-1 text-xs rounded shadow-lg z-10 pointer-events-none ${s === "success" ? "bg-success text-foreground-success" : "bg-danger text-foreground-danger"}`, i.textContent = e;
+    const n = t.closest(".relative");
+    n && (n.appendChild(i), setTimeout(() => {
+      i.parentNode && i.parentNode.removeChild(i);
+    }, 2e3));
+  }
+  /**
+   * Add a custom action handler
+   */
+  addActionHandler(t, e) {
+    document.addEventListener("form-action", (s) => {
+      const i = s;
+      i.detail.action === t && e(i.detail.element);
+    });
+  }
+  /**
+   * Destroy FormActions and clean up
+   */
+  destroy() {
+    this.initialized = !1, console.log("FormActions destroyed");
+  }
+};
+g.instance = null;
+let x = g;
+x.getInstance();
+const m = class m {
+  constructor() {
+    this.initialized = !1;
+  }
+  /**
+   * Get singleton instance
+   */
+  static getInstance() {
+    return m.instance || (m.instance = new m()), m.instance;
+  }
+  /**
+   * Initialize AlertActions for all dismissible alerts
+   */
+  init() {
+    this.initialized || (this.bindEventListeners(), this.initialized = !0, console.log("AlertActions initialized"));
+  }
+  /**
+   * Bind event listeners using event delegation
+   */
+  bindEventListeners() {
+    document.addEventListener("click", (t) => {
+      var s;
+      const e = (s = t.target) == null ? void 0 : s.closest("[data-dismiss-alert]");
+      e && (t.preventDefault(), this.handleDismissClick(e));
+    }), document.addEventListener("keydown", (t) => {
+      if (t.key === "Enter" || t.key === " ") {
+        const e = t.target;
+        e != null && e.hasAttribute("data-dismiss-alert") && (t.preventDefault(), this.handleDismissClick(e));
+      }
+    });
+  }
+  /**
+   * Handle dismiss button click
+   */
+  handleDismissClick(t) {
+    const e = this.findAlertForButton(t);
+    e && (this.dismissAlert(e), this.dispatchAlertEvent(e, "dismiss"));
+  }
+  /**
+   * Find the alert element associated with a dismiss button
+   */
+  findAlertForButton(t) {
+    return t.closest('[data-dismissible="true"]') || null;
+  }
+  /**
+   * Dismiss an alert with smooth animation
+   */
+  dismissAlert(t) {
+    t.classList.add("alert-dismissing"), t.style.transition = "all 0.3s ease-out", t.style.opacity = "0", t.style.transform = "translateX(100%)", t.style.maxHeight = "0", t.style.padding = "0", t.style.margin = "0", t.style.overflow = "hidden", setTimeout(() => {
+      t.parentNode && t.parentNode.removeChild(t);
+    }, 300);
+  }
+  /**
+   * Show an alert programmatically
+   */
+  showAlert(t) {
+    t.style.display = "block", t.style.opacity = "1", t.style.transform = "translateX(0)", this.dispatchAlertEvent(t, "show");
+  }
+  /**
+   * Create and show a new alert dynamically
+   */
+  createAlert(t) {
+    const {
+      variant: e = "info",
+      title: s,
+      message: i,
+      dismissible: n = !0,
+      duration: o,
+      container: r = document.body
+    } = t, a = document.createElement("div");
+    a.className = this.getAlertClasses(e), a.setAttribute("role", "alert"), n && a.setAttribute("data-dismissible", "true");
+    const l = this.buildAlertContent(e, s, i, n);
+    return a.innerHTML = l, r.appendChild(a), a.style.opacity = "0", a.style.transform = "translateX(100%)", setTimeout(() => {
+      this.showAlert(a);
+    }, 10), o && o > 0 && setTimeout(() => {
+      this.dismissAlert(a);
+    }, o), this.dispatchAlertEvent(a, "create"), a;
+  }
+  /**
+   * Get CSS classes for alert variant
+   */
+  getAlertClasses(t) {
+    const e = "rounded-lg border p-4 space-y-3", s = {
+      info: "bg-info/5 border-info/20 text-info-foreground",
+      success: "bg-success/5 border-success/20 text-success-foreground",
+      warning: "bg-warning/5 border-warning/20 text-warning-foreground",
+      danger: "bg-danger/5 border-danger/20 text-danger-foreground",
+      neutral: "bg-neutral/5 border-neutral/20 text-neutral-foreground"
+    };
+    return `${e} ${s[t] || s.info}`;
+  }
+  /**
+   * Build alert content HTML
+   */
+  buildAlertContent(t, e, s, i) {
+    const n = this.getVariantIcon(t), o = this.getVariantIconColor(t);
+    return `
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="w-5 h-5 ${o}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        ${this.getIconSvg(n)}
+                    </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                    ${e ? `<div class="text-base font-medium">${e}</div>` : ""}
+                    <div class="text-sm opacity-90 ${e ? "mt-1" : ""}">${s || ""}</div>
+                </div>
+                ${i ? `
+                    <div class="ml-auto pl-3">
+                        <button type="button" data-dismiss-alert class="inline-flex rounded-md p-1 ${o} hover:bg-current hover:bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-current" aria-label="Dismiss">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                ` : ""}
+            </div>
+        `;
+  }
+  /**
+   * Get icon name for variant
+   */
+  getVariantIcon(t) {
+    const e = {
+      info: "information-circle",
+      success: "check-circle",
+      warning: "exclamation-triangle",
+      danger: "x-circle",
+      neutral: "chat-bubble-left-ellipsis"
+    };
+    return e[t] || e.info;
+  }
+  /**
+   * Get icon color for variant
+   */
+  getVariantIconColor(t) {
+    const e = {
+      info: "text-info",
+      success: "text-success",
+      warning: "text-warning",
+      danger: "text-danger",
+      neutral: "text-neutral"
+    };
+    return e[t] || e.info;
+  }
+  /**
+   * Get SVG path for icon
+   */
+  getIconSvg(t) {
+    const e = {
+      "information-circle": '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+      "check-circle": '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+      "exclamation-triangle": '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>',
+      "x-circle": '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+      "chat-bubble-left-ellipsis": '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>'
+    };
+    return e[t] || e["information-circle"];
+  }
+  /**
+   * Dispatch custom event for alert action
+   */
+  dispatchAlertEvent(t, e) {
+    const s = new CustomEvent("alert-action", {
+      detail: {
+        alert: t,
+        action: e
+      },
+      bubbles: !0
+    });
+    t.dispatchEvent(s), document.dispatchEvent(s);
+  }
+  /**
+   * Add a custom alert action handler
+   */
+  addActionHandler(t, e) {
+    document.addEventListener("alert-action", (s) => {
+      const i = s;
+      i.detail.action === t && e(i.detail.alert);
+    });
+  }
+  /**
+   * Dismiss all alerts of a specific variant
+   */
+  dismissAllByVariant(t) {
+    document.querySelectorAll(`[data-dismissible="true"][class*="${t}"]`).forEach((s) => {
+      this.dismissAlert(s);
+    });
+  }
+  /**
+   * Dismiss all dismissible alerts
+   */
+  dismissAll() {
+    document.querySelectorAll('[data-dismissible="true"]').forEach((e) => {
+      this.dismissAlert(e);
+    });
+  }
+  /**
+   * Destroy AlertActions and clean up
+   */
+  destroy() {
+    this.initialized = !1, console.log("AlertActions destroyed");
+  }
+};
+m.instance = null;
+let A = m;
+A.getInstance();
+const b = class b {
+  constructor() {
+    this.initialized = !1;
+  }
+  /**
+   * Get singleton instance
+   */
+  static getInstance() {
+    return b.instance || (b.instance = new b()), b.instance;
+  }
+  /**
+   * Initialize RadioActions for all radio elements
+   */
+  init() {
+    this.initialized || (this.bindEventListeners(), this.initialized = !0, console.log("RadioActions initialized"));
+  }
+  /**
+   * Bind event listeners using event delegation
+   */
+  bindEventListeners() {
+    document.addEventListener("click", (t) => {
+      const s = t.target.closest("label[for]");
+      if (!s) return;
+      const i = s.getAttribute("for");
+      if (!i) return;
+      const n = document.getElementById(i);
+      !n || n.type !== "radio" || this.focusRadioInput(n);
+    }), document.addEventListener("keydown", (t) => {
+      const e = t.target;
+      !e || e.type !== "radio" || (t.key === "ArrowDown" || t.key === "ArrowRight" ? (t.preventDefault(), this.focusNextRadio(e)) : (t.key === "ArrowUp" || t.key === "ArrowLeft") && (t.preventDefault(), this.focusPreviousRadio(e)));
+    });
+  }
+  /**
+   * Focus a radio input with proper timing
+   */
+  focusRadioInput(t) {
+    setTimeout(() => {
+      t.focus(), this.dispatchFocusEvent(t);
+    }, 0);
+  }
+  /**
+   * Focus the next radio in the same group
+   */
+  focusNextRadio(t) {
+    const e = this.getRadioGroup(t), i = (e.indexOf(t) + 1) % e.length, n = e[i];
+    n && (n.focus(), n.checked = !0, n.dispatchEvent(new Event("change", { bubbles: !0 })), this.dispatchFocusEvent(n));
+  }
+  /**
+   * Focus the previous radio in the same group
+   */
+  focusPreviousRadio(t) {
+    const e = this.getRadioGroup(t), s = e.indexOf(t), i = s === 0 ? e.length - 1 : s - 1, n = e[i];
+    n && (n.focus(), n.checked = !0, n.dispatchEvent(new Event("change", { bubbles: !0 })), this.dispatchFocusEvent(n));
+  }
+  /**
+   * Get all radio inputs in the same group
+   */
+  getRadioGroup(t) {
+    const e = t.name;
+    return e ? Array.from(document.querySelectorAll(`input[type="radio"][name="${e}"]`)).filter((i) => !i.disabled) : [t];
+  }
+  /**
+   * Dispatch custom event for radio focus
+   */
+  dispatchFocusEvent(t) {
+    const e = new CustomEvent("radio-focus", {
+      detail: {
+        radio: t,
+        name: t.name,
+        value: t.value,
+        checked: t.checked
+      },
+      bubbles: !0
+    });
+    t.dispatchEvent(e);
+  }
+  /**
+   * Add a custom radio focus handler
+   */
+  addFocusHandler(t) {
+    document.addEventListener("radio-focus", (e) => {
+      t(e.detail.radio);
+    });
+  }
+  /**
+   * Destroy RadioActions and clean up
+   */
+  destroy() {
+    this.initialized = !1, console.log("RadioActions destroyed");
+  }
+};
+b.instance = null;
+let I = b;
+I.getInstance();
+const w = class w {
+  constructor() {
+    this.initialized = !1, this.selectStates = /* @__PURE__ */ new Map();
+  }
+  /**
+   * Get singleton instance
+   */
+  static getInstance() {
+    return w.instance || (w.instance = new w()), w.instance;
+  }
+  /**
+   * Initialize SelectActions for all select elements
+   */
+  init() {
+    this.initialized || (this.bindEventListeners(), this.initializeSelects(), this.initialized = !0, console.log("SelectActions initialized"));
+  }
+  /**
+   * Initialize all existing select elements
+   */
+  initializeSelects() {
+    document.querySelectorAll('[data-select="true"]').forEach((t) => {
+      this.initializeSelect(t);
+    });
+  }
+  /**
+   * Initialize a single select element
+   */
+  initializeSelect(t) {
+    const e = t.dataset.multiple === "true", s = t.dataset.value;
+    let i = [];
+    if (s)
+      try {
+        i = e ? JSON.parse(s) : [s];
+      } catch {
+        i = e ? [] : [s];
+      }
+    const n = {
+      isOpen: !1,
+      selectedValues: i,
+      searchTerm: "",
+      focusedIndex: -1,
+      filteredOptions: []
+    };
+    this.selectStates.set(t, n), this.updateOptions(t), this.updateOptionsSelectedState(t), this.updateDisplay(t);
+  }
+  /**
+   * Bind global event listeners using event delegation
+   */
+  bindEventListeners() {
+    document.addEventListener("click", (e) => {
+      var l, c, u, d, h, f, E;
+      const s = (l = e.target) == null ? void 0 : l.closest("[data-remove-chip]");
+      if (s) {
+        e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation();
+        const p = s.dataset.removeChip, O = s.closest('[data-select="true"]');
+        O && p && (console.log("Chip remove clicked:", p), this.removeChip(O, p));
+        return;
+      }
+      const i = (c = e.target) == null ? void 0 : c.closest("[data-select-clear]");
+      if (i) {
+        e.preventDefault(), e.stopPropagation();
+        const p = i.closest('[data-select="true"]');
+        p && this.clearSelection(p);
+        return;
+      }
+      const n = (u = e.target) == null ? void 0 : u.closest("[data-select-option]");
+      if (n) {
+        e.preventDefault(), e.stopPropagation();
+        const p = n.closest('[data-select="true"]');
+        p && this.selectOption(p, n);
+        return;
+      }
+      const o = (d = e.target) == null ? void 0 : d.closest("[data-select-trigger]");
+      if (o) {
+        e.preventDefault(), e.stopPropagation();
+        const p = o.closest('[data-select="true"]');
+        p && !this.isDisabled(p) && this.toggleDropdown(p);
+        return;
+      }
+      if ((h = e.target) == null ? void 0 : h.closest("[data-select-search]")) {
+        e.stopPropagation();
+        return;
+      }
+      const a = (E = (f = e.target) == null ? void 0 : f.closest("[data-select-search]")) == null ? void 0 : E.parentElement;
+      if (a && a.querySelector("[data-select-search]")) {
+        e.stopPropagation();
+        return;
+      }
+      this.closeAllDropdowns();
+    }), document.addEventListener("input", (e) => {
+      const s = e.target;
+      if (s != null && s.matches("[data-select-search]")) {
+        const i = s.closest('[data-select="true"]');
+        i && this.handleSearch(i, s.value);
+      }
+    }), document.addEventListener("keydown", (e) => {
+      var i;
+      const s = (i = e.target) == null ? void 0 : i.closest('[data-select="true"]');
+      s && this.handleKeydown(s, e);
+    }), document.addEventListener("focusin", (e) => {
+      var i;
+      const s = (i = e.target) == null ? void 0 : i.closest('[data-select="true"]');
+      s && this.isOpen(s);
+    }), window.addEventListener("resize", () => {
+      this.repositionDropdowns();
+    }), new MutationObserver((e) => {
+      e.forEach((s) => {
+        s.addedNodes.forEach((i) => {
+          i.nodeType === Node.ELEMENT_NODE && i.querySelectorAll('[data-select="true"]').forEach((r) => {
+            this.selectStates.has(r) || this.initializeSelect(r);
+          });
+        });
+      });
+    }).observe(document.body, {
+      childList: !0,
+      subtree: !0
+    });
+  }
+  /**
+   * Toggle dropdown open/closed state
+   */
+  toggleDropdown(t) {
+    const e = this.selectStates.get(t);
+    e && (e.isOpen ? this.closeDropdown(t) : this.openDropdown(t));
+  }
+  /**
+   * Open dropdown
+   */
+  openDropdown(t) {
+    const e = this.selectStates.get(t);
+    if (!e || this.isDisabled(t)) return;
+    this.closeAllDropdowns(), e.isOpen = !0, this.selectStates.set(t, e);
+    const s = t.querySelector("[data-select-dropdown]"), i = t.querySelector("[data-select-trigger]"), n = t.querySelector("[data-select-search]");
+    if (s && (s.classList.remove("hidden"), this.positionDropdown(t)), i) {
+      i.setAttribute("aria-expanded", "true");
+      const o = i.querySelector(".select-arrow");
+      o && o.classList.add("rotate-180");
+    }
+    n && t.dataset.searchable === "true" && setTimeout(() => n.focus(), 10), this.updateFilteredOptions(t), this.dispatchSelectEvent(t, "select:open");
+  }
+  /**
+   * Close dropdown
+   */
+  closeDropdown(t) {
+    const e = this.selectStates.get(t);
+    if (!e || !e.isOpen) return;
+    e.isOpen = !1, e.searchTerm = "", e.focusedIndex = -1, this.selectStates.set(t, e);
+    const s = t.querySelector("[data-select-dropdown]"), i = t.querySelector("[data-select-trigger]"), n = t.querySelector("[data-select-search]");
+    if (s && s.classList.add("hidden"), i) {
+      i.setAttribute("aria-expanded", "false");
+      const o = i.querySelector(".select-arrow");
+      o && o.classList.remove("rotate-180");
+    }
+    n && (n.value = ""), this.handleSearch(t, ""), this.dispatchSelectEvent(t, "select:close");
+  }
+  /**
+   * Close all open dropdowns
+   */
+  closeAllDropdowns() {
+    this.selectStates.forEach((t, e) => {
+      t.isOpen && this.closeDropdown(e);
+    });
+  }
+  /**
+   * Handle option selection
+   */
+  selectOption(t, e) {
+    const s = this.selectStates.get(t), i = e.dataset.value;
+    if (!s || !i || e.getAttribute("aria-disabled") === "true")
+      return;
+    const n = t.dataset.multiple === "true";
+    if (n) {
+      const o = s.selectedValues.indexOf(i);
+      o > -1 ? s.selectedValues.splice(o, 1) : s.selectedValues.push(i);
+    } else
+      s.selectedValues = [i], this.closeDropdown(t);
+    this.selectStates.set(t, s), this.updateDisplay(t), this.updateHiddenInputs(t), this.updateOptionsSelectedState(t), this.dispatchSelectEvent(t, "select:change", {
+      value: n ? s.selectedValues : i,
+      selectedValues: s.selectedValues
+    });
+  }
+  /**
+   * Remove chip (for multiple selection)
+   */
+  removeChip(t, e) {
+    const s = this.selectStates.get(t);
+    if (!s) return;
+    const i = s.selectedValues.indexOf(e);
+    i > -1 && (s.selectedValues.splice(i, 1), this.selectStates.set(t, s), this.updateDisplay(t), this.updateHiddenInputs(t), this.updateOptionsSelectedState(t), this.dispatchSelectEvent(t, "select:change", {
+      value: s.selectedValues,
+      selectedValues: s.selectedValues
+    }));
+  }
+  /**
+   * Clear all selections
+   */
+  clearSelection(t) {
+    const e = this.selectStates.get(t);
+    e && (e.selectedValues = [], this.selectStates.set(t, e), this.updateDisplay(t), this.updateHiddenInputs(t), this.updateOptionsSelectedState(t), this.dispatchSelectEvent(t, "select:change", {
+      value: t.dataset.multiple === "true" ? [] : "",
+      selectedValues: []
+    }));
+  }
+  /**
+   * Handle search functionality
+   */
+  handleSearch(t, e) {
+    const s = this.selectStates.get(t);
+    s && (s.searchTerm = e.toLowerCase(), this.selectStates.set(t, s), this.updateFilteredOptions(t), this.updateOptionsVisibility(t));
+  }
+  /**
+   * Update filtered options based on search term
+   */
+  updateFilteredOptions(t) {
+    const e = this.selectStates.get(t);
+    if (!e) return;
+    const s = this.getAllOptions(t);
+    e.searchTerm ? e.filteredOptions = s.filter(
+      (i) => i.searchableText.includes(e.searchTerm)
+    ) : e.filteredOptions = s, this.selectStates.set(t, e);
+  }
+  /**
+   * Update options visibility based on filter
+   */
+  updateOptionsVisibility(t) {
+    const e = this.selectStates.get(t);
+    if (!e) return;
+    const s = t.querySelectorAll("[data-select-option]"), i = t.querySelector("[data-select-no-results]");
+    let n = 0;
+    s.forEach((o) => {
+      const r = o, a = r.dataset.value || "";
+      e.filteredOptions.some((c) => c.value === a) ? (r.style.display = "", n++) : r.style.display = "none";
+    }), i && (n === 0 && e.searchTerm ? i.classList.remove("hidden") : i.classList.add("hidden"));
+  }
+  /**
+   * Handle keyboard navigation
+   */
+  handleKeydown(t, e) {
+    const s = this.selectStates.get(t);
+    if (s)
+      switch (e.key) {
+        case "Enter":
+        case " ":
+          if (!s.isOpen)
+            e.preventDefault(), this.openDropdown(t);
+          else if (s.focusedIndex >= 0) {
+            e.preventDefault();
+            const i = s.filteredOptions[s.focusedIndex];
+            i && this.selectOption(t, i.element);
+          }
+          break;
+        case "Escape":
+          if (s.isOpen) {
+            e.preventDefault(), this.closeDropdown(t);
+            const i = t.querySelector("[data-select-trigger]");
+            i && i.focus();
+          }
+          break;
+        case "ArrowDown":
+          s.isOpen ? (e.preventDefault(), this.navigateOptions(t, 1)) : (e.preventDefault(), this.openDropdown(t));
+          break;
+        case "ArrowUp":
+          s.isOpen && (e.preventDefault(), this.navigateOptions(t, -1));
+          break;
+        case "Tab":
+          s.isOpen && this.closeDropdown(t);
+          break;
+      }
+  }
+  /**
+   * Navigate through options with arrow keys
+   */
+  navigateOptions(t, e) {
+    const s = this.selectStates.get(t);
+    if (!s || !s.isOpen) return;
+    const i = s.filteredOptions.length;
+    i !== 0 && (s.focusedIndex === -1 ? s.focusedIndex = e > 0 ? 0 : i - 1 : (s.focusedIndex += e, s.focusedIndex >= i ? s.focusedIndex = 0 : s.focusedIndex < 0 && (s.focusedIndex = i - 1)), this.selectStates.set(t, s), this.updateOptionFocus(t));
+  }
+  /**
+   * Update visual focus state of options
+   */
+  updateOptionFocus(t) {
+    const e = this.selectStates.get(t);
+    if (!e) return;
+    t.querySelectorAll("[data-select-option]").forEach((i, n) => {
+      const o = i;
+      n === e.focusedIndex ? (o.classList.add("bg-neutral-100", "dark:bg-neutral-800"), o.scrollIntoView({ block: "nearest" })) : o.classList.remove("bg-neutral-100", "dark:bg-neutral-800");
+    });
+  }
+  /**
+   * Update display of selected values
+   */
+  updateDisplay(t) {
+    if (!this.selectStates.get(t)) return;
+    t.dataset.multiple === "true" ? this.updateChipsDisplay(t) : this.updateSingleValueDisplay(t);
+  }
+  /**
+   * Update chips display for multiple selection using Badge components
+   */
+  updateChipsDisplay(t) {
+    const e = this.selectStates.get(t);
+    if (!e) return;
+    const s = t.querySelector("[data-select-chips]");
+    if (s)
+      if (s.innerHTML = "", e.selectedValues.length === 0) {
+        const i = t.dataset.placeholder || "Select options...";
+        s.innerHTML = `<span class="text-neutral-500 select-placeholder">${i}</span>`;
+      } else
+        e.selectedValues.forEach((i) => {
+          const n = this.findOptionByValue(t, i), o = n ? n.displayLabel : i, r = t.dataset.clearable === "true" && !this.isDisabled(t), a = `select-chip-${this.generateChipId(i)}`, l = document.createElement("button");
+          l.type = "button", l.className = "inline-flex items-center gap-1 font-medium cursor-pointer transition-colors px-1.5 py-0.5 text-xs rounded-sm", l.style.cssText = `
+                    background-color: var(--color-brand-50);
+                    color: var(--color-brand-700);
+                    border: 1px solid var(--color-brand-200);
+                `, l.setAttribute("data-chip-value", i), l.setAttribute("data-remove-chip", i), l.setAttribute("data-dismiss-target", `#${a}`), l.setAttribute("aria-label", "Remove badge"), l.id = a, l.addEventListener("mouseenter", () => {
+            l.style.backgroundColor = "var(--color-brand-100)";
+          }), l.addEventListener("mouseleave", () => {
+            l.style.backgroundColor = "var(--color-brand-50)";
+          });
+          const c = document.createElement("span");
+          if (c.textContent = o, l.appendChild(c), r) {
+            const u = document.createElement("span");
+            u.className = "text-brand-600 hover:text-brand-700 ml-1 flex-shrink-0 font-bold leading-none", u.textContent = "×", u.setAttribute("aria-hidden", "true"), l.appendChild(u);
+            const d = document.createElement("span");
+            d.className = "sr-only", d.textContent = "Remove badge", l.appendChild(d);
+          }
+          s.appendChild(l);
+        });
+  }
+  /**
+   * Update single value display
+   */
+  updateSingleValueDisplay(t) {
+    const e = this.selectStates.get(t);
+    if (!e) return;
+    const s = t.querySelector(".select-value");
+    if (s)
+      if (e.selectedValues.length === 0) {
+        const i = t.dataset.placeholder || "Select option...";
+        s.innerHTML = `<span class="text-neutral-500 select-placeholder">${i}</span>`;
+      } else {
+        const i = e.selectedValues[0], n = this.findOptionByValue(t, i), o = n ? n.displayLabel : i;
+        s.textContent = o;
+      }
+  }
+  /**
+   * Update hidden form inputs
+   */
+  updateHiddenInputs(t) {
+    const e = this.selectStates.get(t);
+    if (!e) return;
+    const s = t.dataset.multiple === "true", i = t.dataset.name;
+    if (!i) return;
+    if (t.querySelectorAll(".select-hidden-input").forEach((o) => o.remove()), s)
+      e.selectedValues.forEach((o) => {
+        const r = document.createElement("input");
+        r.type = "hidden", r.name = `${i}[]`, r.value = o, r.className = "select-hidden-input", t.appendChild(r);
+      });
+    else {
+      const o = document.createElement("input");
+      o.type = "hidden", o.name = i, o.value = e.selectedValues[0] || "", o.className = "select-hidden-input", t.appendChild(o);
+    }
+  }
+  /**
+   * Update options selected state attributes
+   */
+  updateOptionsSelectedState(t) {
+    const e = this.selectStates.get(t);
+    if (!e) return;
+    t.querySelectorAll("[data-select-option]").forEach((i) => {
+      var a, l, c, u;
+      const n = i, o = n.dataset.value || "", r = e.selectedValues.includes(o);
+      if (n.setAttribute("aria-selected", r ? "true" : "false"), r) {
+        n.classList.add("bg-brand-50", "text-brand-700", "dark:bg-brand-900/20", "dark:text-brand-300");
+        const d = n.querySelector(".text-brand-600");
+        d && ((a = d.parentElement) == null || a.classList.remove("opacity-0"), (l = d.parentElement) == null || l.classList.add("opacity-100"));
+      } else {
+        n.classList.remove("bg-brand-50", "text-brand-700", "dark:bg-brand-900/20", "dark:text-brand-300");
+        const d = n.querySelector(".text-brand-600");
+        d && ((c = d.parentElement) == null || c.classList.add("opacity-0"), (u = d.parentElement) == null || u.classList.remove("opacity-100"));
+      }
+    });
+  }
+  /**
+   * Update options list
+   */
+  updateOptions(t) {
+    const e = this.getAllOptions(t), s = this.selectStates.get(t);
+    s && (s.filteredOptions = e, this.selectStates.set(t, s));
+  }
+  /**
+   * Get all options from select element
+   */
+  getAllOptions(t) {
+    const e = t.querySelectorAll("[data-select-option]");
+    return Array.from(e).map((s) => {
+      var o, r;
+      const i = s, n = i.dataset.displayLabel || ((o = i.textContent) == null ? void 0 : o.trim()) || "";
+      return {
+        element: i,
+        value: i.dataset.value || "",
+        label: ((r = i.textContent) == null ? void 0 : r.trim()) || "",
+        displayLabel: n,
+        searchableText: i.dataset.searchableText || "",
+        disabled: i.getAttribute("aria-disabled") === "true"
+      };
+    });
+  }
+  /**
+   * Find option by value
+   */
+  findOptionByValue(t, e) {
+    return this.getAllOptions(t).find((i) => i.value === e) || null;
+  }
+  /**
+   * Position dropdown relative to trigger
+   */
+  positionDropdown(t) {
+    const e = t.querySelector("[data-select-dropdown]"), s = t.querySelector("[data-select-trigger]");
+    if (!e || !s) return;
+    const i = s.getBoundingClientRect(), n = e.getBoundingClientRect(), r = window.innerHeight - i.bottom, a = i.top, l = n.height || 240;
+    r < l && a > l ? (e.style.bottom = "100%", e.style.top = "auto", e.style.marginBottom = "4px", e.style.marginTop = "0") : (e.style.top = "100%", e.style.bottom = "auto", e.style.marginTop = "4px", e.style.marginBottom = "0");
+  }
+  /**
+   * Reposition all open dropdowns
+   */
+  repositionDropdowns() {
+    this.selectStates.forEach((t, e) => {
+      t.isOpen && this.positionDropdown(e);
+    });
+  }
+  /**
+   * Check if select is disabled
+   */
+  isDisabled(t) {
+    return t.dataset.disabled === "true";
+  }
+  /**
+   * Check if dropdown is open
+   */
+  isOpen(t) {
+    const e = this.selectStates.get(t);
+    return e ? e.isOpen : !1;
+  }
+  /**
+   * Generate unique chip ID for a value
+   */
+  generateChipId(t) {
+    return btoa(t).replace(/[^a-zA-Z0-9]/g, "").substring(0, 8) + Date.now().toString(36);
+  }
+  /**
+   * Dispatch custom select event
+   */
+  dispatchSelectEvent(t, e, s = null) {
+    const i = new CustomEvent(e, {
+      detail: {
+        select: t,
+        ...s
+      },
+      bubbles: !0
+    });
+    t.dispatchEvent(i);
+  }
+  /**
+   * Get select state (for external access)
+   */
+  getSelectState(t) {
+    return this.selectStates.get(t) || null;
+  }
+  /**
+   * Set selected values programmatically
+   */
+  setSelectedValues(t, e) {
+    const s = this.selectStates.get(t);
+    if (!s) return;
+    const i = t.dataset.multiple === "true";
+    s.selectedValues = i ? e : e.slice(0, 1), this.selectStates.set(t, s), this.updateDisplay(t), this.updateHiddenInputs(t), this.updateOptionsSelectedState(t), this.dispatchSelectEvent(t, "select:change", {
+      value: i ? s.selectedValues : s.selectedValues[0] || "",
+      selectedValues: s.selectedValues
+    });
+  }
+  /**
+   * Destroy SelectActions and clean up
+   */
+  destroy() {
+    this.selectStates.clear(), this.initialized = !1, console.log("SelectActions destroyed");
+  }
+};
+w.instance = null;
+let k = w;
+k.getInstance();
+const y = class y {
+  constructor() {
+    this.initialized = !1, this.modalStates = /* @__PURE__ */ new Map();
+  }
+  /**
+   * Get singleton instance
+   */
+  static getInstance() {
+    return y.instance || (y.instance = new y()), y.instance;
+  }
+  /**
+   * Initialize ModalActions for enhanced features
+   */
+  init() {
+    this.initialized || (this.bindEventListeners(), this.initializeModals(), this.setupLivewireIntegration(), this.initialized = !0, console.log("ModalActions initialized"));
+  }
+  /**
+   * Initialize all existing modal elements
+   */
+  initializeModals() {
+    document.querySelectorAll("dialog[data-modal]").forEach((t) => {
+      this.initializeModal(t);
+    });
+  }
+  /**
+   * Initialize a single modal element
+   */
+  initializeModal(t) {
+    if (this.modalStates.has(t))
+      return;
+    const e = {
+      lastFocusedElement: null,
+      isAnimating: !1
+    };
+    this.modalStates.set(t, e), t.addEventListener("close", () => {
+      this.handleModalClose(t);
+    }), t.addEventListener("cancel", (s) => {
+      this.handleModalCancel(t, s);
+    });
+  }
+  /**
+   * Bind event listeners for enhanced modal functionality
+   */
+  bindEventListeners() {
+    document.addEventListener("click", (e) => {
+      var n, o;
+      const s = (n = e.target) == null ? void 0 : n.closest("[commandfor]");
+      if (s) {
+        const r = s.getAttribute("command"), a = s.getAttribute("commandfor");
+        if (r === "show-modal" && a) {
+          const l = document.getElementById(a);
+          l && l.matches("dialog[data-modal]") && this.handleModalOpen(l, s);
+        }
+      }
+      const i = (o = e.target) == null ? void 0 : o.closest("[data-modal-close]");
+      if (i) {
+        const r = i.closest("dialog[data-modal]");
+        r && r.close();
+      }
+    }), new MutationObserver((e) => {
+      e.forEach((s) => {
+        s.addedNodes.forEach((i) => {
+          i.nodeType === Node.ELEMENT_NODE && i.querySelectorAll("dialog[data-modal]").forEach((r) => {
+            this.initializeModal(r);
+          });
+        });
+      });
+    }).observe(document.body, {
+      childList: !0,
+      subtree: !0
+    });
+  }
+  /**
+   * Handle modal opening for enhanced features
+   */
+  handleModalOpen(t, e) {
+    const s = this.modalStates.get(t);
+    s && (s.lastFocusedElement = e || document.activeElement, this.modalStates.set(t, s), this.dispatchModalEvent(t, "modal:open", { trigger: e }), setTimeout(() => {
+      this.setInitialFocus(t);
+    }, 50));
+  }
+  /**
+   * Handle modal close event
+   */
+  handleModalClose(t) {
+    const e = this.modalStates.get(t);
+    e && (e.lastFocusedElement && document.contains(e.lastFocusedElement) && e.lastFocusedElement.focus(), e.lastFocusedElement = null, e.isAnimating = !1, this.modalStates.set(t, e), this.dispatchModalEvent(t, "modal:close"));
+  }
+  /**
+   * Handle modal cancel event (ESC key)
+   */
+  handleModalCancel(t, e) {
+    this.dispatchModalEvent(t, "modal:cancel", { originalEvent: e });
+  }
+  /**
+   * Set initial focus when modal opens
+   */
+  setInitialFocus(t) {
+    const e = t.querySelector("[autofocus]");
+    if (e) {
+      e.focus();
+      return;
+    }
+    const s = t.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    s.length > 0 && s[0].focus();
+  }
+  /**
+   * Check if a modal is open
+   */
+  isModalOpen(t) {
+    const e = document.getElementById(t);
+    return e ? e.open : !1;
+  }
+  /**
+   * Dispatch custom modal events
+   */
+  dispatchModalEvent(t, e, s = {}) {
+    const i = new CustomEvent(e, {
+      detail: {
+        modal: t,
+        ...s
+      },
+      bubbles: !0,
+      cancelable: !0
+    });
+    t.dispatchEvent(i);
+  }
+  /**
+   * Get modal state (for external access)
+   */
+  getModalState(t) {
+    const e = document.getElementById(t);
+    return e && this.modalStates.get(e) || null;
+  }
+  /**
+   * Set up Livewire integration if available
+   */
+  setupLivewireIntegration() {
+    typeof window.Livewire > "u" || (window.Livewire.on("openModal", (t) => {
+      const e = t.id || t.modal;
+      e && (this.openModal(e), t.wireModel && this.updateWireModel(e, !0));
+    }), window.Livewire.on("closeModal", (t) => {
+      const e = t.id || t.modal;
+      e ? (this.closeModal(e), t.wireModel && this.updateWireModel(e, !1)) : this.closeAllModals();
+    }), window.Livewire.on("toggleModal", (t) => {
+      const e = t.id || t.modal;
+      e && this.toggleModal(e);
+    }), console.log("Livewire modal integration initialized"));
+  }
+  /**
+   * Update Livewire wire:model for modal state
+   */
+  updateWireModel(t, e) {
+    var n;
+    const s = document.getElementById(t);
+    if (!s) return;
+    const i = s.getAttribute("wire:model");
+    if (i && typeof window.Livewire < "u" && window.Livewire.find) {
+      const o = window.Livewire.find((n = s.closest("[wire\\:id]")) == null ? void 0 : n.getAttribute("wire:id"));
+      o && o.set(i, e);
+    }
+  }
+  /**
+   * Toggle a modal's open state
+   */
+  toggleModal(t) {
+    const e = document.getElementById(t);
+    return !e || !e.matches("dialog[data-modal]") ? (console.warn(`Modal with id "${t}" not found`), !1) : e.open ? this.closeModal(t) : this.openModal(t);
+  }
+  /**
+   * Close all open modals
+   */
+  closeAllModals() {
+    document.querySelectorAll("dialog[data-modal][open]").forEach((t) => {
+      t.id && this.closeModal(t.id);
+    });
+  }
+  /**
+   * Enhanced modal open with Livewire event dispatching
+   */
+  openModal(t, e) {
+    const s = document.getElementById(t);
+    return !s || !s.matches("dialog[data-modal]") ? (console.warn(`Modal with id "${t}" not found`), !1) : (this.handleModalOpen(s, e), s.showModal(), this.dispatchLivewireEvent("modalOpened", { id: t, modal: t }), !0);
+  }
+  /**
+   * Enhanced modal close with Livewire event dispatching
+   */
+  closeModal(t) {
+    const e = document.getElementById(t);
+    return !e || !e.matches("dialog[data-modal]") ? (console.warn(`Modal with id "${t}" not found`), !1) : (e.close(), this.dispatchLivewireEvent("modalClosed", { id: t, modal: t }), !0);
+  }
+  /**
+   * Dispatch Livewire events
+   */
+  dispatchLivewireEvent(t, e) {
+    typeof window.Livewire < "u" && window.Livewire.dispatch && window.Livewire.dispatch(t, e);
+  }
+  /**
+   * Enhanced modal close handler with Livewire integration
+   */
+  handleModalClose(t) {
+    const e = this.modalStates.get(t);
+    if (!e) return;
+    t.getAttribute("wire:model") && this.updateWireModel(t.id, !1), e.lastFocusedElement && document.contains(e.lastFocusedElement) && e.lastFocusedElement.focus(), e.lastFocusedElement = null, e.isAnimating = !1, this.modalStates.set(t, e), this.dispatchModalEvent(t, "modal:close"), this.dispatchLivewireEvent("modalClosed", { id: t.id, modal: t.id });
+  }
+  /**
+   * Enhanced modal open handler with Livewire integration
+   */
+  handleModalOpen(t, e) {
+    const s = this.modalStates.get(t);
+    if (!s) return;
+    t.getAttribute("wire:model") && this.updateWireModel(t.id, !0), s.lastFocusedElement = e || document.activeElement, this.modalStates.set(t, s), this.dispatchModalEvent(t, "modal:open", { trigger: e }), this.dispatchLivewireEvent("modalOpened", { id: t.id, modal: t.id }), setTimeout(() => {
+      this.setInitialFocus(t);
+    }, 50);
+  }
+  /**
+   * Destroy ModalActions and clean up
+   */
+  destroy() {
+    this.modalStates.clear(), this.initialized = !1, console.log("ModalActions destroyed");
+  }
+};
+y.instance = null;
+let D = y;
+D.getInstance();
+const v = class v {
+  constructor() {
+    this.toasts = /* @__PURE__ */ new Map(), this.containers = /* @__PURE__ */ new Map(), this.timers = /* @__PURE__ */ new Map(), this.initializeGlobalListeners();
+  }
+  static getInstance() {
+    return v.instance || (v.instance = new v()), v.instance;
+  }
+  /**
+   * Initialize global event listeners for Livewire integration
+   */
+  initializeGlobalListeners() {
+    document.addEventListener("DOMContentLoaded", () => {
+      this.discoverToasts(), this.setupLivewireListeners();
+    });
+  }
+  /**
+   * Discover and register all toast elements
+   */
+  discoverToasts() {
+    document.querySelectorAll("[data-toast]").forEach((e) => {
+      e instanceof HTMLElement && e.id && this.registerToast(e.id, e);
+    });
+  }
+  /**
+   * Register a toast element for management
+   */
+  registerToast(t, e) {
+    this.toasts.set(t, e), this.setupToastListeners(e);
+  }
+  /**
+   * Set up individual toast event listeners
+   */
+  setupToastListeners(t) {
+    const e = t.id;
+    t.addEventListener("click", (s) => {
+      const i = s.target;
+      if (i.hasAttribute("data-toast-dismiss")) {
+        const n = i.getAttribute("data-toast-dismiss");
+        n && this.dismiss(n);
+      }
+      if (i.hasAttribute("data-toast-action")) {
+        const n = i.getAttribute("data-toast-action");
+        n && this.dispatchToastEvent("toast:action", e, { action: n });
+      }
+    }), t.addEventListener("mouseenter", () => {
+      this.pauseTimer(e);
+    }), t.addEventListener("mouseleave", () => {
+      this.resumeTimer(e);
+    });
+  }
+  /**
+   * Set up Livewire event listeners if available
+   */
+  setupLivewireListeners() {
+    typeof window.Livewire < "u" && (window.Livewire.on("showToast", (t) => {
+      const e = t.variant || "info";
+      this.show(e, t);
+    }), window.Livewire.on("hideToast", (t) => {
+      t.id ? this.dismiss(t.id) : this.dismissAll();
+    }));
+  }
+  /**
+   * Show a toast programmatically
+   */
+  show(t, e = {}) {
+    const s = e.position || "top-right", i = `toast-${t}-${s}`, n = document.getElementById(i);
+    if (!n)
+      return console.warn(`Toast element with ID "${i}" not found`), !1;
+    this.updateToastContent(n, e), n.style.display = "block", requestAnimationFrame(() => {
+      n.setAttribute("data-toast-visible", "true");
+    });
+    const o = e.duration || 5e3;
+    return !(e.persistent === !0) && o > 0 && this.setTimer(i, o), this.toasts.set(i, n), this.setupToastListeners(n), this.dispatchToastEvent("toast:show", i, e), !0;
+  }
+  /**
+   * Dismiss a toast
+   */
+  dismiss(t) {
+    const e = this.toasts.get(t);
+    return e ? (this.clearTimer(t), e.setAttribute("data-toast-visible", "false"), setTimeout(() => {
+      e.parentNode && e.parentNode.removeChild(e);
+    }, 300), this.dispatchToastEvent("toast:dismiss", t), !0) : (console.warn(`Toast with ID "${t}" not found`), !1);
+  }
+  /**
+   * Dismiss all visible toasts
+   */
+  dismissAll() {
+    this.toasts.forEach((t, e) => {
+      t.getAttribute("data-toast-visible") === "true" && this.dismiss(e);
+    });
+  }
+  /**
+   * Helper methods for convenience
+   */
+  success(t, e = {}) {
+    return this.show("success", { message: t, ...e });
+  }
+  error(t, e = {}) {
+    return this.show("error", { message: t, ...e });
+  }
+  warning(t, e = {}) {
+    return this.show("warning", { message: t, ...e });
+  }
+  info(t, e = {}) {
+    return this.show("info", { message: t, ...e });
+  }
+  /**
+   * Update toast content
+   */
+  updateToastContent(t, e) {
+    const s = t.querySelector("[data-toast-title]"), i = t.querySelector("[data-toast-message]"), n = t.querySelector("[data-toast-actions]");
+    s && e.title ? (s.textContent = e.title, s.classList.remove("hidden")) : s && s.classList.add("hidden"), i && e.message && (i.textContent = e.message), n && e.actions ? (n.innerHTML = e.actions, n.classList.remove("hidden")) : n && n.classList.add("hidden");
+  }
+  /**
+   * Set auto-dismiss timer
+   */
+  setTimer(t, e) {
+    this.clearTimer(t);
+    const s = window.setTimeout(() => {
+      this.dismiss(t);
+    }, e);
+    this.timers.set(t, s);
+  }
+  /**
+   * Clear timer
+   */
+  clearTimer(t) {
+    const e = this.timers.get(t);
+    e && (clearTimeout(e), this.timers.delete(t));
+  }
+  /**
+   * Pause timer (on hover)
+   */
+  pauseTimer(t) {
+    this.clearTimer(t);
+  }
+  /**
+   * Resume timer (on mouse leave)
+   */
+  resumeTimer(t) {
+    const e = this.toasts.get(t);
+    if (e) {
+      const s = parseInt(e.getAttribute("data-toast-duration") || "5000");
+      !(e.getAttribute("data-toast-persistent") === "true") && s > 0 && this.setTimer(t, s);
+    }
+  }
+  /**
+   * Dispatch custom toast events
+   */
+  dispatchToastEvent(t, e, s = {}) {
+    const i = new CustomEvent(t, {
+      detail: { id: e, toast: e, ...s }
+    });
+    document.dispatchEvent(i);
+    const n = this.toasts.get(e);
+    if (n && n.dispatchEvent(i), typeof window.Livewire < "u") {
+      const o = t.replace("toast:", "toast");
+      window.Livewire.dispatch(o, { id: e, toast: e, ...s });
+    }
+  }
+  /**
+   * Get toast state (for external access)
+   */
+  getToastState(t) {
+    const e = this.toasts.get(t);
+    return e ? {
+      id: t,
+      visible: e.getAttribute("data-toast-visible") === "true",
+      variant: e.getAttribute("data-toast-variant"),
+      position: e.getAttribute("data-toast-position"),
+      duration: parseInt(e.getAttribute("data-toast-duration") || "0"),
+      persistent: e.getAttribute("data-toast-persistent") === "true"
+    } : null;
+  }
+  /**
+   * Destroy ToastActions and clean up
+   */
+  destroy() {
+    this.toasts.clear(), this.timers.forEach((t) => clearTimeout(t)), this.timers.clear(), console.log("ToastActions destroyed");
+  }
+};
+v.instance = null;
+let L = v;
+const q = L.getInstance();
+typeof window < "u" && (q.discoverToasts(), window.ToastActions = L);
+const S = class S {
+  constructor() {
+    this.initialized = !1, this.dropdownStates = /* @__PURE__ */ new Map();
+  }
+  /**
+   * Get singleton instance
+   */
+  static getInstance() {
+    return S.instance || (S.instance = new S()), S.instance;
+  }
+  /**
+   * Initialize DropdownActions for all dropdown elements
+   */
+  init() {
+    this.initialized || (this.bindEventListeners(), this.initializeDropdowns(), this.initialized = !0, console.log("DropdownActions initialized"));
+  }
+  /**
+   * Initialize all existing dropdown elements
+   */
+  initializeDropdowns() {
+    document.querySelectorAll('[data-dropdown="true"]').forEach((t) => {
+      this.initializeDropdown(t);
+    });
+  }
+  /**
+   * Initialize a single dropdown element
+   */
+  initializeDropdown(t) {
+    const e = {
+      isOpen: !1,
+      focusedIndex: -1,
+      menuItems: [],
+      children: []
+    }, s = t.closest('[data-submenu="true"]');
+    s && s !== t && (e.parent = s), this.dropdownStates.set(t, e), this.updateMenuItems(t), this.initializeSubmenus(t);
+  }
+  /**
+   * Initialize submenus within a dropdown
+   */
+  initializeSubmenus(t) {
+    const e = t.querySelectorAll('[data-submenu="true"]'), s = this.dropdownStates.get(t);
+    s && (s.children = Array.from(e), this.dropdownStates.set(t, s)), e.forEach((i) => {
+      this.dropdownStates.has(i) || this.initializeDropdown(i);
+    });
+  }
+  /**
+   * Bind global event listeners using event delegation
+   */
+  bindEventListeners() {
+    document.addEventListener("click", (e) => {
+      const s = e.target && e.target.closest && e.target.closest("[data-submenu-trigger]");
+      if (s) {
+        e.preventDefault(), e.stopPropagation();
+        const a = s.closest('[data-submenu="true"]');
+        a && !this.isDisabled(a) && this.toggleSubmenu(a);
+        return;
+      }
+      const i = e.target && e.target.closest && e.target.closest("[data-dropdown-trigger]");
+      if (i) {
+        e.preventDefault(), e.stopPropagation();
+        const a = i.closest('[data-dropdown="true"]');
+        a && !this.isDisabled(a) && this.toggleDropdown(a);
+        return;
+      }
+      const n = e.target && e.target.closest && e.target.closest("[data-menu-item]");
+      if (n) {
+        const a = n.closest('[data-dropdown="true"]');
+        a && (n.dataset.keepOpen === "true" || this.closeDropdown(a));
+        return;
+      }
+      const o = e.target && e.target.closest && e.target.closest("[data-menu-checkbox], [data-menu-radio]");
+      if (o) {
+        if (e.stopPropagation(), !(o.dataset.keepOpen !== "false")) {
+          const l = o.closest('[data-dropdown="true"]');
+          l && this.closeDropdown(l);
+        }
+        return;
+      }
+      if (e.target && e.target.closest && e.target.closest("[data-dropdown-panel], [data-submenu-panel]")) {
+        e.stopPropagation();
+        return;
+      }
+      this.closeAllDropdowns();
+    }), document.addEventListener("mouseenter", (e) => {
+      const s = e.target && e.target.closest && e.target.closest("[data-submenu-trigger]");
+      if (s && !this.isMobile()) {
+        const i = s.closest('[data-submenu="true"]');
+        i && !this.isDisabled(i) && (this.closeSiblingSubmenus(i), setTimeout(() => {
+          s.matches(":hover") && this.openSubmenu(i);
+        }, 100));
+      }
+    }, !0), document.addEventListener("mouseleave", (e) => {
+      const s = e.target && e.target.closest && e.target.closest('[data-submenu="true"]');
+      if (s && !this.isMobile()) {
+        const i = this.dropdownStates.get(s);
+        i != null && i.isOpen && setTimeout(() => {
+          s.matches(":hover") || this.closeSubmenu(s);
+        }, 150);
+      }
+    }, !0), document.addEventListener("keydown", (e) => {
+      const s = e.target && e.target.closest && e.target.closest('[data-dropdown="true"]');
+      s && this.handleKeydown(s, e);
+    }), window.addEventListener("resize", () => {
+      this.repositionDropdowns();
+    }), new MutationObserver((e) => {
+      e.forEach((s) => {
+        s.addedNodes.forEach((i) => {
+          i.nodeType === Node.ELEMENT_NODE && i.querySelectorAll('[data-dropdown="true"]').forEach((r) => {
+            this.dropdownStates.has(r) || this.initializeDropdown(r);
+          });
+        });
+      });
+    }).observe(document.body, {
+      childList: !0,
+      subtree: !0
+    });
+  }
+  /**
+   * Toggle dropdown open/closed state
+   */
+  toggleDropdown(t) {
+    const e = this.dropdownStates.get(t);
+    e && (e.isOpen ? this.closeDropdown(t) : this.openDropdown(t));
+  }
+  /**
+   * Open dropdown
+   */
+  openDropdown(t) {
+    const e = this.dropdownStates.get(t);
+    if (!e || this.isDisabled(t)) return;
+    this.closeSiblingDropdowns(t), e.isOpen = !0, e.focusedIndex = -1, this.dropdownStates.set(t, e);
+    const s = t.querySelector("[data-dropdown-panel]"), i = t.querySelector("[data-dropdown-trigger]");
+    s && (s.classList.remove("hidden"), this.positionDropdown(t)), i && i.setAttribute("aria-expanded", "true"), this.updateMenuItems(t), this.dispatchDropdownEvent(t, "dropdown:open");
+  }
+  /**
+   * Open submenu
+   */
+  openSubmenu(t) {
+    const e = this.dropdownStates.get(t);
+    if (!e || this.isDisabled(t)) return;
+    e.isOpen = !0, e.focusedIndex = -1, this.dropdownStates.set(t, e);
+    const s = t.querySelector("[data-submenu-panel]"), i = t.querySelector("[data-submenu-trigger]");
+    s && (s.classList.remove("hidden"), this.positionSubmenu(t)), i && i.setAttribute("aria-expanded", "true"), this.updateMenuItems(t), this.dispatchDropdownEvent(t, "submenu:open");
+  }
+  /**
+   * Close dropdown
+   */
+  closeDropdown(t) {
+    const e = this.dropdownStates.get(t);
+    if (!e || !e.isOpen) return;
+    this.closeChildSubmenus(t), e.isOpen = !1, e.focusedIndex = -1, this.dropdownStates.set(t, e);
+    const s = t.querySelector("[data-dropdown-panel]"), i = t.querySelector("[data-dropdown-trigger]");
+    s && s.classList.add("hidden"), i && i.setAttribute("aria-expanded", "false"), this.dispatchDropdownEvent(t, "dropdown:close");
+  }
+  /**
+   * Close submenu
+   */
+  closeSubmenu(t) {
+    const e = this.dropdownStates.get(t);
+    if (!e || !e.isOpen) return;
+    this.closeChildSubmenus(t), e.isOpen = !1, e.focusedIndex = -1, this.dropdownStates.set(t, e);
+    const s = t.querySelector("[data-submenu-panel]"), i = t.querySelector("[data-submenu-trigger]");
+    s && s.classList.add("hidden"), i && i.setAttribute("aria-expanded", "false"), this.dispatchDropdownEvent(t, "submenu:close");
+  }
+  /**
+   * Close all open dropdowns
+   */
+  closeAllDropdowns() {
+    this.dropdownStates.forEach((t, e) => {
+      t.isOpen && (t.parent || this.closeDropdown(e));
+    });
+  }
+  /**
+   * Close sibling dropdowns but preserve parent-child relationships
+   */
+  closeSiblingDropdowns(t) {
+    const e = this.dropdownStates.get(t);
+    this.dropdownStates.forEach((s, i) => {
+      if (i !== t && s.isOpen) {
+        const n = (e == null ? void 0 : e.parent) === i, o = s.parent === t;
+        !n && !o && this.closeDropdown(i);
+      }
+    });
+  }
+  /**
+   * Close sibling submenus
+   */
+  closeSiblingSubmenus(t) {
+    const e = this.dropdownStates.get(t), s = e == null ? void 0 : e.parent;
+    if (s) {
+      const i = this.dropdownStates.get(s);
+      i == null || i.children.forEach((n) => {
+        n !== t && this.closeSubmenu(n);
+      });
+    }
+  }
+  /**
+   * Close all child submenus
+   */
+  closeChildSubmenus(t) {
+    const e = this.dropdownStates.get(t);
+    e == null || e.children.forEach((s) => {
+      this.closeSubmenu(s);
+    });
+  }
+  /**
+   * Toggle submenu open/closed state
+   */
+  toggleSubmenu(t) {
+    const e = this.dropdownStates.get(t);
+    e && (e.isOpen ? this.closeSubmenu(t) : this.openSubmenu(t));
+  }
+  /**
+   * Check if device is mobile
+   */
+  isMobile() {
+    return window.innerWidth < 768 || "ontouchstart" in window;
+  }
+  /**
+   * Handle keyboard navigation
+   */
+  handleKeydown(t, e) {
+    const s = this.dropdownStates.get(t);
+    if (s)
+      switch (e.key) {
+        case "Enter":
+        case " ":
+          if (!s.isOpen)
+            e.preventDefault(), this.openDropdown(t);
+          else if (s.focusedIndex >= 0) {
+            e.preventDefault();
+            const i = s.menuItems[s.focusedIndex];
+            i && i.click();
+          }
+          break;
+        case "Escape":
+          if (s.isOpen) {
+            e.preventDefault(), this.closeDropdown(t);
+            const i = t.querySelector("[data-dropdown-trigger]");
+            i && i.focus();
+          }
+          break;
+        case "ArrowDown":
+          s.isOpen ? (e.preventDefault(), this.navigateItems(t, 1)) : (e.preventDefault(), this.openDropdown(t));
+          break;
+        case "ArrowUp":
+          s.isOpen && (e.preventDefault(), this.navigateItems(t, -1));
+          break;
+        case "Tab":
+          s.isOpen && this.closeDropdown(t);
+          break;
+      }
+  }
+  /**
+   * Navigate through menu items with arrow keys
+   */
+  navigateItems(t, e) {
+    const s = this.dropdownStates.get(t);
+    if (!s || !s.isOpen) return;
+    const i = s.menuItems.length;
+    i !== 0 && (s.focusedIndex === -1 ? s.focusedIndex = e > 0 ? 0 : i - 1 : (s.focusedIndex += e, s.focusedIndex >= i ? s.focusedIndex = 0 : s.focusedIndex < 0 && (s.focusedIndex = i - 1)), this.dropdownStates.set(t, s), this.updateItemFocus(t));
+  }
+  /**
+   * Update visual focus state of menu items
+   */
+  updateItemFocus(t) {
+    const e = this.dropdownStates.get(t);
+    e && e.menuItems.forEach((s, i) => {
+      i === e.focusedIndex ? (s.classList.add("bg-neutral-100", "dark:bg-neutral-800"), s.scrollIntoView({ block: "nearest" })) : s.classList.remove("bg-neutral-100", "dark:bg-neutral-800");
+    });
+  }
+  /**
+   * Update menu items list for keyboard navigation
+   */
+  updateMenuItems(t) {
+    const e = this.dropdownStates.get(t);
+    if (!e) return;
+    const s = t.querySelectorAll("[data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-submenu-trigger]");
+    e.menuItems = Array.from(s).filter((i) => {
+      const n = i;
+      return !n.hasAttribute("disabled") && n.offsetParent !== null;
+    }), this.dropdownStates.set(t, e);
+  }
+  /**
+   * Position dropdown relative to trigger
+   */
+  positionDropdown(t) {
+    const e = t.querySelector("[data-dropdown-panel]"), s = t.querySelector("[data-dropdown-trigger]");
+    if (!e || !s) return;
+    const i = s.getBoundingClientRect(), n = e.getBoundingClientRect(), o = window.innerHeight, r = window.innerWidth, a = t.dataset.position || "bottom", l = t.dataset.align || "start", c = parseInt(t.dataset.offset || "8");
+    e.style.top = "", e.style.bottom = "", e.style.left = "", e.style.right = "";
+    const u = o - i.bottom, d = i.top;
+    r - i.left, i.right;
+    let h = a, f = l;
+    switch (a === "bottom" && u < n.height && d > n.height ? h = "top" : a === "top" && d < n.height && u > n.height && (h = "bottom"), h) {
+      case "top":
+        e.style.bottom = "100%", e.style.marginBottom = `${c}px`;
+        break;
+      case "bottom":
+        e.style.top = "100%", e.style.marginTop = `${c}px`;
+        break;
+      case "left":
+        e.style.right = "100%", e.style.marginRight = `${c}px`;
+        break;
+      case "right":
+        e.style.left = "100%", e.style.marginLeft = `${c}px`;
+        break;
+    }
+    if (h === "top" || h === "bottom")
+      switch (f) {
+        case "start":
+          e.style.left = "0";
+          break;
+        case "center":
+          e.style.left = "50%", e.style.transform = "translateX(-50%)";
+          break;
+        case "end":
+          e.style.right = "0";
+          break;
+      }
+    else
+      switch (f) {
+        case "start":
+          e.style.top = "0";
+          break;
+        case "center":
+          e.style.top = "50%", e.style.transform = "translateY(-50%)";
+          break;
+        case "end":
+          e.style.bottom = "0";
+          break;
+      }
+  }
+  /**
+   * Position submenu relative to trigger
+   */
+  positionSubmenu(t) {
+    const e = t.querySelector("[data-submenu-panel]"), s = t.querySelector("[data-submenu-trigger]");
+    if (!e || !s) return;
+    const i = s.getBoundingClientRect(), n = e.getBoundingClientRect(), o = window.innerHeight, r = window.innerWidth, a = t.dataset.position || "right", l = t.dataset.align || "start", c = parseInt(t.dataset.offset || "4");
+    e.style.top = "", e.style.bottom = "", e.style.left = "", e.style.right = "", e.style.transform = "";
+    const u = r - i.right, d = i.left;
+    o - i.bottom, i.top;
+    let h = a;
+    switch (a === "right" && u < n.width && d > n.width ? h = "left" : a === "left" && d < n.width && u > n.width && (h = "right"), h) {
+      case "right":
+        e.style.left = "100%", e.style.marginLeft = `${c}px`;
+        break;
+      case "left":
+        e.style.right = "100%", e.style.marginRight = `${c}px`;
+        break;
+    }
+    switch (l) {
+      case "start":
+        e.style.top = "0";
+        break;
+      case "center":
+        e.style.top = "50%", e.style.transform = "translateY(-50%)";
+        break;
+      case "end":
+        e.style.bottom = "0";
+        break;
+    }
+    const f = e.getBoundingClientRect();
+    if (f.bottom > o) {
+      const E = f.bottom - o + 8;
+      e.style.transform = `translateY(-${E}px)`;
+    } else if (f.top < 0) {
+      const E = Math.abs(f.top) + 8;
+      e.style.transform = `translateY(${E}px)`;
+    }
+  }
+  /**
+   * Reposition all open dropdowns and submenus
+   */
+  repositionDropdowns() {
+    this.dropdownStates.forEach((t, e) => {
+      t.isOpen && (e.hasAttribute("data-submenu") ? this.positionSubmenu(e) : this.positionDropdown(e));
+    });
+  }
+  /**
+   * Check if dropdown is disabled
+   */
+  isDisabled(t) {
+    return t.dataset.disabled === "true";
+  }
+  /**
+   * Dispatch custom dropdown event
+   */
+  dispatchDropdownEvent(t, e, s = null) {
+    const i = new CustomEvent(e, {
+      detail: {
+        dropdown: t,
+        ...s
+      },
+      bubbles: !0
+    });
+    t.dispatchEvent(i);
+  }
+  /**
+   * Destroy DropdownActions and clean up
+   */
+  destroy() {
+    this.dropdownStates.clear(), this.initialized = !1, console.log("DropdownActions destroyed");
+  }
+};
+S.instance = null;
+let C = S;
+C.getInstance();
+function z() {
+  x.getInstance().init(), A.getInstance().init(), I.getInstance().init(), k.getInstance().init(), D.getInstance().init(), L.getInstance().discoverToasts(), C.getInstance().init(), console.log("Keys UI initialized");
+}
+const V = {
+  FormActions: x.getInstance(),
+  AlertActions: A.getInstance(),
+  RadioActions: I.getInstance(),
+  SelectActions: k.getInstance(),
+  ModalActions: D.getInstance(),
+  ToastActions: L.getInstance(),
+  DropdownActions: C.getInstance(),
+  init: z
+};
+export {
+  A as AlertActions,
+  C as DropdownActions,
+  x as FormActions,
+  D as ModalActions,
+  I as RadioActions,
+  k as SelectActions,
+  L as ToastActions,
+  V as default,
+  z as initializeKeysUI
+};

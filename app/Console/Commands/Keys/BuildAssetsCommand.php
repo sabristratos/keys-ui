@@ -1,0 +1,157 @@
+<?php
+
+namespace App\Console\Commands\Keys;
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Process;
+
+class BuildAssetsCommand extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'keys:build
+                            {--watch : Watch for changes and rebuild automatically}
+                            {--dev : Build in development mode}
+                            {--publish : Publish assets after building}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Build Keys UI package assets (CSS and JS)';
+
+    protected string $packagePath;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->packagePath = base_path('packages/keys-ui');
+    }
+
+    /**
+     * Execute the console command.
+     */
+    public function handle(): int
+    {
+        if (!$this->packageExists()) {
+            $this->error('Keys UI package not found at: ' . $this->packagePath);
+            return 1;
+        }
+
+        $this->info('Building Keys UI assets...');
+
+        // Install dependencies if needed
+        if (!$this->dependenciesInstalled()) {
+            $this->info('Installing package dependencies...');
+            if (!$this->installDependencies()) {
+                return 1;
+            }
+        }
+
+        // Build assets
+        if ($this->option('watch')) {
+            return $this->watchAssets();
+        }
+
+        if (!$this->buildAssets()) {
+            return 1;
+        }
+
+        // Publish assets if requested
+        if ($this->option('publish')) {
+            $this->publishAssets();
+        }
+
+        $this->info('✅ Keys UI assets built successfully!');
+        return 0;
+    }
+
+    /**
+     * Check if the package exists
+     */
+    protected function packageExists(): bool
+    {
+        return File::isDirectory($this->packagePath) &&
+               File::exists($this->packagePath . '/package.json');
+    }
+
+    /**
+     * Check if dependencies are installed
+     */
+    protected function dependenciesInstalled(): bool
+    {
+        return File::isDirectory($this->packagePath . '/node_modules');
+    }
+
+    /**
+     * Install package dependencies
+     */
+    protected function installDependencies(): bool
+    {
+        $result = Process::path($this->packagePath)
+            ->run(['npm', 'install']);
+
+        if ($result->failed()) {
+            $this->error('Failed to install dependencies:');
+            $this->line($result->errorOutput());
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Build the assets
+     */
+    protected function buildAssets(): bool
+    {
+        $command = $this->option('dev') ? 'npm run dev' : 'npm run build:all';
+
+        $this->info("Running: {$command}");
+
+        $result = Process::path($this->packagePath)
+            ->run(explode(' ', $command));
+
+        if ($result->failed()) {
+            $this->error('Build failed:');
+            $this->line($result->errorOutput());
+            return false;
+        }
+
+        $this->line($result->output());
+        return true;
+    }
+
+    /**
+     * Watch assets for changes
+     */
+    protected function watchAssets(): int
+    {
+        $this->info('👀 Watching Keys UI assets for changes...');
+        $this->info('Press Ctrl+C to stop watching');
+
+        $result = Process::path($this->packagePath)
+            ->forever()
+            ->run(['npm', 'run', 'watch:all']);
+
+        return $result->exitCode();
+    }
+
+    /**
+     * Publish built assets
+     */
+    protected function publishAssets(): void
+    {
+        $this->info('Publishing assets...');
+
+        $this->call('vendor:publish', [
+            '--tag' => 'keys-ui-assets',
+            '--force' => true
+        ]);
+    }
+}

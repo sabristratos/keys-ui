@@ -6,7 +6,14 @@
         "build": "vite build",
         "dev": "vite",
         "package:build": "vite build --mode production",
-        "package:dev": "vite build --mode development --watch"
+        "package:dev": "vite build --mode development --watch",
+        "keys:build": "php artisan keys:build",
+        "keys:watch": "php artisan keys:build --watch",
+        "keys:dev": "php artisan keys:build --dev --publish",
+        "keys:publish": "php artisan keys:build --publish",
+        "dev:all": "concurrently \"npm run dev\" \"npm run keys:watch\"",
+        "build:all": "npm run build && npm run keys:build",
+        "setup:keys": "cd packages/keys-ui && npm install"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",

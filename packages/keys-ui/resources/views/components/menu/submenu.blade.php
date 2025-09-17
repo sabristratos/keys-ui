@@ -1,0 +1,23 @@
+{{-- Menu Submenu Component --}}
+<div class="relative" {{ $attributes->merge($computedDataAttributes) }}>
+    {{-- Submenu Trigger --}}
+    <div class="{{ $computedTriggerClasses }}" {{ $attributes->only([])->merge($computedTriggerDataAttributes) }}>
+        <div class="flex items-center flex-1 min-w-0">
+            @if($hasIcon())
+                <x-keys::icon :name="$icon" :size="$computedIconSize" class="{{ $computedIconClasses }}" />
+            @endif
+
+            @if($hasHeading())
+                <span class="truncate">{{ $heading }}</span>
+            @endif
+        </div>
+
+        {{-- Chevron indicator --}}
+        <x-keys::icon name="heroicon-o-chevron-right" class="w-4 h-4 text-neutral-400 dark:text-neutral-500 flex-shrink-0 transition-transform duration-200" />
+    </div>
+
+    {{-- Submenu Panel --}}
+    <div class="{{ $computedPanelClasses }}" {{ $attributes->only([])->merge($computedPanelDataAttributes) }}>
+        {{ $slot }}
+    </div>
+</div>
