@@ -22,25 +22,25 @@ class Tab extends Component
         $base = 'tab-trigger inline-flex items-center justify-center px-3 py-2 font-medium text-sm transition-colors duration-200';
 
         if ($this->disabled) {
-            return $base . ' cursor-not-allowed opacity-50 text-neutral-400 dark:text-neutral-600';
+            return $base . ' cursor-not-allowed opacity-50 text-muted';
         }
 
-        return $base . ' cursor-pointer text-neutral-600 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200';
+        return $base . ' cursor-pointer text-muted hover:text-foreground';
     }
 
     public function defaultVariantClasses(): string
     {
-        return 'border-b-2 border-transparent hover:border-neutral-300 dark:hover:border-neutral-600 data-[state=active]:border-brand data-[state=active]:text-brand';
+        return 'border-b-2 border-transparent hover:border-border data-[state=active]:border-foreground data-[state=active]:text-foreground';
     }
 
     public function pillsVariantClasses(): string
     {
-        return 'rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-700 data-[state=active]:bg-white data-[state=active]:text-brand data-[state=active]:shadow-sm dark:data-[state=active]:bg-neutral-900';
+        return 'rounded-md hover:bg-body data-[state=active]:bg-surface data-[state=active]:text-foreground data-[state=active]:shadow-sm';
     }
 
     public function underlineVariantClasses(): string
     {
-        return 'border-b-2 border-transparent hover:border-neutral-300 dark:hover:border-neutral-600 data-[state=active]:border-brand data-[state=active]:text-brand';
+        return 'border-b-2 border-transparent hover:border-border data-[state=active]:border-foreground data-[state=active]:text-foreground';
     }
 
     public function iconClasses(): string

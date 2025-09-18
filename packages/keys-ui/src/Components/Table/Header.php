@@ -20,7 +20,7 @@ class Header extends Component
 
     public function getHeaderClasses(): string
     {
-        $base = 'font-medium text-neutral-600 dark:text-neutral-400 tracking-wider uppercase text-xs';
+        $base = 'font-medium text-muted tracking-wider uppercase text-xs';
         $padding = $this->getPaddingClasses();
         $alignment = $this->getAlignmentClasses();
         $interaction = $this->getInteractionClasses();
@@ -52,7 +52,7 @@ class Header extends Component
     protected function getInteractionClasses(): string
     {
         if ($this->sortable) {
-            return 'cursor-pointer hover:text-neutral-900 dark:hover:text-neutral-100 select-none group transition-colors duration-150';
+            return 'cursor-pointer hover:text-foreground select-none group transition-colors duration-150';
         }
 
         if ($this->selectAll) {

@@ -29,13 +29,13 @@ class Row extends Component
     protected function getVariantClasses(): string
     {
         if ($this->selected) {
-            return 'bg-brand-50 dark:bg-brand-900/20 border-brand-200 dark:border-brand-800';
+            return 'bg-brand/10 border-brand';
         }
 
         return match ($this->variant) {
-            'danger' => 'bg-danger-50 dark:bg-danger-900/20',
-            'warning' => 'bg-warning-50 dark:bg-warning-900/20',
-            'success' => 'bg-success-50 dark:bg-success-900/20',
+            'danger' => 'bg-danger/10',
+            'warning' => 'bg-warning/10',
+            'success' => 'bg-success/10',
             default => ''
         };
     }
@@ -43,7 +43,7 @@ class Row extends Component
     protected function getInteractionClasses(): string
     {
         if ($this->clickable || $this->href) {
-            return 'cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-900/50';
+            return 'cursor-pointer hover:bg-body';
         }
 
         return '';

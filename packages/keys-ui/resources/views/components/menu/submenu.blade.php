@@ -13,7 +13,7 @@
         </div>
 
         
-        <x-keys::icon name="heroicon-o-chevron-right" class="w-4 h-4 text-neutral-400 dark:text-neutral-500 flex-shrink-0 transition-transform duration-200" />
+        <x-keys::icon name="heroicon-o-chevron-right" class="w-4 h-4 text-muted flex-shrink-0 transition-transform duration-200" />
     </div>
 
     

@@ -14,8 +14,10 @@ import { ModalActions } from './ModalActions';
 import { ToastActions } from './ToastActions';
 import { DropdownActions } from './DropdownActions';
 import { TableActions } from './TableActions';
+import { ButtonGroupActions } from './ButtonGroupActions';
+import { TooltipActions } from './TooltipActions';
 
-export { FormActions, AlertActions, RadioActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions };
+export { FormActions, AlertActions, RadioActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions };
 
 /**
  * Initialize all Keys UI components
@@ -40,6 +42,10 @@ export function initializeKeysUI(): void {
 
     TableActions.getInstance().init();
 
+    ButtonGroupActions.getInstance().init();
+
+    TooltipActions.getInstance().init();
+
 }
 
 /**
@@ -55,5 +61,7 @@ export default {
     ToastActions: ToastActions.getInstance(),
     DropdownActions: DropdownActions.getInstance(),
     TableActions: TableActions.getInstance(),
+    ButtonGroupActions: ButtonGroupActions.getInstance(),
+    TooltipActions: TooltipActions.getInstance(),
     init: initializeKeysUI
 };

@@ -33,7 +33,6 @@
 
 .tab-marker {
     position: absolute;
-    background: var(--color-brand-500);
     transition: all 0.2s ease;
     pointer-events: none;
     z-index: 0;
@@ -44,7 +43,8 @@
     height: 2px;
     bottom: 0;
     left: 0;
-    border-radius: 1px;
+    border-radius: var(--radius-sm);
+    background: var(--color-brand);
 }
 
 /* Vertical tabs marker */
@@ -52,25 +52,18 @@
     width: 2px;
     top: 0;
     left: 0;
-    border-radius: 1px;
+    border-radius: var(--radius-sm);
+    background: var(--color-brand);
 }
 
 /* Pills variant marker - full height behind tab */
 [data-variant="pills"] .tab-marker {
-    background: var(--color-brand-50);
-    border: 1px solid var(--color-brand-200);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     top: 0;
     left: 0;
     z-index: 0;
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    .dark [data-variant="pills"] .tab-marker {
-        background: var(--color-brand-900);
-        border-color: var(--color-brand-700);
-    }
 }
 
 /* Tab states */
@@ -80,9 +73,7 @@
     z-index: 1;
 }
 
-[data-tabs-trigger="true"]:hover {
-    color: var(--color-brand-600);
-}
+/* Hover state handled by Tailwind classes in Tab.php */
 
 /* Remove focus styles for non-keyboard users */
 [data-tabs-trigger="true"]:focus:not(:focus-visible) {
@@ -92,13 +83,11 @@
 
 /* Focus ring only on keyboard navigation */
 [data-tabs-trigger="true"]:focus-visible {
-    outline: 2px solid var(--color-brand-500);
+    outline: 2px solid var(--color-border);
     outline-offset: 2px;
 }
 
-[data-tabs-trigger="true"][data-state="active"] {
-    color: var(--color-brand-600);
-}
+/* Active state handled by Tailwind classes in Tab.php */
 
 /* Panel states */
 [data-tabs-panel="true"] {

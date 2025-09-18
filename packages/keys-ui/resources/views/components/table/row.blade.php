@@ -11,8 +11,7 @@
                     :checked="$selected"
                     data-table-row-select="true"
                     :data-row-id="$rowId"
-                    :showInput="false"
-                    size="sm"
+                    size="md"
                     color="brand"
                 />
             </td>
@@ -30,8 +29,7 @@
                     :checked="$selected"
                     data-table-row-select="true"
                     :data-row-id="$rowId"
-                    :showInput="false"
-                    size="sm"
+                    size="md"
                     color="brand"
                 />
             </td>

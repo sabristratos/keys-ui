@@ -111,11 +111,11 @@ class Card extends Component
         }
 
         $hoverClasses = match ($this->variant) {
-            'default' => 'hover:shadow-sm hover:border-neutral-300',
+            'default' => 'hover:shadow-sm hover:border-neutral',
             'elevated' => 'hover:shadow-md hover:-translate-y-0.5',
-            'outlined' => 'hover:bg-surface hover:border-neutral-400',
+            'outlined' => 'hover:bg-surface hover:border-neutral',
             'filled' => 'hover:bg-surface',
-            default => 'hover:shadow-sm hover:border-neutral-300'
+            default => 'hover:shadow-sm hover:border-neutral'
         };
 
         $focusClasses = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2';

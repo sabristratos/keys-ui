@@ -5,6 +5,7 @@ namespace Keys\UI;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Keys\UI\Components\Accordion;
 use Keys\UI\Components\Alert;
 use Keys\UI\Components\Avatar;
 use Keys\UI\Components\Avatar\Stack;
@@ -12,6 +13,7 @@ use Keys\UI\Components\Badge;
 use Keys\UI\Components\Breadcrumbs;
 use Keys\UI\Components\Breadcrumbs\Item;
 use Keys\UI\Components\Button;
+use Keys\UI\Components\Button\Group;
 use Keys\UI\Components\Card;
 use Keys\UI\Components\Checkbox;
 use Keys\UI\Components\ChoiceGroup;
@@ -38,6 +40,7 @@ use Keys\UI\Components\Tabs\Panel;
 use Keys\UI\Components\Textarea;
 use Keys\UI\Components\Toast;
 use Keys\UI\Components\Toggle;
+use Keys\UI\Components\Tooltip;
 use Keys\UI\Components\Table;
 use Keys\UI\Components\Table\Head;
 use Keys\UI\Components\Table\Body;
@@ -109,9 +112,11 @@ class KeysUiServiceProvider extends ServiceProvider
             __DIR__.'/../lang' => $this->app->langPath('vendor/keys-ui'),
         ], 'keys-ui-lang');
 
+        Blade::component('keys::accordion', Accordion::class);
         Blade::component('keys::icon', Icon::class);
         Blade::component('keys::loading', Loading::class);
         Blade::component('keys::button', Button::class);
+        Blade::component('keys::button.group', Group::class);
         Blade::component('keys::card', Card::class);
         Blade::component('keys::label', Label::class);
         Blade::component('keys::error', Error::class);
@@ -150,6 +155,7 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::table.header', Header::class);
         Blade::component('keys::table.empty-state', TableEmpty::class);
         Blade::component('keys::table.loading-state', TableLoading::class);
+        Blade::component('keys::tooltip', Tooltip::class);
 
         $this->app->alias(KeysManager::class, 'keys');
 

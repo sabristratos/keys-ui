@@ -25,7 +25,12 @@
       "WebFetch(domain:stackoverflow.com)",
       "Bash(dir)",
       "Bash(move Empty.php EmptyState.php)",
-      "Bash(php artisan route:list:*)"
+      "Bash(php artisan route:list:*)",
+      "Bash(tasklist:*)",
+      "Bash(move:*)",
+      "WebFetch(domain:css-tricks.com)",
+      "Bash(npm run typecheck:*)",
+      "Bash(git add:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

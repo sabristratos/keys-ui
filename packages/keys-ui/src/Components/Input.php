@@ -90,14 +90,14 @@ class Input extends Component
     public function stateClasses(): string
     {
         if ($this->disabled) {
-            return 'bg-neutral-100 border-neutral-300 text-neutral-500 cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400';
+            return 'bg-surface border-border text-muted cursor-not-allowed opacity-50';
         }
 
         if ($this->hasError()) {
             return 'bg-input border-danger text-foreground focus:border-danger focus:ring-danger';
         }
 
-        return 'bg-input border-border text-foreground focus:border-brand focus:ring-brand hover:border-neutral-300 dark:hover:border-neutral-600';
+        return 'bg-input border-border text-foreground focus:border-brand focus:ring-brand hover:border-neutral';
     }
 
     public function iconSize(): string

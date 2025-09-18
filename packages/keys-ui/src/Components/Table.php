@@ -42,7 +42,7 @@ class Table extends Component
         }
 
         if ($this->bordered) {
-            $base .= 'border border-border rounded-lg ';
+            $base .= 'border border-border rounded-md overflow-hidden ';
         }
 
         return trim($base);
@@ -63,11 +63,11 @@ class Table extends Component
         $classes = '';
 
         if ($this->striped) {
-            $classes .= '[&_tbody_tr:nth-child(odd)]:bg-neutral-50 dark:[&_tbody_tr:nth-child(odd)]:bg-neutral-900/50 ';
+            $classes .= '[&_tbody_tr:nth-child(odd)]:bg-body ';
         }
 
         if ($this->hover) {
-            $classes .= '[&_tbody_tr]:hover:bg-neutral-50 dark:[&_tbody_tr]:hover:bg-neutral-900/50 ';
+            $classes .= '[&_tbody_tr]:hover:bg-body ';
         }
 
         return trim($classes);

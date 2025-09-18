@@ -76,20 +76,20 @@ class Badge extends Component
     public function colorClasses(): string
     {
         return match ($this->color) {
-            'brand' => 'bg-brand/10 text-brand dark:bg-brand/20 dark:text-brand-300',
-            'success' => 'bg-success/10 text-success dark:bg-success/20 dark:text-success-300',
-            'warning' => 'bg-warning/10 text-warning dark:bg-warning/20 dark:text-warning-300',
-            'danger' => 'bg-danger/10 text-danger dark:bg-danger/20 dark:text-danger-300',
-            'neutral' => 'bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300',
-            'blue' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-            'gray' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-            'red' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-            'green' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-            'yellow' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-            'indigo' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
-            'purple' => 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-            'pink' => 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300',
-            default => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+            'brand' => 'bg-brand/10 text-brand',
+            'success' => 'bg-success/10 text-success',
+            'warning' => 'bg-warning/10 text-warning',
+            'danger' => 'bg-danger/10 text-danger',
+            'neutral' => 'bg-neutral/10 text-neutral',
+            'blue' => 'bg-blue-500/10 text-blue-600',
+            'gray' => 'bg-neutral-500/10 text-neutral-600',
+            'red' => 'bg-red-500/10 text-red-600',
+            'green' => 'bg-green-500/10 text-green-600',
+            'yellow' => 'bg-yellow-500/10 text-yellow-600',
+            'indigo' => 'bg-indigo-500/10 text-indigo-600',
+            'purple' => 'bg-purple-500/10 text-purple-600',
+            'pink' => 'bg-pink-500/10 text-pink-600',
+            default => 'bg-blue-500/10 text-blue-600'
         };
     }
 
@@ -115,20 +115,20 @@ class Badge extends Component
     public function hoverClasses(): string
     {
         return match ($this->color) {
-            'brand' => 'hover:bg-brand/20 dark:hover:bg-brand/30',
-            'success' => 'hover:bg-success/20 dark:hover:bg-success/30',
-            'warning' => 'hover:bg-warning/20 dark:hover:bg-warning/30',
-            'danger' => 'hover:bg-danger/20 dark:hover:bg-danger/30',
-            'neutral' => 'hover:bg-neutral-200 dark:hover:bg-neutral-600',
-            'blue' => 'hover:bg-blue-200 dark:hover:bg-blue-800',
-            'gray' => 'hover:bg-gray-200 dark:hover:bg-gray-600',
-            'red' => 'hover:bg-red-200 dark:hover:bg-red-800',
-            'green' => 'hover:bg-green-200 dark:hover:bg-green-800',
-            'yellow' => 'hover:bg-yellow-200 dark:hover:bg-yellow-800',
-            'indigo' => 'hover:bg-indigo-200 dark:hover:bg-indigo-800',
-            'purple' => 'hover:bg-purple-200 dark:hover:bg-purple-800',
-            'pink' => 'hover:bg-pink-200 dark:hover:bg-pink-800',
-            default => 'hover:bg-blue-200 dark:hover:bg-blue-800'
+            'brand' => 'hover:bg-brand/20',
+            'success' => 'hover:bg-success/20',
+            'warning' => 'hover:bg-warning/20',
+            'danger' => 'hover:bg-danger/20',
+            'neutral' => 'hover:bg-neutral/20',
+            'blue' => 'hover:bg-blue-500/20',
+            'gray' => 'hover:bg-neutral-500/20',
+            'red' => 'hover:bg-red-500/20',
+            'green' => 'hover:bg-green-500/20',
+            'yellow' => 'hover:bg-yellow-500/20',
+            'indigo' => 'hover:bg-indigo-500/20',
+            'purple' => 'hover:bg-purple-500/20',
+            'pink' => 'hover:bg-pink-500/20',
+            default => 'hover:bg-blue-500/20'
         };
     }
 

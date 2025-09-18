@@ -6,8 +6,7 @@
             :name="'select-all'"
             :id="'table-select-all-' . uniqid()"
             data-table-select-all="true"
-            :showInput="false"
-            size="sm"
+            size="md"
             color="brand"
         />
     @else

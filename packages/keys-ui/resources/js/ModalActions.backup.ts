@@ -131,6 +131,41 @@ export class ModalActions {
     }
 
     /**
+     * Handle modal opening for enhanced features
+     */
+    private handleModalOpen(modal: HTMLDialogElement, trigger?: HTMLElement): void {
+        const state = this.modalStates.get(modal);
+        if (!state) return;
+
+        state.lastFocusedElement = trigger || document.activeElement as HTMLElement;
+        this.modalStates.set(modal, state);
+
+        this.dispatchModalEvent(modal, 'modal:open', { trigger });
+
+        setTimeout(() => {
+            this.setInitialFocus(modal);
+        }, 50); // Small delay to ensure modal is fully rendered
+    }
+
+    /**
+     * Handle modal close event
+     */
+    private handleModalClose(modal: HTMLDialogElement): void {
+        const state = this.modalStates.get(modal);
+        if (!state) return;
+
+        if (state.lastFocusedElement && document.contains(state.lastFocusedElement)) {
+            state.lastFocusedElement.focus();
+        }
+
+        state.lastFocusedElement = null;
+        state.isAnimating = false;
+        this.modalStates.set(modal, state);
+
+        this.dispatchModalEvent(modal, 'modal:close');
+    }
+
+    /**
      * Handle modal cancel event (ESC key)
      */
     private handleModalCancel(modal: HTMLDialogElement, event: Event): void {
@@ -319,7 +354,7 @@ export class ModalActions {
     }
 
     /**
-     * Handle modal close event with Livewire integration
+     * Enhanced modal close handler with Livewire integration
      */
     private handleModalClose(modal: HTMLDialogElement): void {
         const state = this.modalStates.get(modal);
@@ -344,7 +379,7 @@ export class ModalActions {
     }
 
     /**
-     * Handle modal opening with Livewire integration
+     * Enhanced modal open handler with Livewire integration
      */
     private handleModalOpen(modal: HTMLDialogElement, trigger?: HTMLElement): void {
         const state = this.modalStates.get(modal);

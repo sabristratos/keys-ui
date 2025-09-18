@@ -50,10 +50,10 @@ class Cell extends Component
     {
         return match ($this->variant) {
             'strong' => 'font-semibold text-foreground',
-            'muted' => 'text-neutral-600 dark:text-neutral-400',
-            'success' => 'text-success-600 dark:text-success-400',
-            'danger' => 'text-danger-600 dark:text-danger-400',
-            'warning' => 'text-warning-600 dark:text-warning-400',
+            'muted' => 'text-muted',
+            'success' => 'text-success',
+            'danger' => 'text-danger',
+            'warning' => 'text-warning',
             default => 'text-foreground'
         };
     }

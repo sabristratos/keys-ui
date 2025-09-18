@@ -33,7 +33,7 @@
                 <header class="text-center mb-8">
                     <h1 class="text-3xl font-bold mb-3">Keys UI Components</h1>
                     <p class="text-foreground/60 mb-4">
-                        Avatar, Badge, Breadcrumbs, Modal, Toast, Table, and Tabs components showcase
+                        Accordion, Avatar, Badge, Breadcrumbs, Modal, Toast, Table, Tabs, and Tooltip components showcase
                     </p>
                     <div class="flex justify-center gap-2 p-1 bg-surface rounded-lg border border-border">
                         <button
@@ -633,6 +633,148 @@
                             </div>
                         </section>
 
+                        <!-- Button Group Components -->
+                        <section class="space-y-4">
+                            <h2 class="text-lg font-semibold border-b border-border pb-2">Button Group Components</h2>
+
+                            <div class="space-y-6">
+                                <!-- Basic Horizontal Button Groups -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Horizontal Button Groups</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Basic button group with different variants</p>
+                                            <x-keys::button.group>
+                                                <x-keys::button variant="brand">First</x-keys::button>
+                                                <x-keys::button variant="brand">Second</x-keys::button>
+                                                <x-keys::button variant="brand">Third</x-keys::button>
+                                            </x-keys::button.group>
+                                        </div>
+
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Outline variant button group</p>
+                                            <x-keys::button.group>
+                                                <x-keys::button variant="outline">Edit</x-keys::button>
+                                                <x-keys::button variant="outline">Copy</x-keys::button>
+                                                <x-keys::button variant="outline">Delete</x-keys::button>
+                                            </x-keys::button.group>
+                                        </div>
+
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Mixed variants (not recommended but functional)</p>
+                                            <x-keys::button.group>
+                                                <x-keys::button variant="success">Save</x-keys::button>
+                                                <x-keys::button variant="neutral">Cancel</x-keys::button>
+                                                <x-keys::button variant="danger">Delete</x-keys::button>
+                                            </x-keys::button.group>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Vertical Button Groups -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Vertical Button Groups</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Vertical orientation for stacked layouts</p>
+                                            <x-keys::button.group orientation="vertical">
+                                                <x-keys::button variant="ghost">Profile Settings</x-keys::button>
+                                                <x-keys::button variant="ghost">Account Settings</x-keys::button>
+                                                <x-keys::button variant="ghost">Privacy Settings</x-keys::button>
+                                                <x-keys::button variant="ghost">Security Settings</x-keys::button>
+                                            </x-keys::button.group>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Icon-Only Button Groups -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Icon-Only Button Groups</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Text formatting toolbar</p>
+                                            <x-keys::button.group>
+                                                <x-keys::button variant="outline" icon="heroicon-o-bold" />
+                                                <x-keys::button variant="outline" icon="heroicon-o-italic" />
+                                                <x-keys::button variant="outline" icon="heroicon-o-underline" />
+                                            </x-keys::button.group>
+                                        </div>
+
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Media controls</p>
+                                            <x-keys::button.group>
+                                                <x-keys::button variant="neutral" icon="heroicon-o-backward" />
+                                                <x-keys::button variant="brand" icon="heroicon-o-play" />
+                                                <x-keys::button variant="neutral" icon="heroicon-o-forward" />
+                                                <x-keys::button variant="neutral" icon="heroicon-o-stop" />
+                                            </x-keys::button.group>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Size Variants -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Size Variants</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Small buttons for compact interfaces</p>
+                                            <x-keys::button.group>
+                                                <x-keys::button variant="outline" size="sm">Small</x-keys::button>
+                                                <x-keys::button variant="outline" size="sm">Group</x-keys::button>
+                                                <x-keys::button variant="outline" size="sm">Example</x-keys::button>
+                                            </x-keys::button.group>
+                                        </div>
+
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Large buttons for prominence</p>
+                                            <x-keys::button.group>
+                                                <x-keys::button variant="brand" size="lg">Large</x-keys::button>
+                                                <x-keys::button variant="brand" size="lg">Button</x-keys::button>
+                                                <x-keys::button variant="brand" size="lg">Group</x-keys::button>
+                                            </x-keys::button.group>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Practical Examples -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Practical Use Cases</h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Pagination controls</p>
+                                            <x-keys::button.group>
+                                                <x-keys::button variant="outline" icon="heroicon-o-chevron-left">Previous</x-keys::button>
+                                                <x-keys::button variant="outline">1</x-keys::button>
+                                                <x-keys::button variant="brand">2</x-keys::button>
+                                                <x-keys::button variant="outline">3</x-keys::button>
+                                                <x-keys::button variant="outline">Next<x-keys::icon name="heroicon-o-chevron-right" /></x-keys::button>
+                                            </x-keys::button.group>
+                                        </div>
+
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Segmented control / Toggle group</p>
+                                            <x-keys::button.group>
+                                                <x-keys::button variant="brand">Day</x-keys::button>
+                                                <x-keys::button variant="outline">Week</x-keys::button>
+                                                <x-keys::button variant="outline">Month</x-keys::button>
+                                                <x-keys::button variant="outline">Year</x-keys::button>
+                                            </x-keys::button.group>
+                                        </div>
+
+                                        <div>
+                                            <p class="text-sm text-muted mb-2">Action toolbar</p>
+                                            <x-keys::button.group>
+                                                <x-keys::button variant="outline" icon="heroicon-o-pencil">Edit</x-keys::button>
+                                                <x-keys::button variant="outline" icon="heroicon-o-document-duplicate">Duplicate</x-keys::button>
+                                                <x-keys::button variant="outline" icon="heroicon-o-archive-box">Archive</x-keys::button>
+                                                <x-keys::button variant="danger" icon="heroicon-o-trash">Delete</x-keys::button>
+                                            </x-keys::button.group>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
                         <!-- Avatar Components -->
                         <section class="space-y-4">
                             <h2 class="text-lg font-semibold border-b border-border pb-2">Avatar Components</h2>
@@ -969,6 +1111,280 @@
                                         </div>
                                         <div>
                                             <strong>Responsive Design:</strong> Optimized for all screen sizes
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Accordion Components -->
+                        <section class="mb-8">
+                            <div class="bg-surface border border-border rounded-lg p-6">
+                                <h2 class="text-xl font-bold mb-4">Accordion Components</h2>
+                                <p class="text-foreground/70 mb-6">
+                                    Collapsible content containers with smooth WAAPI animations, semantic HTML, and full accessibility support.
+                                </p>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <!-- Basic Accordion -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Basic Accordion</h3>
+                                        <div class="space-y-2">
+                                            <x-keys::accordion title="What is Keys UI?">
+                                                Keys UI is a modern Blade components library built specifically for Laravel 12 and Tailwind v4.
+                                                It provides semantic design tokens, progressive enhancement, and accessibility-first components.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="How does it work?" collapsed>
+                                                Keys UI components use native HTML elements enhanced with JavaScript for smooth animations.
+                                                All components work without JavaScript and are progressively enhanced for better user experience.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Is it accessible?">
+                                                Yes! All Keys UI components are built with WCAG compliance in mind, featuring proper ARIA attributes,
+                                                keyboard navigation, and respect for user preferences like reduced motion.
+                                            </x-keys::accordion>
+                                        </div>
+                                    </div>
+
+                                    <!-- Color Variants -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Color Variants</h3>
+                                        <div class="space-y-2">
+                                            <x-keys::accordion title="Brand" color="brand">
+                                                Brand colored accordion with consistent theming across light and dark modes.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Success" color="success" collapsed>
+                                                Success variant perfect for positive feedback and completion states.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Warning" color="warning">
+                                                Warning variant for important notices and caution messages.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Danger" color="danger" collapsed>
+                                                Danger variant for critical information and error states.
+                                            </x-keys::accordion>
+                                        </div>
+                                    </div>
+
+                                    <!-- Neutral Variant -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Neutral Variant</h3>
+                                        <div class="space-y-2">
+                                            <x-keys::accordion title="Default Neutral" color="neutral">
+                                                Neutral variant using semantic tokens (surface, border, foreground, muted) for consistent theming.
+                                            </x-keys::accordion>
+                                        </div>
+                                    </div>
+
+                                    <!-- Size Variants -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Size Variants</h3>
+                                        <div class="space-y-2">
+                                            <x-keys::accordion title="Extra Small" size="xs">
+                                                Compact accordion perfect for dense layouts and sidebars.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Small" size="sm" collapsed>
+                                                Small size variant for secondary content areas.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Medium (Default)" size="md">
+                                                Default medium size - perfect for most use cases.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Large" size="lg" collapsed>
+                                                Large size for prominent sections and main content areas.
+                                            </x-keys::accordion>
+                                        </div>
+                                    </div>
+
+                                    <!-- With Actions -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">With Actions</h3>
+                                        <div class="space-y-2">
+                                            <x-keys::accordion
+                                                title="User Settings"
+                                                color="brand"
+                                                :actions="[
+                                                    ['type' => 'edit', 'icon' => 'heroicon-o-pencil', 'label' => 'Edit'],
+                                                    ['type' => 'delete', 'icon' => 'heroicon-o-trash', 'label' => 'Delete']
+                                                ]">
+                                                <div class="space-y-3">
+                                                    <div class="flex items-center justify-between">
+                                                        <span>Email Notifications</span>
+                                                        <x-keys::toggle size="sm" checked />
+                                                    </div>
+                                                    <div class="flex items-center justify-between">
+                                                        <span>Push Notifications</span>
+                                                        <x-keys::toggle size="sm" />
+                                                    </div>
+                                                    <div class="flex items-center justify-between">
+                                                        <span>Marketing Emails</span>
+                                                        <x-keys::toggle size="sm" />
+                                                    </div>
+                                                </div>
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion
+                                                title="Privacy Settings"
+                                                color="neutral"
+                                                collapsed
+                                                :actions="[
+                                                    ['type' => 'info', 'icon' => 'heroicon-o-information-circle', 'label' => 'Info'],
+                                                    ['type' => 'share', 'icon' => 'heroicon-o-share', 'label' => 'Share']
+                                                ]">
+                                                <div class="text-sm text-muted space-y-2">
+                                                    <p>Your privacy is important to us. Here are your current privacy settings:</p>
+                                                    <ul class="list-disc list-inside space-y-1 ml-4">
+                                                        <li>Profile visibility: Public</li>
+                                                        <li>Search indexing: Enabled</li>
+                                                        <li>Data collection: Minimal</li>
+                                                    </ul>
+                                                </div>
+                                            </x-keys::accordion>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Layout Variants -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <!-- Default and Outlined -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Layout Variants</h3>
+                                        <div class="space-y-2">
+                                            <x-keys::accordion title="Default Variant" variant="default" color="brand">
+                                                Default variant with background and borders - perfect for most use cases.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Outlined Variant" variant="outlined" color="success" collapsed>
+                                                Outlined variant with borders only - clean and minimal appearance.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Elevated Variant" variant="elevated" color="warning">
+                                                Elevated variant with shadow - stands out from the background.
+                                            </x-keys::accordion>
+                                        </div>
+                                    </div>
+
+                                    <!-- Flush and Spaced -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Clean Variants</h3>
+                                        <div class="space-y-0">
+                                            <x-keys::accordion title="Flush Item 1" variant="flush" color="neutral">
+                                                Flush variant with no borders or backgrounds - seamless integration.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Flush Item 2" variant="flush" color="brand" collapsed>
+                                                Multiple flush items create a clean, list-like appearance.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Flush Item 3" variant="flush" color="danger">
+                                                Perfect for FAQ sections and content hierarchies.
+                                            </x-keys::accordion>
+                                        </div>
+
+                                        <h4 class="text-sm font-medium mt-6 mb-3">Spaced Variant</h4>
+                                        <div>
+                                            <x-keys::accordion title="Spaced Item 1" variant="spaced" color="success">
+                                                Spaced variant adds margins between items for better visual separation.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Spaced Item 2" variant="spaced" color="warning" collapsed>
+                                                Each accordion has its own space, making content easier to scan.
+                                            </x-keys::accordion>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Border Radius Examples -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <!-- Different Rounded Options -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Border Radius Options</h3>
+                                        <div class="space-y-2">
+                                            <x-keys::accordion title="No Radius" rounded="none" color="neutral">
+                                                Sharp corners for modern, geometric designs.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Small Radius" rounded="sm" color="brand" collapsed>
+                                                Subtle rounding for a softer appearance.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Default (Large)" rounded="lg" color="success">
+                                                Default large radius - balanced and friendly.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion title="Extra Large" rounded="2xl" color="warning" collapsed>
+                                                Pronounced rounding for a modern, approachable feel.
+                                            </x-keys::accordion>
+                                        </div>
+                                    </div>
+
+                                    <!-- Mixed Examples -->
+                                    <div>
+                                        <h3 class="text-base font-medium mb-3">Combined Examples</h3>
+                                        <div class="space-y-2">
+                                            <x-keys::accordion
+                                                title="Elevated + Extra Rounded"
+                                                variant="elevated"
+                                                rounded="xl"
+                                                color="brand"
+                                                size="lg">
+                                                Combining elevated variant with extra rounding for maximum visual impact.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion
+                                                title="Outlined + Medium Size"
+                                                variant="outlined"
+                                                rounded="md"
+                                                color="success"
+                                                size="md"
+                                                collapsed>
+                                                Clean outlined style perfect for secondary content areas.
+                                            </x-keys::accordion>
+
+                                            <x-keys::accordion
+                                                title="Small + Minimal"
+                                                variant="outlined"
+                                                rounded="sm"
+                                                color="neutral"
+                                                size="sm">
+                                                Compact size with subtle styling for dense layouts.
+                                            </x-keys::accordion>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Features List -->
+                                <div class="bg-muted/50 p-4 rounded-lg">
+                                    <h3 class="text-base font-medium mb-3">Key Features</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                        <div>
+                                            <strong>Semantic HTML:</strong> Uses native details/summary elements
+                                        </div>
+                                        <div>
+                                            <strong>WAAPI Animations:</strong> Smooth height transitions with Web Animations API
+                                        </div>
+                                        <div>
+                                            <strong>Progressive Enhancement:</strong> Works without JavaScript
+                                        </div>
+                                        <div>
+                                            <strong>Accessibility:</strong> WCAG compliant with proper ARIA attributes
+                                        </div>
+                                        <div>
+                                            <strong>Action Support:</strong> Integrated action buttons with multi-state icons
+                                        </div>
+                                        <div>
+                                            <strong>Reduced Motion:</strong> Respects user preferences for animations
+                                        </div>
+                                        <div>
+                                            <strong>Layout Variants:</strong> Default, flush, spaced, outlined, elevated options
+                                        </div>
+                                        <div>
+                                            <strong>Border Radius:</strong> Configurable rounding from none to 3xl
                                         </div>
                                     </div>
                                 </div>
@@ -1767,12 +2183,276 @@
                                 </div>
                             </div>
                         </section>
+
+                        <!-- Tooltip Components -->
+                        <section class="space-y-4">
+                            <h2 class="text-lg font-semibold border-b border-border pb-2">Tooltip Components</h2>
+                            <div class="space-y-6">
+                                <!-- Basic Tooltips -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Basic Tooltips</h3>
+                                    <div class="flex flex-wrap items-center gap-6">
+                                        <div class="relative">
+                                            <x-keys::button variant="brand" data-tooltip-target="tooltip-basic">
+                                                Hover me
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-basic" placement="top">
+                                                This is a basic tooltip with default settings
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="relative">
+                                            <x-keys::button variant="success" data-tooltip-target="tooltip-click">
+                                                Click me
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-click" trigger="click" placement="bottom">
+                                                This tooltip appears on click
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="relative">
+                                            <x-keys::input placeholder="Focus me" data-tooltip-target="tooltip-focus" />
+                                            <x-keys::tooltip id="tooltip-focus" trigger="focus" placement="right">
+                                                This tooltip appears on focus
+                                            </x-keys::tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Placement Options -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Placement Options</h3>
+                                    <div class="grid grid-cols-2 gap-6 max-w-lg mx-auto">
+                                        <div class="text-center">
+                                            <x-keys::button variant="neutral" data-tooltip-target="tooltip-top">
+                                                Top
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-top" placement="top">
+                                                Tooltip on top
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <x-keys::button variant="neutral" data-tooltip-target="tooltip-bottom">
+                                                Bottom
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-bottom" placement="bottom">
+                                                Tooltip on bottom
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <x-keys::button variant="neutral" data-tooltip-target="tooltip-left">
+                                                Left
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-left" placement="left">
+                                                Tooltip on left
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <x-keys::button variant="neutral" data-tooltip-target="tooltip-right">
+                                                Right
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-right" placement="right">
+                                                Tooltip on right
+                                            </x-keys::tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Color Variants -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Color Variants</h3>
+                                    <div class="flex flex-wrap items-center gap-4">
+                                        <div class="relative">
+                                            <x-keys::button variant="brand" data-tooltip-target="tooltip-dark">
+                                                Dark
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-dark" color="dark">
+                                                Dark tooltip (default)
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="relative">
+                                            <x-keys::button variant="neutral" data-tooltip-target="tooltip-light">
+                                                Light
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-light" color="light">
+                                                Light tooltip with shadow
+                                            </x-keys::tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Size Variants -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Size Variants</h3>
+                                    <div class="flex flex-wrap items-center gap-4">
+                                        <div class="relative">
+                                            <x-keys::button variant="success" size="sm" data-tooltip-target="tooltip-sm">
+                                                Small
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-sm" size="sm">
+                                                Small tooltip
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="relative">
+                                            <x-keys::button variant="warning" data-tooltip-target="tooltip-md">
+                                                Medium
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-md" size="md">
+                                                Medium tooltip (default)
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="relative">
+                                            <x-keys::button variant="danger" size="lg" data-tooltip-target="tooltip-lg">
+                                                Large
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-lg" size="lg">
+                                                Large tooltip with more content
+                                            </x-keys::tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- With and Without Arrows -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Arrow Options</h3>
+                                    <div class="flex flex-wrap items-center gap-4">
+                                        <div class="relative">
+                                            <x-keys::button variant="purple" data-tooltip-target="tooltip-arrow">
+                                                With Arrow
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-arrow" :arrow="true">
+                                                Tooltip with arrow (default)
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="relative">
+                                            <x-keys::button variant="pink" data-tooltip-target="tooltip-no-arrow">
+                                                No Arrow
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-no-arrow" :arrow="false">
+                                                Tooltip without arrow
+                                            </x-keys::tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Complex Content -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Rich Content</h3>
+                                    <div class="flex flex-wrap items-center gap-4">
+                                        <div class="relative">
+                                            <x-keys::avatar name="John Doe" status="online" data-tooltip-target="tooltip-avatar" />
+                                            <x-keys::tooltip id="tooltip-avatar" size="lg" placement="bottom">
+                                                <div class="text-center">
+                                                    <div class="font-medium">John Doe</div>
+                                                    <div class="text-xs opacity-75">Senior Developer</div>
+                                                    <div class="text-xs opacity-75 mt-1">Online now</div>
+                                                </div>
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="relative">
+                                            <x-keys::badge color="warning" data-tooltip-target="tooltip-badge">
+                                                Beta
+                                            </x-keys::badge>
+                                            <x-keys::tooltip id="tooltip-badge">
+                                                This feature is currently in beta testing
+                                            </x-keys::tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delay Options -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Custom Delays</h3>
+                                    <div class="flex flex-wrap items-center gap-4">
+                                        <div class="relative">
+                                            <x-keys::button variant="indigo" data-tooltip-target="tooltip-fast">
+                                                Fast (50ms)
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-fast" :delay="50">
+                                                Fast appearing tooltip
+                                            </x-keys::tooltip>
+                                        </div>
+
+                                        <div class="relative">
+                                            <x-keys::button variant="cyan" data-tooltip-target="tooltip-slow">
+                                                Slow (500ms)
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-slow" :delay="500">
+                                                Slow appearing tooltip
+                                            </x-keys::tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Disabled State -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Disabled Tooltip</h3>
+                                    <div class="flex flex-wrap items-center gap-4">
+                                        <div class="relative">
+                                            <x-keys::button variant="neutral" disabled data-tooltip-target="tooltip-disabled">
+                                                Disabled Button
+                                            </x-keys::button>
+                                            <x-keys::tooltip id="tooltip-disabled" :disabled="true">
+                                                This tooltip won't show (disabled)
+                                            </x-keys::tooltip>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Features Summary -->
+                                <div>
+                                    <h3 class="text-base font-medium mb-3">Tooltip Features</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                            <strong>Smart Positioning:</strong>
+                                            <ul class="list-disc pl-4 text-muted">
+                                                <li>Collision detection</li>
+                                                <li>Viewport constraints</li>
+                                                <li>Automatic fallback placement</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong>Interaction Types:</strong>
+                                            <ul class="list-disc pl-4 text-muted">
+                                                <li>Hover (default)</li>
+                                                <li>Click to toggle</li>
+                                                <li>Focus for form elements</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong>Accessibility:</strong>
+                                            <ul class="list-disc pl-4 text-muted">
+                                                <li>ARIA attributes</li>
+                                                <li>Keyboard ESC support</li>
+                                                <li>Focus management</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong>Dynamic Features:</strong>
+                                            <ul class="list-disc pl-4 text-muted">
+                                                <li>Auto-initialization</li>
+                                                <li>Livewire compatibility</li>
+                                                <li>Mutation observer support</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
 
                 <footer class="text-center mt-8 text-sm text-muted">
-                    <p>This page demonstrates Keys UI Breadcrumbs, Avatar, Badge, Modal, Toast, Table, and Tabs components.</p>
-                    <p class="mt-1">Components: Breadcrumbs, Avatar/Stack, Badge with auto icon-only detection, Modal with native dialog features, Toast with server-side dispatching, Table with nested architecture and sortable headers, Tabs with slot-based architecture and keyboard navigation.</p>
+                    <p>This page demonstrates Keys UI Breadcrumbs, Avatar, Badge, Modal, Toast, Table, Tabs, and Tooltip components.</p>
+                    <p class="mt-1">Components: Breadcrumbs, Avatar/Stack, Badge with auto icon-only detection, Modal with native dialog features, Toast with server-side dispatching, Table with nested architecture and sortable headers, Tabs with slot-based architecture and keyboard navigation, Tooltip with smart positioning and multiple trigger types.</p>
                 </footer>
             </div>
         </div>

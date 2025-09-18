@@ -49,6 +49,6 @@
 
     
     <div class="{{ $computedCheckmarkClasses }}">
-        <x-keys::icon name="heroicon-o-check" size="sm" class="text-brand-600" />
+        <x-keys::icon name="heroicon-o-check" size="sm" class="text-brand" />
     </div>
 </div>

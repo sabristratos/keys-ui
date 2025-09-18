@@ -6,9 +6,9 @@
     </table>
 
     @if($hasPagination())
-        <div class="px-6 py-3 bg-neutral-50 dark:bg-neutral-900/50 border-t border-border">
+        <div class="px-6 py-3 bg-body border-t border-border">
             <div class="flex items-center justify-between">
-                <div class="text-sm text-neutral-600 dark:text-neutral-400">
+                <div class="text-sm text-muted">
                     {{ $getPaginationInfo() }}
                 </div>
                 <div>
@@ -21,7 +21,7 @@
     {{-- Inline styles for table enhancements --}}
     <style>
         [data-table="true"] .table-row-selected {
-            @apply bg-brand-50 dark:bg-brand-900/20;
+            @apply bg-brand/10;
         }
 
         [data-table="true"] [data-sortable="true"] {
@@ -29,7 +29,7 @@
         }
 
         [data-table="true"] [data-sortable="true"]:hover {
-            @apply bg-neutral-100 dark:bg-neutral-700/50;
+            @apply bg-body;
         }
 
         [data-table="true"] [data-sortable="true"]:focus {
@@ -41,11 +41,11 @@
         }
 
         [data-table="true"] [data-selected="true"] {
-            @apply bg-brand-50 dark:bg-brand-900/20 border-l-2 border-l-brand;
+            @apply bg-brand/10 border-l-2 border-l-brand;
         }
 
         [data-table="true"] tbody tr:hover:not(.table-row-selected) {
-            @apply bg-neutral-50 dark:bg-neutral-900/50;
+            @apply bg-body;
         }
     </style>
 </div>

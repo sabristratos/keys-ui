@@ -28,6 +28,14 @@ This is a Laravel 12 application that serves as both a development environment a
 - **Accessibility First**: WCAG compliance built into all components
 - **Tailwind v4**: Uses modern `@import "tailwindcss"` syntax, semantic variables
 
+### Tailwind v4 Auto-Generated Utilities
+Tailwind v4 automatically generates utility classes from CSS custom properties defined in the theme:
+- CSS variables like `--color-foreground` become `text-foreground`, `bg-foreground`, `border-foreground`
+- All design tokens follow this pattern: `--color-muted` → `text-muted`, `bg-muted`, etc.
+- Radius tokens: `--radius-lg` → `rounded-lg` (already supported)
+- This eliminates manual utility definitions and ensures perfect consistency with the design system
+- All auto-generated utilities automatically work with light/dark modes via the `light-dark()` CSS function
+
 ## Development Commands
 
 ### Laravel Application

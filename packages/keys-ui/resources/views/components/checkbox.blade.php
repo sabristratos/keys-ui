@@ -5,34 +5,18 @@
 
 
 <label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $combinedClasses()]) }}>
-    @if($showInput)
-        <input
-            type="checkbox"
-            id="{{ $id }}"
-            name="{{ $name }}"
-            value="{{ $value }}"
-            {{ $checked ? 'checked' : '' }}
-            {{ $disabled ? 'disabled' : '' }}
-            {{ $required ? 'required' : '' }}
-            {{ $indeterminate ? 'data-indeterminate=true' : '' }}
-            class="{{ $checkboxClasses() }} shrink-0"
-            {{ $checkboxAttributes }}
-        />
-    @else
-        
-        <input
-            type="checkbox"
-            id="{{ $id }}"
-            name="{{ $name }}"
-            value="{{ $value }}"
-            {{ $checked ? 'checked' : '' }}
-            {{ $disabled ? 'disabled' : '' }}
-            {{ $required ? 'required' : '' }}
-            {{ $indeterminate ? 'data-indeterminate=true' : '' }}
-            class="sr-only"
-            {{ $checkboxAttributes }}
-        />
-    @endif
+    <input
+        type="checkbox"
+        id="{{ $id }}"
+        name="{{ $name }}"
+        value="{{ $value }}"
+        {{ $checked ? 'checked' : '' }}
+        {{ $disabled ? 'disabled' : '' }}
+        {{ $required ? 'required' : '' }}
+        {{ $indeterminate ? 'data-indeterminate=true' : '' }}
+        class="{{ $checkboxClasses() }} shrink-0"
+        {{ $checkboxAttributes }}
+    />
 
     @if($hasContent())
         <div class="flex-1 min-w-0">
@@ -128,3 +112,4 @@
 @if($showErrors && !is_null($errors))
     <x-keys::error :messages="$errors" />
 @endif
+

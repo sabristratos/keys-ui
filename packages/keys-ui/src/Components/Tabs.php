@@ -83,10 +83,10 @@ class Tabs extends Component
     public function tabListVariantClasses(): string
     {
         return match ($this->variant) {
-            'pills' => 'bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg',
-            'underline' => 'border-b border-neutral-200 dark:border-neutral-700',
-            'default' => 'border-b border-neutral-200 dark:border-neutral-700',
-            default => 'border-b border-neutral-200 dark:border-neutral-700'
+            'pills' => 'bg-body p-1 rounded-lg',
+            'underline' => 'border-b border-border',
+            'default' => 'border-b border-border',
+            default => 'border-b border-border'
         };
     }
 
