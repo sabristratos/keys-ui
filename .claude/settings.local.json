@@ -38,7 +38,8 @@
       "Bash(npx tsc:*)",
       "Bash(ren:*)",
       "Bash(del C:Workkeystest-image-overlay.html)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(dir:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

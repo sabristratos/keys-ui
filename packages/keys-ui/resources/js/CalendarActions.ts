@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CalendarActions - Handles interactive functionality for Calendar components
  *
  * Provides functionality for:
@@ -13,6 +13,7 @@ import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
 import { AnimationUtils } from './utils/AnimationUtils';
+import { DateUtils } from './utils/DateUtils';
 
 type ViewMode = 'calendar' | 'month' | 'year';
 
@@ -556,7 +557,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
             html += '<tr role="row">';
             week.forEach(day => {
                 const buttonClasses = this.getDayButtonClasses(day);
-                const ariaLabel = this.getDateAriaLabel(day.date, day.isToday, day.isSelected, day.isRangeStart, day.isRangeEnd, day.isInRange);
+                const ariaLabel = DateUtils.createDateAriaLabel(day.date, day.isToday, day.isSelected, day.isRangeStart, day.isRangeEnd, day.isInRange);
                 const rangeAttributes = this.getRangeAttributes(day, state);
 
                 html += `
@@ -621,23 +622,6 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
         return classes;
     }
 
-    /**
-     * Get ARIA label for a date
-     */
-    private getDateAriaLabel(dateString: string, isToday: boolean, isSelected: boolean): string {
-        const date = new Date(dateString);
-        const formatted = date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-
-        let label = formatted;
-        if (isToday) label += ' (Today)';
-        if (isSelected) label += ' (Selected)';
-
-        return label;
-    }
 
     /**
      * Update month/year display
@@ -894,18 +878,6 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
         this.renderCalendarGrid(calendar);
     }
 
-    /**
-     * Update hidden form input
-     */
-    private updateHiddenInput(calendar: HTMLElement): void {
-        const state = this.getState(calendar);
-        if (!state) return;
-
-        const hiddenInput = DOMUtils.querySelector('.calendar-hidden-input', calendar) as HTMLInputElement;
-        if (hiddenInput) {
-            hiddenInput.value = state.selectedDate || '';
-        }
-    }
 
     /**
      * Utility: Add days to a date string
@@ -1093,7 +1065,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
                 html += '<tr role="row">';
                 week.forEach(day => {
                     const buttonClasses = this.getDayButtonClasses(day);
-                    const ariaLabel = this.getDateAriaLabel(day.date, day.isToday, day.isSelected, day.isRangeStart, day.isRangeEnd, day.isInRange);
+                    const ariaLabel = DateUtils.createDateAriaLabel(day.date, day.isToday, day.isSelected, day.isRangeStart, day.isRangeEnd, day.isInRange);
                     const rangeAttributes = this.getRangeAttributes(day, state);
 
                     html += `
@@ -1177,28 +1149,6 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
         return attributes.join(' ');
     }
 
-    /**
-     * Update aria label to include range information
-     */
-    private getDateAriaLabel(date: string, isToday: boolean, isSelected: boolean, isRangeStart?: boolean, isRangeEnd?: boolean, isInRange?: boolean): string {
-        let label = this.formatDateForDisplay(date);
-
-        if (isToday) {
-            label += ', Today';
-        }
-
-        if (isSelected) {
-            label += ', Selected';
-        } else if (isRangeStart) {
-            label += ', Range start';
-        } else if (isRangeEnd) {
-            label += ', Range end';
-        } else if (isInRange) {
-            label += ', In selected range';
-        }
-
-        return label;
-    }
 
     /**
      * Update hidden input for range selection

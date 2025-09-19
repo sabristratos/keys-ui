@@ -20,13 +20,15 @@ import { ButtonGroupActions } from './ButtonGroupActions';
 import { TooltipActions } from './TooltipActions';
 import { TimePickerActions } from './TimePickerActions';
 import { AccordionActions } from './AccordionActions';
+import { EditorActions } from './EditorActions';
+import { DatePickerActions } from './DatePickerActions';
 
 // Import utility classes for external use
 import { BaseActionClass } from './utils/BaseActionClass';
 import { DOMUtils } from './utils/DOMUtils';
 import { EventUtils } from './utils/EventUtils';
 
-export { FormActions, AlertActions, CalendarActions, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, AccordionActions };
+export { FormActions, AlertActions, CalendarActions, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, AccordionActions, EditorActions, DatePickerActions };
 
 // Export utility classes for external consumption
 export { BaseActionClass, DOMUtils, EventUtils };
@@ -66,6 +68,10 @@ export function initializeKeysUI(): void {
 
     AccordionActions.getInstance().init();
 
+    EditorActions.getInstance().init();
+
+    DatePickerActions.getInstance().init();
+
 }
 
 /**
@@ -87,5 +93,7 @@ export default {
     TooltipActions: TooltipActions.getInstance(),
     TimePickerActions: TimePickerActions.getInstance(),
     AccordionActions: AccordionActions.getInstance(),
+    EditorActions: EditorActions.getInstance(),
+    DatePickerActions: DatePickerActions.getInstance(),
     init: initializeKeysUI
 };

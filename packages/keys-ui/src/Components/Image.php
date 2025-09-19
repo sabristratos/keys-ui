@@ -142,33 +142,224 @@ class Image extends Component
 
     protected function getGradientClass(string $direction): string
     {
-        $opacity = $this->overlayOpacity;
+        // Map opacity values to valid Tailwind opacity modifiers
+        $opacityMap = [
+            '10' => '10',
+            '20' => '20',
+            '30' => '30',
+            '40' => '40',
+            '50' => '50',
+            '60' => '60',
+            '70' => '70',
+            '80' => '80',
+            '90' => '90'
+        ];
 
-        return match ($this->overlayColor) {
-            'black' => "bg-gradient-{$direction} from-black/{$opacity} to-transparent",
-            'white' => "bg-gradient-{$direction} from-white/{$opacity} to-transparent",
-            'brand' => "bg-gradient-{$direction} from-blue-600/{$opacity} to-transparent",
-            'success' => "bg-gradient-{$direction} from-emerald-600/{$opacity} to-transparent",
-            'warning' => "bg-gradient-{$direction} from-amber-500/{$opacity} to-transparent",
-            'danger' => "bg-gradient-{$direction} from-red-600/{$opacity} to-transparent",
-            'neutral' => "bg-gradient-{$direction} from-gray-600/{$opacity} to-transparent",
-            default => "bg-gradient-{$direction} from-black/{$opacity} to-transparent"
+        $opacity = $opacityMap[$this->overlayOpacity] ?? '50';
+
+        // Build complete gradient class names that Tailwind can detect
+        $colorClass = match ($this->overlayColor) {
+            'black' => match($opacity) {
+                '10' => 'from-black/10',
+                '20' => 'from-black/20',
+                '30' => 'from-black/30',
+                '40' => 'from-black/40',
+                '50' => 'from-black/50',
+                '60' => 'from-black/60',
+                '70' => 'from-black/70',
+                '80' => 'from-black/80',
+                '90' => 'from-black/90',
+                default => 'from-black/50'
+            },
+            'white' => match($opacity) {
+                '10' => 'from-white/10',
+                '20' => 'from-white/20',
+                '30' => 'from-white/30',
+                '40' => 'from-white/40',
+                '50' => 'from-white/50',
+                '60' => 'from-white/60',
+                '70' => 'from-white/70',
+                '80' => 'from-white/80',
+                '90' => 'from-white/90',
+                default => 'from-white/50'
+            },
+            'brand' => match($opacity) {
+                '10' => 'from-blue-600/10',
+                '20' => 'from-blue-600/20',
+                '30' => 'from-blue-600/30',
+                '40' => 'from-blue-600/40',
+                '50' => 'from-blue-600/50',
+                '60' => 'from-blue-600/60',
+                '70' => 'from-blue-600/70',
+                '80' => 'from-blue-600/80',
+                '90' => 'from-blue-600/90',
+                default => 'from-blue-600/50'
+            },
+            'success' => match($opacity) {
+                '10' => 'from-emerald-600/10',
+                '20' => 'from-emerald-600/20',
+                '30' => 'from-emerald-600/30',
+                '40' => 'from-emerald-600/40',
+                '50' => 'from-emerald-600/50',
+                '60' => 'from-emerald-600/60',
+                '70' => 'from-emerald-600/70',
+                '80' => 'from-emerald-600/80',
+                '90' => 'from-emerald-600/90',
+                default => 'from-emerald-600/50'
+            },
+            'warning' => match($opacity) {
+                '10' => 'from-amber-500/10',
+                '20' => 'from-amber-500/20',
+                '30' => 'from-amber-500/30',
+                '40' => 'from-amber-500/40',
+                '50' => 'from-amber-500/50',
+                '60' => 'from-amber-500/60',
+                '70' => 'from-amber-500/70',
+                '80' => 'from-amber-500/80',
+                '90' => 'from-amber-500/90',
+                default => 'from-amber-500/50'
+            },
+            'danger' => match($opacity) {
+                '10' => 'from-red-600/10',
+                '20' => 'from-red-600/20',
+                '30' => 'from-red-600/30',
+                '40' => 'from-red-600/40',
+                '50' => 'from-red-600/50',
+                '60' => 'from-red-600/60',
+                '70' => 'from-red-600/70',
+                '80' => 'from-red-600/80',
+                '90' => 'from-red-600/90',
+                default => 'from-red-600/50'
+            },
+            'neutral' => match($opacity) {
+                '10' => 'from-gray-600/10',
+                '20' => 'from-gray-600/20',
+                '30' => 'from-gray-600/30',
+                '40' => 'from-gray-600/40',
+                '50' => 'from-gray-600/50',
+                '60' => 'from-gray-600/60',
+                '70' => 'from-gray-600/70',
+                '80' => 'from-gray-600/80',
+                '90' => 'from-gray-600/90',
+                default => 'from-gray-600/50'
+            },
+            default => match($opacity) {
+                '10' => 'from-black/10',
+                '20' => 'from-black/20',
+                '30' => 'from-black/30',
+                '40' => 'from-black/40',
+                '50' => 'from-black/50',
+                '60' => 'from-black/60',
+                '70' => 'from-black/70',
+                '80' => 'from-black/80',
+                '90' => 'from-black/90',
+                default => 'from-black/50'
+            }
         };
+
+        return "bg-gradient-{$direction} {$colorClass} to-transparent";
     }
 
     protected function getSolidOverlayClass(): string
     {
-        $opacity = $this->overlayOpacity;
-
+        // Use complete class names for proper Tailwind detection
         return match ($this->overlayColor) {
-            'black' => "bg-black/{$opacity}",
-            'white' => "bg-white/{$opacity}",
-            'brand' => "bg-brand/{$opacity}",
-            'success' => "bg-success/{$opacity}",
-            'warning' => "bg-warning/{$opacity}",
-            'danger' => "bg-danger/{$opacity}",
-            'neutral' => "bg-neutral/{$opacity}",
-            default => "bg-black/{$opacity}"
+            'black' => match($this->overlayOpacity) {
+                '10' => 'bg-black/10',
+                '20' => 'bg-black/20',
+                '30' => 'bg-black/30',
+                '40' => 'bg-black/40',
+                '50' => 'bg-black/50',
+                '60' => 'bg-black/60',
+                '70' => 'bg-black/70',
+                '80' => 'bg-black/80',
+                '90' => 'bg-black/90',
+                default => 'bg-black/50'
+            },
+            'white' => match($this->overlayOpacity) {
+                '10' => 'bg-white/10',
+                '20' => 'bg-white/20',
+                '30' => 'bg-white/30',
+                '40' => 'bg-white/40',
+                '50' => 'bg-white/50',
+                '60' => 'bg-white/60',
+                '70' => 'bg-white/70',
+                '80' => 'bg-white/80',
+                '90' => 'bg-white/90',
+                default => 'bg-white/50'
+            },
+            'brand' => match($this->overlayOpacity) {
+                '10' => 'bg-blue-600/10',
+                '20' => 'bg-blue-600/20',
+                '30' => 'bg-blue-600/30',
+                '40' => 'bg-blue-600/40',
+                '50' => 'bg-blue-600/50',
+                '60' => 'bg-blue-600/60',
+                '70' => 'bg-blue-600/70',
+                '80' => 'bg-blue-600/80',
+                '90' => 'bg-blue-600/90',
+                default => 'bg-blue-600/50'
+            },
+            'success' => match($this->overlayOpacity) {
+                '10' => 'bg-emerald-600/10',
+                '20' => 'bg-emerald-600/20',
+                '30' => 'bg-emerald-600/30',
+                '40' => 'bg-emerald-600/40',
+                '50' => 'bg-emerald-600/50',
+                '60' => 'bg-emerald-600/60',
+                '70' => 'bg-emerald-600/70',
+                '80' => 'bg-emerald-600/80',
+                '90' => 'bg-emerald-600/90',
+                default => 'bg-emerald-600/50'
+            },
+            'warning' => match($this->overlayOpacity) {
+                '10' => 'bg-amber-500/10',
+                '20' => 'bg-amber-500/20',
+                '30' => 'bg-amber-500/30',
+                '40' => 'bg-amber-500/40',
+                '50' => 'bg-amber-500/50',
+                '60' => 'bg-amber-500/60',
+                '70' => 'bg-amber-500/70',
+                '80' => 'bg-amber-500/80',
+                '90' => 'bg-amber-500/90',
+                default => 'bg-amber-500/50'
+            },
+            'danger' => match($this->overlayOpacity) {
+                '10' => 'bg-red-600/10',
+                '20' => 'bg-red-600/20',
+                '30' => 'bg-red-600/30',
+                '40' => 'bg-red-600/40',
+                '50' => 'bg-red-600/50',
+                '60' => 'bg-red-600/60',
+                '70' => 'bg-red-600/70',
+                '80' => 'bg-red-600/80',
+                '90' => 'bg-red-600/90',
+                default => 'bg-red-600/50'
+            },
+            'neutral' => match($this->overlayOpacity) {
+                '10' => 'bg-gray-600/10',
+                '20' => 'bg-gray-600/20',
+                '30' => 'bg-gray-600/30',
+                '40' => 'bg-gray-600/40',
+                '50' => 'bg-gray-600/50',
+                '60' => 'bg-gray-600/60',
+                '70' => 'bg-gray-600/70',
+                '80' => 'bg-gray-600/80',
+                '90' => 'bg-gray-600/90',
+                default => 'bg-gray-600/50'
+            },
+            default => match($this->overlayOpacity) {
+                '10' => 'bg-black/10',
+                '20' => 'bg-black/20',
+                '30' => 'bg-black/30',
+                '40' => 'bg-black/40',
+                '50' => 'bg-black/50',
+                '60' => 'bg-black/60',
+                '70' => 'bg-black/70',
+                '80' => 'bg-black/80',
+                '90' => 'bg-black/90',
+                default => 'bg-black/50'
+            }
         };
     }
 

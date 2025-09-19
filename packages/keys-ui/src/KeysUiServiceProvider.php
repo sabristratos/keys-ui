@@ -15,10 +15,12 @@ use Keys\UI\Components\Breadcrumbs\Item;
 use Keys\UI\Components\Button;
 use Keys\UI\Components\Button\Group;
 use Keys\UI\Components\Calendar;
+use Keys\UI\Components\DatePicker;
 use Keys\UI\Components\Card;
 use Keys\UI\Components\Checkbox;
 use Keys\UI\Components\ChoiceGroup;
 use Keys\UI\Components\Dropdown;
+use Keys\UI\Components\Editor;
 use Keys\UI\Components\Error;
 use Keys\UI\Components\Field;
 use Keys\UI\Components\Icon;
@@ -123,6 +125,7 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::button', Button::class);
         Blade::component('keys::button.group', Group::class);
         Blade::component('keys::calendar', Calendar::class);
+        Blade::component('keys::date-picker', DatePicker::class);
         Blade::component('keys::card', Card::class);
         Blade::component('keys::label', Label::class);
         Blade::component('keys::error', Error::class);
@@ -148,6 +151,7 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::modal', Modal::class);
         Blade::component('keys::toast', Toast::class);
         Blade::component('keys::dropdown', Dropdown::class);
+        Blade::component('keys::editor', Editor::class);
         Blade::component('keys::menu', Menu::class);
         Blade::component('keys::menu.item', MenuItem::class);
         Blade::component('keys::menu.checkbox', MenuCheckbox::class);
