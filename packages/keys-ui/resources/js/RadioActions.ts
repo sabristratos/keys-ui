@@ -6,64 +6,45 @@
  * - Accessibility enhancements for radio interactions
  */
 
-export class RadioActions {
-    private static instance: RadioActions | null = null;
-    private initialized = false;
+import { BaseActionClass } from './utils/BaseActionClass';
+import { EventUtils } from './utils/EventUtils';
+import { DOMUtils } from './utils/DOMUtils';
 
+export class RadioActions extends BaseActionClass {
     /**
-     * Get singleton instance
+     * Initialize radio elements - required by BaseActionClass
      */
-    public static getInstance(): RadioActions {
-        if (!RadioActions.instance) {
-            RadioActions.instance = new RadioActions();
-        }
-        return RadioActions.instance;
+    protected initializeElements(): void {
+        // RadioActions doesn't need to initialize specific elements on load
+        // Actions are handled via event delegation
     }
 
     /**
-     * Initialize RadioActions for all radio elements
+     * Bind event listeners using event delegation - required by BaseActionClass
      */
-    public init(): void {
-        if (this.initialized) {
-            return;
-        }
-
-        this.bindEventListeners();
-        this.initialized = true;
-
-    }
-
-    /**
-     * Bind event listeners using event delegation
-     */
-    private bindEventListeners(): void {
-        document.addEventListener('click', (event) => {
-            const target = event.target as Element;
-
-            const radioLabel = target.closest('label[for]') as HTMLLabelElement;
-            if (!radioLabel) return;
-
-            const radioId = radioLabel.getAttribute('for');
+    protected bindEventListeners(): void {
+        // Handle label clicks
+        EventUtils.handleDelegatedClick('label[for]', (label) => {
+            const radioId = label.getAttribute('for');
             if (!radioId) return;
 
-            const radioInput = document.getElementById(radioId) as HTMLInputElement;
+            const radioInput = DOMUtils.getElementById(radioId) as HTMLInputElement;
             if (!radioInput || radioInput.type !== 'radio') return;
 
             this.focusRadioInput(radioInput);
         });
 
-        document.addEventListener('keydown', (event) => {
-            const target = event.target as HTMLInputElement;
+        // Handle keyboard navigation
+        EventUtils.handleDelegatedKeydown('input[type="radio"]', (target, event) => {
+            const navigationHandler = EventUtils.createNavigationHandler({
+                onArrowDown: () => this.focusNextRadio(target as HTMLInputElement),
+                onArrowRight: () => this.focusNextRadio(target as HTMLInputElement),
+                onArrowUp: () => this.focusPreviousRadio(target as HTMLInputElement),
+                onArrowLeft: () => this.focusPreviousRadio(target as HTMLInputElement),
+                preventDefault: ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft']
+            });
 
-            if (!target || target.type !== 'radio') return;
-
-            if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-                event.preventDefault();
-                this.focusNextRadio(target);
-            } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-                event.preventDefault();
-                this.focusPreviousRadio(target);
-            }
+            navigationHandler(event);
         });
     }
 
@@ -71,11 +52,8 @@ export class RadioActions {
      * Focus a radio input with proper timing
      */
     private focusRadioInput(radioInput: HTMLInputElement): void {
-        setTimeout(() => {
-            radioInput.focus();
-
-            this.dispatchFocusEvent(radioInput);
-        }, 0);
+        DOMUtils.focus(radioInput, 0);
+        this.dispatchFocusEvent(radioInput);
     }
 
     /**
@@ -121,7 +99,7 @@ export class RadioActions {
         const name = radio.name;
         if (!name) return [radio];
 
-        const radios = Array.from(document.querySelectorAll(`input[type="radio"][name="${name}"]`)) as HTMLInputElement[];
+        const radios = Array.from(DOMUtils.querySelectorAll(`input[type="radio"][name="${name}"]`)) as HTMLInputElement[];
 
         return radios.filter(r => !r.disabled);
     }
@@ -130,24 +108,19 @@ export class RadioActions {
      * Dispatch custom event for radio focus
      */
     private dispatchFocusEvent(radioInput: HTMLInputElement): void {
-        const event = new CustomEvent('radio-focus', {
-            detail: {
-                radio: radioInput,
-                name: radioInput.name,
-                value: radioInput.value,
-                checked: radioInput.checked
-            },
-            bubbles: true
+        EventUtils.dispatchCustomEvent(radioInput, 'radio-focus', {
+            radio: radioInput,
+            name: radioInput.name,
+            value: radioInput.value,
+            checked: radioInput.checked
         });
-
-        radioInput.dispatchEvent(event);
     }
 
     /**
-     * Add a custom radio focus handler
+     * Add a custom radio focus handler with automatic cleanup
      */
-    public addFocusHandler(handler: (radio: HTMLInputElement) => void): void {
-        document.addEventListener('radio-focus', (event) => {
+    public addFocusHandler(handler: (radio: HTMLInputElement) => void): () => void {
+        return EventUtils.addEventListener(document, 'radio-focus', (event) => {
             const customEvent = event as CustomEvent<{
                 radio: HTMLInputElement;
                 name: string;
@@ -159,11 +132,11 @@ export class RadioActions {
     }
 
     /**
-     * Destroy RadioActions and clean up
+     * Clean up RadioActions - extends BaseActionClass destroy
      */
-    public destroy(): void {
-        this.initialized = false;
-
+    protected onDestroy(): void {
+        // RadioActions doesn't have additional cleanup beyond base class
+        // Event listeners are automatically cleaned up by browser
     }
 }
 

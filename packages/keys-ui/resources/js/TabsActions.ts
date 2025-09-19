@@ -9,6 +9,11 @@
  * - Event delegation and custom events
  */
 
+import { BaseActionClass } from './utils/BaseActionClass';
+import { EventUtils } from './utils/EventUtils';
+import { DOMUtils } from './utils/DOMUtils';
+import { AnimationUtils } from './utils/AnimationUtils';
+
 interface TabState {
     activeTab: string | null;
     tabs: HTMLElement[];
@@ -18,41 +23,16 @@ interface TabState {
     disabled: boolean;
 }
 
-export class TabsActions {
-    private static instance: TabsActions | null = null;
-    private initialized = false;
-    private tabsStates = new Map<HTMLElement, TabState>();
+export class TabsActions extends BaseActionClass<TabState> {
+    private resizeCleanup: (() => void) | null = null;
+
 
     /**
-     * Get singleton instance
+     * Initialize tabs elements - required by BaseActionClass
      */
-    public static getInstance(): TabsActions {
-        if (!TabsActions.instance) {
-            TabsActions.instance = new TabsActions();
-        }
-        return TabsActions.instance;
-    }
-
-    /**
-     * Initialize TabsActions for all tabs elements
-     */
-    public init(): void {
-        if (this.initialized) {
-            return;
-        }
-
-        this.bindEventListeners();
-        this.initializeTabs();
-        this.initialized = true;
-
-    }
-
-    /**
-     * Initialize all existing tabs elements
-     */
-    private initializeTabs(): void {
-        document.querySelectorAll('[data-tabs="true"]').forEach(tabs => {
-            this.initializeTabsElement(tabs as HTMLElement);
+    protected initializeElements(): void {
+        DOMUtils.findByDataAttribute('tabs', 'true').forEach(tabs => {
+            this.initializeTabsElement(tabs);
         });
     }
 
@@ -65,10 +45,10 @@ export class TabsActions {
         const disabled = tabsElement.dataset.disabled === 'true';
         const initialValue = tabsElement.dataset.value;
 
-        const tabs = Array.from(tabsElement.querySelectorAll('[data-tabs-trigger="true"]')) as HTMLElement[];
-        const panels = Array.from(tabsElement.querySelectorAll('[data-tabs-panel="true"]')) as HTMLElement[];
+        const tabs = Array.from(DOMUtils.querySelectorAll('[data-tabs-trigger="true"]', tabsElement)) as HTMLElement[];
+        const panels = Array.from(DOMUtils.querySelectorAll('[data-tabs-panel="true"]', tabsElement)) as HTMLElement[];
 
-        let activeTab = initialValue;
+        let activeTab = initialValue || null;
         if (!activeTab && tabs.length > 0) {
             const firstEnabledTab = tabs.find(tab => tab.getAttribute('aria-disabled') !== 'true');
             activeTab = firstEnabledTab?.dataset.value || null;
@@ -83,7 +63,7 @@ export class TabsActions {
             disabled
         };
 
-        this.tabsStates.set(tabsElement, state);
+        this.setState(tabsElement, state);
         this.updateTabsState(tabsElement);
 
         this.initializeMarker(tabsElement);
@@ -91,54 +71,55 @@ export class TabsActions {
     }
 
     /**
-     * Bind global event listeners using event delegation
+     * Bind event listeners using event delegation - required by BaseActionClass
      */
-    private bindEventListeners(): void {
-        document.addEventListener('click', (event) => {
-            const tab = (event.target as Element)?.closest('[data-tabs-trigger="true"]') as HTMLElement;
-            if (tab) {
-                event.preventDefault();
+    protected bindEventListeners(): void {
+        EventUtils.handleDelegatedClick('[data-tabs-trigger="true"]', (tab, event) => {
+            event.preventDefault();
 
-                const tabsElement = tab.closest('[data-tabs="true"]') as HTMLElement;
-                if (tabsElement && tab.getAttribute('aria-disabled') !== 'true') {
-                    this.activateTab(tabsElement, tab.dataset.value || '');
-                }
+            const tabsElement = DOMUtils.findClosest(tab, '[data-tabs="true"]');
+            if (tabsElement && tab.getAttribute('aria-disabled') !== 'true') {
+                this.activateTab(tabsElement, tab.dataset.value || '');
             }
         });
 
-        document.addEventListener('keydown', (event) => {
-            const tab = (event.target as Element)?.closest('[data-tabs-trigger="true"]') as HTMLElement;
-            if (tab) {
-                const tabsElement = tab.closest('[data-tabs="true"]') as HTMLElement;
-                if (tabsElement) {
-                    this.handleKeydown(tabsElement, event);
-                }
+        EventUtils.handleDelegatedKeydown('[data-tabs-trigger="true"]', (tab, event) => {
+            const tabsElement = DOMUtils.findClosest(tab, '[data-tabs="true"]');
+            if (tabsElement) {
+                this.handleKeydown(tabsElement, event);
             }
         });
 
-        window.addEventListener('resize', () => {
+        this.resizeCleanup = EventUtils.handleResize(() => {
             this.handleResize();
-        });
+        }, 100);
+    }
 
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const element = node as Element;
-                        const tabs = element.querySelectorAll('[data-tabs="true"]');
-                        tabs.forEach(tabsEl => {
-                            if (!this.tabsStates.has(tabsEl as HTMLElement)) {
-                                this.initializeTabsElement(tabsEl as HTMLElement);
-                            }
-                        });
+    /**
+     * Setup dynamic observer for new tabs - uses BaseActionClass utility
+     */
+    protected setupDynamicObserver(): void {
+        this.createDynamicObserver((addedNodes) => {
+            addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const element = node as HTMLElement;
+
+                    // Check if the added node is a tabs element
+                    if (DOMUtils.hasDataAttribute(element, 'tabs', 'true')) {
+                        if (!this.hasState(element)) {
+                            this.initializeTabsElement(element);
+                        }
                     }
-                });
-            });
-        });
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
+                    // Check for tabs within the added node
+                    const tabs = DOMUtils.findByDataAttribute('tabs', 'true', element);
+                    tabs.forEach(tabsEl => {
+                        if (!this.hasState(tabsEl)) {
+                            this.initializeTabsElement(tabsEl);
+                        }
+                    });
+                }
+            });
         });
     }
 
@@ -146,7 +127,7 @@ export class TabsActions {
      * Activate a specific tab
      */
     private activateTab(tabsElement: HTMLElement, value: string, shouldFocus: boolean = false): void {
-        const state = this.tabsStates.get(tabsElement);
+        const state = this.getState(tabsElement);
         if (!state || state.disabled) return;
 
         const targetTab = state.tabs.find(tab => tab.dataset.value === value);
@@ -157,7 +138,7 @@ export class TabsActions {
         const previousTab = state.activeTab;
 
         state.activeTab = value;
-        this.tabsStates.set(tabsElement, state);
+        this.setState(tabsElement, state);
 
         this.updateTabsState(tabsElement);
 
@@ -168,7 +149,8 @@ export class TabsActions {
             targetTab.focus();
         }
 
-        this.dispatchTabsEvent(tabsElement, 'tabs:change', {
+        EventUtils.dispatchCustomEvent(tabsElement, 'tabs:change', {
+            tabs: tabsElement,
             activeTab: value,
             previousTab: previousTab
         });
@@ -178,7 +160,7 @@ export class TabsActions {
      * Update tabs visual state and panel visibility
      */
     private updateTabsState(tabsElement: HTMLElement): void {
-        const state = this.tabsStates.get(tabsElement);
+        const state = this.getState(tabsElement);
         if (!state) return;
 
         state.tabs.forEach(tab => {
@@ -214,7 +196,7 @@ export class TabsActions {
      * Handle keyboard navigation
      */
     private handleKeydown(tabsElement: HTMLElement, event: KeyboardEvent): void {
-        const state = this.tabsStates.get(tabsElement);
+        const state = this.getState(tabsElement);
         if (!state || state.disabled) return;
 
         const currentTab = event.target as HTMLElement;
@@ -316,25 +298,12 @@ export class TabsActions {
         return state.tabs.length - 1;
     }
 
-    /**
-     * Dispatch custom tabs event
-     */
-    private dispatchTabsEvent(tabsElement: HTMLElement, eventName: string, detail: any = null): void {
-        const event = new CustomEvent(eventName, {
-            detail: {
-                tabs: tabsElement,
-                ...detail
-            },
-            bubbles: true
-        });
-        tabsElement.dispatchEvent(event);
-    }
 
     /**
      * Get tabs state (for external access)
      */
     public getTabsState(tabsElement: HTMLElement): TabState | null {
-        return this.tabsStates.get(tabsElement) || null;
+        return this.getState(tabsElement) || null;
     }
 
     /**
@@ -348,12 +317,12 @@ export class TabsActions {
      * Initialize marker position for the active tab
      */
     private initializeMarker(tabsElement: HTMLElement): void {
-        const state = this.tabsStates.get(tabsElement);
+        const state = this.getState(tabsElement);
         if (!state || !state.activeTab) return;
 
         const activeTab = state.tabs.find(tab => tab.dataset.value === state.activeTab);
         if (activeTab) {
-            setTimeout(() => {
+            AnimationUtils.createTimer(() => {
                 this.repositionMarker(tabsElement, activeTab);
             }, 10);
         }
@@ -363,10 +332,10 @@ export class TabsActions {
      * Reposition marker to match the given tab
      */
     private repositionMarker(tabsElement: HTMLElement, targetTab: HTMLElement): void {
-        const state = this.tabsStates.get(tabsElement);
+        const state = this.getState(tabsElement);
         if (!state) return;
 
-        const marker = tabsElement.querySelector('[data-tab-marker="true"]') as HTMLElement;
+        const marker = DOMUtils.querySelector('[data-tab-marker="true"]', tabsElement) as HTMLElement;
         if (!marker) return;
 
         const { orientation, variant } = state;
@@ -420,28 +389,24 @@ export class TabsActions {
      * Handle window resize - reposition all markers
      */
     private handleResize(): void {
-        clearTimeout(this.resizeTimeout);
-        this.resizeTimeout = setTimeout(() => {
-            this.tabsStates.forEach((state, tabsElement) => {
-                if (state.activeTab) {
-                    const activeTab = state.tabs.find(tab => tab.dataset.value === state.activeTab);
-                    if (activeTab) {
-                        this.repositionMarker(tabsElement, activeTab);
-                    }
+        this.getAllStates().forEach((state, tabsElement) => {
+            if (state.activeTab) {
+                const activeTab = state.tabs.find(tab => tab.dataset.value === state.activeTab);
+                if (activeTab) {
+                    this.repositionMarker(tabsElement, activeTab);
                 }
-            });
-        }, 100);
+            }
+        });
     }
 
-    private resizeTimeout: number = 0;
-
     /**
-     * Destroy TabsActions and clean up
+     * Clean up TabsActions - extends BaseActionClass destroy
      */
-    public destroy(): void {
-        this.tabsStates.clear();
-        this.initialized = false;
-        clearTimeout(this.resizeTimeout);
+    protected onDestroy(): void {
+        if (this.resizeCleanup) {
+            this.resizeCleanup();
+            this.resizeCleanup = null;
+        }
     }
 }
 

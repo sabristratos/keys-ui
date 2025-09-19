@@ -30,7 +30,15 @@
       "Bash(move:*)",
       "WebFetch(domain:css-tricks.com)",
       "Bash(npm run typecheck:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_press_key",
+      "mcp__laravel-boost__browser-logs",
+      "Bash(npm run:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ren:*)",
+      "Bash(del C:Workkeystest-image-overlay.html)",
+      "Bash(timeout:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

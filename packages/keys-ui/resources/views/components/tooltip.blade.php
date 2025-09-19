@@ -73,64 +73,48 @@
         border-right: 6px solid;
     }
 
-    /* Arrow colors for dark theme */
+    /* Arrow colors using semantic tokens with automatic light/dark switching */
     .keys-tooltip[data-color="dark"] .keys-tooltip-arrow {
         filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
     }
 
     .keys-tooltip[data-color="dark"][data-placement="top"] .keys-tooltip-arrow {
-        border-top-color: rgb(23 23 23); /* neutral-900 */
+        border-top-color: var(--tooltip-dark-bg);
     }
 
     .keys-tooltip[data-color="dark"][data-placement="bottom"] .keys-tooltip-arrow {
-        border-bottom-color: rgb(23 23 23); /* neutral-900 */
+        border-bottom-color: var(--tooltip-dark-bg);
     }
 
     .keys-tooltip[data-color="dark"][data-placement="left"] .keys-tooltip-arrow {
-        border-left-color: rgb(23 23 23); /* neutral-900 */
+        border-left-color: var(--tooltip-dark-bg);
     }
 
     .keys-tooltip[data-color="dark"][data-placement="right"] .keys-tooltip-arrow {
-        border-right-color: rgb(23 23 23); /* neutral-900 */
+        border-right-color: var(--tooltip-dark-bg);
     }
 
-    /* Arrow colors for light theme */
+    /* Arrow colors for light tooltips using semantic tokens */
     .keys-tooltip[data-color="light"] .keys-tooltip-arrow {
         filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
     }
 
     .keys-tooltip[data-color="light"][data-placement="top"] .keys-tooltip-arrow {
-        border-top-color: white;
+        border-top-color: var(--surface);
     }
 
     .keys-tooltip[data-color="light"][data-placement="bottom"] .keys-tooltip-arrow {
-        border-bottom-color: white;
+        border-bottom-color: var(--surface);
     }
 
     .keys-tooltip[data-color="light"][data-placement="left"] .keys-tooltip-arrow {
-        border-left-color: white;
+        border-left-color: var(--surface);
     }
 
     .keys-tooltip[data-color="light"][data-placement="right"] .keys-tooltip-arrow {
-        border-right-color: white;
+        border-right-color: var(--surface);
     }
 
-    /* Dark mode support */
-    .dark .keys-tooltip[data-color="dark"][data-placement="top"] .keys-tooltip-arrow {
-        border-top-color: rgb(39 39 42); /* neutral-800 */
-    }
-
-    .dark .keys-tooltip[data-color="dark"][data-placement="bottom"] .keys-tooltip-arrow {
-        border-bottom-color: rgb(39 39 42); /* neutral-800 */
-    }
-
-    .dark .keys-tooltip[data-color="dark"][data-placement="left"] .keys-tooltip-arrow {
-        border-left-color: rgb(39 39 42); /* neutral-800 */
-    }
-
-    .dark .keys-tooltip[data-color="dark"][data-placement="right"] .keys-tooltip-arrow {
-        border-right-color: rgb(39 39 42); /* neutral-800 */
-    }
 
     /* Hover states */
     [data-tooltip-target]:hover,

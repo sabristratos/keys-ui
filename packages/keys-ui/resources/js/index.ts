@@ -7,7 +7,9 @@
 
 import { FormActions } from './FormActions';
 import { AlertActions } from './AlertActions';
+import { CalendarActions } from './CalendarActions';
 import { RadioActions } from './RadioActions';
+import { RangeActions } from './RangeActions';
 import { SelectActions } from './SelectActions';
 import { TabsActions } from './TabsActions';
 import { ModalActions } from './ModalActions';
@@ -16,8 +18,18 @@ import { DropdownActions } from './DropdownActions';
 import { TableActions } from './TableActions';
 import { ButtonGroupActions } from './ButtonGroupActions';
 import { TooltipActions } from './TooltipActions';
+import { TimePickerActions } from './TimePickerActions';
+import { AccordionActions } from './AccordionActions';
 
-export { FormActions, AlertActions, RadioActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions };
+// Import utility classes for external use
+import { BaseActionClass } from './utils/BaseActionClass';
+import { DOMUtils } from './utils/DOMUtils';
+import { EventUtils } from './utils/EventUtils';
+
+export { FormActions, AlertActions, CalendarActions, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, AccordionActions };
+
+// Export utility classes for external consumption
+export { BaseActionClass, DOMUtils, EventUtils };
 
 /**
  * Initialize all Keys UI components
@@ -28,7 +40,11 @@ export function initializeKeysUI(): void {
 
     AlertActions.getInstance().init();
 
+    CalendarActions.getInstance().init();
+
     RadioActions.getInstance().init();
+
+    RangeActions.getInstance().init();
 
     SelectActions.getInstance().init();
 
@@ -46,6 +62,10 @@ export function initializeKeysUI(): void {
 
     TooltipActions.getInstance().init();
 
+    TimePickerActions.getInstance().init();
+
+    AccordionActions.getInstance().init();
+
 }
 
 /**
@@ -54,7 +74,9 @@ export function initializeKeysUI(): void {
 export default {
     FormActions: FormActions.getInstance(),
     AlertActions: AlertActions.getInstance(),
+    CalendarActions: CalendarActions.getInstance(),
     RadioActions: RadioActions.getInstance(),
+    RangeActions: RangeActions.getInstance(),
     SelectActions: SelectActions.getInstance(),
     TabsActions: TabsActions.getInstance(),
     ModalActions: ModalActions.getInstance(),
@@ -63,5 +85,7 @@ export default {
     TableActions: TableActions.getInstance(),
     ButtonGroupActions: ButtonGroupActions.getInstance(),
     TooltipActions: TooltipActions.getInstance(),
+    TimePickerActions: TimePickerActions.getInstance(),
+    AccordionActions: AccordionActions.getInstance(),
     init: initializeKeysUI
 };

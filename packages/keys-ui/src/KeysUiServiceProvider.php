@@ -14,6 +14,7 @@ use Keys\UI\Components\Breadcrumbs;
 use Keys\UI\Components\Breadcrumbs\Item;
 use Keys\UI\Components\Button;
 use Keys\UI\Components\Button\Group;
+use Keys\UI\Components\Calendar;
 use Keys\UI\Components\Card;
 use Keys\UI\Components\Checkbox;
 use Keys\UI\Components\ChoiceGroup;
@@ -32,6 +33,7 @@ use Keys\UI\Components\Menu\Separator as MenuSeparator;
 use Keys\UI\Components\Menu\Submenu as MenuSubmenu;
 use Keys\UI\Components\Modal;
 use Keys\UI\Components\Radio;
+use Keys\UI\Components\Range;
 use Keys\UI\Components\Select;
 use Keys\UI\Components\Select\Option;
 use Keys\UI\Components\Tabs;
@@ -41,6 +43,9 @@ use Keys\UI\Components\Textarea;
 use Keys\UI\Components\Toast;
 use Keys\UI\Components\Toggle;
 use Keys\UI\Components\Tooltip;
+use Keys\UI\Components\HeadingDecorator;
+use Keys\UI\Components\Image;
+use Keys\UI\Components\TimePicker;
 use Keys\UI\Components\Table;
 use Keys\UI\Components\Table\Head;
 use Keys\UI\Components\Table\Body;
@@ -117,6 +122,7 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::loading', Loading::class);
         Blade::component('keys::button', Button::class);
         Blade::component('keys::button.group', Group::class);
+        Blade::component('keys::calendar', Calendar::class);
         Blade::component('keys::card', Card::class);
         Blade::component('keys::label', Label::class);
         Blade::component('keys::error', Error::class);
@@ -124,6 +130,7 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::textarea', Textarea::class);
         Blade::component('keys::checkbox', Checkbox::class);
         Blade::component('keys::radio', Radio::class);
+        Blade::component('keys::range', Range::class);
         Blade::component('keys::choice-group', ChoiceGroup::class);
         Blade::component('keys::field', Field::class);
         Blade::component('keys::alert', Alert::class);
@@ -156,6 +163,9 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::table.empty-state', TableEmpty::class);
         Blade::component('keys::table.loading-state', TableLoading::class);
         Blade::component('keys::tooltip', Tooltip::class);
+        Blade::component('keys::heading-decorator', HeadingDecorator::class);
+        Blade::component('keys::image', Image::class);
+        Blade::component('keys::timepicker', TimePicker::class);
 
         $this->app->alias(KeysManager::class, 'keys');
 

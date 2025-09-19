@@ -8,6 +8,10 @@
  * - Focus management and accessibility
  */
 
+import { BaseActionClass } from './utils/BaseActionClass';
+import { EventUtils } from './utils/EventUtils';
+import { DOMUtils } from './utils/DOMUtils';
+
 interface DropdownState {
     isOpen: boolean;
     focusedIndex: number;
@@ -16,41 +20,15 @@ interface DropdownState {
     children: HTMLElement[];
 }
 
-export class DropdownActions {
-    private static instance: DropdownActions | null = null;
-    private initialized = false;
-    private dropdownStates = new Map<HTMLElement, DropdownState>();
+export class DropdownActions extends BaseActionClass<DropdownState> {
+
 
     /**
-     * Get singleton instance
+     * Initialize dropdown elements - required by BaseActionClass
      */
-    public static getInstance(): DropdownActions {
-        if (!DropdownActions.instance) {
-            DropdownActions.instance = new DropdownActions();
-        }
-        return DropdownActions.instance;
-    }
-
-    /**
-     * Initialize DropdownActions for all dropdown elements
-     */
-    public init(): void {
-        if (this.initialized) {
-            return;
-        }
-
-        this.bindEventListeners();
-        this.initializeDropdowns();
-        this.initialized = true;
-
-    }
-
-    /**
-     * Initialize all existing dropdown elements
-     */
-    private initializeDropdowns(): void {
-        document.querySelectorAll('[data-dropdown="true"]').forEach(dropdown => {
-            this.initializeDropdown(dropdown as HTMLElement);
+    protected initializeElements(): void {
+        DOMUtils.findByDataAttribute('dropdown', 'true').forEach(dropdown => {
+            this.initializeDropdown(dropdown);
         });
     }
 
@@ -65,12 +43,12 @@ export class DropdownActions {
             children: []
         };
 
-        const parentSubmenu = dropdownElement.closest('[data-submenu="true"]');
+        const parentSubmenu = DOMUtils.findClosest(dropdownElement, '[data-submenu="true"]');
         if (parentSubmenu && parentSubmenu !== dropdownElement) {
             state.parent = parentSubmenu as HTMLElement;
         }
 
-        this.dropdownStates.set(dropdownElement, state);
+        this.setState(dropdownElement, state);
         this.updateMenuItems(dropdownElement);
         this.initializeSubmenus(dropdownElement);
     }
@@ -79,53 +57,51 @@ export class DropdownActions {
      * Initialize submenus within a dropdown
      */
     private initializeSubmenus(dropdownElement: HTMLElement): void {
-        const submenus = dropdownElement.querySelectorAll('[data-submenu="true"]');
-        const state = this.dropdownStates.get(dropdownElement);
+        const submenus = DOMUtils.querySelectorAll('[data-submenu="true"]', dropdownElement);
+        const state = this.getState(dropdownElement);
 
         if (state) {
             state.children = Array.from(submenus) as HTMLElement[];
-            this.dropdownStates.set(dropdownElement, state);
+            this.setState(dropdownElement, state);
         }
 
         submenus.forEach(submenu => {
-            if (!this.dropdownStates.has(submenu as HTMLElement)) {
+            if (!this.hasState(submenu as HTMLElement)) {
                 this.initializeDropdown(submenu as HTMLElement);
             }
         });
     }
 
     /**
-     * Bind global event listeners using event delegation
+     * Bind event listeners using event delegation - required by BaseActionClass
      */
-    private bindEventListeners(): void {
-        document.addEventListener('click', (event) => {
-            const submenuTrigger = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-submenu-trigger]') as HTMLElement;
-            if (submenuTrigger) {
+    protected bindEventListeners(): void {
+        // Handle all click events with a single delegated listener
+        EventUtils.handleDelegatedClick('[data-submenu-trigger], [data-dropdown-trigger], [data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-dropdown-panel], [data-submenu-panel]', (element, event) => {
+            if (element.matches('[data-submenu-trigger]')) {
                 event.preventDefault();
                 event.stopPropagation();
-                const submenu = submenuTrigger.closest('[data-submenu="true"]') as HTMLElement;
+                const submenu = DOMUtils.findClosest(element, '[data-submenu="true"]');
                 if (submenu && !this.isDisabled(submenu)) {
                     this.toggleSubmenu(submenu);
                 }
                 return;
             }
 
-            const trigger = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-dropdown-trigger]') as HTMLElement;
-            if (trigger) {
+            if (element.matches('[data-dropdown-trigger]')) {
                 event.preventDefault();
                 event.stopPropagation();
-                const dropdown = trigger.closest('[data-dropdown="true"]') as HTMLElement;
+                const dropdown = DOMUtils.findClosest(element, '[data-dropdown="true"]');
                 if (dropdown && !this.isDisabled(dropdown)) {
                     this.toggleDropdown(dropdown);
                 }
                 return;
             }
 
-            const menuItem = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-menu-item]') as HTMLElement;
-            if (menuItem) {
-                const dropdown = menuItem.closest('[data-dropdown="true"]') as HTMLElement;
+            if (element.matches('[data-menu-item]')) {
+                const dropdown = DOMUtils.findClosest(element, '[data-dropdown="true"]');
                 if (dropdown) {
-                    const keepOpen = menuItem.dataset.keepOpen === 'true';
+                    const keepOpen = element.dataset.keepOpen === 'true';
                     if (!keepOpen) {
                         this.closeDropdown(dropdown);
                     }
@@ -133,12 +109,11 @@ export class DropdownActions {
                 return;
             }
 
-            const formControl = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-menu-checkbox], [data-menu-radio]') as HTMLElement;
-            if (formControl) {
+            if (element.matches('[data-menu-checkbox], [data-menu-radio]')) {
                 event.stopPropagation();
-                const keepOpen = formControl.dataset.keepOpen !== 'false';
+                const keepOpen = element.dataset.keepOpen !== 'false';
                 if (!keepOpen) {
-                    const dropdown = formControl.closest('[data-dropdown="true"]') as HTMLElement;
+                    const dropdown = DOMUtils.findClosest(element, '[data-dropdown="true"]');
                     if (dropdown) {
                         this.closeDropdown(dropdown);
                     }
@@ -146,19 +121,32 @@ export class DropdownActions {
                 return;
             }
 
-            const dropdownPanel = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-dropdown-panel], [data-submenu-panel]') as HTMLElement;
-            if (dropdownPanel) {
+            if (element.matches('[data-dropdown-panel], [data-submenu-panel]')) {
                 event.stopPropagation();
                 return;
             }
-
-            this.closeAllDropdowns();
         });
 
-        document.addEventListener('mouseenter', (event) => {
-            const submenuTrigger = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-submenu-trigger]') as HTMLElement;
+        // Handle click outside to close dropdowns
+        EventUtils.addEventListener(document, 'click', (event) => {
+            const target = event.target as Node;
+
+            // Check if the click was inside any dropdown element
+            if (target && target instanceof Element) {
+                const closestDropdownElement = target.closest('[data-submenu-trigger], [data-dropdown-trigger], [data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-dropdown-panel], [data-submenu-panel]');
+
+                // If click is not inside any dropdown element, close all dropdowns
+                if (!closestDropdownElement) {
+                    this.closeAllDropdowns();
+                }
+            }
+        });
+
+        // Handle submenu hover events
+        EventUtils.addEventListener(document, 'mouseenter', (event) => {
+            const submenuTrigger = DOMUtils.findClosest(event.target as Element, '[data-submenu-trigger]') as HTMLElement;
             if (submenuTrigger && !this.isMobile()) {
-                const submenu = submenuTrigger.closest('[data-submenu="true"]') as HTMLElement;
+                const submenu = DOMUtils.findClosest(submenuTrigger, '[data-submenu="true"]');
                 if (submenu && !this.isDisabled(submenu)) {
                     this.closeSiblingSubmenus(submenu);
                     setTimeout(() => {
@@ -168,12 +156,12 @@ export class DropdownActions {
                     }, 100);
                 }
             }
-        }, true);
+        }, { capture: true });
 
-        document.addEventListener('mouseleave', (event) => {
-            const submenu = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-submenu="true"]') as HTMLElement;
+        EventUtils.addEventListener(document, 'mouseleave', (event) => {
+            const submenu = DOMUtils.findClosest(event.target as Element, '[data-submenu="true"]') as HTMLElement;
             if (submenu && !this.isMobile()) {
-                const state = this.dropdownStates.get(submenu);
+                const state = this.getState(submenu);
                 if (state?.isOpen) {
                     setTimeout(() => {
                         if (!submenu.matches(':hover')) {
@@ -182,38 +170,39 @@ export class DropdownActions {
                     }, 150);
                 }
             }
-        }, true);
+        }, { capture: true });
 
-        document.addEventListener('keydown', (event) => {
-            const dropdown = event.target && (event.target as Element).closest && (event.target as Element).closest('[data-dropdown="true"]') as HTMLElement;
-            if (dropdown) {
-                this.handleKeydown(dropdown, event);
-            }
+        // Handle keyboard navigation
+        EventUtils.handleDelegatedKeydown('[data-dropdown="true"]', (dropdown, event) => {
+            this.handleKeydown(dropdown, event);
         });
+    }
 
-        window.addEventListener('resize', () => {
-            this.repositionDropdowns();
-        });
+    /**
+     * Setup dynamic observer for new dropdowns - uses BaseActionClass utility
+     */
+    protected setupDynamicObserver(): void {
+        this.createDynamicObserver((addedNodes) => {
+            addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const element = node as HTMLElement;
 
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const element = node as Element;
-                        const dropdowns = element.querySelectorAll('[data-dropdown="true"]');
-                        dropdowns.forEach(dropdown => {
-                            if (!this.dropdownStates.has(dropdown as HTMLElement)) {
-                                this.initializeDropdown(dropdown as HTMLElement);
-                            }
-                        });
+                    // Check if the added node is a dropdown
+                    if (DOMUtils.hasDataAttribute(element, 'dropdown', 'true')) {
+                        if (!this.hasState(element)) {
+                            this.initializeDropdown(element);
+                        }
                     }
-                });
-            });
-        });
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
+                    // Check for dropdowns within the added node
+                    const dropdowns = DOMUtils.findByDataAttribute('dropdown', 'true', element);
+                    dropdowns.forEach(dropdown => {
+                        if (!this.hasState(dropdown)) {
+                            this.initializeDropdown(dropdown);
+                        }
+                    });
+                }
+            });
         });
     }
 
@@ -221,7 +210,7 @@ export class DropdownActions {
      * Toggle dropdown open/closed state
      */
     private toggleDropdown(dropdown: HTMLElement): void {
-        const state = this.dropdownStates.get(dropdown);
+        const state = this.getState(dropdown);
         if (!state) return;
 
         if (state.isOpen) {
@@ -235,17 +224,17 @@ export class DropdownActions {
      * Open dropdown
      */
     private openDropdown(dropdown: HTMLElement): void {
-        const state = this.dropdownStates.get(dropdown);
+        const state = this.getState(dropdown);
         if (!state || this.isDisabled(dropdown)) return;
 
         this.closeSiblingDropdowns(dropdown);
 
         state.isOpen = true;
         state.focusedIndex = -1;
-        this.dropdownStates.set(dropdown, state);
+        this.setState(dropdown, state);
 
-        const panel = dropdown.querySelector('[data-dropdown-panel]') as HTMLElement;
-        const trigger = dropdown.querySelector('[data-dropdown-trigger]') as HTMLElement;
+        const panel = DOMUtils.querySelector('[data-dropdown-panel]', dropdown) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
 
         if (panel) {
             panel.classList.remove('hidden');
@@ -265,15 +254,15 @@ export class DropdownActions {
      * Open submenu
      */
     private openSubmenu(submenu: HTMLElement): void {
-        const state = this.dropdownStates.get(submenu);
+        const state = this.getState(submenu);
         if (!state || this.isDisabled(submenu)) return;
 
         state.isOpen = true;
         state.focusedIndex = -1;
-        this.dropdownStates.set(submenu, state);
+        this.setState(submenu, state);
 
-        const panel = submenu.querySelector('[data-submenu-panel]') as HTMLElement;
-        const trigger = submenu.querySelector('[data-submenu-trigger]') as HTMLElement;
+        const panel = DOMUtils.querySelector('[data-submenu-panel]', submenu) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
 
         if (panel) {
             panel.classList.remove('hidden');
@@ -293,17 +282,17 @@ export class DropdownActions {
      * Close dropdown
      */
     private closeDropdown(dropdown: HTMLElement): void {
-        const state = this.dropdownStates.get(dropdown);
+        const state = this.getState(dropdown);
         if (!state || !state.isOpen) return;
 
         this.closeChildSubmenus(dropdown);
 
         state.isOpen = false;
         state.focusedIndex = -1;
-        this.dropdownStates.set(dropdown, state);
+        this.setState(dropdown, state);
 
-        const panel = dropdown.querySelector('[data-dropdown-panel]') as HTMLElement;
-        const trigger = dropdown.querySelector('[data-dropdown-trigger]') as HTMLElement;
+        const panel = DOMUtils.querySelector('[data-dropdown-panel]', dropdown) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
 
         if (panel) {
             panel.classList.add('hidden');
@@ -320,17 +309,17 @@ export class DropdownActions {
      * Close submenu
      */
     private closeSubmenu(submenu: HTMLElement): void {
-        const state = this.dropdownStates.get(submenu);
+        const state = this.getState(submenu);
         if (!state || !state.isOpen) return;
 
         this.closeChildSubmenus(submenu);
 
         state.isOpen = false;
         state.focusedIndex = -1;
-        this.dropdownStates.set(submenu, state);
+        this.setState(submenu, state);
 
-        const panel = submenu.querySelector('[data-submenu-panel]') as HTMLElement;
-        const trigger = submenu.querySelector('[data-submenu-trigger]') as HTMLElement;
+        const panel = DOMUtils.querySelector('[data-submenu-panel]', submenu) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
 
         if (panel) {
             panel.classList.add('hidden');
@@ -347,7 +336,7 @@ export class DropdownActions {
      * Close all open dropdowns
      */
     private closeAllDropdowns(): void {
-        this.dropdownStates.forEach((state, dropdown) => {
+        this.getAllStates().forEach((state, dropdown) => {
             if (state.isOpen) {
                 if (!state.parent) {
                     this.closeDropdown(dropdown);
@@ -360,9 +349,9 @@ export class DropdownActions {
      * Close sibling dropdowns but preserve parent-child relationships
      */
     private closeSiblingDropdowns(dropdown: HTMLElement): void {
-        const state = this.dropdownStates.get(dropdown);
+        const state = this.getState(dropdown);
 
-        this.dropdownStates.forEach((otherState, otherDropdown) => {
+        this.getAllStates().forEach((otherState, otherDropdown) => {
             if (otherDropdown !== dropdown && otherState.isOpen) {
                 const isParent = state?.parent === otherDropdown;
                 const isChild = otherState.parent === dropdown;
@@ -378,11 +367,11 @@ export class DropdownActions {
      * Close sibling submenus
      */
     private closeSiblingSubmenus(submenu: HTMLElement): void {
-        const state = this.dropdownStates.get(submenu);
+        const state = this.getState(submenu);
         const parent = state?.parent;
 
         if (parent) {
-            const parentState = this.dropdownStates.get(parent);
+            const parentState = this.getState(parent);
             parentState?.children.forEach(childSubmenu => {
                 if (childSubmenu !== submenu) {
                     this.closeSubmenu(childSubmenu);
@@ -395,7 +384,7 @@ export class DropdownActions {
      * Close all child submenus
      */
     private closeChildSubmenus(dropdown: HTMLElement): void {
-        const state = this.dropdownStates.get(dropdown);
+        const state = this.getState(dropdown);
 
         state?.children.forEach(childSubmenu => {
             this.closeSubmenu(childSubmenu);
@@ -406,7 +395,7 @@ export class DropdownActions {
      * Toggle submenu open/closed state
      */
     private toggleSubmenu(submenu: HTMLElement): void {
-        const state = this.dropdownStates.get(submenu);
+        const state = this.getState(submenu);
         if (!state) return;
 
         if (state.isOpen) {
@@ -427,7 +416,7 @@ export class DropdownActions {
      * Handle keyboard navigation
      */
     private handleKeydown(dropdown: HTMLElement, event: KeyboardEvent): void {
-        const state = this.dropdownStates.get(dropdown);
+        const state = this.getState(dropdown);
         if (!state) return;
 
         switch (event.key) {
@@ -449,7 +438,7 @@ export class DropdownActions {
                 if (state.isOpen) {
                     event.preventDefault();
                     this.closeDropdown(dropdown);
-                    const trigger = dropdown.querySelector('[data-dropdown-trigger]') as HTMLElement;
+                    const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
                     if (trigger) trigger.focus();
                 }
                 break;
@@ -483,7 +472,7 @@ export class DropdownActions {
      * Navigate through menu items with arrow keys
      */
     private navigateItems(dropdown: HTMLElement, direction: number): void {
-        const state = this.dropdownStates.get(dropdown);
+        const state = this.getState(dropdown);
         if (!state || !state.isOpen) return;
 
         const itemCount = state.menuItems.length;
@@ -500,7 +489,7 @@ export class DropdownActions {
             }
         }
 
-        this.dropdownStates.set(dropdown, state);
+        this.setState(dropdown, state);
         this.updateItemFocus(dropdown);
     }
 
@@ -508,7 +497,7 @@ export class DropdownActions {
      * Update visual focus state of menu items
      */
     private updateItemFocus(dropdown: HTMLElement): void {
-        const state = this.dropdownStates.get(dropdown);
+        const state = this.getState(dropdown);
         if (!state) return;
 
         state.menuItems.forEach((item, index) => {
@@ -525,24 +514,24 @@ export class DropdownActions {
      * Update menu items list for keyboard navigation
      */
     private updateMenuItems(dropdown: HTMLElement): void {
-        const state = this.dropdownStates.get(dropdown);
+        const state = this.getState(dropdown);
         if (!state) return;
 
-        const items = dropdown.querySelectorAll('[data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-submenu-trigger]');
+        const items = DOMUtils.querySelectorAll('[data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-submenu-trigger]', dropdown);
         state.menuItems = Array.from(items).filter(item => {
             const element = item as HTMLElement;
             return !element.hasAttribute('disabled') && element.offsetParent !== null;
         }) as HTMLElement[];
 
-        this.dropdownStates.set(dropdown, state);
+        this.setState(dropdown, state);
     }
 
     /**
      * Position dropdown relative to trigger
      */
     private positionDropdown(dropdown: HTMLElement): void {
-        const panel = dropdown.querySelector('[data-dropdown-panel]') as HTMLElement;
-        const trigger = dropdown.querySelector('[data-dropdown-trigger]') as HTMLElement;
+        const panel = DOMUtils.querySelector('[data-dropdown-panel]', dropdown) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
 
         if (!panel || !trigger) return;
 
@@ -626,8 +615,8 @@ export class DropdownActions {
      * Position submenu relative to trigger
      */
     private positionSubmenu(submenu: HTMLElement): void {
-        const panel = submenu.querySelector('[data-submenu-panel]') as HTMLElement;
-        const trigger = submenu.querySelector('[data-submenu-trigger]') as HTMLElement;
+        const panel = DOMUtils.querySelector('[data-submenu-panel]', submenu) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
 
         if (!panel || !trigger) return;
 
@@ -697,7 +686,7 @@ export class DropdownActions {
      * Reposition all open dropdowns and submenus
      */
     private repositionDropdowns(): void {
-        this.dropdownStates.forEach((state, dropdown) => {
+        this.getAllStates().forEach((state, dropdown) => {
             if (state.isOpen) {
                 if (dropdown.hasAttribute('data-submenu')) {
                     this.positionSubmenu(dropdown);
@@ -719,23 +708,20 @@ export class DropdownActions {
      * Dispatch custom dropdown event
      */
     private dispatchDropdownEvent(dropdown: HTMLElement, eventName: string, detail: any = null): void {
-        const event = new CustomEvent(eventName, {
-            detail: {
-                dropdown,
-                ...detail
-            },
+        EventUtils.dispatchCustomEvent(dropdown, eventName, {
+            dropdown,
+            ...detail
+        }, {
             bubbles: true
         });
-        dropdown.dispatchEvent(event);
     }
 
     /**
-     * Destroy DropdownActions and clean up
+     * Clean up DropdownActions - extends BaseActionClass destroy
      */
-    public destroy(): void {
-        this.dropdownStates.clear();
-        this.initialized = false;
-
+    protected onDestroy(): void {
+        // DropdownActions doesn't have additional cleanup beyond base class
+        // Event listeners and observers are automatically cleaned up
     }
 }
 

@@ -7,56 +7,40 @@
  * - Accessibility support
  */
 
+import { BaseActionClass } from './utils/BaseActionClass';
+import { EventUtils } from './utils/EventUtils';
+import { DOMUtils } from './utils/DOMUtils';
+import { AnimationUtils } from './utils/AnimationUtils';
+
 interface AlertActionEvent {
     alert: HTMLElement;
     action: string;
 }
 
-export class AlertActions {
-    private static instance: AlertActions | null = null;
-    private initialized = false;
-
+export class AlertActions extends BaseActionClass {
     /**
-     * Get singleton instance
+     * Initialize alert elements - required by BaseActionClass
      */
-    public static getInstance(): AlertActions {
-        if (!AlertActions.instance) {
-            AlertActions.instance = new AlertActions();
-        }
-        return AlertActions.instance;
+    protected initializeElements(): void {
+        // AlertActions doesn't need to initialize specific elements on load
+        // Actions are handled via event delegation
     }
 
     /**
-     * Initialize AlertActions for all dismissible alerts
+     * Bind event listeners using event delegation - required by BaseActionClass
      */
-    public init(): void {
-        if (this.initialized) {
-            return;
-        }
-
-        this.bindEventListeners();
-        this.initialized = true;
-    }
-
-    /**
-     * Bind event listeners using event delegation
-     */
-    private bindEventListeners(): void {
-        document.addEventListener('click', (event) => {
-            const button = (event.target as Element)?.closest('[data-dismiss-alert]') as HTMLButtonElement;
-            if (!button) return;
-
+    protected bindEventListeners(): void {
+        // Handle dismiss button clicks
+        EventUtils.handleDelegatedClick('[data-dismiss-alert]', (button, event) => {
             event.preventDefault();
-            this.handleDismissClick(button);
+            this.handleDismissClick(button as HTMLButtonElement);
         });
 
-        document.addEventListener('keydown', (event) => {
+        // Handle dismiss button keyboard activation
+        EventUtils.handleDelegatedKeydown('[data-dismiss-alert]', (button, event) => {
             if (event.key === 'Enter' || event.key === ' ') {
-                const button = event.target as HTMLButtonElement;
-                if (button?.hasAttribute('data-dismiss-alert')) {
-                    event.preventDefault();
-                    this.handleDismissClick(button);
-                }
+                event.preventDefault();
+                this.handleDismissClick(button as HTMLButtonElement);
             }
         });
     }
@@ -76,7 +60,7 @@ export class AlertActions {
      * Find the alert element associated with a dismiss button
      */
     private findAlertForButton(button: HTMLButtonElement): HTMLElement | null {
-        return button.closest('[data-dismissible="true"]') as HTMLElement || null;
+        return DOMUtils.findClosest(button, '[data-dismissible="true"]');
     }
 
     /**
@@ -85,19 +69,24 @@ export class AlertActions {
     public dismissAlert(alert: HTMLElement): void {
         alert.classList.add('alert-dismissing');
 
-        alert.style.transition = 'all 0.3s ease-out';
-        alert.style.opacity = '0';
-        alert.style.transform = 'translateX(100%)';
-        alert.style.maxHeight = '0';
-        alert.style.padding = '0';
-        alert.style.margin = '0';
-        alert.style.overflow = 'hidden';
+        // Use AnimationUtils for slide out + fade animation
+        const slideAnimation = AnimationUtils.slideOut(alert, 'right', {
+            duration: 300,
+            easing: 'ease-out',
+            distance: 100
+        });
 
-        setTimeout(() => {
-            if (alert.parentNode) {
-                alert.parentNode.removeChild(alert);
+        // Also animate height collapse
+        const collapseAnimation = AnimationUtils.collapseHeight(alert, {
+            toHeight: 0,
+            duration: 300,
+            easing: 'ease-out',
+            onComplete: () => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
             }
-        }, 300);
+        });
     }
 
     /**
@@ -105,10 +94,16 @@ export class AlertActions {
      */
     public showAlert(alert: HTMLElement): void {
         alert.style.display = 'block';
-        alert.style.opacity = '1';
-        alert.style.transform = 'translateX(0)';
 
-        this.dispatchAlertEvent(alert, 'show');
+        // Use AnimationUtils for slide in animation
+        AnimationUtils.slideIn(alert, 'right', {
+            duration: 300,
+            easing: 'ease-out',
+            distance: 100,
+            onComplete: () => {
+                this.dispatchAlertEvent(alert, 'show');
+            }
+        });
     }
 
     /**
@@ -144,15 +139,18 @@ export class AlertActions {
 
         container.appendChild(alert);
 
+        // Initial hidden state
         alert.style.opacity = '0';
         alert.style.transform = 'translateX(100%)';
 
+        // Small delay then show
         setTimeout(() => {
             this.showAlert(alert);
         }, 10);
 
+        // Auto-dismiss with AnimationUtils timer
         if (duration && duration > 0) {
-            setTimeout(() => {
+            AnimationUtils.createTimer(() => {
                 this.dismissAlert(alert);
             }, duration);
         }
@@ -258,23 +256,23 @@ export class AlertActions {
      * Dispatch custom event for alert action
      */
     private dispatchAlertEvent(alert: HTMLElement, action: string): void {
-        const event = new CustomEvent('alert-action', {
-            detail: {
-                alert,
-                action
-            } as AlertActionEvent,
-            bubbles: true
-        });
+        EventUtils.dispatchCustomEvent(alert, 'alert-action', {
+            alert,
+            action
+        } as AlertActionEvent);
 
-        alert.dispatchEvent(event);
-        document.dispatchEvent(event);
+        // Also dispatch on document for global listeners
+        EventUtils.dispatchCustomEvent(document.body, 'alert-action', {
+            alert,
+            action
+        } as AlertActionEvent);
     }
 
     /**
-     * Add a custom alert action handler
+     * Add a custom alert action handler with automatic cleanup
      */
-    public addActionHandler(action: string, handler: (alert: HTMLElement) => void): void {
-        document.addEventListener('alert-action', (event) => {
+    public addActionHandler(action: string, handler: (alert: HTMLElement) => void): () => void {
+        return EventUtils.addEventListener(document, 'alert-action', (event) => {
             const customEvent = event as CustomEvent<AlertActionEvent>;
             if (customEvent.detail.action === action) {
                 handler(customEvent.detail.alert);
@@ -286,7 +284,7 @@ export class AlertActions {
      * Dismiss all alerts of a specific variant
      */
     public dismissAllByVariant(variant: string): void {
-        const alerts = document.querySelectorAll(`[data-dismissible="true"][class*="${variant}"]`);
+        const alerts = DOMUtils.querySelectorAll(`[data-dismissible="true"][class*="${variant}"]`);
         alerts.forEach((alert) => {
             this.dismissAlert(alert as HTMLElement);
         });
@@ -296,17 +294,18 @@ export class AlertActions {
      * Dismiss all dismissible alerts
      */
     public dismissAll(): void {
-        const alerts = document.querySelectorAll('[data-dismissible="true"]');
+        const alerts = DOMUtils.querySelectorAll('[data-dismissible="true"]');
         alerts.forEach((alert) => {
             this.dismissAlert(alert as HTMLElement);
         });
     }
 
     /**
-     * Destroy AlertActions and clean up
+     * Clean up AlertActions - extends BaseActionClass destroy
      */
-    public destroy(): void {
-        this.initialized = false;
+    protected onDestroy(): void {
+        // AlertActions doesn't have additional cleanup beyond base class
+        // Event listeners are automatically cleaned up by browser
     }
 }
 

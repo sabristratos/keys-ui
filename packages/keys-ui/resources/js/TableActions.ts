@@ -9,6 +9,10 @@
  * - Event dispatching for Livewire integration
  */
 
+import { BaseActionClass } from './utils/BaseActionClass';
+import { EventUtils } from './utils/EventUtils';
+import { DOMUtils } from './utils/DOMUtils';
+
 interface TableState {
     selectedRows: Set<string>;
     sortColumn: string | null;
@@ -24,48 +28,26 @@ interface SortConfig {
     livewireParams?: any[];
 }
 
-export class TableActions {
-    private static instance: TableActions | null = null;
-    private initialized = false;
-    private tableStates = new Map<HTMLElement, TableState>();
+export class TableActions extends BaseActionClass<TableState> {
 
     /**
-     * Get singleton instance
+     * Initialize table elements - required by BaseActionClass
      */
-    public static getInstance(): TableActions {
-        if (!TableActions.instance) {
-            TableActions.instance = new TableActions();
-        }
-        return TableActions.instance;
-    }
-
-    /**
-     * Initialize TableActions for all table elements
-     */
-    public init(): void {
-        if (this.initialized) {
-            return;
-        }
-
-        this.initTables();
-        this.bindEvents();
-        this.initialized = true;
-    }
-
-    /**
-     * Initialize all tables on the page
-     */
-    private initTables(): void {
-        const tables = document.querySelectorAll('[data-table="true"]');
-        tables.forEach((table) => {
-            this.initTable(table as HTMLElement);
+    protected initializeElements(): void {
+        DOMUtils.findByDataAttribute('table', 'true').forEach(table => {
+            this.initializeTable(table);
         });
+        this.setupLivewireIntegration();
     }
 
     /**
      * Initialize a single table
      */
-    private initTable(table: HTMLElement): void {
+    private initializeTable(table: HTMLElement): void {
+        if (this.hasState(table)) {
+            return;
+        }
+
         const state: TableState = {
             selectedRows: new Set(),
             sortColumn: null,
@@ -73,10 +55,10 @@ export class TableActions {
             selectAllState: 'none'
         };
 
-        this.tableStates.set(table, state);
+        this.setState(table, state);
 
         // Initialize sort state from current DOM
-        const sortedHeader = table.querySelector('[data-sorted="true"]');
+        const sortedHeader = DOMUtils.querySelector('[data-sorted="true"]', table);
         if (sortedHeader) {
             const column = sortedHeader.getAttribute('data-sort-key') ||
                          sortedHeader.textContent?.trim() || '';
@@ -91,45 +73,62 @@ export class TableActions {
     }
 
     /**
-     * Bind event listeners
+     * Bind event listeners using event delegation - required by BaseActionClass
      */
-    private bindEvents(): void {
+    protected bindEventListeners(): void {
         // Sort header clicks
-        document.addEventListener('click', (e) => {
-            const target = e.target as HTMLElement;
-            const sortHeader = target.closest('[data-sortable="true"]');
-
-            if (sortHeader) {
-                e.preventDefault();
-                this.handleSort(sortHeader as HTMLElement);
-            }
+        EventUtils.handleDelegatedClick('[data-sortable="true"]', (sortHeader, event) => {
+            event.preventDefault();
+            this.handleSort(sortHeader);
         });
 
         // Row selection checkboxes
-        document.addEventListener('change', (e) => {
-            const target = e.target as HTMLInputElement;
+        EventUtils.handleDelegatedChange('[data-table-row-select]', (target) => {
+            this.handleRowSelection(target as HTMLInputElement);
+        });
 
-            // Individual row selection
-            if (target.matches('[data-table-row-select]')) {
-                this.handleRowSelection(target);
-            }
-
-            // Select all checkbox
-            if (target.matches('[data-table-select-all]')) {
-                this.handleSelectAll(target);
-            }
+        // Select all checkbox
+        EventUtils.handleDelegatedChange('[data-table-select-all]', (target) => {
+            this.handleSelectAll(target as HTMLInputElement);
         });
 
         // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.target && (e.target as HTMLElement).closest('[data-table="true"]')) {
-                this.handleKeyboard(e);
-            }
+        EventUtils.handleDelegatedKeydown('[data-table="true"]', (target, event) => {
+            this.handleKeyboard(event);
         });
+    }
 
-        // Livewire hooks
-        document.addEventListener('livewire:navigated', () => {
-            this.reinit();
+    /**
+     * Setup dynamic observer for new tables - uses BaseActionClass utility
+     */
+    protected setupDynamicObserver(): void {
+        this.createDynamicObserver((addedNodes) => {
+            addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const element = node as HTMLElement;
+
+                    // Check if the added node is a table
+                    if (DOMUtils.hasDataAttribute(element, 'table', 'true')) {
+                        this.initializeTable(element);
+                    }
+
+                    // Check for tables within the added node
+                    DOMUtils.findByDataAttribute('table', 'true', element).forEach(table => {
+                        this.initializeTable(table);
+                    });
+                }
+            });
+        });
+    }
+
+    /**
+     * Setup Livewire integration
+     */
+    private setupLivewireIntegration(): void {
+        if (typeof window.Livewire === 'undefined') return;
+
+        EventUtils.addEventListener(document, 'livewire:navigated', () => {
+            this.reinitialize();
         });
     }
 
@@ -137,10 +136,10 @@ export class TableActions {
      * Handle sortable header clicks
      */
     private handleSort(header: HTMLElement): void {
-        const table = header.closest('[data-table="true"]') as HTMLElement;
+        const table = DOMUtils.findClosest(header, '[data-table="true"]');
         if (!table) return;
 
-        const state = this.tableStates.get(table);
+        const state = this.getState(table);
         if (!state) return;
 
         const column = header.getAttribute('data-sort-key') ||
@@ -178,13 +177,13 @@ export class TableActions {
      */
     private updateSortUI(table: HTMLElement, column: string, direction: 'asc' | 'desc' | null): void {
         // Clear all sort indicators
-        const headers = table.querySelectorAll('[data-sortable="true"]');
+        const headers = DOMUtils.querySelectorAll('[data-sortable="true"]', table);
         headers.forEach((header) => {
             header.setAttribute('data-sorted', 'false');
             header.removeAttribute('data-direction');
 
             // Update icons
-            const icons = header.querySelectorAll('.table-sort-icon');
+            const icons = DOMUtils.querySelectorAll('.table-sort-icon', header);
             icons.forEach(icon => {
                 icon.setAttribute('data-icon', 'heroicon-o-chevron-up-down');
                 icon.classList.remove('opacity-100');
@@ -199,7 +198,7 @@ export class TableActions {
                 activeHeader.setAttribute('data-sorted', 'true');
                 activeHeader.setAttribute('data-direction', direction);
 
-                const icon = activeHeader.querySelector('.table-sort-icon');
+                const icon = DOMUtils.querySelector('.table-sort-icon', activeHeader);
                 if (icon) {
                     const iconName = direction === 'asc'
                         ? 'heroicon-o-chevron-up'
@@ -217,10 +216,10 @@ export class TableActions {
      * Handle individual row selection
      */
     private handleRowSelection(checkbox: HTMLInputElement): void {
-        const table = checkbox.closest('[data-table="true"]') as HTMLElement;
+        const table = DOMUtils.findClosest(checkbox, '[data-table="true"]');
         if (!table) return;
 
-        const state = this.tableStates.get(table);
+        const state = this.getState(table);
         if (!state) return;
 
         const rowId = checkbox.getAttribute('data-row-id');
@@ -240,13 +239,13 @@ export class TableActions {
      * Handle select all checkbox
      */
     private handleSelectAll(checkbox: HTMLInputElement): void {
-        const table = checkbox.closest('[data-table="true"]') as HTMLElement;
+        const table = DOMUtils.findClosest(checkbox, '[data-table="true"]');
         if (!table) return;
 
-        const state = this.tableStates.get(table);
+        const state = this.getState(table);
         if (!state) return;
 
-        const rowCheckboxes = table.querySelectorAll('[data-table-row-select]') as NodeListOf<HTMLInputElement>;
+        const rowCheckboxes = DOMUtils.querySelectorAll('[data-table-row-select]', table) as NodeListOf<HTMLInputElement>;
 
         if (checkbox.checked) {
             // Select all
@@ -272,11 +271,11 @@ export class TableActions {
      * Update selection state and UI
      */
     private updateSelectionState(table: HTMLElement): void {
-        const state = this.tableStates.get(table);
+        const state = this.getState(table);
         if (!state) return;
 
-        const rowCheckboxes = table.querySelectorAll('[data-table-row-select]') as NodeListOf<HTMLInputElement>;
-        const selectAllCheckbox = table.querySelector('[data-table-select-all]') as HTMLInputElement;
+        const rowCheckboxes = DOMUtils.querySelectorAll('[data-table-row-select]', table) as NodeListOf<HTMLInputElement>;
+        const selectAllCheckbox = DOMUtils.querySelector('[data-table-select-all]', table) as HTMLInputElement;
 
         const totalRows = rowCheckboxes.length;
         const selectedCount = state.selectedRows.size;
@@ -303,7 +302,7 @@ export class TableActions {
         }
 
         // Update row states
-        const rows = table.querySelectorAll('[data-table-row]');
+        const rows = DOMUtils.querySelectorAll('[data-table-row]', table);
         rows.forEach(row => {
             const rowId = row.getAttribute('data-row-id');
             const isSelected = rowId && state.selectedRows.has(rowId);
@@ -341,17 +340,19 @@ export class TableActions {
      * Dispatch sort event
      */
     private dispatchSortEvent(table: HTMLElement, config: SortConfig): void {
-        const event = new CustomEvent('table:sort', {
-            detail: config,
-            bubbles: true
+        EventUtils.dispatchCustomEvent(table, 'table:sort', config, {
+            bubbles: true,
+            cancelable: true
         });
-        table.dispatchEvent(event);
 
         // Livewire integration
         if (config.livewireMethod && window.Livewire) {
-            const component = window.Livewire.find(table.getAttribute('wire:id'));
-            if (component) {
-                component.call(config.livewireMethod, config.column, config.direction);
+            const wireId = table.getAttribute('wire:id');
+            if (wireId) {
+                const component = window.Livewire.find(wireId);
+                if (component) {
+                    component.call(config.livewireMethod, config.column, config.direction);
+                }
             }
         }
     }
@@ -360,18 +361,20 @@ export class TableActions {
      * Dispatch selection event
      */
     private dispatchSelectionEvent(table: HTMLElement, selectedIds: string[]): void {
-        const event = new CustomEvent('table:selection', {
-            detail: { selectedIds },
-            bubbles: true
+        EventUtils.dispatchCustomEvent(table, 'table:selection', { selectedIds }, {
+            bubbles: true,
+            cancelable: true
         });
-        table.dispatchEvent(event);
 
         // Livewire integration
         const livewireMethod = table.getAttribute('data-selection-method');
         if (livewireMethod && window.Livewire) {
-            const component = window.Livewire.find(table.getAttribute('wire:id'));
-            if (component) {
-                component.call(livewireMethod, selectedIds);
+            const wireId = table.getAttribute('wire:id');
+            if (wireId) {
+                const component = window.Livewire.find(wireId);
+                if (component) {
+                    component.call(livewireMethod, selectedIds);
+                }
             }
         }
     }
@@ -379,16 +382,16 @@ export class TableActions {
     /**
      * Reinitialize after page changes
      */
-    private reinit(): void {
-        this.tableStates.clear();
-        this.initTables();
+    private reinitialize(): void {
+        this.clearAllStates();
+        this.initializeElements();
     }
 
     /**
      * Get selected rows for a table
      */
     public getSelectedRows(table: HTMLElement): string[] {
-        const state = this.tableStates.get(table);
+        const state = this.getState(table);
         return state ? Array.from(state.selectedRows) : [];
     }
 
@@ -396,12 +399,20 @@ export class TableActions {
      * Clear selection for a table
      */
     public clearSelection(table: HTMLElement): void {
-        const state = this.tableStates.get(table);
+        const state = this.getState(table);
         if (state) {
             state.selectedRows.clear();
             this.updateSelectionState(table);
             this.dispatchSelectionEvent(table, []);
         }
+    }
+
+    /**
+     * Clean up TableActions - extends BaseActionClass destroy
+     */
+    protected onDestroy(): void {
+        // TableActions doesn't have additional cleanup beyond base class
+        // Event listeners and observers are automatically cleaned up
     }
 }
 
@@ -416,3 +427,14 @@ if (document.readyState === 'loading') {
 
 // Export for global access
 (window as any).TableActions = TableActions;
+
+declare global {
+    interface Window {
+        TableActions: typeof TableActions;
+        Livewire?: {
+            find: (id: string) => any;
+        };
+    }
+}
+
+export default TableActions.getInstance();

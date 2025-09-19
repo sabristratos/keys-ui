@@ -10,6 +10,10 @@
  * Note: Core modal functionality works without JavaScript using native dialog features
  */
 
+import { BaseActionClass } from './utils/BaseActionClass';
+import { EventUtils } from './utils/EventUtils';
+import { DOMUtils } from './utils/DOMUtils';
+
 interface ModalState {
     lastFocusedElement: HTMLElement | null;
     isAnimating: boolean;
@@ -20,50 +24,24 @@ interface ModalEventDetail {
     trigger?: HTMLElement;
 }
 
-export class ModalActions {
-    private static instance: ModalActions | null = null;
-    private initialized = false;
-    private modalStates = new Map<HTMLDialogElement, ModalState>();
+export class ModalActions extends BaseActionClass<ModalState> {
+
 
     /**
-     * Get singleton instance
+     * Initialize modal elements - required by BaseActionClass
      */
-    public static getInstance(): ModalActions {
-        if (!ModalActions.instance) {
-            ModalActions.instance = new ModalActions();
-        }
-        return ModalActions.instance;
-    }
-
-    /**
-     * Initialize ModalActions for enhanced features
-     */
-    public init(): void {
-        if (this.initialized) {
-            return;
-        }
-
-        this.bindEventListeners();
-        this.initializeModals();
-        this.setupLivewireIntegration();
-        this.initialized = true;
-
-    }
-
-    /**
-     * Initialize all existing modal elements
-     */
-    private initializeModals(): void {
-        document.querySelectorAll('dialog[data-modal]').forEach(modal => {
+    protected initializeElements(): void {
+        DOMUtils.querySelectorAll('dialog[data-modal]').forEach(modal => {
             this.initializeModal(modal as HTMLDialogElement);
         });
+        this.setupLivewireIntegration();
     }
 
     /**
      * Initialize a single modal element
      */
     private initializeModal(modal: HTMLDialogElement): void {
-        if (this.modalStates.has(modal)) {
+        if (this.hasState(modal)) {
             return;
         }
 
@@ -72,7 +50,7 @@ export class ModalActions {
             isAnimating: false
         };
 
-        this.modalStates.set(modal, state);
+        this.setState(modal, state);
 
         modal.addEventListener('close', () => {
             this.handleModalClose(modal);
@@ -84,49 +62,50 @@ export class ModalActions {
     }
 
     /**
-     * Bind event listeners for enhanced modal functionality
+     * Bind event listeners using event delegation - required by BaseActionClass
      */
-    private bindEventListeners(): void {
-        document.addEventListener('click', (event) => {
-            const trigger = (event.target as Element)?.closest('[commandfor]') as HTMLElement;
-            if (trigger) {
-                const command = trigger.getAttribute('command');
-                const modalId = trigger.getAttribute('commandfor');
+    protected bindEventListeners(): void {
+        EventUtils.handleDelegatedClick('[commandfor]', (trigger, event) => {
+            const command = trigger.getAttribute('command');
+            const modalId = trigger.getAttribute('commandfor');
 
-                if (command === 'show-modal' && modalId) {
-                    const modal = document.getElementById(modalId) as HTMLDialogElement;
-                    if (modal && modal.matches('dialog[data-modal]')) {
-                        this.handleModalOpen(modal, trigger);
-                    }
-                }
-            }
-
-            const closeButton = (event.target as Element)?.closest('[data-modal-close]') as HTMLElement;
-            if (closeButton) {
-                const modal = closeButton.closest('dialog[data-modal]') as HTMLDialogElement;
-                if (modal) {
-                    modal.close();
+            if (command === 'show-modal' && modalId) {
+                const modal = DOMUtils.getElementById(modalId) as HTMLDialogElement;
+                if (modal && modal.matches('dialog[data-modal]')) {
+                    this.handleModalOpen(modal, trigger);
                 }
             }
         });
 
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const element = node as Element;
-                        const modals = element.querySelectorAll('dialog[data-modal]');
-                        modals.forEach(modal => {
-                            this.initializeModal(modal as HTMLDialogElement);
-                        });
+        EventUtils.handleDelegatedClick('[data-modal-close]', (closeButton, event) => {
+            const modal = DOMUtils.findClosest(closeButton, 'dialog[data-modal]') as HTMLDialogElement;
+            if (modal) {
+                modal.close();
+            }
+        });
+    }
+
+    /**
+     * Setup dynamic observer for new modals - uses BaseActionClass utility
+     */
+    protected setupDynamicObserver(): void {
+        this.createDynamicObserver((addedNodes) => {
+            addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const element = node as HTMLElement;
+
+                    // Check if the added node is a modal
+                    if (element.matches && element.matches('dialog[data-modal]')) {
+                        this.initializeModal(element as HTMLDialogElement);
                     }
-                });
+
+                    // Check for modals within the added node
+                    const modals = DOMUtils.querySelectorAll('dialog[data-modal]', element);
+                    modals.forEach(modal => {
+                        this.initializeModal(modal as HTMLDialogElement);
+                    });
+                }
             });
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
         });
     }
 
@@ -141,7 +120,7 @@ export class ModalActions {
      * Set initial focus when modal opens
      */
     private setInitialFocus(modal: HTMLDialogElement): void {
-        const autofocusElement = modal.querySelector('[autofocus]') as HTMLElement;
+        const autofocusElement = DOMUtils.querySelector('[autofocus]', modal) as HTMLElement;
         if (autofocusElement) {
             autofocusElement.focus();
             return;
@@ -161,7 +140,7 @@ export class ModalActions {
      * Check if a modal is open
      */
     public isModalOpen(modalId: string): boolean {
-        const modal = document.getElementById(modalId) as HTMLDialogElement;
+        const modal = DOMUtils.getElementById(modalId) as HTMLDialogElement;
         return modal ? modal.open : false;
     }
 
@@ -169,23 +148,21 @@ export class ModalActions {
      * Dispatch custom modal events
      */
     private dispatchModalEvent(modal: HTMLDialogElement, eventName: string, detail: any = {}): void {
-        const event = new CustomEvent(eventName, {
-            detail: {
-                modal,
-                ...detail
-            },
+        EventUtils.dispatchCustomEvent(modal, eventName, {
+            modal,
+            ...detail
+        }, {
             bubbles: true,
             cancelable: true
         });
-        modal.dispatchEvent(event);
     }
 
     /**
      * Get modal state (for external access)
      */
     public getModalState(modalId: string): ModalState | null {
-        const modal = document.getElementById(modalId) as HTMLDialogElement;
-        return modal ? this.modalStates.get(modal) || null : null;
+        const modal = DOMUtils.getElementById(modalId) as HTMLDialogElement;
+        return modal ? this.getState(modal) || null : null;
     }
 
     /**
@@ -234,14 +211,17 @@ export class ModalActions {
      * Update Livewire wire:model for modal state
      */
     private updateWireModel(modalId: string, isOpen: boolean): void {
-        const modal = document.getElementById(modalId) as HTMLDialogElement;
+        const modal = DOMUtils.getElementById(modalId) as HTMLDialogElement;
         if (!modal) return;
 
         const wireModel = modal.getAttribute('wire:model');
         if (wireModel && typeof window.Livewire !== 'undefined' && window.Livewire.find) {
-            const component = window.Livewire.find(modal.closest('[wire\\:id]')?.getAttribute('wire:id'));
-            if (component) {
-                component.set(wireModel, isOpen);
+            const wireId = DOMUtils.findClosest(modal, '[wire\\:id]')?.getAttribute('wire:id');
+            if (wireId) {
+                const component = window.Livewire.find(wireId);
+                if (component) {
+                    component.set(wireModel, isOpen);
+                }
             }
         }
     }
@@ -250,7 +230,7 @@ export class ModalActions {
      * Toggle a modal's open state
      */
     public toggleModal(modalId: string): boolean {
-        const modal = document.getElementById(modalId) as HTMLDialogElement;
+        const modal = DOMUtils.getElementById(modalId) as HTMLDialogElement;
         if (!modal || !modal.matches('dialog[data-modal]')) {
             console.warn(`Modal with id "${modalId}" not found`);
             return false;
@@ -267,7 +247,7 @@ export class ModalActions {
      * Close all open modals
      */
     public closeAllModals(): void {
-        document.querySelectorAll('dialog[data-modal][open]').forEach(modal => {
+        DOMUtils.querySelectorAll('dialog[data-modal][open]').forEach(modal => {
             if (modal.id) {
                 this.closeModal(modal.id);
             }
@@ -278,7 +258,7 @@ export class ModalActions {
      * Enhanced modal open with Livewire event dispatching
      */
     public openModal(modalId: string, trigger?: HTMLElement): boolean {
-        const modal = document.getElementById(modalId) as HTMLDialogElement;
+        const modal = DOMUtils.getElementById(modalId) as HTMLDialogElement;
         if (!modal || !modal.matches('dialog[data-modal]')) {
             console.warn(`Modal with id "${modalId}" not found`);
             return false;
@@ -296,7 +276,7 @@ export class ModalActions {
      * Enhanced modal close with Livewire event dispatching
      */
     public closeModal(modalId: string): boolean {
-        const modal = document.getElementById(modalId) as HTMLDialogElement;
+        const modal = DOMUtils.getElementById(modalId) as HTMLDialogElement;
         if (!modal || !modal.matches('dialog[data-modal]')) {
             console.warn(`Modal with id "${modalId}" not found`);
             return false;
@@ -322,7 +302,7 @@ export class ModalActions {
      * Handle modal close event with Livewire integration
      */
     private handleModalClose(modal: HTMLDialogElement): void {
-        const state = this.modalStates.get(modal);
+        const state = this.getState(modal);
         if (!state) return;
 
         const wireModel = modal.getAttribute('wire:model');
@@ -336,7 +316,7 @@ export class ModalActions {
 
         state.lastFocusedElement = null;
         state.isAnimating = false;
-        this.modalStates.set(modal, state);
+        this.setState(modal, state);
 
         this.dispatchModalEvent(modal, 'modal:close');
 
@@ -347,7 +327,7 @@ export class ModalActions {
      * Handle modal opening with Livewire integration
      */
     private handleModalOpen(modal: HTMLDialogElement, trigger?: HTMLElement): void {
-        const state = this.modalStates.get(modal);
+        const state = this.getState(modal);
         if (!state) return;
 
         const wireModel = modal.getAttribute('wire:model');
@@ -356,7 +336,7 @@ export class ModalActions {
         }
 
         state.lastFocusedElement = trigger || document.activeElement as HTMLElement;
-        this.modalStates.set(modal, state);
+        this.setState(modal, state);
 
         this.dispatchModalEvent(modal, 'modal:open', { trigger });
 
@@ -368,12 +348,11 @@ export class ModalActions {
     }
 
     /**
-     * Destroy ModalActions and clean up
+     * Clean up ModalActions - extends BaseActionClass destroy
      */
-    public destroy(): void {
-        this.modalStates.clear();
-        this.initialized = false;
-
+    protected onDestroy(): void {
+        // ModalActions doesn't have additional cleanup beyond base class
+        // Event listeners and observers are automatically cleaned up
     }
 }
 

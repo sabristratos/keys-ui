@@ -7,70 +7,57 @@
  * - Border radius management for grouped buttons
  */
 
-export class ButtonGroupActions {
-    private static instance: ButtonGroupActions | null = null;
-    private initialized = false;
+import { BaseActionClass } from './utils/BaseActionClass';
+import { DOMUtils } from './utils/DOMUtils';
 
+export class ButtonGroupActions extends BaseActionClass {
     /**
-     * Get singleton instance
+     * Initialize button group elements - required by BaseActionClass
      */
-    public static getInstance(): ButtonGroupActions {
-        if (!ButtonGroupActions.instance) {
-            ButtonGroupActions.instance = new ButtonGroupActions();
-        }
-        return ButtonGroupActions.instance;
-    }
-
-    /**
-     * Initialize ButtonGroupActions for all button group elements
-     */
-    public init(): void {
-        if (this.initialized) {
-            return;
-        }
-
+    protected initializeElements(): void {
         this.processButtonGroups();
-        this.bindEventListeners();
-        this.initialized = true;
     }
 
     /**
      * Process all existing button groups on the page
      */
     private processButtonGroups(): void {
-        const buttonGroups = document.querySelectorAll('[data-button-group="true"][data-attached="true"]');
-        buttonGroups.forEach(group => this.processButtonGroup(group as HTMLElement));
+        const buttonGroups = DOMUtils.findByDataAttribute('button-group', 'true').filter(group =>
+            DOMUtils.hasDataAttribute(group, 'attached', 'true')
+        );
+        buttonGroups.forEach(group => this.processButtonGroup(group));
     }
 
     /**
-     * Bind event listeners using event delegation
+     * Bind event listeners using event delegation - required by BaseActionClass
      */
-    private bindEventListeners(): void {
-        // Listen for dynamically added button groups
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const element = node as HTMLElement;
+    protected bindEventListeners(): void {
+        // ButtonGroupActions doesn't need event listeners
+        // Dynamic content is handled via setupDynamicObserver hook
+    }
 
-                        // Check if the added node is a button group
-                        if (element.matches && element.matches('[data-button-group="true"][data-attached="true"]')) {
-                            this.processButtonGroup(element);
-                        }
+    /**
+     * Setup dynamic observer for new button groups - uses BaseActionClass utility
+     */
+    protected setupDynamicObserver(): void {
+        this.createDynamicObserver((addedNodes) => {
+            addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const element = node as HTMLElement;
 
-                        // Check for button groups within the added node
-                        const buttonGroups = element.querySelectorAll && element.querySelectorAll('[data-button-group="true"][data-attached="true"]');
-                        if (buttonGroups) {
-                            buttonGroups.forEach(group => this.processButtonGroup(group as HTMLElement));
-                        }
+                    // Check if the added node is a button group
+                    if (DOMUtils.hasDataAttribute(element, 'button-group', 'true') &&
+                        DOMUtils.hasDataAttribute(element, 'attached', 'true')) {
+                        this.processButtonGroup(element);
                     }
-                });
-            });
-        });
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
+                    // Check for button groups within the added node
+                    const buttonGroups = DOMUtils.findByDataAttribute('button-group', 'true', element).filter(group =>
+                        DOMUtils.hasDataAttribute(group, 'attached', 'true')
+                    );
+                    buttonGroups.forEach(group => this.processButtonGroup(group));
+                }
+            });
         });
     }
 
@@ -153,10 +140,11 @@ export class ButtonGroupActions {
     }
 
     /**
-     * Destroy ButtonGroupActions and clean up
+     * Clean up ButtonGroupActions - extends BaseActionClass destroy
      */
-    public destroy(): void {
-        this.initialized = false;
+    protected onDestroy(): void {
+        // ButtonGroupActions doesn't have additional cleanup beyond base class
+        // MutationObserver is automatically cleaned up by browser
     }
 }
 

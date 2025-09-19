@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --radius-base: 1rem;
+    --radius-base: 0.5rem;
     --radius-sm: calc(var(--radius-base) * 0.25);
     --radius-md: calc(var(--radius-base) * 0.75);
     --radius-lg: var(--radius-base);
@@ -142,7 +142,12 @@
     --neutral-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
     --foreground-neutral: white;
 
+    /* Inverse semantic tokens for tooltip arrows and other inverse color needs */
+    --color-surface-inverse: light-dark(var(--color-neutral-900), white);
+    --color-border-inverse: light-dark(var(--color-neutral-700), var(--color-neutral-200));
 
+    /* Tooltip-specific semantic tokens matching exact Tailwind class behavior */
+    --tooltip-dark-bg: light-dark(var(--color-neutral-900), var(--color-neutral-800));
 }
 
 @theme inline {
@@ -295,138 +300,4 @@
     background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
 }
 
-/* ===== TOOLTIP ENHANCEMENTS ===== */
-/* Advanced styling for Tooltip components */
-
-/* Base tooltip styling */
-.keys-tooltip {
-    /* High z-index to appear above most content */
-    z-index: 9999;
-
-    /* Smooth transitions for show/hide */
-    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-                visibility 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-    /* Default hidden state */
-    opacity: 0;
-    visibility: hidden;
-    transform: scale(0.95);
-    pointer-events: none;
-}
-
-/* Visible state */
-.keys-tooltip[data-show="true"] {
-    opacity: 1;
-    visibility: visible;
-    transform: scale(1);
-    pointer-events: auto;
-}
-
-/* Tooltip arrow styling */
-.keys-tooltip-arrow {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    transform: rotate(45deg);
-    z-index: 1;
-}
-
-/* Arrow positioning for different placements */
-.keys-tooltip[data-placement="top"] .keys-tooltip-arrow {
-    bottom: -4px;
-    left: 50%;
-    margin-left: -4px;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
-}
-
-.keys-tooltip[data-placement="bottom"] .keys-tooltip-arrow {
-    top: -4px;
-    left: 50%;
-    margin-left: -4px;
-    border-top-color: transparent;
-    border-right-color: transparent;
-}
-
-.keys-tooltip[data-placement="left"] .keys-tooltip-arrow {
-    right: -4px;
-    top: 50%;
-    margin-top: -4px;
-    border-top-color: transparent;
-    border-left-color: transparent;
-}
-
-.keys-tooltip[data-placement="right"] .keys-tooltip-arrow {
-    left: -4px;
-    top: 50%;
-    margin-top: -4px;
-    border-bottom-color: transparent;
-    border-right-color: transparent;
-}
-
-/* Enhanced hover states for triggers */
-[data-tooltip-target]:hover,
-[data-tooltip-trigger]:hover {
-    cursor: help;
-}
-
-/* Focus states for keyboard accessibility */
-[data-tooltip-target]:focus,
-[data-tooltip-trigger]:focus {
-    outline: 2px solid var(--color-brand);
-    outline-offset: 2px;
-}
-
-/* Animation delays for different trigger types */
-.keys-tooltip[data-trigger="click"] {
-    transition-delay: 0ms;
-}
-
-.keys-tooltip[data-trigger="hover"] {
-    transition-delay: 100ms;
-}
-
-.keys-tooltip[data-trigger="focus"] {
-    transition-delay: 0ms;
-}
-
-/* Disabled tooltip styling */
-.keys-tooltip[data-disabled="true"] {
-    display: none !important;
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 640px) {
-    .keys-tooltip {
-        /* Ensure tooltips don't exceed mobile screen width */
-        max-width: calc(100vw - 2rem);
-        word-wrap: break-word;
-    }
-
-    /* Slightly larger touch targets */
-    [data-tooltip-target],
-    [data-tooltip-trigger] {
-        min-height: 44px;
-        min-width: 44px;
-    }
-}
-
-/* Reduce motion for users who prefer it */
-@media (prefers-reduced-motion: reduce) {
-    .keys-tooltip {
-        transition-duration: 0.1s;
-    }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-    .keys-tooltip {
-        border-width: 2px;
-    }
-
-    .keys-tooltip-arrow {
-        border-width: 2px;
-    }
-}
 

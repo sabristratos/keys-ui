@@ -9,6 +9,11 @@
  * - Click outside to close
  */
 
+import { BaseActionClass } from './utils/BaseActionClass';
+import { EventUtils } from './utils/EventUtils';
+import { DOMUtils } from './utils/DOMUtils';
+import { AnimationUtils } from './utils/AnimationUtils';
+
 interface SelectOption {
     element: HTMLElement;
     value: string;
@@ -26,41 +31,15 @@ interface SelectState {
     filteredOptions: SelectOption[];
 }
 
-export class SelectActions {
-    private static instance: SelectActions | null = null;
-    private initialized = false;
-    private selectStates = new Map<HTMLElement, SelectState>();
+export class SelectActions extends BaseActionClass<SelectState> {
+
 
     /**
-     * Get singleton instance
+     * Initialize select elements - required by BaseActionClass
      */
-    public static getInstance(): SelectActions {
-        if (!SelectActions.instance) {
-            SelectActions.instance = new SelectActions();
-        }
-        return SelectActions.instance;
-    }
-
-    /**
-     * Initialize SelectActions for all select elements
-     */
-    public init(): void {
-        if (this.initialized) {
-            return;
-        }
-
-        this.bindEventListeners();
-        this.initializeSelects();
-        this.initialized = true;
-
-    }
-
-    /**
-     * Initialize all existing select elements
-     */
-    private initializeSelects(): void {
-        document.querySelectorAll('[data-select="true"]').forEach(select => {
-            this.initializeSelect(select as HTMLElement);
+    protected initializeElements(): void {
+        DOMUtils.findByDataAttribute('select', 'true').forEach(select => {
+            this.initializeSelect(select);
         });
     }
 
@@ -89,126 +68,133 @@ export class SelectActions {
             filteredOptions: []
         };
 
-        this.selectStates.set(selectElement, state);
+        this.setState(selectElement, state);
         this.updateOptions(selectElement);
         this.updateOptionsSelectedState(selectElement);
         this.updateDisplay(selectElement);
     }
 
     /**
-     * Bind global event listeners using event delegation
+     * Bind event listeners using event delegation - required by BaseActionClass
      */
-    private bindEventListeners(): void {
-        document.addEventListener('click', (event) => {
-            const chipRemove = (event.target as Element)?.closest('[data-remove-chip]') as HTMLElement;
-            if (chipRemove) {
+    protected bindEventListeners(): void {
+        // Handle all click events with a single delegated listener
+        EventUtils.handleDelegatedClick('[data-remove-chip], [data-select-clear], [data-select-option], [data-select-trigger], [data-select-search]', (element, event) => {
+            if (element.matches('[data-remove-chip]')) {
                 event.preventDefault();
                 event.stopPropagation();
                 event.stopImmediatePropagation();
-                const chipValue = chipRemove.dataset.removeChip;
-                const select = chipRemove.closest('[data-select="true"]') as HTMLElement;
+                const chipValue = element.dataset.removeChip;
+                const select = DOMUtils.findClosest(element, '[data-select="true"]');
                 if (select && chipValue) {
-
                     this.removeChip(select, chipValue);
                 }
                 return;
             }
 
-            const clearButton = (event.target as Element)?.closest('[data-select-clear]') as HTMLElement;
-            if (clearButton) {
+            if (element.matches('[data-select-clear]')) {
                 event.preventDefault();
                 event.stopPropagation();
-                const select = clearButton.closest('[data-select="true"]') as HTMLElement;
+                const select = DOMUtils.findClosest(element, '[data-select="true"]');
                 if (select) {
                     this.clearSelection(select);
                 }
                 return;
             }
 
-            const option = (event.target as Element)?.closest('[data-select-option]') as HTMLElement;
-            if (option) {
+            if (element.matches('[data-select-option]')) {
                 event.preventDefault();
                 event.stopPropagation();
-                const select = option.closest('[data-select="true"]') as HTMLElement;
+                const select = DOMUtils.findClosest(element, '[data-select="true"]');
                 if (select) {
-                    this.selectOption(select, option);
+                    this.selectOption(select, element);
                 }
                 return;
             }
 
-            const trigger = (event.target as Element)?.closest('[data-select-trigger]') as HTMLElement;
-            if (trigger) {
+            if (element.matches('[data-select-trigger]')) {
                 event.preventDefault();
                 event.stopPropagation();
-                const select = trigger.closest('[data-select="true"]') as HTMLElement;
+                const select = DOMUtils.findClosest(element, '[data-select="true"]');
                 if (select && !this.isDisabled(select)) {
                     this.toggleDropdown(select);
                 }
                 return;
             }
 
-            const searchInput = (event.target as Element)?.closest('[data-select-search]') as HTMLElement;
-            if (searchInput) {
+            if (element.matches('[data-select-search]')) {
                 event.stopPropagation();
                 return; // Don't close dropdown when clicking search input
             }
-
-            const searchContainer = (event.target as Element)?.closest('[data-select-search]')?.parentElement;
-            if (searchContainer && searchContainer.querySelector('[data-select-search]')) {
-                event.stopPropagation();
-                return; // Don't close dropdown when clicking search container
-            }
-
-            this.closeAllDropdowns();
         });
 
-        document.addEventListener('input', (event) => {
-            const searchInput = event.target as HTMLInputElement;
-            if (searchInput?.matches('[data-select-search]')) {
-                const select = searchInput.closest('[data-select="true"]') as HTMLElement;
-                if (select) {
-                    this.handleSearch(select, searchInput.value);
+        // Handle click outside to close dropdowns
+        EventUtils.addEventListener(document, 'click', (event) => {
+            const target = event.target as Node;
+
+            // Check if the click was inside any select element
+            if (target && target instanceof Element) {
+                const searchContainer = target.closest('[data-select-search]')?.parentElement;
+                if (searchContainer && DOMUtils.querySelector('[data-select-search]', searchContainer)) {
+                    event.stopPropagation();
+                    return; // Don't close dropdown when clicking search container
+                }
+
+                const closestSelectElement = target.closest('[data-remove-chip], [data-select-clear], [data-select-option], [data-select-trigger], [data-select-search]');
+
+                // If click is not inside any select element, close all dropdowns
+                if (!closestSelectElement) {
+                    this.closeAllDropdowns();
                 }
             }
         });
 
-        document.addEventListener('keydown', (event) => {
-            const select = (event.target as Element)?.closest('[data-select="true"]') as HTMLElement;
+        // Handle search input
+        EventUtils.handleDelegatedInput('[data-select-search]', (searchInput, event) => {
+            const select = DOMUtils.findClosest(searchInput, '[data-select="true"]');
             if (select) {
-                this.handleKeydown(select, event);
+                this.handleSearch(select, searchInput.value);
             }
         });
 
-        document.addEventListener('focusin', (event) => {
-            const select = (event.target as Element)?.closest('[data-select="true"]') as HTMLElement;
-            if (select && !this.isOpen(select)) {
+        // Handle keyboard navigation
+        EventUtils.handleDelegatedKeydown('[data-select="true"]', (select, event) => {
+            this.handleKeydown(select, event);
+        });
+
+        // Handle focus events
+        EventUtils.handleDelegatedFocus('[data-select="true"]', (select, event) => {
+            if (!this.isOpen(select)) {
+                // Handle focus logic if needed
             }
         });
+    }
 
-        window.addEventListener('resize', () => {
-            this.repositionDropdowns();
-        });
+    /**
+     * Setup dynamic observer for new selects - uses BaseActionClass utility
+     */
+    protected setupDynamicObserver(): void {
+        this.createDynamicObserver((addedNodes) => {
+            addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const element = node as HTMLElement;
 
-
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const element = node as Element;
-                        const selects = element.querySelectorAll('[data-select="true"]');
-                        selects.forEach(select => {
-                            if (!this.selectStates.has(select as HTMLElement)) {
-                                this.initializeSelect(select as HTMLElement);
-                            }
-                        });
+                    // Check if the added node is a select
+                    if (DOMUtils.hasDataAttribute(element, 'select', 'true')) {
+                        if (!this.hasState(element)) {
+                            this.initializeSelect(element);
+                        }
                     }
-                });
-            });
-        });
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
+                    // Check for selects within the added node
+                    const selects = DOMUtils.findByDataAttribute('select', 'true', element);
+                    selects.forEach(select => {
+                        if (!this.hasState(select)) {
+                            this.initializeSelect(select);
+                        }
+                    });
+                }
+            });
         });
     }
 
@@ -216,7 +202,7 @@ export class SelectActions {
      * Toggle dropdown open/closed state
      */
     private toggleDropdown(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
         if (state.isOpen) {
@@ -230,17 +216,17 @@ export class SelectActions {
      * Open dropdown
      */
     private openDropdown(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state || this.isDisabled(select)) return;
 
         this.closeAllDropdowns();
 
         state.isOpen = true;
-        this.selectStates.set(select, state);
+        this.setState(select, state);
 
-        const dropdown = select.querySelector('[data-select-dropdown]') as HTMLElement;
-        const trigger = select.querySelector('[data-select-trigger]') as HTMLElement;
-        const searchInput = select.querySelector('[data-select-search]') as HTMLInputElement;
+        const dropdown = DOMUtils.querySelector('[data-select-dropdown]', select) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-select-trigger]', select) as HTMLElement;
+        const searchInput = DOMUtils.querySelector('[data-select-search]', select) as HTMLInputElement;
 
         if (dropdown) {
             dropdown.classList.remove('hidden');
@@ -249,14 +235,14 @@ export class SelectActions {
 
         if (trigger) {
             trigger.setAttribute('aria-expanded', 'true');
-            const arrow = trigger.querySelector('.select-arrow');
+            const arrow = DOMUtils.querySelector('.select-arrow', trigger);
             if (arrow) {
                 arrow.classList.add('rotate-180');
             }
         }
 
         if (searchInput && select.dataset.searchable === 'true') {
-            setTimeout(() => searchInput.focus(), 10);
+            AnimationUtils.createTimer(() => searchInput.focus(), 10);
         }
 
         this.updateFilteredOptions(select);
@@ -268,17 +254,17 @@ export class SelectActions {
      * Close dropdown
      */
     private closeDropdown(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state || !state.isOpen) return;
 
         state.isOpen = false;
         state.searchTerm = '';
         state.focusedIndex = -1;
-        this.selectStates.set(select, state);
+        this.setState(select, state);
 
-        const dropdown = select.querySelector('[data-select-dropdown]') as HTMLElement;
-        const trigger = select.querySelector('[data-select-trigger]') as HTMLElement;
-        const searchInput = select.querySelector('[data-select-search]') as HTMLInputElement;
+        const dropdown = DOMUtils.querySelector('[data-select-dropdown]', select) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-select-trigger]', select) as HTMLElement;
+        const searchInput = DOMUtils.querySelector('[data-select-search]', select) as HTMLInputElement;
 
         if (dropdown) {
             dropdown.classList.add('hidden');
@@ -286,7 +272,7 @@ export class SelectActions {
 
         if (trigger) {
             trigger.setAttribute('aria-expanded', 'false');
-            const arrow = trigger.querySelector('.select-arrow');
+            const arrow = DOMUtils.querySelector('.select-arrow', trigger);
             if (arrow) {
                 arrow.classList.remove('rotate-180');
             }
@@ -305,7 +291,7 @@ export class SelectActions {
      * Close all open dropdowns
      */
     private closeAllDropdowns(): void {
-        this.selectStates.forEach((state, select) => {
+        this.getAllStates().forEach((state, select) => {
             if (state.isOpen) {
                 this.closeDropdown(select);
             }
@@ -316,7 +302,7 @@ export class SelectActions {
      * Handle option selection
      */
     private selectOption(select: HTMLElement, option: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         const optionValue = option.dataset.value;
 
         if (!state || !optionValue || option.getAttribute('aria-disabled') === 'true') {
@@ -337,7 +323,7 @@ export class SelectActions {
             this.closeDropdown(select);
         }
 
-        this.selectStates.set(select, state);
+        this.setState(select, state);
         this.updateDisplay(select);
         this.updateHiddenInputs(select);
         this.updateOptionsSelectedState(select);
@@ -352,13 +338,13 @@ export class SelectActions {
      * Remove chip (for multiple selection)
      */
     private removeChip(select: HTMLElement, value: string): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
         const index = state.selectedValues.indexOf(value);
         if (index > -1) {
             state.selectedValues.splice(index, 1);
-            this.selectStates.set(select, state);
+            this.setState(select, state);
             this.updateDisplay(select);
             this.updateHiddenInputs(select);
             this.updateOptionsSelectedState(select);
@@ -375,11 +361,11 @@ export class SelectActions {
      * Clear all selections
      */
     private clearSelection(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
         state.selectedValues = [];
-        this.selectStates.set(select, state);
+        this.setState(select, state);
         this.updateDisplay(select);
         this.updateHiddenInputs(select);
         this.updateOptionsSelectedState(select);
@@ -394,11 +380,11 @@ export class SelectActions {
      * Handle search functionality
      */
     private handleSearch(select: HTMLElement, searchTerm: string): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
         state.searchTerm = searchTerm.toLowerCase();
-        this.selectStates.set(select, state);
+        this.setState(select, state);
 
         this.updateFilteredOptions(select);
         this.updateOptionsVisibility(select);
@@ -408,7 +394,7 @@ export class SelectActions {
      * Update filtered options based on search term
      */
     private updateFilteredOptions(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
         const allOptions = this.getAllOptions(select);
@@ -421,18 +407,18 @@ export class SelectActions {
             );
         }
 
-        this.selectStates.set(select, state);
+        this.setState(select, state);
     }
 
     /**
      * Update options visibility based on filter
      */
     private updateOptionsVisibility(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
-        const allOptionElements = select.querySelectorAll('[data-select-option]');
-        const noResultsElement = select.querySelector('[data-select-no-results]') as HTMLElement;
+        const allOptionElements = DOMUtils.querySelectorAll('[data-select-option]', select);
+        const noResultsElement = DOMUtils.querySelector('[data-select-no-results]', select) as HTMLElement;
 
         let visibleCount = 0;
 
@@ -462,7 +448,7 @@ export class SelectActions {
      * Handle keyboard navigation
      */
     private handleKeydown(select: HTMLElement, event: KeyboardEvent): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
         switch (event.key) {
@@ -484,7 +470,7 @@ export class SelectActions {
                 if (state.isOpen) {
                     event.preventDefault();
                     this.closeDropdown(select);
-                    const trigger = select.querySelector('[data-select-trigger]') as HTMLElement;
+                    const trigger = DOMUtils.querySelector('[data-select-trigger]', select) as HTMLElement;
                     if (trigger) trigger.focus();
                 }
                 break;
@@ -518,7 +504,7 @@ export class SelectActions {
      * Navigate through options with arrow keys
      */
     private navigateOptions(select: HTMLElement, direction: number): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state || !state.isOpen) return;
 
         const optionCount = state.filteredOptions.length;
@@ -535,7 +521,7 @@ export class SelectActions {
             }
         }
 
-        this.selectStates.set(select, state);
+        this.setState(select, state);
         this.updateOptionFocus(select);
     }
 
@@ -543,10 +529,10 @@ export class SelectActions {
      * Update visual focus state of options
      */
     private updateOptionFocus(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
-        const allOptions = select.querySelectorAll('[data-select-option]');
+        const allOptions = DOMUtils.querySelectorAll('[data-select-option]', select);
         allOptions.forEach((option, index) => {
             const element = option as HTMLElement;
             if (index === state.focusedIndex) {
@@ -562,7 +548,7 @@ export class SelectActions {
      * Update display of selected values
      */
     private updateDisplay(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
         const isMultiple = select.dataset.multiple === 'true';
@@ -578,10 +564,10 @@ export class SelectActions {
      * Update chips display for multiple selection using Badge components
      */
     private updateChipsDisplay(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
-        const chipsContainer = select.querySelector('[data-select-chips]') as HTMLElement;
+        const chipsContainer = DOMUtils.querySelector('[data-select-chips]', select) as HTMLElement;
         if (!chipsContainer) return;
 
         chipsContainer.innerHTML = '';
@@ -645,10 +631,10 @@ export class SelectActions {
      * Update single value display
      */
     private updateSingleValueDisplay(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
-        const valueDisplay = select.querySelector('.select-value') as HTMLElement;
+        const valueDisplay = DOMUtils.querySelector('.select-value', select) as HTMLElement;
         if (!valueDisplay) return;
 
         if (state.selectedValues.length === 0) {
@@ -666,14 +652,14 @@ export class SelectActions {
      * Update hidden form inputs
      */
     private updateHiddenInputs(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
         const isMultiple = select.dataset.multiple === 'true';
         const name = select.dataset.name;
         if (!name) return;
 
-        const existingInputs = select.querySelectorAll('.select-hidden-input');
+        const existingInputs = DOMUtils.querySelectorAll('.select-hidden-input', select);
         existingInputs.forEach(input => input.remove());
 
         if (isMultiple) {
@@ -699,10 +685,10 @@ export class SelectActions {
      * Update options selected state attributes
      */
     private updateOptionsSelectedState(select: HTMLElement): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
-        const allOptions = select.querySelectorAll('[data-select-option]');
+        const allOptions = DOMUtils.querySelectorAll('[data-select-option]', select);
         allOptions.forEach(optionElement => {
             const option = optionElement as HTMLElement;
             const value = option.dataset.value || '';
@@ -712,14 +698,14 @@ export class SelectActions {
 
             if (isSelected) {
                 option.classList.add('bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/20', 'dark:text-brand-300');
-                const checkmark = option.querySelector('.text-brand-600');
+                const checkmark = DOMUtils.querySelector('.text-brand-600', option);
                 if (checkmark) {
                     checkmark.parentElement?.classList.remove('opacity-0');
                     checkmark.parentElement?.classList.add('opacity-100');
                 }
             } else {
                 option.classList.remove('bg-brand-50', 'text-brand-700', 'dark:bg-brand-900/20', 'dark:text-brand-300');
-                const checkmark = option.querySelector('.text-brand-600');
+                const checkmark = DOMUtils.querySelector('.text-brand-600', option);
                 if (checkmark) {
                     checkmark.parentElement?.classList.add('opacity-0');
                     checkmark.parentElement?.classList.remove('opacity-100');
@@ -733,10 +719,10 @@ export class SelectActions {
      */
     private updateOptions(select: HTMLElement): void {
         const allOptions = this.getAllOptions(select);
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (state) {
             state.filteredOptions = allOptions;
-            this.selectStates.set(select, state);
+            this.setState(select, state);
         }
     }
 
@@ -744,7 +730,7 @@ export class SelectActions {
      * Get all options from select element
      */
     private getAllOptions(select: HTMLElement): SelectOption[] {
-        const optionElements = select.querySelectorAll('[data-select-option]');
+        const optionElements = DOMUtils.querySelectorAll('[data-select-option]', select);
         return Array.from(optionElements).map(element => {
             const optionEl = element as HTMLElement;
 
@@ -773,8 +759,8 @@ export class SelectActions {
      * Position dropdown relative to trigger
      */
     private positionDropdown(select: HTMLElement): void {
-        const dropdown = select.querySelector('[data-select-dropdown]') as HTMLElement;
-        const trigger = select.querySelector('[data-select-trigger]') as HTMLElement;
+        const dropdown = DOMUtils.querySelector('[data-select-dropdown]', select) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-select-trigger]', select) as HTMLElement;
 
         if (!dropdown || !trigger) return;
 
@@ -804,7 +790,7 @@ export class SelectActions {
      * Reposition all open dropdowns
      */
     private repositionDropdowns(): void {
-        this.selectStates.forEach((state, select) => {
+        this.getAllStates().forEach((state, select) => {
             if (state.isOpen) {
                 this.positionDropdown(select);
             }
@@ -822,7 +808,7 @@ export class SelectActions {
      * Check if dropdown is open
      */
     private isOpen(select: HTMLElement): boolean {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         return state ? state.isOpen : false;
     }
 
@@ -838,34 +824,32 @@ export class SelectActions {
      * Dispatch custom select event
      */
     private dispatchSelectEvent(select: HTMLElement, eventName: string, detail: any = null): void {
-        const event = new CustomEvent(eventName, {
-            detail: {
-                select,
-                ...detail
-            },
+        EventUtils.dispatchCustomEvent(select, eventName, {
+            select,
+            ...detail
+        }, {
             bubbles: true
         });
-        select.dispatchEvent(event);
     }
 
     /**
      * Get select state (for external access)
      */
     public getSelectState(select: HTMLElement): SelectState | null {
-        return this.selectStates.get(select) || null;
+        return this.getState(select) || null;
     }
 
     /**
      * Set selected values programmatically
      */
     public setSelectedValues(select: HTMLElement, values: string[]): void {
-        const state = this.selectStates.get(select);
+        const state = this.getState(select);
         if (!state) return;
 
         const isMultiple = select.dataset.multiple === 'true';
         state.selectedValues = isMultiple ? values : values.slice(0, 1);
 
-        this.selectStates.set(select, state);
+        this.setState(select, state);
         this.updateDisplay(select);
         this.updateHiddenInputs(select);
         this.updateOptionsSelectedState(select);
@@ -877,12 +861,11 @@ export class SelectActions {
     }
 
     /**
-     * Destroy SelectActions and clean up
+     * Clean up SelectActions - extends BaseActionClass destroy
      */
-    public destroy(): void {
-        this.selectStates.clear();
-        this.initialized = false;
-
+    protected onDestroy(): void {
+        // SelectActions doesn't have additional cleanup beyond base class
+        // Event listeners and observers are automatically cleaned up
     }
 }
 

@@ -9,6 +9,10 @@
  * - Custom action callbacks
  */
 
+import { BaseActionClass } from './utils/BaseActionClass';
+import { DOMUtils } from './utils/DOMUtils';
+import { EventUtils } from './utils/EventUtils';
+
 interface FormAction {
     type: string;
     icon: string;
@@ -42,52 +46,30 @@ function t(key: string, fallback: string = ''): string {
     return value || fallback;
 }
 
-export class FormActions {
-    private static instance: FormActions | null = null;
-    private initialized = false;
-
+export class FormActions extends BaseActionClass {
     /**
-     * Get singleton instance
+     * Initialize form elements - required by BaseActionClass
      */
-    public static getInstance(): FormActions {
-        if (!FormActions.instance) {
-            FormActions.instance = new FormActions();
-        }
-        return FormActions.instance;
+    protected initializeElements(): void {
+        // FormActions doesn't need to initialize specific elements on load
+        // Actions are handled via event delegation
     }
 
     /**
-     * Initialize FormActions for all form elements with actions
+     * Bind event listeners using event delegation - required by BaseActionClass
      */
-    public init(): void {
-        if (this.initialized) {
-            return;
-        }
-
-        this.bindEventListeners();
-        this.initialized = true;
-
-    }
-
-    /**
-     * Bind event listeners using event delegation
-     */
-    private bindEventListeners(): void {
-        document.addEventListener('click', (event) => {
-            const button = (event.target as Element)?.closest('.input-action') as HTMLButtonElement;
-            if (!button) return;
-
+    protected bindEventListeners(): void {
+        // Handle input action button clicks
+        EventUtils.handleDelegatedClick('.input-action', (button, event) => {
             event.preventDefault();
-            this.handleActionClick(button);
+            this.handleActionClick(button as HTMLButtonElement);
         });
 
-        document.addEventListener('keydown', (event) => {
+        // Handle input action button keyboard activation
+        EventUtils.handleDelegatedKeydown('.input-action', (button, event) => {
             if (event.key === 'Enter' || event.key === ' ') {
-                const button = event.target as HTMLButtonElement;
-                if (button?.classList.contains('input-action')) {
-                    event.preventDefault();
-                    this.handleActionClick(button);
-                }
+                event.preventDefault();
+                this.handleActionClick(button as HTMLButtonElement);
             }
         });
     }
@@ -96,11 +78,11 @@ export class FormActions {
      * Handle action button click
      */
     private async handleActionClick(button: HTMLButtonElement): Promise<void> {
-        const wrapper = button.closest('.input-action') as HTMLElement;
+        const wrapper = DOMUtils.findClosest(button, '.input-action');
         const action = wrapper?.dataset.action;
         if (!action) return;
 
-        const element = this.findFormElementForAction(button);
+        const element = DOMUtils.findFormElementForAction(button);
         if (!element) return;
 
         switch (action) {
@@ -124,13 +106,6 @@ export class FormActions {
         this.dispatchActionEvent(element, action);
     }
 
-    /**
-     * Find the form element (input or textarea) associated with an action button
-     */
-    private findFormElementForAction(button: HTMLButtonElement): HTMLInputElement | HTMLTextAreaElement | null {
-        const container = button.closest('.relative');
-        return container?.querySelector('input, textarea') as HTMLInputElement | HTMLTextAreaElement || null;
-    }
 
     /**
      * Swap the icon using CSS classes and data attributes
@@ -145,9 +120,9 @@ export class FormActions {
      * Update button icon state using Tailwind classes
      */
     private updateButtonIconState(button: HTMLButtonElement, iconName: string): void {
-        const defaultIcon = button.querySelector('.button-icon-default') as HTMLElement;
-        const toggleIcon = button.querySelector('.button-icon-toggle') as HTMLElement;
-        const successIcon = button.querySelector('.button-icon-success') as HTMLElement;
+        const defaultIcon = DOMUtils.querySelector('.button-icon-default', button) as HTMLElement;
+        const toggleIcon = DOMUtils.querySelector('.button-icon-toggle', button) as HTMLElement;
+        const successIcon = DOMUtils.querySelector('.button-icon-success', button) as HTMLElement;
 
         const defaultIconName = button.dataset.iconDefault;
         const toggleIconName = button.dataset.iconToggle;
@@ -209,7 +184,7 @@ export class FormActions {
      * Copy form element value to clipboard
      */
     private async copyToClipboard(element: HTMLInputElement | HTMLTextAreaElement, wrapper: HTMLElement): Promise<void> {
-        const copyButton = wrapper.querySelector('button') as HTMLButtonElement;
+        const copyButton = DOMUtils.querySelector('button', wrapper) as HTMLButtonElement;
 
         try {
             await navigator.clipboard.writeText(element.value);
@@ -227,7 +202,7 @@ export class FormActions {
      * Fallback copy method for older browsers
      */
     private fallbackCopyToClipboard(element: HTMLInputElement | HTMLTextAreaElement, wrapper: HTMLElement): void {
-        const copyButton = wrapper.querySelector('button') as HTMLButtonElement;
+        const copyButton = DOMUtils.querySelector('button', wrapper) as HTMLButtonElement;
 
         element.select();
         if (element instanceof HTMLInputElement) {
@@ -253,7 +228,7 @@ export class FormActions {
         const successIcon = button.dataset.iconSuccess;
         const successLabel = button.dataset.labelSuccess;
         const defaultIcon = button.dataset.iconDefault;
-        const labelElement = button.querySelector('.sr-only');
+        const labelElement = DOMUtils.querySelector('.sr-only', button);
 
         if (successIcon && defaultIcon) {
             await this.swapButtonIcon(button, successIcon);
@@ -285,12 +260,12 @@ export class FormActions {
 
         const defaultIcon = button.dataset.iconDefault;
         const toggleIcon = button.dataset.iconToggle;
-        const defaultLabel = button.querySelector('.sr-only')?.textContent;
+        const defaultLabel = DOMUtils.querySelector('.sr-only', button)?.textContent;
         const toggleLabel = button.dataset.labelToggle;
 
         input.type = newType;
 
-        const labelElement = button.querySelector('.sr-only');
+        const labelElement = DOMUtils.querySelector('.sr-only', button);
 
         if (isPassword) {
             if (toggleIcon) {
@@ -335,16 +310,11 @@ export class FormActions {
      * Dispatch custom event for action
      */
     private dispatchActionEvent(element: HTMLInputElement | HTMLTextAreaElement, action: string): void {
-        const event = new CustomEvent('form-action', {
-            detail: {
-                element,
-                action,
-                value: element.value
-            } as FormActionEvent,
-            bubbles: true
-        });
-
-        element.dispatchEvent(event);
+        EventUtils.dispatchCustomEvent(element, 'form-action', {
+            element,
+            action,
+            value: element.value
+        } as FormActionEvent);
     }
 
     /**
@@ -359,7 +329,7 @@ export class FormActions {
         }`;
         feedback.textContent = message;
 
-        const container = element.closest('.relative');
+        const container = DOMUtils.findClosest(element, '.relative');
         if (container) {
             container.appendChild(feedback);
 
@@ -372,10 +342,10 @@ export class FormActions {
     }
 
     /**
-     * Add a custom action handler
+     * Add a custom action handler with automatic cleanup
      */
-    public addActionHandler(action: string, handler: (element: HTMLInputElement | HTMLTextAreaElement) => void): void {
-        document.addEventListener('form-action', (event) => {
+    public addActionHandler(action: string, handler: (element: HTMLInputElement | HTMLTextAreaElement) => void): () => void {
+        return EventUtils.addEventListener(document, 'form-action', (event) => {
             const customEvent = event as CustomEvent<FormActionEvent>;
             if (customEvent.detail.action === action) {
                 handler(customEvent.detail.element);
@@ -384,11 +354,11 @@ export class FormActions {
     }
 
     /**
-     * Destroy FormActions and clean up
+     * Clean up FormActions - extends BaseActionClass destroy
      */
-    public destroy(): void {
-        this.initialized = false;
-
+    protected onDestroy(): void {
+        // FormActions doesn't have additional cleanup beyond base class
+        // Event listeners are automatically cleaned up by browser
     }
 }
 

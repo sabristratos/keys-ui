@@ -9,14 +9,19 @@
  * - Livewire compatibility
  */
 
+import { BaseActionClass } from './utils/BaseActionClass';
+import { EventUtils } from './utils/EventUtils';
+import { DOMUtils } from './utils/DOMUtils';
+import { AnimationUtils } from './utils/AnimationUtils';
+
 interface TooltipState {
     isVisible: boolean;
     trigger: HTMLElement | null;
     tooltip: HTMLElement;
     triggerType: 'hover' | 'click' | 'focus';
     delay: number;
-    showTimeout?: number;
-    hideTimeout?: number;
+    showTimer?: number;
+    hideTimer?: number;
 }
 
 interface TooltipPosition {
@@ -25,67 +30,43 @@ interface TooltipPosition {
     placement: 'top' | 'bottom' | 'left' | 'right';
 }
 
-export class TooltipActions {
-    private static instance: TooltipActions | null = null;
-    private initialized = false;
-    private tooltipStates = new Map<HTMLElement, TooltipState>();
+export class TooltipActions extends BaseActionClass<TooltipState> {
+
 
     /**
-     * Get singleton instance
+     * Initialize tooltip elements - required by BaseActionClass
      */
-    public static getInstance(): TooltipActions {
-        if (!TooltipActions.instance) {
-            TooltipActions.instance = new TooltipActions();
-        }
-        return TooltipActions.instance;
-    }
-
-    /**
-     * Initialize TooltipActions for all tooltip elements
-     */
-    public init(): void {
-        if (this.initialized) {
-            return;
-        }
-
-        this.initializeTooltips();
-        this.bindGlobalEvents();
-        this.setupLivewireIntegration();
-        this.initialized = true;
-    }
-
-    /**
-     * Initialize all tooltips on the page
-     */
-    private initializeTooltips(): void {
+    protected initializeElements(): void {
         // Initialize tooltips with explicit targets
-        document.querySelectorAll('[data-tooltip-target]').forEach(trigger => {
+        DOMUtils.querySelectorAll('[data-tooltip-target]').forEach(trigger => {
             const tooltipId = trigger.getAttribute('data-tooltip-target');
             if (tooltipId) {
-                const tooltip = document.getElementById(tooltipId);
+                const tooltip = DOMUtils.getElementById(tooltipId);
                 if (tooltip) {
-                    this.initializeTooltip(trigger as HTMLElement, tooltip as HTMLElement);
+                    this.initializeTooltip(trigger, tooltip);
                 }
             }
         });
 
         // Initialize standalone tooltips
-        document.querySelectorAll('[data-tooltip="true"]').forEach(tooltip => {
+        DOMUtils.findByDataAttribute('tooltip', 'true').forEach(tooltip => {
             const target = tooltip.getAttribute('data-target');
             if (target) {
-                const trigger = document.querySelector(target);
+                const trigger = DOMUtils.querySelector(target);
                 if (trigger) {
-                    this.initializeTooltip(trigger as HTMLElement, tooltip as HTMLElement);
+                    this.initializeTooltip(trigger, tooltip);
                 }
             }
         });
+
+        this.setupLivewireIntegration();
     }
 
     /**
      * Initialize a single tooltip
      */
     private initializeTooltip(trigger: HTMLElement, tooltip: HTMLElement): void {
-        if (this.tooltipStates.has(tooltip)) {
+        if (this.hasState(tooltip)) {
             return;
         }
 
@@ -103,7 +84,7 @@ export class TooltipActions {
             delay
         };
 
-        this.tooltipStates.set(tooltip, state);
+        this.setState(tooltip, state);
         this.bindTooltipEvents(trigger, tooltip, state);
 
         // Set initial state
@@ -144,77 +125,90 @@ export class TooltipActions {
     }
 
     /**
-     * Bind global events
+     * Bind event listeners using event delegation - required by BaseActionClass
      */
-    private bindGlobalEvents(): void {
+    protected bindEventListeners(): void {
         // Close tooltips on outside click
-        document.addEventListener('click', (e) => {
-            const target = e.target as HTMLElement;
+        EventUtils.addEventListener(document, 'click', (e) => {
+            const target = e.target as Node;
 
-            this.tooltipStates.forEach((state, tooltip) => {
-                if (state.triggerType === 'click' && state.isVisible) {
-                    if (!state.trigger?.contains(target) && !tooltip.contains(target)) {
-                        this.hideTooltip(tooltip);
+            // Only process if target is an Element
+            if (target && target instanceof Element) {
+                this.getAllStates().forEach((state, tooltip) => {
+                    if (state.triggerType === 'click' && state.isVisible) {
+                        const targetElement = target as HTMLElement;
+                        if (!state.trigger?.contains(targetElement) && !tooltip.contains(targetElement)) {
+                            this.hideTooltip(tooltip);
+                        }
                     }
-                }
-            });
+                });
+            }
         });
 
         // Close tooltips on scroll
-        document.addEventListener('scroll', () => {
-            this.tooltipStates.forEach((state, tooltip) => {
+        EventUtils.addEventListener(document, 'scroll', () => {
+            this.getAllStates().forEach((state, tooltip) => {
                 if (state.isVisible) {
                     this.hideTooltip(tooltip);
                 }
             });
         }, { passive: true });
 
-        // Reposition on window resize
-        window.addEventListener('resize', () => {
-            this.tooltipStates.forEach((state, tooltip) => {
+        // Reposition on window resize - using EventUtils
+        EventUtils.handleResize(() => {
+            this.getAllStates().forEach((state, tooltip) => {
                 if (state.isVisible) {
                     this.positionTooltip(state.trigger!, tooltip);
                 }
             });
-        });
+        }, 100);
+    }
 
-        // Dynamic tooltip initialization observer
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const element = node as Element;
+    /**
+     * Setup dynamic observer for new tooltips - uses BaseActionClass utility
+     */
+    protected setupDynamicObserver(): void {
+        this.createDynamicObserver((addedNodes) => {
+            addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const element = node as HTMLElement;
 
-                        // Initialize new tooltips
-                        element.querySelectorAll('[data-tooltip="true"], [data-tooltip-target]').forEach(el => {
-                            if (el.hasAttribute('data-tooltip-target')) {
-                                const tooltipId = el.getAttribute('data-tooltip-target');
-                                if (tooltipId) {
-                                    const tooltip = document.getElementById(tooltipId);
-                                    if (tooltip) {
-                                        this.initializeTooltip(el as HTMLElement, tooltip as HTMLElement);
-                                    }
-                                }
+                    // Initialize new tooltips with explicit targets
+                    DOMUtils.querySelectorAll('[data-tooltip-target]', element).forEach(trigger => {
+                        const tooltipId = trigger.getAttribute('data-tooltip-target');
+                        if (tooltipId) {
+                            const tooltip = DOMUtils.getElementById(tooltipId);
+                            if (tooltip && !this.hasState(tooltip)) {
+                                this.initializeTooltip(trigger, tooltip);
                             }
-                        });
-                    }
-                });
+                        }
+                    });
+
+                    // Initialize standalone tooltips
+                    DOMUtils.findByDataAttribute('tooltip', 'true', element).forEach(tooltip => {
+                        const target = tooltip.getAttribute('data-target');
+                        if (target) {
+                            const trigger = DOMUtils.querySelector(target);
+                            if (trigger && !this.hasState(tooltip)) {
+                                this.initializeTooltip(trigger, tooltip);
+                            }
+                        }
+                    });
+                }
             });
         });
-
-        observer.observe(document.body, { childList: true, subtree: true });
     }
 
     /**
      * Schedule tooltip to show with delay
      */
     private scheduleShow(tooltip: HTMLElement): void {
-        const state = this.tooltipStates.get(tooltip);
+        const state = this.getState(tooltip);
         if (!state || tooltip.getAttribute('data-disabled') === 'true') return;
 
         this.cancelHide(tooltip);
 
-        state.showTimeout = window.setTimeout(() => {
+        state.showTimer = AnimationUtils.createTimer(() => {
             this.showTooltip(tooltip);
         }, state.delay);
     }
@@ -223,12 +217,12 @@ export class TooltipActions {
      * Schedule tooltip to hide with delay
      */
     private scheduleHide(tooltip: HTMLElement): void {
-        const state = this.tooltipStates.get(tooltip);
+        const state = this.getState(tooltip);
         if (!state) return;
 
         this.cancelShow(tooltip);
 
-        state.hideTimeout = window.setTimeout(() => {
+        state.hideTimer = AnimationUtils.createTimer(() => {
             this.hideTooltip(tooltip);
         }, 100); // Short delay for better UX
     }
@@ -237,10 +231,10 @@ export class TooltipActions {
      * Cancel scheduled show
      */
     private cancelShow(tooltip: HTMLElement): void {
-        const state = this.tooltipStates.get(tooltip);
-        if (state?.showTimeout) {
-            clearTimeout(state.showTimeout);
-            delete state.showTimeout;
+        const state = this.getState(tooltip);
+        if (state?.showTimer) {
+            AnimationUtils.clearTimer(state.showTimer);
+            delete state.showTimer;
         }
     }
 
@@ -248,10 +242,10 @@ export class TooltipActions {
      * Cancel scheduled hide
      */
     private cancelHide(tooltip: HTMLElement): void {
-        const state = this.tooltipStates.get(tooltip);
-        if (state?.hideTimeout) {
-            clearTimeout(state.hideTimeout);
-            delete state.hideTimeout;
+        const state = this.getState(tooltip);
+        if (state?.hideTimer) {
+            AnimationUtils.clearTimer(state.hideTimer);
+            delete state.hideTimer;
         }
     }
 
@@ -259,37 +253,47 @@ export class TooltipActions {
      * Show tooltip
      */
     private showTooltip(tooltip: HTMLElement): void {
-        const state = this.tooltipStates.get(tooltip);
+        const state = this.getState(tooltip);
         if (!state || state.isVisible) return;
 
         if (state.trigger) {
             this.positionTooltip(state.trigger, tooltip);
         }
 
-        tooltip.setAttribute('data-show', 'true');
-        state.isVisible = true;
-
-        this.dispatchTooltipEvent(tooltip, 'tooltip:show', { trigger: state.trigger });
+        // Use AnimationUtils for fade in animation
+        AnimationUtils.fadeIn(tooltip, {
+            duration: 200,
+            onComplete: () => {
+                tooltip.setAttribute('data-show', 'true');
+                state.isVisible = true;
+                this.dispatchTooltipEvent(tooltip, 'tooltip:show', { trigger: state.trigger });
+            }
+        });
     }
 
     /**
      * Hide tooltip
      */
     private hideTooltip(tooltip: HTMLElement): void {
-        const state = this.tooltipStates.get(tooltip);
+        const state = this.getState(tooltip);
         if (!state || !state.isVisible) return;
 
-        tooltip.setAttribute('data-show', 'false');
-        state.isVisible = false;
-
-        this.dispatchTooltipEvent(tooltip, 'tooltip:hide', { trigger: state.trigger });
+        // Use AnimationUtils for fade out animation
+        AnimationUtils.fadeOut(tooltip, {
+            duration: 150,
+            onComplete: () => {
+                tooltip.setAttribute('data-show', 'false');
+                state.isVisible = false;
+                this.dispatchTooltipEvent(tooltip, 'tooltip:hide', { trigger: state.trigger });
+            }
+        });
     }
 
     /**
      * Toggle tooltip visibility
      */
     private toggleTooltip(tooltip: HTMLElement): void {
-        const state = this.tooltipStates.get(tooltip);
+        const state = this.getState(tooltip);
         if (!state) return;
 
         if (state.isVisible) {
@@ -407,12 +411,13 @@ export class TooltipActions {
      * Dispatch tooltip events
      */
     private dispatchTooltipEvent(tooltip: HTMLElement, eventName: string, detail: any = {}): void {
-        const event = new CustomEvent(eventName, {
-            detail: { tooltip, ...detail },
+        EventUtils.dispatchCustomEvent(tooltip, eventName, {
+            tooltip,
+            ...detail
+        }, {
             bubbles: true,
             cancelable: true
         });
-        tooltip.dispatchEvent(event);
     }
 
     /**
@@ -439,8 +444,8 @@ export class TooltipActions {
      * Public API: Show tooltip programmatically
      */
     public show(tooltipId: string): boolean {
-        const tooltip = document.getElementById(tooltipId);
-        if (tooltip && this.tooltipStates.has(tooltip)) {
+        const tooltip = DOMUtils.getElementById(tooltipId);
+        if (tooltip && this.hasState(tooltip)) {
             this.showTooltip(tooltip);
             return true;
         }
@@ -451,8 +456,8 @@ export class TooltipActions {
      * Public API: Hide tooltip programmatically
      */
     public hide(tooltipId: string): boolean {
-        const tooltip = document.getElementById(tooltipId);
-        if (tooltip && this.tooltipStates.has(tooltip)) {
+        const tooltip = DOMUtils.getElementById(tooltipId);
+        if (tooltip && this.hasState(tooltip)) {
             this.hideTooltip(tooltip);
             return true;
         }
@@ -463,8 +468,8 @@ export class TooltipActions {
      * Public API: Toggle tooltip programmatically
      */
     public toggle(tooltipId: string): boolean {
-        const tooltip = document.getElementById(tooltipId);
-        if (tooltip && this.tooltipStates.has(tooltip)) {
+        const tooltip = DOMUtils.getElementById(tooltipId);
+        if (tooltip && this.hasState(tooltip)) {
             this.toggleTooltip(tooltip);
             return true;
         }
@@ -475,13 +480,21 @@ export class TooltipActions {
      * Public API: Destroy tooltip instance
      */
     public destroy(tooltipId: string): boolean {
-        const tooltip = document.getElementById(tooltipId);
-        if (tooltip && this.tooltipStates.has(tooltip)) {
+        const tooltip = DOMUtils.getElementById(tooltipId);
+        if (tooltip && this.hasState(tooltip)) {
             this.hideTooltip(tooltip);
-            this.tooltipStates.delete(tooltip);
+            this.removeState(tooltip);
             return true;
         }
         return false;
+    }
+
+    /**
+     * Clean up TooltipActions - extends BaseActionClass destroy
+     */
+    protected onDestroy(): void {
+        // TooltipActions doesn't have additional cleanup beyond base class
+        // Event listeners and observers are automatically cleaned up
     }
 }
 
