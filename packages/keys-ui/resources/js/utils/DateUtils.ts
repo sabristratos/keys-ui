@@ -139,7 +139,7 @@ export class DateUtils {
         const start = this.formatDateForSubmission(startDate, format);
         const end = endDate ? this.formatDateForSubmission(endDate, format) : '';
 
-        return end ? `${start},${end}` : `${start},`;
+        return end ? `${start},${end}` : start;
     }
 
     /**

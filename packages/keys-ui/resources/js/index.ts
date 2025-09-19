@@ -22,13 +22,16 @@ import { TimePickerActions } from './TimePickerActions';
 import { AccordionActions } from './AccordionActions';
 import { EditorActions } from './EditorActions';
 import { DatePickerActions } from './DatePickerActions';
+import { AddToCartActions } from './AddToCartActions';
+import { FileUploadActions } from './FileUploadActions';
+import { GalleryActions } from './GalleryActions';
 
 // Import utility classes for external use
 import { BaseActionClass } from './utils/BaseActionClass';
 import { DOMUtils } from './utils/DOMUtils';
 import { EventUtils } from './utils/EventUtils';
 
-export { FormActions, AlertActions, CalendarActions, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, AccordionActions, EditorActions, DatePickerActions };
+export { FormActions, AlertActions, CalendarActions, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, AccordionActions, EditorActions, DatePickerActions, AddToCartActions, FileUploadActions, GalleryActions };
 
 // Export utility classes for external consumption
 export { BaseActionClass, DOMUtils, EventUtils };
@@ -72,6 +75,12 @@ export function initializeKeysUI(): void {
 
     DatePickerActions.getInstance().init();
 
+    AddToCartActions.getInstance().init();
+
+    FileUploadActions.getInstance().init();
+
+    GalleryActions.getInstance().init();
+
 }
 
 /**
@@ -95,5 +104,8 @@ export default {
     AccordionActions: AccordionActions.getInstance(),
     EditorActions: EditorActions.getInstance(),
     DatePickerActions: DatePickerActions.getInstance(),
+    AddToCartActions: AddToCartActions.getInstance(),
+    FileUploadActions: FileUploadActions.getInstance(),
+    GalleryActions: GalleryActions.getInstance(),
     init: initializeKeysUI
 };

@@ -90,22 +90,12 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Input focus/click to open dropdown
+        // Input click to toggle dropdown
         EventUtils.handleDelegatedClick('[data-date-picker-input]', (input, event) => {
             event.preventDefault();
             const datePicker = DOMUtils.findClosest(input, '[data-date-picker="true"]');
             if (datePicker && !this.isDisabled(datePicker)) {
                 this.toggleDropdown(datePicker);
-            }
-        });
-
-        EventUtils.handleDelegatedFocus('[data-date-picker-input]', (input) => {
-            const datePicker = DOMUtils.findClosest(input, '[data-date-picker="true"]');
-            if (datePicker && !this.isDisabled(datePicker)) {
-                const state = this.getState(datePicker);
-                if (state && !state.isOpen && !state.isInline) {
-                    this.openDropdown(datePicker);
-                }
             }
         });
 
@@ -200,7 +190,16 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
             DOMUtils.findByDataAttribute('date-picker', 'true').forEach(datePicker => {
                 const state = this.getState(datePicker);
                 if (state && state.isOpen && !state.isInline) {
-                    if (!datePicker.contains(target)) {
+                    const isOutside = !datePicker.contains(target);
+
+                    // Don't close if clicking on calendar elements (date buttons, navigation, etc.)
+                    const isCalendarElement = target.closest('[data-calendar="true"]') ||
+                                            target.hasAttribute('data-calendar-date') ||
+                                            target.hasAttribute('data-calendar-nav') ||
+                                            target.hasAttribute('data-calendar-action') ||
+                                            target.hasAttribute('data-quick-selector');
+
+                    if (isOutside && !isCalendarElement) {
                         this.closeDropdown(datePicker);
                     }
                 }
@@ -227,18 +226,21 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
 
         // Listen for date selection events from calendar
         calendar.addEventListener('calendar:dateSelected', (event: any) => {
+            event.stopPropagation(); // Prevent bubbling to input handlers that could retoggle dropdown
             const detail = event.detail;
             this.handleDateSelected(datePicker, detail.selectedDate, detail.formattedDate);
         });
 
         // Listen for range selection events from calendar
         calendar.addEventListener('calendar:rangeSelected', (event: any) => {
+            event.stopPropagation(); // Prevent bubbling to input handlers that could retoggle dropdown
             const detail = event.detail;
             this.handleRangeSelected(datePicker, detail.startDate, detail.endDate, detail.formattedRange);
         });
 
         // Listen for calendar cleared event
         calendar.addEventListener('calendar:cleared', (event: any) => {
+            event.stopPropagation(); // Prevent bubbling to input handlers that could retoggle dropdown
             this.handleCalendarCleared(datePicker);
         });
     }
@@ -302,6 +304,7 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
         const state = this.getState(datePicker);
         if (!state || !state.isOpen || state.isInline) return;
 
+
         state.isOpen = false;
         this.setState(datePicker, state);
 
@@ -358,6 +361,7 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
         const state = this.getState(datePicker);
         if (!state) return;
 
+
         state.selectedDate = selectedDate;
         this.setState(datePicker, state);
 
@@ -373,15 +377,14 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
             hiddenInput.value = selectedDate ? DateUtils.formatDateForSubmission(selectedDate, state.format) : '';
         }
 
-        // Close dropdown if configured
-        if (state.closeOnSelect && !state.isInline) {
+        // Close dropdown if configured (only for single date mode, range mode handles closing in handleRangeSelected)
+        if (state.closeOnSelect && !state.isInline && !state.isRange) {
             AnimationUtils.createTimer(() => {
                 this.closeDropdown(datePicker);
             }, 150);
         }
 
-        // Update clear button visibility
-        this.updateClearButtonVisibility(datePicker);
+        // Clear button visibility is handled by template conditional rendering
 
         // Dispatch change event
         this.dispatchDatePickerEvent(datePicker, 'datepicker:change', {
@@ -396,6 +399,7 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
     private handleRangeSelected(datePicker: HTMLElement, startDate: string | null, endDate: string | null, formattedRange: string | null): void {
         const state = this.getState(datePicker);
         if (!state) return;
+
 
         state.startDate = startDate;
         state.endDate = endDate;
@@ -421,8 +425,7 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
             }, 150);
         }
 
-        // Update clear button visibility
-        this.updateClearButtonVisibility(datePicker);
+        // Clear button visibility is handled by template conditional rendering
 
         // Dispatch change event
         this.dispatchDatePickerEvent(datePicker, 'datepicker:change', {
@@ -467,25 +470,28 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
         // Clear calendar selection
         const calendar = DOMUtils.querySelector('[data-calendar="true"]', datePicker);
         if (calendar && (window as any).CalendarActions) {
-            const calendarActions = (window as any).CalendarActions.getInstance();
-            if (state.isRange) {
-                // Clear range selection
-                const calendarState = calendarActions.getCalendarState(calendar);
-                if (calendarState) {
-                    calendarState.startDate = null;
-                    calendarState.endDate = null;
-                    calendarState.rangeSelectionState = 'none';
-                    calendarActions.setState(calendar, calendarState);
-                    // Trigger re-render
-                    calendar.dispatchEvent(new CustomEvent('calendar:cleared'));
+            try {
+                const calendarActions = (window as any).CalendarActions.getInstance();
+                if (state.isRange) {
+                    // Clear range selection
+                    const calendarState = calendarActions.getCalendarState(calendar);
+                    if (calendarState) {
+                        calendarState.startDate = null;
+                        calendarState.endDate = null;
+                        calendarState.rangeSelectionState = 'none';
+                        calendarActions.setState(calendar, calendarState);
+                        // Trigger re-render
+                        calendar.dispatchEvent(new CustomEvent('calendar:cleared'));
+                    }
+                } else {
+                    calendarActions.setSelectedDate(calendar, null);
                 }
-            } else {
-                calendarActions.setSelectedDate(calendar, null);
+            } catch (error) {
+                console.warn('Calendar actions not available or failed:', error);
             }
         }
 
-        // Update clear button visibility
-        this.updateClearButtonVisibility(datePicker);
+        // Clear button visibility is handled by template conditional rendering
 
         // Close dropdown
         if (!state.isInline) {
@@ -511,30 +517,34 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
         // Update calendar
         const calendar = DOMUtils.querySelector('[data-calendar="true"]', datePicker);
         if (calendar && (window as any).CalendarActions) {
-            const calendarActions = (window as any).CalendarActions.getInstance();
+            try {
+                const calendarActions = (window as any).CalendarActions.getInstance();
 
-            if (state.isRange && startDate && endDate) {
-                // Set range dates
-                const calendarState = calendarActions.getCalendarState(calendar);
-                if (calendarState) {
-                    calendarState.startDate = DateUtils.formatDateString(startDate);
-                    calendarState.endDate = DateUtils.formatDateString(endDate);
-                    calendarState.rangeSelectionState = 'none';
-                    calendarActions.setState(calendar, calendarState);
+                if (state.isRange && startDate && endDate) {
+                    // Set range dates
+                    const calendarState = calendarActions.getCalendarState(calendar);
+                    if (calendarState) {
+                        calendarState.startDate = DateUtils.formatDateString(startDate);
+                        calendarState.endDate = DateUtils.formatDateString(endDate);
+                        calendarState.rangeSelectionState = 'none';
+                        calendarActions.setState(calendar, calendarState);
 
-                    // Trigger calendar update
-                    calendar.dispatchEvent(new CustomEvent('calendar:rangeSelected', {
-                        detail: {
-                            startDate: calendarState.startDate,
-                            endDate: calendarState.endDate,
-                            formattedRange: DateUtils.formatRangeForDisplay(calendarState.startDate, calendarState.endDate, state.displayFormat)
-                        }
-                    }));
+                        // Trigger calendar update
+                        calendar.dispatchEvent(new CustomEvent('calendar:rangeSelected', {
+                            detail: {
+                                startDate: calendarState.startDate,
+                                endDate: calendarState.endDate,
+                                formattedRange: DateUtils.formatRangeForDisplay(calendarState.startDate, calendarState.endDate, state.displayFormat)
+                            }
+                        }));
+                    }
+                } else if (selectedDate) {
+                    // Set single date
+                    const dateString = DateUtils.formatDateString(selectedDate);
+                    calendarActions.setSelectedDate(calendar, dateString);
                 }
-            } else if (selectedDate) {
-                // Set single date
-                const dateString = DateUtils.formatDateString(selectedDate);
-                calendarActions.setSelectedDate(calendar, dateString);
+            } catch (error) {
+                console.warn('Calendar actions not available or failed:', error);
             }
         }
     }
@@ -556,26 +566,17 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
             // Update calendar
             const calendar = DOMUtils.querySelector('[data-calendar="true"]', datePicker);
             if (calendar && (window as any).CalendarActions) {
-                const calendarActions = (window as any).CalendarActions.getInstance();
-                calendarActions.setSelectedDate(calendar, dateString);
+                try {
+                    const calendarActions = (window as any).CalendarActions.getInstance();
+                    calendarActions.setSelectedDate(calendar, dateString);
+                } catch (error) {
+                    console.warn('Calendar actions not available or failed:', error);
+                }
             }
         }
     }
 
-    /**
-     * Update clear button visibility
-     */
-    private updateClearButtonVisibility(datePicker: HTMLElement): void {
-        const clearBtn = DOMUtils.querySelector('[data-date-picker-clear]', datePicker) as HTMLElement;
-        if (!clearBtn) return;
-
-        const input = DOMUtils.querySelector('[data-date-picker-input]', datePicker) as HTMLInputElement;
-        if (input && input.value) {
-            clearBtn.style.display = '';
-        } else {
-            clearBtn.style.display = 'none';
-        }
-    }
+    // updateClearButtonVisibility method removed - visibility handled by template conditional rendering
 
 
 

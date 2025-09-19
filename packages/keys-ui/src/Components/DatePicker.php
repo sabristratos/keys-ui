@@ -21,7 +21,7 @@ class DatePicker extends Component
         public bool $closeOnSelect = true,
         public bool $showCalendarIcon = true,
         public bool $inline = false,
-        public bool $quickSelectors = false,
+        public bool|array $quickSelectors = false,
 
         // Calendar properties
         public string|Carbon|null $minDate = null,
@@ -74,10 +74,7 @@ class DatePicker extends Component
             }
         }
 
-        // Override icon right if calendar icon is shown
-        if ($this->showCalendarIcon && !$this->iconRight && !$this->customTrigger) {
-            $this->iconRight = 'heroicon-o-calendar';
-        }
+        // Note: Calendar icon is handled separately in template, not as iconRight
     }
 
     /**
@@ -247,7 +244,8 @@ class DatePicker extends Component
             if ($start && $end) {
                 return $start . ',' . $end;
             } elseif ($start) {
-                return $start . ',';
+                // Return just start date for incomplete range (no trailing comma)
+                return $start;
             } else {
                 return null;
             }
@@ -338,10 +336,10 @@ class DatePicker extends Component
         };
 
         $rightPadding = match ($this->size) {
-            'sm' => ($this->iconRight || $this->clearable || $this->showCalendarIcon) ? 'pr-8' : 'pr-3',
-            'md' => ($this->iconRight || $this->clearable || $this->showCalendarIcon) ? 'pr-10' : 'pr-3',
-            'lg' => ($this->iconRight || $this->clearable || $this->showCalendarIcon) ? 'pr-12' : 'pr-4',
-            default => ($this->iconRight || $this->clearable || $this->showCalendarIcon) ? 'pr-10' : 'pr-3'
+            'sm' => ($this->iconRight || $this->clearable || $this->showCalendarIcon) ? 'pr-12' : 'pr-3',
+            'md' => ($this->iconRight || $this->clearable || $this->showCalendarIcon) ? 'pr-14' : 'pr-3',
+            'lg' => ($this->iconRight || $this->clearable || $this->showCalendarIcon) ? 'pr-16' : 'pr-4',
+            default => ($this->iconRight || $this->clearable || $this->showCalendarIcon) ? 'pr-14' : 'pr-3'
         };
 
         $verticalPadding = match ($this->size) {
@@ -388,7 +386,13 @@ class DatePicker extends Component
      */
     public function getFilteredQuickSelectors(): array
     {
-        $selectors = $this->getQuickSelectors();
+        // If quickSelectors is false, return empty array
+        if ($this->quickSelectors === false) {
+            return [];
+        }
+
+        // If quickSelectors is true, use default selectors
+        $selectors = is_array($this->quickSelectors) ? $this->quickSelectors : $this->getQuickSelectors();
 
         if (!$this->isRange) {
             // Filter out range selectors for single date mode

@@ -104,10 +104,10 @@
 
 @if($multiple)
     @foreach($getSelectedValues() as $selectedValue)
-        <input type="hidden" name="{{ $name }}[]" value="{{ $selectedValue }}" class="select-hidden-input">
+        <input type="hidden" name="{{ $name }}[]" value="{{ $selectedValue }}" class="select-hidden-input" {{ $livewireAttributes ?? '' }}>
     @endforeach
 @else
-    <input type="hidden" name="{{ $name }}" value="{{ is_array($value) ? '' : $value }}" class="select-hidden-input">
+    <input type="hidden" name="{{ $name }}" value="{{ is_array($value) ? '' : $value }}" class="select-hidden-input" {{ $livewireAttributes ?? '' }}>
 @endif
 
 

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./quill-editor.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -298,6 +299,146 @@
 
 .scrollbar-thick::-webkit-scrollbar-thumb:hover {
     background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+}
+
+/* Gallery Component Styles */
+[data-gallery="true"] {
+    /* Ensure proper positioning for absolute elements */
+}
+
+.gallery-slide {
+    z-index: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.gallery-slide.active {
+    z-index: 2;
+}
+
+.gallery-thumbnail.active {
+    border-color: var(--color-brand-500);
+    transform: scale(1.05);
+}
+
+.gallery-thumbnail:hover {
+    transform: scale(1.02);
+}
+
+.gallery-thumbnail:focus {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+}
+
+.gallery-navigation button:hover {
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.gallery-autoplay-controls .play-icon.show,
+.gallery-autoplay-controls .pause-icon.show {
+    display: block;
+}
+
+.gallery-autoplay-controls .play-icon.hide,
+.gallery-autoplay-controls .pause-icon.hide {
+    display: none;
+}
+
+/* Touch-friendly navigation on mobile */
+@media (max-width: 768px) {
+    .gallery-navigation button {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .gallery-thumbnails {
+        gap: 0.5rem;
+    }
+
+    .gallery-thumbnail {
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
+/* Ecommerce-specific styles */
+.gallery-ecommerce .gallery-main {
+    min-height: 400px;
+}
+
+/* Side thumbnail layout adjustments */
+.gallery-container:has(.gallery-thumbnails) .gallery-main-container {
+    flex: 1;
+}
+
+[data-gallery-type="thumbnail"] .gallery-thumbnails {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+[data-gallery-type="thumbnail"] .gallery-thumbnails::-webkit-scrollbar {
+    display: none;
+}
+
+/* Focus indicators for gallery navigation */
+[data-gallery="true"]:focus {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+}
+
+/* Loading and error states */
+.gallery-image-loading {
+    position: relative;
+}
+
+.gallery-image-loading::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.gallery-image-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2rem;
+    height: 2rem;
+    margin: -1rem 0 0 -1rem;
+    border: 2px solid var(--color-neutral-200);
+    border-top-color: var(--color-brand-500);
+    border-radius: 50%;
+    animation: gallery-spin 1s linear infinite;
+    z-index: 11;
+}
+
+.gallery-image-error {
+    position: relative;
+}
+
+.gallery-error-placeholder {
+    z-index: 10;
+}
+
+.gallery-thumbnail-error {
+    position: relative;
+}
+
+.gallery-thumbnail-error-placeholder {
+    z-index: 10;
+}
+
+/* Loading animation */
+@keyframes gallery-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 

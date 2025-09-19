@@ -1,22 +1,25 @@
 /**
- * EditorActions - Handles editor functionality and toolbar interactions
+ * EditorActions - Handles Quill.js editor initialization and form integration
  *
  * Provides functionality for:
- * - Toolbar button event handling with delegation
- * - Document editing commands (bold, italic, lists, etc.)
- * - Content synchronization between contenteditable and hidden input
- * - Toggle state management for formatting buttons
+ * - Quill.js editor initialization with custom configuration
+ * - Content synchronization between Quill editor and hidden input
+ * - Form integration and value management
+ * - Dynamic editor creation and cleanup
  */
 
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
 import { BaseActionClass } from './utils/BaseActionClass';
 import { DOMUtils } from './utils/DOMUtils';
-import { EventUtils } from './utils/EventUtils';
 
 interface EditorState {
-    contentElement: HTMLElement;
+    quillInstance: Quill;
+    containerElement: HTMLElement;
     hiddenInput: HTMLInputElement | null;
-    toolbarButtons: HTMLButtonElement[];
-    isActive: boolean;
+    config: any;
+    liveRegion: HTMLElement | null;
+    lastAnnouncementTime: number;
 }
 
 export class EditorActions extends BaseActionClass<EditorState> {
@@ -24,43 +27,22 @@ export class EditorActions extends BaseActionClass<EditorState> {
      * Initialize editor elements - required by BaseActionClass
      */
     protected initializeElements(): void {
-        this.processEditors();
+        this.processQuillEditors();
     }
 
     /**
-     * Process all existing editors on the page
+     * Process all existing Quill editors on the page
      */
-    private processEditors(): void {
-        const editors = DOMUtils.findByDataAttribute('editor', 'true');
-        editors.forEach(editor => this.initializeEditor(editor));
+    private processQuillEditors(): void {
+        const editors = DOMUtils.findByDataAttribute('quill-editor', 'true');
+        editors.forEach(editor => this.initializeQuillEditor(editor));
     }
 
     /**
-     * Bind event listeners using event delegation - required by BaseActionClass
+     * Bind event listeners - minimal for Quill integration
      */
     protected bindEventListeners(): void {
-        // Handle toolbar button clicks
-        EventUtils.handleDelegatedClick(
-            '[data-editor-command]',
-            (button, event) => this.handleToolbarClick(button, event)
-        );
-
-        // Handle content changes to sync with hidden input
-        EventUtils.handleDelegatedInput(
-            '[data-editor-content="true"]',
-            (element, event) => this.handleContentChange(element as HTMLElement, event)
-        );
-
-        // Handle selection changes to update button states
-        EventUtils.addEventListener(document, 'selectionchange', () => {
-            this.updateToolbarStates();
-        });
-
-        // Handle focus/blur to manage editor state
-        EventUtils.handleDelegatedFocus(
-            '[data-editor-content="true"]',
-            (element, event) => this.handleEditorFocus(element, event)
-        );
+        // Quill handles most events internally, minimal setup needed
     }
 
     /**
@@ -72,163 +54,130 @@ export class EditorActions extends BaseActionClass<EditorState> {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as HTMLElement;
 
-                    // Check if the added node is an editor
-                    if (DOMUtils.hasDataAttribute(element, 'editor', 'true')) {
-                        this.initializeEditor(element);
+                    // Check if the added node is a Quill editor
+                    if (DOMUtils.hasDataAttribute(element, 'quill-editor', 'true')) {
+                        this.initializeQuillEditor(element);
                     }
 
-                    // Check for editors within the added node
-                    const editors = DOMUtils.findByDataAttribute('editor', 'true', element);
-                    editors.forEach(editor => this.initializeEditor(editor));
+                    // Check for Quill editors within the added node
+                    const editors = DOMUtils.findByDataAttribute('quill-editor', 'true', element);
+                    editors.forEach(editor => this.initializeQuillEditor(editor));
                 }
             });
         });
     }
 
     /**
-     * Initialize a single editor element
+     * Initialize a single Quill editor element
      */
-    private initializeEditor(editor: HTMLElement): void {
-        const editorId = DOMUtils.getDataAttribute(editor, 'editor-id');
-        if (!editorId) return;
+    private initializeQuillEditor(editor: HTMLElement): void {
+        console.log('EditorActions: Initializing Quill editor', editor);
 
-        const contentElement = DOMUtils.querySelector(`[data-editor-content="true"]`, editor);
-        const hiddenInput = DOMUtils.querySelector(`[data-editor-input="true"]`, editor) as HTMLInputElement;
-        const toolbarButtons = DOMUtils.querySelectorAll('[data-editor-command]', editor) as HTMLButtonElement[];
+        const editorId = DOMUtils.getDataAttribute(editor, 'editorId');
+        if (!editorId) {
+            console.warn('EditorActions: No editor-id found');
+            return;
+        }
 
-        if (!contentElement) return;
+        const containerElement = DOMUtils.querySelector(`[data-quill-container="true"]`, editor);
+        const hiddenInput = DOMUtils.querySelector(`[data-quill-input="true"]`, editor) as HTMLInputElement;
+        const liveRegion = DOMUtils.querySelector(`[data-quill-live-region="true"]`, editor) as HTMLElement;
+
+        if (!containerElement) {
+            console.warn('EditorActions: No Quill container element found');
+            return;
+        }
+
+        // Get configuration from data attribute
+        const configData = DOMUtils.getDataAttribute(containerElement as HTMLElement, 'quillConfig');
+        const initialValue = DOMUtils.getDataAttribute(containerElement as HTMLElement, 'quillValue');
+
+        let config: any = {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'header': [1, 2, false] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        };
+
+        if (configData) {
+            try {
+                const parsedConfig = JSON.parse(configData);
+                config = { ...config, ...parsedConfig };
+            } catch (e) {
+                console.warn('EditorActions: Invalid Quill config JSON', e);
+                console.warn('EditorActions: Using default config');
+            }
+        }
+
+        console.log('EditorActions: Final Quill config', config);
+        console.log('EditorActions: Container element', containerElement);
+
+        // Initialize Quill instance
+        let quillInstance: Quill;
+        try {
+            quillInstance = new Quill(containerElement as HTMLElement, config);
+            console.log('EditorActions: Quill instance created successfully', quillInstance);
+        } catch (error) {
+            console.error('EditorActions: Failed to create Quill instance', error);
+            return;
+        }
+
+        // Set initial content if provided
+        if (initialValue) {
+            try {
+                // Try to parse as HTML first
+                quillInstance.root.innerHTML = initialValue;
+            } catch (e) {
+                console.warn('EditorActions: Error setting initial value', e);
+            }
+        }
 
         const state: EditorState = {
-            contentElement: contentElement as HTMLElement,
+            quillInstance,
+            containerElement: containerElement as HTMLElement,
             hiddenInput,
-            toolbarButtons,
-            isActive: false
+            config,
+            liveRegion,
+            lastAnnouncementTime: 0
         };
 
         this.setState(editor, state);
 
-        // Initialize content if hidden input has value
-        if (hiddenInput && hiddenInput.value && !contentElement.innerHTML.trim()) {
-            contentElement.innerHTML = hiddenInput.value;
-        }
+        // Set up content change listener for form synchronization
+        this.setupContentSync(state);
+
+        // Set up accessibility features
+        this.setupAccessibilityFeatures(state);
+
+        console.log('EditorActions: Quill editor initialized successfully');
     }
 
     /**
-     * Handle toolbar button clicks
+     * Set up content synchronization between Quill and hidden input
      */
-    private handleToolbarClick(button: HTMLButtonElement, event: MouseEvent): void {
-        event.preventDefault();
-
-        const command = DOMUtils.getDataAttribute(button, 'editor-command');
-        const value = DOMUtils.getDataAttribute(button, 'editor-value');
-        const isToggle = DOMUtils.hasDataAttribute(button, 'editor-toggle', 'true');
-
-        if (!command) return;
-
-        const editor = DOMUtils.findClosest(button, '[data-editor="true"]');
-        if (!editor) return;
-
-        const state = this.getState(editor);
-        if (!state) return;
-
-        // Focus the content area
-        DOMUtils.focus(state.contentElement);
-
-        // Handle special commands
-        if (command === 'createLink') {
-            this.handleCreateLink();
-        } else {
-            // Execute document command
-            if (value) {
-                document.execCommand(command, false, value);
-            } else {
-                document.execCommand(command, false);
-            }
-        }
-
-        // Update toolbar states
-        this.updateToolbarStates();
-
-        // Sync content with hidden input
-        this.syncContentToInput(state);
-    }
-
-    /**
-     * Handle content changes in the editor
-     */
-    private handleContentChange(element: HTMLElement, event: InputEvent): void {
-        const editor = DOMUtils.findClosest(element, '[data-editor="true"]');
-        if (!editor) return;
-
-        const state = this.getState(editor);
-        if (!state) return;
-
-        // Sync content to hidden input
-        this.syncContentToInput(state);
-
-        // Update toolbar states after content change
-        setTimeout(() => this.updateToolbarStates(), 10);
-    }
-
-    /**
-     * Handle editor focus
-     */
-    private handleEditorFocus(element: HTMLElement, event: FocusEvent): void {
-        const editor = DOMUtils.findClosest(element, '[data-editor="true"]');
-        if (!editor) return;
-
-        const state = this.getState(editor);
-        if (!state) return;
-
-        state.isActive = true;
-        this.updateToolbarStates();
-    }
-
-    /**
-     * Sync contenteditable content to hidden input
-     */
-    private syncContentToInput(state: EditorState): void {
-        if (state.hiddenInput) {
-            state.hiddenInput.value = state.contentElement.innerHTML;
-        }
-    }
-
-    /**
-     * Update toolbar button states based on current selection
-     */
-    private updateToolbarStates(): void {
-        // Get all active editors
-        this.stateManager.forEach((state, editor) => {
-            if (!state.isActive) return;
-
-            state.toolbarButtons.forEach(button => {
-                const command = DOMUtils.getDataAttribute(button, 'editor-command');
-                const isToggle = DOMUtils.hasDataAttribute(button, 'editor-toggle', 'true');
-
-                if (!command || !isToggle) return;
-
-                try {
-                    const isActive = document.queryCommandState(command);
-                    DOMUtils.toggleClass(button, 'active', isActive);
-                } catch (e) {
-                    // Some commands might not be supported, ignore errors
-                }
-            });
+    private setupContentSync(state: EditorState): void {
+        // Listen to Quill text-change events
+        state.quillInstance.on('text-change', () => {
+            this.syncQuillToInput(state);
         });
+
+        // Initial sync
+        this.syncQuillToInput(state);
     }
 
     /**
-     * Handle link creation with user input
+     * Sync Quill content to hidden input
      */
-    private handleCreateLink(): void {
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return;
-
-        const selectedText = selection.toString();
-        const url = prompt('Enter URL:', selectedText.startsWith('http') ? selectedText : 'https://');
-
-        if (url) {
-            document.execCommand('createLink', false, url);
+    private syncQuillToInput(state: EditorState): void {
+        if (state.hiddenInput) {
+            // Get HTML content from Quill
+            state.hiddenInput.value = state.quillInstance.root.innerHTML;
         }
     }
 
@@ -237,7 +186,7 @@ export class EditorActions extends BaseActionClass<EditorState> {
      */
     public getEditorContent(editor: HTMLElement): string {
         const state = this.getState(editor);
-        return state ? state.contentElement.innerHTML : '';
+        return state ? state.quillInstance.root.innerHTML : '';
     }
 
     /**
@@ -247,15 +196,19 @@ export class EditorActions extends BaseActionClass<EditorState> {
         const state = this.getState(editor);
         if (!state) return;
 
-        state.contentElement.innerHTML = content;
-        this.syncContentToInput(state);
+        state.quillInstance.root.innerHTML = content;
+        this.syncQuillToInput(state);
     }
 
     /**
      * Clear editor content
      */
     public clearEditor(editor: HTMLElement): void {
-        this.setEditorContent(editor, '');
+        const state = this.getState(editor);
+        if (!state) return;
+
+        state.quillInstance.setText('');
+        this.syncQuillToInput(state);
     }
 
     /**
@@ -264,45 +217,242 @@ export class EditorActions extends BaseActionClass<EditorState> {
     public focusEditor(editor: HTMLElement): void {
         const state = this.getState(editor);
         if (state) {
-            DOMUtils.focus(state.contentElement);
-            state.isActive = true;
+            state.quillInstance.focus();
         }
     }
 
     /**
-     * Check if editor is focused/active
+     * Get Quill instance for advanced usage
      */
-    public isEditorActive(editor: HTMLElement): boolean {
+    public getQuillInstance(editor: HTMLElement): Quill | null {
         const state = this.getState(editor);
-        return state ? state.isActive : false;
+        return state ? state.quillInstance : null;
     }
 
     /**
-     * Execute command on specific editor
+     * Set up accessibility features for the editor
      */
-    public execCommand(editor: HTMLElement, command: string, value?: string): void {
-        const state = this.getState(editor);
-        if (!state) return;
+    private setupAccessibilityFeatures(state: EditorState): void {
+        // Add keyboard navigation enhancements
+        this.setupKeyboardNavigation(state);
 
-        DOMUtils.focus(state.contentElement);
+        // Set up content change announcements
+        this.setupContentAnnouncements(state);
 
-        if (value) {
-            document.execCommand(command, false, value);
-        } else {
-            document.execCommand(command, false);
+        // Add toolbar accessibility enhancements
+        this.setupToolbarAccessibility(state);
+    }
+
+    /**
+     * Set up keyboard navigation enhancements
+     */
+    private setupKeyboardNavigation(state: EditorState): void {
+        // Add keyboard shortcuts information
+        state.quillInstance.keyboard.addBinding({
+            key: 'F1',
+            handler: () => {
+                this.announceKeyboardHelp(state);
+                return false;
+            }
+        });
+
+        // Enhance focus management
+        state.containerElement.addEventListener('focus', () => {
+            if (state.liveRegion) {
+                this.announceToLiveRegion(state, 'Rich text editor focused. Press F1 for keyboard shortcuts.');
+            }
+        });
+    }
+
+    /**
+     * Set up content change announcements for screen readers
+     */
+    private setupContentAnnouncements(state: EditorState): void {
+        let typingTimer: number | null = null;
+        const typingDelay = 2000; // 2 second delay after typing stops
+
+        state.quillInstance.on('text-change', (delta, oldDelta, source) => {
+            if (source === 'user') {
+                // Clear previous timer
+                if (typingTimer) {
+                    clearTimeout(typingTimer);
+                }
+
+                // Set new timer for announcement
+                typingTimer = window.setTimeout(() => {
+                    const text = state.quillInstance.getText().trim();
+                    const wordCount = text ? text.split(/\s+/).length : 0;
+
+                    if (wordCount > 0) {
+                        this.announceToLiveRegion(state, `${wordCount} words written`);
+                    }
+                }, typingDelay);
+            }
+        });
+
+        // Announce formatting changes
+        state.quillInstance.on('selection-change', (range, oldRange, source) => {
+            if (range && source === 'user') {
+                const formats = state.quillInstance.getFormat(range);
+                this.announceFormattingChanges(state, formats);
+            }
+        });
+    }
+
+    /**
+     * Set up toolbar accessibility enhancements
+     */
+    private setupToolbarAccessibility(state: EditorState): void {
+        const toolbar = state.containerElement.querySelector('.ql-toolbar');
+        if (!toolbar) return;
+
+        // Add toolbar accessibility attributes
+        toolbar.setAttribute('role', 'toolbar');
+        toolbar.setAttribute('aria-label', 'Rich text editor toolbar');
+
+        // Enhance button accessibility
+        const buttons = toolbar.querySelectorAll('button');
+        buttons.forEach((button, index) => {
+            // Add accessible names based on Quill button classes
+            this.enhanceButtonAccessibility(button as HTMLButtonElement);
+
+            // Add tabindex management for roving tabindex pattern
+            button.setAttribute('tabindex', index === 0 ? '0' : '-1');
+        });
+
+        // Add keyboard navigation for toolbar
+        toolbar.addEventListener('keydown', (e) => {
+            this.handleToolbarKeyboard(e, buttons);
+        });
+    }
+
+    /**
+     * Enhance individual button accessibility
+     */
+    private enhanceButtonAccessibility(button: HTMLButtonElement): void {
+        const buttonLabels: Record<string, string> = {
+            'ql-bold': 'Bold',
+            'ql-italic': 'Italic',
+            'ql-underline': 'Underline',
+            'ql-strike': 'Strikethrough',
+            'ql-link': 'Insert link',
+            'ql-clean': 'Remove formatting',
+            'ql-list[value="ordered"]': 'Numbered list',
+            'ql-list[value="bullet"]': 'Bullet list',
+            'ql-header[value="1"]': 'Heading 1',
+            'ql-header[value="2"]': 'Heading 2'
+        };
+
+        // Find matching label
+        for (const [className, label] of Object.entries(buttonLabels)) {
+            if (button.classList.contains(className.split('[')[0]) ||
+                button.matches(`[${className.split('[')[1]}`)) {
+                button.setAttribute('aria-label', label);
+                button.setAttribute('title', label);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Handle toolbar keyboard navigation
+     */
+    private handleToolbarKeyboard(e: KeyboardEvent, buttons: NodeListOf<Element>): void {
+        const currentIndex = Array.from(buttons).findIndex(btn => btn === document.activeElement);
+
+        if (currentIndex === -1) return;
+
+        let nextIndex = currentIndex;
+
+        switch (e.key) {
+            case 'ArrowLeft':
+            case 'ArrowUp':
+                nextIndex = currentIndex > 0 ? currentIndex - 1 : buttons.length - 1;
+                e.preventDefault();
+                break;
+            case 'ArrowRight':
+            case 'ArrowDown':
+                nextIndex = currentIndex < buttons.length - 1 ? currentIndex + 1 : 0;
+                e.preventDefault();
+                break;
+            case 'Home':
+                nextIndex = 0;
+                e.preventDefault();
+                break;
+            case 'End':
+                nextIndex = buttons.length - 1;
+                e.preventDefault();
+                break;
+            default:
+                return;
         }
 
-        this.updateToolbarStates();
-        this.syncContentToInput(state);
+        // Update tabindex and focus
+        buttons[currentIndex].setAttribute('tabindex', '-1');
+        buttons[nextIndex].setAttribute('tabindex', '0');
+        (buttons[nextIndex] as HTMLElement).focus();
+    }
+
+    /**
+     * Announce text to the live region
+     */
+    private announceToLiveRegion(state: EditorState, message: string): void {
+        if (!state.liveRegion) return;
+
+        // Throttle announcements to avoid overwhelming screen readers
+        const now = Date.now();
+        if (now - state.lastAnnouncementTime < 1000) return;
+
+        state.liveRegion.textContent = message;
+        state.lastAnnouncementTime = now;
+
+        // Clear message after a delay to allow for new announcements
+        setTimeout(() => {
+            if (state.liveRegion) {
+                state.liveRegion.textContent = '';
+            }
+        }, 3000);
+    }
+
+    /**
+     * Announce formatting changes
+     */
+    private announceFormattingChanges(state: EditorState, formats: any): void {
+        const activeFormats = Object.keys(formats).filter(key => formats[key]);
+
+        if (activeFormats.length > 0) {
+            const formatNames = activeFormats.map(format => {
+                switch (format) {
+                    case 'bold': return 'bold';
+                    case 'italic': return 'italic';
+                    case 'underline': return 'underlined';
+                    case 'strike': return 'strikethrough';
+                    case 'header': return `heading ${formats[format]}`;
+                    case 'list': return `${formats[format]} list`;
+                    default: return format;
+                }
+            });
+
+            this.announceToLiveRegion(state, `Formatting: ${formatNames.join(', ')}`);
+        }
+    }
+
+    /**
+     * Announce keyboard shortcuts help
+     */
+    private announceKeyboardHelp(state: EditorState): void {
+        const helpText = 'Keyboard shortcuts: Ctrl+B for bold, Ctrl+I for italic, Ctrl+U for underline, Ctrl+K for link. Use arrow keys to navigate toolbar buttons.';
+        this.announceToLiveRegion(state, helpText);
     }
 
     /**
      * Clean up EditorActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // Clear all editor states
+        // Clean up Quill instances
         this.stateManager.forEach((state) => {
-            state.isActive = false;
+            // Quill doesn't have a destroy method, but we can remove event listeners
+            state.quillInstance.off('text-change');
         });
     }
 }

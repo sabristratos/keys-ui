@@ -1,0 +1,799 @@
+/**
+ * Quill Editor Tailwind CSS Integration for Keys UI
+ * Using @layer directive and @apply for proper Tailwind organization
+ * Aligned with Button component design system patterns
+ */
+
+@layer components {
+  /* Base Quill Editor Container */
+  .quill-editor {
+    @apply focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2 transition-all duration-200;
+  }
+
+  /* Editor Container Base */
+  .quill-container {
+    @apply border border-border bg-surface overflow-hidden;
+  }
+
+  /* Size-based border radius variants */
+  .quill-container-xs { @apply rounded-sm; }
+  .quill-container-sm { @apply rounded-md; }
+  .quill-container-md { @apply rounded-md; }
+  .quill-container-lg { @apply rounded-lg; }
+  .quill-container-xl { @apply rounded-lg; }
+
+  /* Disabled state */
+  .quill-editor-disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  .quill-editor-disabled .quill-container {
+    @apply pointer-events-none;
+  }
+
+  .quill-editor-disabled .ql-toolbar {
+    @apply pointer-events-none;
+  }
+
+  /* Error state */
+  .quill-editor-error .quill-container {
+    @apply border-danger;
+  }
+
+  .quill-editor-error:focus-within {
+    @apply ring-danger;
+  }
+
+  .quill-editor-error .ql-toolbar {
+    @apply border-b-danger;
+  }
+
+  /* Loading state */
+  .quill-editor-loading {
+    @apply relative;
+  }
+
+  .quill-editor-loading .quill-container {
+    @apply pointer-events-none;
+  }
+
+  .quill-editor-loading .ql-toolbar {
+    @apply pointer-events-none;
+  }
+
+  /* Loading overlay */
+  .quill-editor-loading::after {
+    @apply absolute inset-0 bg-surface/50 backdrop-blur-sm rounded-md flex items-center justify-center;
+    content: '';
+    z-index: 10;
+  }
+
+  /* Loading spinner container */
+  .quill-editor-loading .loading-container {
+    @apply absolute inset-0 flex items-center justify-center;
+    z-index: 11;
+  }
+
+  /* Quill Toolbar Styling */
+  .quill-editor .ql-toolbar {
+    @apply border-b border-border bg-surface;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+  }
+
+  /* Toolbar Size Variants */
+  .quill-editor-xs .ql-toolbar { @apply p-1; }
+  .quill-editor-sm .ql-toolbar { @apply p-2; }
+  .quill-editor-md .ql-toolbar { @apply p-2; }
+  .quill-editor-lg .ql-toolbar { @apply p-3; }
+  .quill-editor-xl .ql-toolbar { @apply p-3; }
+
+  /* Responsive Toolbar Layout */
+  @media (max-width: 768px) {
+    /* Increase padding for better touch interaction */
+    .quill-editor-xs .ql-toolbar { @apply p-2; }
+    .quill-editor-sm .ql-toolbar { @apply p-2.5; }
+    .quill-editor-md .ql-toolbar { @apply p-3; }
+    .quill-editor-lg .ql-toolbar { @apply p-3.5; }
+    .quill-editor-xl .ql-toolbar { @apply p-4; }
+
+    /* Allow toolbar to wrap on small screens */
+    .quill-editor .ql-toolbar {
+      @apply flex-wrap;
+    }
+  }
+
+  @media (max-width: 480px) {
+    /* Compact padding for very small screens */
+    .quill-editor-xs .ql-toolbar { @apply p-1.5; }
+    .quill-editor-sm .ql-toolbar { @apply p-2; }
+    .quill-editor-md .ql-toolbar { @apply p-2; }
+    .quill-editor-lg .ql-toolbar { @apply p-2.5; }
+    .quill-editor-xl .ql-toolbar { @apply p-3; }
+  }
+
+  /* Quill Container Styling */
+  .quill-editor .ql-container {
+    @apply text-foreground bg-surface;
+    border: none;
+    font-family: inherit;
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+  }
+
+  /* Quill Editor Content Area */
+  .quill-editor .ql-editor {
+    @apply text-foreground bg-transparent;
+    line-height: 1.6;
+    min-height: inherit;
+    border: none;
+  }
+
+  /* Editor Content Size Variants */
+  .quill-editor-xs .ql-editor { @apply p-2 text-xs; }
+  .quill-editor-sm .ql-editor { @apply p-3 text-sm; }
+  .quill-editor-md .ql-editor { @apply p-3 text-sm; }
+  .quill-editor-lg .ql-editor { @apply p-4 text-base; }
+  .quill-editor-xl .ql-editor { @apply p-4 text-lg; }
+
+  /* Responsive Editor Content */
+  @media (max-width: 768px) {
+    /* Adjust padding and typography for mobile */
+    .quill-editor-xs .ql-editor { @apply p-2.5 text-sm; }
+    .quill-editor-sm .ql-editor { @apply p-3 text-sm; }
+    .quill-editor-md .ql-editor { @apply p-3.5 text-base; }
+    .quill-editor-lg .ql-editor { @apply p-4 text-base; }
+    .quill-editor-xl .ql-editor { @apply p-4.5 text-lg; }
+
+    /* Better line height for mobile reading */
+    .quill-editor .ql-editor {
+      line-height: 1.7;
+    }
+  }
+
+  @media (max-width: 480px) {
+    /* Compact padding for small screens */
+    .quill-editor-xs .ql-editor { @apply p-2 text-sm; }
+    .quill-editor-sm .ql-editor { @apply p-2.5 text-sm; }
+    .quill-editor-md .ql-editor { @apply p-3 text-base; }
+    .quill-editor-lg .ql-editor { @apply p-3.5 text-base; }
+    .quill-editor-xl .ql-editor { @apply p-4 text-lg; }
+  }
+
+  /* Toolbar Button Base Styling - Aligned with Button Component */
+  .quill-editor .ql-toolbar button {
+    @apply inline-flex items-center justify-center rounded-sm text-foreground transition-all duration-200;
+    @apply hover:bg-surface active:bg-border;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1;
+    padding: 0;
+    border: none;
+    background: transparent;
+    margin: 0;
+  }
+
+  /* Toolbar Button Size Variants - Matching Button Component Scale */
+  .quill-editor-xs .ql-toolbar button { @apply w-5 h-5; }
+  .quill-editor-sm .ql-toolbar button { @apply w-6 h-6; }
+  .quill-editor-md .ql-toolbar button { @apply w-7 h-7; }
+  .quill-editor-lg .ql-toolbar button { @apply w-8 h-8; }
+  .quill-editor-xl .ql-toolbar button { @apply w-9 h-9; }
+
+  /* Mobile Touch-Friendly Enhancements */
+  @media (max-width: 768px) {
+    /* Increase button size for better touch interaction */
+    .quill-editor-xs .ql-toolbar button { @apply w-7 h-7; }
+    .quill-editor-sm .ql-toolbar button { @apply w-8 h-8; }
+    .quill-editor-md .ql-toolbar button { @apply w-9 h-9; }
+    .quill-editor-lg .ql-toolbar button { @apply w-10 h-10; }
+    .quill-editor-xl .ql-toolbar button { @apply w-11 h-11; }
+
+    /* Add minimum touch target size (44px iOS / 48px Android) */
+    .quill-editor .ql-toolbar button {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
+
+  /* Toolbar Button States */
+  .quill-editor .ql-toolbar button:hover {
+    @apply bg-surface;
+  }
+
+  .quill-editor .ql-toolbar button.ql-active {
+    @apply bg-brand text-foreground-brand;
+  }
+
+  /* Toolbar Button Icons */
+  .quill-editor .ql-toolbar button svg {
+    @apply fill-current;
+  }
+
+  /* Icon Size Variants */
+  .quill-editor-xs .ql-toolbar button svg { @apply w-3 h-3; }
+  .quill-editor-sm .ql-toolbar button svg { @apply w-3.5 h-3.5; }
+  .quill-editor-md .ql-toolbar button svg { @apply w-4 h-4; }
+  .quill-editor-lg .ql-toolbar button svg { @apply w-4 h-4; }
+  .quill-editor-xl .ql-toolbar button svg { @apply w-5 h-5; }
+
+  /* Responsive Icon Sizing for Touch Devices */
+  @media (max-width: 768px) {
+    /* Slightly larger icons for better visibility on mobile */
+    .quill-editor-xs .ql-toolbar button svg { @apply w-3.5 h-3.5; }
+    .quill-editor-sm .ql-toolbar button svg { @apply w-4 h-4; }
+    .quill-editor-md .ql-toolbar button svg { @apply w-4.5 h-4.5; }
+    .quill-editor-lg .ql-toolbar button svg { @apply w-5 h-5; }
+    .quill-editor-xl .ql-toolbar button svg { @apply w-5.5 h-5.5; }
+  }
+
+  /* Toolbar Groups */
+  .quill-editor .ql-toolbar .ql-formats {
+    margin-right: 0;
+  }
+
+  .quill-editor-xs .ql-toolbar .ql-formats { @apply mr-1.5; }
+  .quill-editor-sm .ql-toolbar .ql-formats { @apply mr-2; }
+  .quill-editor-md .ql-toolbar .ql-formats { @apply mr-2; }
+  .quill-editor-lg .ql-toolbar .ql-formats { @apply mr-3; }
+  .quill-editor-xl .ql-toolbar .ql-formats { @apply mr-3; }
+
+  .quill-editor .ql-toolbar .ql-formats:last-child {
+    margin-right: 0;
+  }
+
+  /* Responsive Toolbar Groups Spacing */
+  @media (max-width: 768px) {
+    /* Adjust group spacing for mobile */
+    .quill-editor-xs .ql-toolbar .ql-formats { @apply mr-2; }
+    .quill-editor-sm .ql-toolbar .ql-formats { @apply mr-2.5; }
+    .quill-editor-md .ql-toolbar .ql-formats { @apply mr-3; }
+    .quill-editor-lg .ql-toolbar .ql-formats { @apply mr-3.5; }
+    .quill-editor-xl .ql-toolbar .ql-formats { @apply mr-4; }
+
+    /* Add bottom margin when wrapping */
+    .quill-editor .ql-toolbar .ql-formats {
+      @apply mb-1;
+    }
+  }
+
+  @media (max-width: 480px) {
+    /* Tighter spacing on very small screens */
+    .quill-editor-xs .ql-toolbar .ql-formats { @apply mr-1.5; }
+    .quill-editor-sm .ql-toolbar .ql-formats { @apply mr-2; }
+    .quill-editor-md .ql-toolbar .ql-formats { @apply mr-2; }
+    .quill-editor-lg .ql-toolbar .ql-formats { @apply mr-2.5; }
+    .quill-editor-xl .ql-toolbar .ql-formats { @apply mr-3; }
+  }
+
+  /* Dropdown Picker Styling */
+  .quill-editor .ql-toolbar .ql-picker {
+    @apply text-foreground;
+  }
+
+  .quill-editor .ql-toolbar .ql-picker-label {
+    @apply text-foreground border-none;
+    height: inherit;
+    line-height: inherit;
+  }
+
+  /* Picker Label Size Variants */
+  .quill-editor-xs .ql-toolbar .ql-picker-label { @apply px-1 text-xs; }
+  .quill-editor-sm .ql-toolbar .ql-picker-label { @apply px-1.5 text-sm; }
+  .quill-editor-md .ql-toolbar .ql-picker-label { @apply px-1.5 text-sm; }
+  .quill-editor-lg .ql-toolbar .ql-picker-label { @apply px-2 text-base; }
+  .quill-editor-xl .ql-toolbar .ql-picker-label { @apply px-2 text-lg; }
+
+  /* Dropdown Options */
+  .quill-editor .ql-toolbar .ql-picker-options {
+    @apply bg-surface border border-border rounded-md shadow-md;
+    z-index: 1000;
+  }
+
+  .quill-editor .ql-toolbar .ql-picker-item {
+    @apply hover:bg-surface;
+  }
+
+  .quill-editor .ql-toolbar .ql-picker-item.ql-selected {
+    @apply bg-brand text-foreground-brand;
+  }
+
+  /* Placeholder Styling */
+  .quill-editor .ql-editor.ql-blank::before {
+    @apply text-muted;
+    font-style: normal;
+  }
+
+  /* Content Typography - Keys UI Scale Aligned */
+  /* Base Typography - Inherits from editor size */
+  .quill-editor .ql-editor p {
+    @apply text-foreground;
+    margin: 0.5rem 0;
+    font-size: inherit;
+  }
+
+  .quill-editor .ql-editor blockquote {
+    @apply border-l-4 border-border pl-4 text-muted italic;
+    margin: 1rem 0;
+    font-size: inherit;
+  }
+
+  .quill-editor .ql-editor ul,
+  .quill-editor .ql-editor ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+    font-size: inherit;
+  }
+
+  .quill-editor .ql-editor li {
+    @apply text-foreground;
+    margin: 0.25rem 0;
+    font-size: inherit;
+  }
+
+  .quill-editor .ql-editor a {
+    @apply text-brand underline hover:opacity-80;
+  }
+
+  .quill-editor .ql-editor strong {
+    @apply font-semibold;
+  }
+
+  .quill-editor .ql-editor em {
+    @apply italic;
+  }
+
+  /* Size-Specific Heading Typography */
+  /* XS Editor Typography */
+  .quill-editor-xs .ql-editor h1 {
+    @apply text-sm font-bold text-foreground;
+    line-height: 1.3;
+    margin: 0.75rem 0 0.25rem 0;
+  }
+
+  .quill-editor-xs .ql-editor h2 {
+    @apply text-xs font-semibold text-foreground;
+    line-height: 1.4;
+    margin: 0.5rem 0 0.25rem 0;
+  }
+
+  .quill-editor-xs .ql-editor h3 {
+    @apply text-xs font-medium text-foreground;
+    line-height: 1.4;
+    margin: 0.5rem 0 0.125rem 0;
+  }
+
+  /* SM Editor Typography */
+  .quill-editor-sm .ql-editor h1 {
+    @apply text-lg font-bold text-foreground;
+    line-height: 1.3;
+    margin: 0.75rem 0 0.375rem 0;
+  }
+
+  .quill-editor-sm .ql-editor h2 {
+    @apply text-base font-semibold text-foreground;
+    line-height: 1.4;
+    margin: 0.625rem 0 0.25rem 0;
+  }
+
+  .quill-editor-sm .ql-editor h3 {
+    @apply text-sm font-semibold text-foreground;
+    line-height: 1.4;
+    margin: 0.5rem 0 0.25rem 0;
+  }
+
+  /* MD Editor Typography */
+  .quill-editor-md .ql-editor h1 {
+    @apply text-xl font-bold text-foreground;
+    line-height: 1.2;
+    margin: 1rem 0 0.5rem 0;
+  }
+
+  .quill-editor-md .ql-editor h2 {
+    @apply text-lg font-semibold text-foreground;
+    line-height: 1.3;
+    margin: 0.75rem 0 0.375rem 0;
+  }
+
+  .quill-editor-md .ql-editor h3 {
+    @apply text-base font-semibold text-foreground;
+    line-height: 1.4;
+    margin: 0.625rem 0 0.25rem 0;
+  }
+
+  /* LG Editor Typography */
+  .quill-editor-lg .ql-editor h1 {
+    @apply text-2xl font-bold text-foreground;
+    line-height: 1.2;
+    margin: 1.25rem 0 0.625rem 0;
+  }
+
+  .quill-editor-lg .ql-editor h2 {
+    @apply text-xl font-semibold text-foreground;
+    line-height: 1.3;
+    margin: 1rem 0 0.5rem 0;
+  }
+
+  .quill-editor-lg .ql-editor h3 {
+    @apply text-lg font-semibold text-foreground;
+    line-height: 1.4;
+    margin: 0.75rem 0 0.375rem 0;
+  }
+
+  /* XL Editor Typography */
+  .quill-editor-xl .ql-editor h1 {
+    @apply text-3xl font-bold text-foreground;
+    line-height: 1.2;
+    margin: 1.5rem 0 0.75rem 0;
+  }
+
+  .quill-editor-xl .ql-editor h2 {
+    @apply text-2xl font-semibold text-foreground;
+    line-height: 1.3;
+    margin: 1.25rem 0 0.625rem 0;
+  }
+
+  .quill-editor-xl .ql-editor h3 {
+    @apply text-xl font-semibold text-foreground;
+    line-height: 1.4;
+    margin: 1rem 0 0.5rem 0;
+  }
+
+  /* Responsive Typography Adjustments */
+  @media (max-width: 768px) {
+    /* Scale down typography slightly on mobile for better readability */
+    .quill-editor-lg .ql-editor h1 { @apply text-xl; }
+    .quill-editor-lg .ql-editor h2 { @apply text-lg; }
+    .quill-editor-lg .ql-editor h3 { @apply text-base; }
+
+    .quill-editor-xl .ql-editor h1 { @apply text-2xl; }
+    .quill-editor-xl .ql-editor h2 { @apply text-xl; }
+    .quill-editor-xl .ql-editor h3 { @apply text-lg; }
+  }
+
+  /* Comprehensive Dark Mode Support */
+  /* SVG Icon Color Fixes */
+  .quill-editor .ql-snow .ql-stroke {
+    stroke: currentColor;
+  }
+
+  .quill-editor .ql-snow .ql-fill {
+    fill: currentColor;
+  }
+
+  .quill-editor .ql-snow .ql-stroke.ql-thin {
+    stroke: currentColor;
+    opacity: 0.7;
+  }
+
+  /* Quill Tooltip Dark Mode Support */
+  .quill-editor .ql-tooltip {
+    @apply bg-surface border border-border text-foreground shadow-lg;
+  }
+
+  .quill-editor .ql-tooltip::before {
+    @apply border-b-surface;
+  }
+
+  .quill-editor .ql-tooltip input[type=text] {
+    @apply bg-input text-foreground border border-border;
+  }
+
+  .quill-editor .ql-tooltip input[type=text]:focus {
+    @apply border-brand ring-1 ring-brand;
+  }
+
+  .quill-editor .ql-tooltip a.ql-preview {
+    @apply text-brand;
+  }
+
+  .quill-editor .ql-tooltip a.ql-action::after,
+  .quill-editor .ql-tooltip a.ql-remove::before {
+    @apply text-foreground;
+  }
+
+  /* Picker Dropdown Dark Mode */
+  .quill-editor .ql-picker.ql-expanded .ql-picker-options {
+    @apply bg-surface border border-border shadow-lg;
+  }
+
+  .quill-editor .ql-picker-options .ql-picker-item {
+    @apply text-foreground;
+  }
+
+  .quill-editor .ql-picker-options .ql-picker-item:hover {
+    @apply bg-border;
+  }
+
+  .quill-editor .ql-picker-options .ql-picker-item.ql-selected {
+    @apply bg-brand text-foreground-brand;
+  }
+
+  /* Selection and Link Preview */
+  .quill-editor .ql-editor ::selection {
+    @apply bg-brand/20;
+  }
+
+  /* Code Block Dark Mode */
+  .quill-editor .ql-editor pre.ql-syntax {
+    @apply bg-border text-foreground;
+  }
+
+  /* Blockquote Enhanced Dark Mode */
+  .quill-editor .ql-editor blockquote {
+    @apply border-l-border;
+  }
+
+  /* Video and Image Resize Handles */
+  .quill-editor .ql-editor .ql-video,
+  .quill-editor .ql-editor img {
+    @apply border border-border;
+  }
+
+  /* Link Styling Enhanced */
+  .quill-editor .ql-editor a {
+    @apply text-brand decoration-brand/30 hover:decoration-brand;
+  }
+
+  /* Formula and Special Content */
+  .quill-editor .ql-editor .ql-formula {
+    @apply bg-border text-foreground;
+  }
+
+  /* Clipboard Matcher */
+  .quill-editor .ql-clipboard {
+    @apply bg-surface text-foreground;
+  }
+
+  /* Snow Theme Specific Overrides */
+  .quill-editor.ql-snow .ql-tooltip[data-mode=link]::before {
+    content: "Visit URL:";
+  }
+
+  .quill-editor.ql-snow .ql-tooltip[data-mode=formula]::before {
+    content: "Enter formula:";
+  }
+
+  .quill-editor.ql-snow .ql-tooltip[data-mode=video]::before {
+    content: "Enter video:";
+  }
+
+  /* Active/Focus State Improvements for Dark Mode */
+  .quill-editor .ql-toolbar button:focus-visible {
+    @apply outline-none ring-2 ring-brand ring-offset-1 ring-offset-surface;
+  }
+
+  .quill-editor .ql-toolbar .ql-picker-label:focus-visible {
+    @apply outline-none ring-2 ring-brand ring-offset-1 ring-offset-surface;
+  }
+
+  /* Better Border Visibility in Dark Mode */
+  @media (prefers-color-scheme: dark) {
+    .quill-editor .ql-toolbar {
+      border-bottom-color: var(--color-border);
+    }
+
+    .quill-editor .ql-container {
+      border-color: var(--color-border);
+    }
+
+    /* Ensure proper contrast for disabled toolbar items */
+    .quill-editor .ql-toolbar button:disabled {
+      @apply opacity-40;
+    }
+  }
+
+  /* Disabled State for Toolbar Buttons */
+  .quill-editor-disabled .ql-toolbar button {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  /* Accessibility Enhancements */
+  /* Screen Reader Only Content */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Enhanced Focus Indicators */
+  .quill-editor .ql-editor:focus-visible {
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-surface;
+  }
+
+  /* High Contrast Mode Support */
+  @media (prefers-contrast: high) {
+    .quill-editor .ql-toolbar button {
+      @apply border border-foreground;
+    }
+
+    .quill-editor .ql-toolbar button.ql-active {
+      @apply bg-foreground text-surface;
+    }
+
+    .quill-editor .ql-container {
+      @apply border-2 border-foreground;
+    }
+  }
+
+  /* Reduced Motion Support */
+  @media (prefers-reduced-motion: reduce) {
+    .quill-editor .ql-toolbar button {
+      transition: none;
+    }
+
+    .quill-editor {
+      transition: none;
+    }
+  }
+
+  /* Keyboard Navigation Enhancements */
+  .quill-editor .ql-toolbar {
+    /* Ensure toolbar can receive focus for keyboard navigation */
+    position: relative;
+  }
+
+  .quill-editor .ql-toolbar:focus-within {
+    @apply ring-2 ring-brand ring-offset-1 ring-offset-surface;
+  }
+
+  /* Toolbar Button Enhanced Focus */
+  .quill-editor .ql-toolbar button:focus-visible {
+    @apply ring-2 ring-brand ring-offset-1 ring-offset-surface;
+    z-index: 1;
+  }
+
+  /* ARIA Live Region Styling */
+  [data-quill-live-region] {
+    /* Ensure live region is properly hidden but available to screen readers */
+    position: absolute !important;
+    left: -10000px !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+  }
+
+  /* Bubble Theme Support */
+  /* Bubble theme has no top toolbar, only floating bubble */
+  .quill-editor .ql-bubble .ql-toolbar {
+    display: none;
+  }
+
+  /* Bubble Tooltip Styling */
+  .quill-editor .ql-bubble .ql-tooltip {
+    @apply bg-surface border border-border shadow-lg rounded-md;
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+  }
+
+  /* Bubble Toolbar Styling */
+  .quill-editor .ql-bubble .ql-tooltip.ql-editing {
+    @apply bg-surface border border-border;
+  }
+
+  /* Bubble Button Styling */
+  .quill-editor .ql-bubble .ql-tooltip button {
+    @apply inline-flex items-center justify-center text-foreground transition-all duration-200;
+    @apply hover:bg-border active:bg-border/80;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1;
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  /* Bubble Button Size Variants */
+  .quill-editor-xs .ql-bubble .ql-tooltip button { @apply w-5 h-5; }
+  .quill-editor-sm .ql-bubble .ql-tooltip button { @apply w-6 h-6; }
+  .quill-editor-md .ql-bubble .ql-tooltip button { @apply w-7 h-7; }
+  .quill-editor-lg .ql-bubble .ql-tooltip button { @apply w-8 h-8; }
+  .quill-editor-xl .ql-bubble .ql-tooltip button { @apply w-9 h-9; }
+
+  /* Bubble Button Icons */
+  .quill-editor .ql-bubble .ql-tooltip button svg {
+    @apply fill-current;
+  }
+
+  /* Bubble Icon Size Variants */
+  .quill-editor-xs .ql-bubble .ql-tooltip button svg { @apply w-3 h-3; }
+  .quill-editor-sm .ql-bubble .ql-tooltip button svg { @apply w-3.5 h-3.5; }
+  .quill-editor-md .ql-bubble .ql-tooltip button svg { @apply w-4 h-4; }
+  .quill-editor-lg .ql-bubble .ql-tooltip button svg { @apply w-4 h-4; }
+  .quill-editor-xl .ql-bubble .ql-tooltip button svg { @apply w-5 h-5; }
+
+  /* Bubble Active Button */
+  .quill-editor .ql-bubble .ql-tooltip button.ql-active {
+    @apply bg-brand text-foreground-brand;
+  }
+
+  /* Bubble Input Styling */
+  .quill-editor .ql-bubble .ql-tooltip input[type=text] {
+    @apply bg-input text-foreground border border-border rounded-sm px-2 py-1;
+  }
+
+  .quill-editor .ql-bubble .ql-tooltip input[type=text]:focus {
+    @apply border-brand ring-1 ring-brand outline-none;
+  }
+
+  /* Bubble Action Links */
+  .quill-editor .ql-bubble .ql-tooltip a.ql-preview {
+    @apply text-brand hover:text-brand-hover;
+  }
+
+  .quill-editor .ql-bubble .ql-tooltip a.ql-action,
+  .quill-editor .ql-bubble .ql-tooltip a.ql-remove {
+    @apply text-foreground hover:text-brand;
+  }
+
+  /* Bubble Arrow Styling */
+  .quill-editor .ql-bubble .ql-tooltip::before {
+    @apply border-t-surface;
+  }
+
+  /* Bubble Picker Support */
+  .quill-editor .ql-bubble .ql-picker {
+    @apply text-foreground;
+  }
+
+  .quill-editor .ql-bubble .ql-picker-label {
+    @apply text-foreground border-none;
+  }
+
+  .quill-editor .ql-bubble .ql-picker-options {
+    @apply bg-surface border border-border rounded-md shadow-lg;
+  }
+
+  .quill-editor .ql-bubble .ql-picker-item {
+    @apply text-foreground hover:bg-border;
+  }
+
+  .quill-editor .ql-bubble .ql-picker-item.ql-selected {
+    @apply bg-brand text-foreground-brand;
+  }
+
+  /* Responsive Bubble Adjustments */
+  @media (max-width: 768px) {
+    /* Larger touch targets for mobile */
+    .quill-editor-xs .ql-bubble .ql-tooltip button { @apply w-7 h-7; }
+    .quill-editor-sm .ql-bubble .ql-tooltip button { @apply w-8 h-8; }
+    .quill-editor-md .ql-bubble .ql-tooltip button { @apply w-9 h-9; }
+
+    /* Better spacing for mobile */
+    .quill-editor .ql-bubble .ql-tooltip {
+      @apply p-2;
+    }
+  }
+
+  /* Dark Mode Bubble Support */
+  @media (prefers-color-scheme: dark) {
+    .quill-editor .ql-bubble .ql-tooltip {
+      backdrop-filter: blur(12px);
+      border-color: var(--color-border);
+    }
+
+    .quill-editor .ql-bubble .ql-tooltip::before {
+      border-top-color: var(--color-surface);
+    }
+  }
+}
+
+/* Print Styles */
+@media print {
+  .quill-editor .ql-toolbar,
+  .quill-editor .ql-tooltip {
+    display: none;
+  }
+
+  .quill-editor .ql-container {
+    border: none;
+    border-radius: 0;
+  }
+
+  /* Hide accessibility helpers in print */
+  [data-quill-live-region] {
+    display: none !important;
+  }
+}

@@ -31,14 +31,13 @@
                @if($disabled) disabled @endif
                @if($readonly || !$inline) readonly @endif
                @if($required) required @endif
-               autocomplete="off"
-               {{ $wireAttributes }}>
+               autocomplete="off">
 
-        {{-- Calendar icon or clear button --}}
-        <div class="absolute top-0 right-0 h-full flex items-center pr-2 gap-1">
+        {{-- Actions container (clear + calendar buttons) following input-field pattern --}}
+        <div class="absolute inset-y-0 right-2 flex items-center gap-1">
             @if($clearable && $formattedValue)
                 <button type="button"
-                        class="date-picker-clear"
+                        class="date-picker-clear flex items-center justify-center w-6 h-6 text-muted hover:text-danger focus:outline-none focus:text-danger transition-colors"
                         data-date-picker-clear
                         aria-label="Clear date"
                         @if($disabled) disabled @endif>
@@ -48,16 +47,16 @@
 
             @if($showCalendarIcon && !$iconRight)
                 <button type="button"
-                        class="date-picker-trigger"
+                        class="date-picker-trigger flex items-center justify-center w-8 h-8 text-muted hover:text-brand focus:outline-none focus:text-brand transition-colors"
                         data-date-picker-trigger
                         aria-label="Open calendar"
                         @if($disabled) disabled @endif>
                     <x-keys::icon name="heroicon-o-calendar" :size="$iconSize" />
                 </button>
             @elseif($iconRight)
-                <span class="icon-right">
+                <div class="flex items-center justify-center w-8 h-8 text-muted pointer-events-none">
                     <x-keys::icon :name="$iconRight" :size="$iconSize" />
-                </span>
+                </div>
             @endif
         </div>
 

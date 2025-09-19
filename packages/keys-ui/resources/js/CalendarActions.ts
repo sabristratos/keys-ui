@@ -65,6 +65,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
             calendarData = {};
         }
 
+
         const state: CalendarState = {
             currentMonth: calendarData.currentMonth || this.getCurrentYearMonth(),
             selectedDate: calendarData.selectedDate || null,
@@ -86,6 +87,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
             viewMode: 'calendar'
         };
 
+
         this.setState(calendarElement, state);
         this.renderCalendarGrid(calendarElement);
         this.updateMonthYearDisplay(calendarElement);
@@ -99,6 +101,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
         EventUtils.handleDelegatedClick('[data-calendar-date]', (dateButton, event) => {
             if (!(dateButton as HTMLButtonElement).disabled) {
                 event.preventDefault();
+                event.stopPropagation(); // Prevent bubbling to document click handlers
                 const calendar = DOMUtils.findClosest(dateButton, '[data-calendar="true"]');
                 if (calendar && !this.isCalendarDisabled(calendar)) {
                     this.selectDate(calendar, dateButton.dataset.calendarDate!);
@@ -224,6 +227,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
         const state = this.getState(calendar);
         if (!state || state.isDisabled) return;
 
+
         if (state.isRange) {
             this.handleRangeSelection(calendar, dateString);
         } else {
@@ -250,6 +254,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
     private handleRangeSelection(calendar: HTMLElement, dateString: string): void {
         const state = this.getState(calendar);
         if (!state) return;
+
 
         const clickedDate = new Date(dateString);
 
@@ -279,6 +284,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
         this.setState(calendar, state);
         this.renderCalendarGrid(calendar);
         this.updateHiddenInput(calendar);
+
 
         // Dispatch custom event
         this.dispatchCalendarEvent(calendar, 'calendar:rangeSelected', {

@@ -2,6 +2,7 @@
 
 namespace Keys\UI\Components;
 
+use Illuminate\Support\Collection;
 use Illuminate\View\Component;
 
 class Editor extends Component
@@ -14,17 +15,27 @@ class Editor extends Component
         public string $height = '200px',
         public bool $disabled = false,
         public array $toolbar = [],
-        public string $size = 'md'
+        public string $size = 'md',
+        public string $theme = 'snow',
+        public ?string $label = null,
+        public bool $required = false,
+        public ?string $describedBy = null,
+        public string|array|Collection|null $errors = null,
+        public bool $showErrors = true,
+        public bool $hasError = false,
+        public bool $optional = false,
+        public bool $loading = false,
+        public string $loadingAnimation = 'spinner',
+        public string $loadingText = 'Loading...'
     ) {
-        // Default toolbar if none provided
+        // Default toolbar if none provided - using proper Quill format
         if (empty($this->toolbar)) {
             $this->toolbar = [
-                'bold', 'italic', 'underline', 'strikethrough', '|',
-                'h1', 'h2', 'h3', 'paragraph', '|',
-                'alignLeft', 'alignCenter', 'alignRight', 'alignJustify', '|',
-                'insertUnorderedList', 'insertOrderedList', '|',
-                'createLink', 'blockquote', '|',
-                'undo', 'redo', 'removeFormat'
+                ['bold', 'italic', 'underline'],
+                [['header' => [1, 2, false]]],
+                [['list' => 'ordered'], ['list' => 'bullet']],
+                ['link'],
+                ['clean']
             ];
         }
 
@@ -34,194 +45,184 @@ class Editor extends Component
         }
 
         // Validate size
-        if (!in_array($this->size, ['sm', 'md', 'lg'])) {
+        if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
             $this->size = 'md';
         }
+
+        // Validate theme
+        if (!in_array($this->theme, ['snow', 'bubble'])) {
+            $this->theme = 'snow';
+        }
+
+        // Validate loading animation
+        if (!in_array($this->loadingAnimation, ['spinner', 'dots', 'pulse'])) {
+            $this->loadingAnimation = 'spinner';
+        }
+
+        // Set error state if errors are present
+        if (!$this->hasError && $this->hasErrors()) {
+            $this->hasError = true;
+        }
     }
 
-    public function getToolbarData(): array
+    public function getQuillConfig(): array
     {
-        $toolbarConfig = [
-            'bold' => [
-                'command' => 'bold',
-                'icon' => 'heroicon-o-bold',
-                'title' => 'Bold',
-                'type' => 'toggle'
-            ],
-            'italic' => [
-                'command' => 'italic',
-                'icon' => 'heroicon-o-italic',
-                'title' => 'Italic',
-                'type' => 'toggle'
-            ],
-            'underline' => [
-                'command' => 'underline',
-                'icon' => 'heroicon-o-underline',
-                'title' => 'Underline',
-                'type' => 'toggle'
-            ],
-            'strikethrough' => [
-                'command' => 'strikeThrough',
-                'icon' => 'heroicon-o-strikethrough',
-                'title' => 'Strikethrough',
-                'type' => 'toggle'
-            ],
-            'h1' => [
-                'command' => 'formatBlock',
-                'value' => 'h1',
-                'icon' => 'heroicon-o-h1',
-                'title' => 'Heading 1',
-                'type' => 'button'
-            ],
-            'h2' => [
-                'command' => 'formatBlock',
-                'value' => 'h2',
-                'icon' => 'heroicon-o-h2',
-                'title' => 'Heading 2',
-                'type' => 'button'
-            ],
-            'h3' => [
-                'command' => 'formatBlock',
-                'value' => 'h3',
-                'icon' => 'heroicon-o-h3',
-                'title' => 'Heading 3',
-                'type' => 'button'
-            ],
-            'paragraph' => [
-                'command' => 'formatBlock',
-                'value' => 'p',
-                'icon' => 'heroicon-o-bars-3-bottom-left',
-                'title' => 'Paragraph',
-                'type' => 'button'
-            ],
-            'alignLeft' => [
-                'command' => 'justifyLeft',
-                'icon' => 'heroicon-o-bars-3-bottom-left',
-                'title' => 'Align Left',
-                'type' => 'button'
-            ],
-            'alignCenter' => [
-                'command' => 'justifyCenter',
-                'icon' => 'heroicon-o-bars-3',
-                'title' => 'Align Center',
-                'type' => 'button'
-            ],
-            'alignRight' => [
-                'command' => 'justifyRight',
-                'icon' => 'heroicon-o-bars-3-bottom-right',
-                'title' => 'Align Right',
-                'type' => 'button'
-            ],
-            'alignJustify' => [
-                'command' => 'justifyFull',
-                'icon' => 'heroicon-o-bars-4',
-                'title' => 'Justify',
-                'type' => 'button'
-            ],
-            'insertUnorderedList' => [
-                'command' => 'insertUnorderedList',
-                'icon' => 'heroicon-o-list-bullet',
-                'title' => 'Bullet List',
-                'type' => 'toggle'
-            ],
-            'insertOrderedList' => [
-                'command' => 'insertOrderedList',
-                'icon' => 'heroicon-o-numbered-list',
-                'title' => 'Numbered List',
-                'type' => 'toggle'
-            ],
-            'createLink' => [
-                'command' => 'createLink',
-                'icon' => 'heroicon-o-link',
-                'title' => 'Insert Link',
-                'type' => 'button'
-            ],
-            'blockquote' => [
-                'command' => 'formatBlock',
-                'value' => 'blockquote',
-                'icon' => 'heroicon-o-chat-bubble-left-right',
-                'title' => 'Blockquote',
-                'type' => 'button'
-            ],
-            'undo' => [
-                'command' => 'undo',
-                'icon' => 'heroicon-o-arrow-uturn-left',
-                'title' => 'Undo',
-                'type' => 'button'
-            ],
-            'redo' => [
-                'command' => 'redo',
-                'icon' => 'heroicon-o-arrow-uturn-right',
-                'title' => 'Redo',
-                'type' => 'button'
-            ],
-            'removeFormat' => [
-                'command' => 'removeFormat',
-                'icon' => 'heroicon-o-x-mark',
-                'title' => 'Clear Formatting',
-                'type' => 'button'
-            ]
+        $config = [
+            'theme' => $this->theme,
+            'placeholder' => $this->placeholder,
+            'modules' => $this->getQuillModules()
         ];
 
-        $processedToolbar = [];
-        foreach ($this->toolbar as $item) {
-            if ($item === '|') {
-                $processedToolbar[] = ['type' => 'separator'];
-            } elseif (isset($toolbarConfig[$item])) {
-                $processedToolbar[] = $toolbarConfig[$item];
-            }
+        // Add readOnly if disabled or loading
+        if ($this->disabled || $this->loading) {
+            $config['readOnly'] = true;
         }
 
-        return $processedToolbar;
+        return $config;
     }
 
-    public function getEditorClasses(): string
+    public function getQuillModules(): array
     {
-        $baseClasses = 'w-full border border-border rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent prose prose-sm max-w-none';
+        return [
+            'toolbar' => $this->toolbar
+        ];
+    }
+
+    public function editorClasses(): string
+    {
+        $classes = "quill-editor quill-editor-{$this->size}";
+
+        $stateClasses = $this->stateClasses();
+        if ($stateClasses) {
+            $classes .= ' ' . $stateClasses;
+        }
+
+        return $classes;
+    }
+
+    public function containerClasses(): string
+    {
+        return "quill-container quill-container-{$this->size}";
+    }
+
+    public function getDataAttributes(): array
+    {
+        return [
+            'data-quill-editor' => 'true',
+            'data-editor-id' => $this->id,
+            'data-size' => $this->size,
+            'data-disabled' => $this->disabled ? 'true' : 'false',
+        ];
+    }
+
+    public function getAccessibilityAttributes(): array
+    {
+        $attributes = [
+            'role' => 'textbox',
+            'aria-multiline' => 'true',
+            'aria-label' => $this->label ?? ($this->name ? ucfirst(str_replace('_', ' ', $this->name)) : 'Rich text editor'),
+        ];
+
+        if ($this->required) {
+            $attributes['aria-required'] = 'true';
+        }
 
         if ($this->disabled) {
-            $baseClasses .= ' bg-neutral-50 cursor-not-allowed opacity-50';
-        } else {
-            $baseClasses .= ' bg-background';
+            $attributes['aria-disabled'] = 'true';
         }
 
-        return $baseClasses;
-    }
-
-    public function getToolbarClasses(): string
-    {
-        return 'flex flex-wrap items-center gap-1 p-2 border-b border-border bg-neutral-50/50';
-    }
-
-    public function getContainerClasses(): string
-    {
-        $baseClasses = 'border border-border rounded-md overflow-hidden bg-background';
-
-        if ($this->disabled) {
-            $baseClasses .= ' opacity-50';
+        if ($this->describedBy) {
+            $attributes['aria-describedby'] = $this->describedBy;
         }
 
-        return $baseClasses;
+        return $attributes;
     }
 
-    public function getButtonSize(): string
+    public function getToolbarAccessibilityAttributes(): array
     {
-        return match ($this->size) {
-            'sm' => 'xs',
-            'md' => 'sm',
-            'lg' => 'sm',
-            default => 'sm'
-        };
+        return [
+            'role' => 'toolbar',
+            'aria-label' => 'Rich text editor toolbar',
+            'data-quill-toolbar' => 'true',
+        ];
+    }
+
+    public function getLiveRegionId(): string
+    {
+        return $this->id . '-live-region';
+    }
+
+    public function isShorthand(): bool
+    {
+        return !is_null($this->label);
+    }
+
+    public function hasError(): bool
+    {
+        return $this->hasError || $this->hasErrors();
+    }
+
+    public function hasErrors(): bool
+    {
+        if (is_null($this->errors)) {
+            return false;
+        }
+
+        if (is_string($this->errors)) {
+            return !empty(trim($this->errors));
+        }
+
+        if (is_array($this->errors)) {
+            return !empty($this->errors);
+        }
+
+        if ($this->errors instanceof Collection) {
+            return $this->errors->isNotEmpty();
+        }
+
+        return false;
+    }
+
+    public function stateClasses(): string
+    {
+        $classes = [];
+
+        if ($this->disabled || $this->loading) {
+            $classes[] = 'quill-editor-disabled';
+        }
+
+        if ($this->loading) {
+            $classes[] = 'quill-editor-loading';
+        }
+
+        if ($this->hasError()) {
+            $classes[] = 'quill-editor-error';
+        }
+
+        return implode(' ', $classes);
+    }
+
+    public function isDisabledOrLoading(): bool
+    {
+        return $this->disabled || $this->loading;
+    }
+
+    public function getEditorHeight(): string
+    {
+        return $this->height;
     }
 
     public function render()
     {
         return view('keys::components.editor', [
-            'toolbarData' => $this->getToolbarData(),
-            'editorClasses' => $this->getEditorClasses(),
-            'toolbarClasses' => $this->getToolbarClasses(),
-            'containerClasses' => $this->getContainerClasses(),
-            'buttonSize' => $this->getButtonSize()
+            'quillConfig' => $this->getQuillConfig(),
+            'editorClasses' => $this->editorClasses(),
+            'containerClasses' => $this->containerClasses(),
+            'dataAttributes' => $this->getDataAttributes(),
+            'editorHeight' => $this->getEditorHeight(),
+            'accessibilityAttributes' => $this->getAccessibilityAttributes(),
+            'toolbarAccessibilityAttributes' => $this->getToolbarAccessibilityAttributes(),
+            'liveRegionId' => $this->getLiveRegionId(),
         ]);
     }
 }

@@ -6,6 +6,7 @@
         'data-date-picker-config' => json_encode($calendarData),
         'data-inline' => $inline ? 'true' : 'false',
         'data-disabled' => $disabled ? 'true' : 'false',
+        'data-size' => $size,
         'id' => $id . '-container'
     ]);
 @endphp
@@ -87,41 +88,7 @@
         box-shadow: none;
     }
 
-    /* Calendar icon button */
-    [data-date-picker="true"] .date-picker-trigger {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        padding: 0.25rem;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-    }
-
-    [data-date-picker="true"] .date-picker-trigger:hover:not(:disabled) {
-        color: var(--color-brand);
-    }
-
-    [data-date-picker="true"] .date-picker-trigger:focus-visible {
-        outline: 2px solid var(--color-brand);
-        outline-offset: 2px;
-        border-radius: var(--radius-sm);
-    }
-
-    /* Clear button */
-    [data-date-picker="true"] .date-picker-clear {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        padding: 0.25rem;
-        cursor: pointer;
-        color: var(--color-muted);
-        transition: all 0.2s ease-in-out;
-    }
-
-    [data-date-picker="true"] .date-picker-clear:hover {
-        color: var(--color-danger);
-        transform: translateY(-50%) scale(1.1);
-    }
+    /* Action buttons (clear and calendar) use flex layout - no absolute positioning needed */
 
     /* Quick selectors */
     [data-date-picker="true"] .quick-selectors {
@@ -163,9 +130,8 @@
         transform: scale(0.95);
     }
 
-    /* Date picker with icons */
-    [data-date-picker="true"] .icon-left,
-    [data-date-picker="true"] .icon-right {
+    /* Left icon positioning (if used) */
+    [data-date-picker="true"] .icon-left {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
@@ -175,11 +141,8 @@
 
     /* Icon positions based on size */
     [data-date-picker="true"][data-size="sm"] .icon-left { left: 0.625rem; }
-    [data-date-picker="true"][data-size="sm"] .icon-right { right: 0.625rem; }
     [data-date-picker="true"][data-size="md"] .icon-left { left: 0.75rem; }
-    [data-date-picker="true"][data-size="md"] .icon-right { right: 0.75rem; }
     [data-date-picker="true"][data-size="lg"] .icon-left { left: 0.875rem; }
-    [data-date-picker="true"][data-size="lg"] .icon-right { right: 0.875rem; }
 
     /* Error state */
     [data-date-picker="true"].has-error .date-picker-input {

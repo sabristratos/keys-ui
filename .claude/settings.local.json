@@ -39,7 +39,10 @@
       "Bash(ren:*)",
       "Bash(del C:Workkeystest-image-overlay.html)",
       "Bash(timeout:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "mcp__playwright__browser_file_upload",
+      "Bash(npm install)",
+      "Bash(del \"C:\\Users\\chaab\\Herd\\key-ui\\packages\\keys-ui\\resources\\css\\quill-theme.css\")"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -45,29 +45,30 @@ composer run dev
 
 # Run tests
 composer run test
-php artisan test
-php artisan test --filter=specific_test_name
+cmd //c "php artisan test"
+cmd //c "php artisan test --filter=specific_test_name"
 
 # Code formatting
-vendor/bin/pint --dirty
+cmd //c "vendor/bin/pint --dirty"
 ```
 
 ### Keys UI Package Development
 ```bash
 # Build Keys UI assets (CSS + JS)
-php artisan keys:build
+cmd //c "php artisan keys:build"
 
 # Watch for changes during development
-php artisan keys:build --watch
+cmd //c "php artisan keys:build --watch"
 
 # Development build with publishing
-php artisan keys:build --dev --publish
+cmd //c "php artisan keys:build --dev --publish"
 
 # Package-level commands (in packages/keys-ui/)
 cd packages/keys-ui
 npm run build        # Build production assets
 npm run watch        # Watch mode for development
 npm run build:all    # Build both CSS and JS
+npm run typecheck    # TypeScript type checking
 ```
 
 ### Full Development Workflow
@@ -116,10 +117,10 @@ The Button component natively supports icon state changes:
 ### Browser Testing (Pest 4)
 ```bash
 # Component interaction testing
-php artisan test tests/Browser/
+cmd //c "php artisan test tests/Browser/"
 
 # Specific component test
-php artisan test --filter=password_toggle
+cmd //c "php artisan test --filter=password_toggle"
 ```
 
 Components should have comprehensive browser tests covering:
@@ -527,7 +528,6 @@ Blade::component('keys::toggle', Toggle::class);
 
 ### Component Testing
 - **Add component tests to the welcome page**, NOT separate test pages
-- **Integrate all component demonstrations** into the main welcome page showcase
 - **Keep testing consolidated** in one place for easier maintenance and review
 
 ### Example Inline Styling Pattern:

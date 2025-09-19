@@ -46,6 +46,7 @@ use Keys\UI\Components\Toast;
 use Keys\UI\Components\Toggle;
 use Keys\UI\Components\Tooltip;
 use Keys\UI\Components\HeadingDecorator;
+use Keys\UI\Components\Gallery;
 use Keys\UI\Components\Image;
 use Keys\UI\Components\TimePicker;
 use Keys\UI\Components\Table;
@@ -56,6 +57,10 @@ use Keys\UI\Components\Table\Cell;
 use Keys\UI\Components\Table\Header;
 use Keys\UI\Components\Table\EmptyState as TableEmpty;
 use Keys\UI\Components\Table\Loading as TableLoading;
+use Keys\UI\Components\AddToCart;
+use Keys\UI\Components\FileUpload;
+use Keys\UI\Components\Progress;
+use Keys\UI\Components\Separator;
 use Keys\UI\Services\AssetManager;
 use Keys\UI\Services\KeysManager;
 use Keys\UI\Services\ModalManager;
@@ -107,7 +112,7 @@ class KeysUiServiceProvider extends ServiceProvider
         ], 'keys-ui-views');
 
         $this->publishes([
-            __DIR__.'/../resources/css' => public_path('vendor/keys-ui'),
+            __DIR__.'/../dist' => public_path('vendor/keys-ui'),
         ], 'keys-ui-assets');
 
         $this->publishes([
@@ -168,8 +173,13 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::table.loading-state', TableLoading::class);
         Blade::component('keys::tooltip', Tooltip::class);
         Blade::component('keys::heading-decorator', HeadingDecorator::class);
+        Blade::component('keys::gallery', Gallery::class);
         Blade::component('keys::image', Image::class);
         Blade::component('keys::timepicker', TimePicker::class);
+        Blade::component('keys::add-to-cart', AddToCart::class);
+        Blade::component('keys::file-upload', FileUpload::class);
+        Blade::component('keys::progress', Progress::class);
+        Blade::component('keys::separator', Separator::class);
 
         $this->app->alias(KeysManager::class, 'keys');
 

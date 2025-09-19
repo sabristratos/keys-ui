@@ -104,313 +104,6 @@
                 </header>
 
                 <div class="space-y-12">
-                    <!-- Image Component -->
-                    <section class="space-y-6">
-                        <div>
-                            <h2 class="text-2xl font-bold mb-4">Image Component</h2>
-                            <p class="text-foreground/70 mb-6">Responsive images with overlays, aspect ratios, and captions</p>
-                        </div>
-                        <!-- Hero Image with Overlay -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Hero Image with Gradient Overlay (Built-in)</h3>
-                            <x-keys::image
-                                src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80"
-                                alt="Cozy bedroom with neatly made bed"
-                                size="full"
-                                aspect-ratio="wide"
-                                radius="lg"
-                                overlay="gradient-bottom"
-                                overlay-color="black"
-                                overlay-opacity="60"
-                            >
-                                <div class="text-white">
-                                    <h3 class="text-2xl font-bold mb-2">Luxury Bedroom Suite</h3>
-                                    <p class="text-white/90 mb-4">Experience ultimate comfort in our premium accommodations with modern amenities and stunning city views.</p>
-                                    <x-keys::button variant="brand" size="md">
-                                        Book Now
-                                    </x-keys::button>
-                                </div>
-                            </x-keys::image>
-                        </div>
-
-                        <!-- Additional overlay examples -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <h3 class="text-lg font-semibold mb-3">Gradient Top Overlay</h3>
-                                <x-keys::image
-                                    src="https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=800&q=80"
-                                    alt="Coffee shop interior"
-                                    size="full"
-                                    aspect-ratio="photo"
-                                    radius="md"
-                                    overlay="gradient-top"
-                                    overlay-color="brand"
-                                    overlay-opacity="70"
-                                    caption="Gradient from top with brand color"
-                                />
-                            </div>
-
-                            <div>
-                                <h3 class="text-lg font-semibold mb-3">Solid Overlay</h3>
-                                <x-keys::image
-                                    src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80"
-                                    alt="Mountain landscape"
-                                    size="full"
-                                    aspect-ratio="photo"
-                                    radius="md"
-                                    overlay="solid"
-                                    overlay-color="black"
-                                    overlay-opacity="40"
-                                    caption="Solid overlay for text readability"
-                                >
-                                    <div class="text-white text-center">
-                                        <h4 class="text-xl font-bold">Adventure Awaits</h4>
-                                        <p class="text-white/80">Explore the mountains</p>
-                                    </div>
-                                </x-keys::image>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Calendar Component - Multi-Month Range Demo -->
-                    <section class="space-y-6">
-                        <div>
-                            <h2 class="text-2xl font-bold mb-4">Calendar Component - Multi-Month Range Demo</h2>
-                            <p class="text-foreground/70 mb-6">Testing calendar functionality after refactoring</p>
-                        </div>
-
-                        <!-- Three Months with Range Selection -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Three Months with Range Selection</h3>
-                            <x-keys::calendar
-                                name="three_months_range"
-                                label="Multi-Month Range Selection"
-                                :monthsToShow="3"
-                                :isRange="true"
-                                startDate="{{ now()->addDays(10)->format('Y-m-d') }}"
-                                endDate="{{ now()->addDays(45)->format('Y-m-d') }}"
-                            />
-                        </div>
-
-                        <!-- Test Info -->
-                        <div class="bg-surface border border-border rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-3">Refactoring Test Results</h3>
-                            <div class="text-sm text-foreground/70 space-y-2">
-                                <p><strong>✅ Completed Refactoring:</strong></p>
-                                <ul class="list-disc list-inside space-y-1 ml-4">
-                                    <li>Extracted calendar content into shared partial (eliminated template duplication)</li>
-                                    <li>Refactored constructor into smaller, focused initialization methods</li>
-                                    <li>Cleaned up CSS architecture and removed !important declarations</li>
-                                    <li>Added comprehensive inline documentation for range selection logic</li>
-                                    <li>Standardized method naming conventions throughout Calendar class</li>
-                                    <li>Improved computed methods pattern consistency with other Keys UI components</li>
-                                </ul>
-                                <p class="mt-3"><strong>🧪 Test the following functionality:</strong></p>
-                                <ul class="list-disc list-inside space-y-1 ml-4">
-                                    <li>Date range selection (click start date, then end date)</li>
-                                    <li>Multi-month navigation (previous/next month buttons)</li>
-                                    <li>Month/year dropdown selection</li>
-                                    <li>Keyboard navigation (arrow keys, Enter, Escape)</li>
-                                    <li>Range visual feedback and styling</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- DatePicker Component -->
-                    <section class="space-y-6">
-                        <div>
-                            <h2 class="text-2xl font-bold mb-4">DatePicker Component</h2>
-                            <p class="text-foreground/70 mb-6">Input field with integrated calendar dropdown for date selection</p>
-                        </div>
-
-                        <!-- Basic DatePicker -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Basic Date Picker</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <x-keys::date-picker
-                                        name="basic_date"
-                                        label="Select Date"
-                                        placeholder="Choose a date"
-                                        :clearable="true"
-                                    />
-                                </div>
-                                <div>
-                                    <x-keys::date-picker
-                                        name="preselected_date"
-                                        label="Pre-selected Date"
-                                        value="{{ now()->format('Y-m-d') }}"
-                                        :clearable="true"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Date Range Picker -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Date Range Picker</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <x-keys::date-picker
-                                        name="date_range"
-                                        label="Select Date Range"
-                                        :isRange="true"
-                                        :clearable="true"
-                                        :quickSelectors="true"
-                                    />
-                                </div>
-                                <div>
-                                    <x-keys::date-picker
-                                        name="vacation_range"
-                                        label="Vacation Dates"
-                                        :isRange="true"
-                                        startDate="{{ now()->addDays(7)->format('Y-m-d') }}"
-                                        endDate="{{ now()->addDays(14)->format('Y-m-d') }}"
-                                        :quickSelectors="true"
-                                        :clearable="true"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Different Formats and Sizes -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Formats and Sizes</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div>
-                                    <x-keys::date-picker
-                                        name="us_format"
-                                        label="US Format (Small)"
-                                        format="m/d/Y"
-                                        size="sm"
-                                        :clearable="true"
-                                    />
-                                </div>
-                                <div>
-                                    <x-keys::date-picker
-                                        name="eu_format"
-                                        label="EU Format (Medium)"
-                                        format="d/m/Y"
-                                        size="md"
-                                        :clearable="true"
-                                    />
-                                </div>
-                                <div>
-                                    <x-keys::date-picker
-                                        name="verbose_format"
-                                        label="Verbose Format (Large)"
-                                        format="F j, Y"
-                                        size="lg"
-                                        :clearable="true"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Date Constraints -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Date Constraints</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <x-keys::date-picker
-                                        name="future_only"
-                                        label="Future Dates Only"
-                                        minDate="{{ now()->format('Y-m-d') }}"
-                                        maxDate="{{ now()->addYear()->format('Y-m-d') }}"
-                                        :clearable="true"
-                                    />
-                                </div>
-                                <div>
-                                    <x-keys::date-picker
-                                        name="past_only"
-                                        label="Past Dates Only"
-                                        maxDate="{{ now()->format('Y-m-d') }}"
-                                        :clearable="true"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Inline Calendar -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Inline Calendar</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <x-keys::date-picker
-                                        name="inline_single"
-                                        label="Inline Single Date"
-                                        :inline="true"
-                                        :clearable="true"
-                                    />
-                                </div>
-                                <div>
-                                    <x-keys::date-picker
-                                        name="inline_range"
-                                        label="Inline Date Range"
-                                        :inline="true"
-                                        :isRange="true"
-                                        :quickSelectors="true"
-                                        :clearable="true"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Advanced Features -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Advanced Features</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <x-keys::date-picker
-                                        name="no_calendar_icon"
-                                        label="Custom Icon"
-                                        :showCalendarIcon="false"
-                                        iconRight="heroicon-o-clock"
-                                        :clearable="true"
-                                    />
-                                </div>
-                                <div>
-                                    <x-keys::date-picker
-                                        name="disabled_dates"
-                                        label="With Disabled Weekends"
-                                        :disabledDates="[
-                                            now()->next('Saturday')->format('Y-m-d'),
-                                            now()->next('Sunday')->format('Y-m-d'),
-                                            now()->addWeek()->next('Saturday')->format('Y-m-d'),
-                                            now()->addWeek()->next('Sunday')->format('Y-m-d')
-                                        ]"
-                                        :clearable="true"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Test Info -->
-                        <div class="bg-surface border border-border rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-3">DatePicker Features to Test</h3>
-                            <div class="text-sm text-foreground/70 space-y-2">
-                                <p><strong>🎯 Core Features:</strong></p>
-                                <ul class="list-disc list-inside space-y-1 ml-4">
-                                    <li>Click input field to open calendar dropdown</li>
-                                    <li>Select dates from calendar interface</li>
-                                    <li>Use quick selectors for common date ranges</li>
-                                    <li>Clear dates with clear button</li>
-                                    <li>Different date formats and display modes</li>
-                                    <li>Keyboard navigation (Tab, Enter, Escape, Arrow keys)</li>
-                                </ul>
-                                <p class="mt-3"><strong>🔧 Interactive Elements:</strong></p>
-                                <ul class="list-disc list-inside space-y-1 ml-4">
-                                    <li>Range selection (start and end dates)</li>
-                                    <li>Date constraints (min/max dates)</li>
-                                    <li>Disabled specific dates</li>
-                                    <li>Inline vs dropdown modes</li>
-                                    <li>Size variants and custom styling</li>
-                                    <li>Form integration and validation</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </section>
 
                     <!-- Editor Component -->
                     <section class="space-y-6">
@@ -464,7 +157,7 @@
                             <div class="space-y-4">
                                 <x-keys::editor
                                     name="custom_editor"
-                                    :toolbar="['bold', 'italic', 'underline', '|', 'h1', 'h2', 'paragraph', '|', 'insertUnorderedList', 'createLink', '|', 'undo', 'redo']"
+                                    :toolbar="[['bold', 'italic', 'underline'], [['header' => [1, 2, false]]], ['list', 'bullet'], ['link'], ['clean']]"
                                     placeholder="Editor with simplified toolbar..."
                                     value="<h1>Custom Toolbar</h1><p>This editor has a <strong>simplified toolbar</strong> with only essential formatting options.</p>"
                                 />
@@ -527,6 +220,297 @@
                             </div>
                         </div>
                     </section>
+
+
+                    <!-- File Upload Component Testing -->
+                    <section class="space-y-6">
+                        <div class="border-t border-border pt-8">
+                            <h2 class="text-2xl font-bold mb-6">File Upload Components</h2>
+
+                            <!-- Progress Component Examples -->
+                            <div class="bg-surface border border-border rounded-lg p-6 mb-6">
+                                <h3 class="text-lg font-semibold mb-4">Progress Component</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-4">
+                                        <h4 class="text-sm font-medium text-foreground/70">Basic Progress</h4>
+                                        <x-keys::progress :value="25" label="Uploading..." />
+                                        <x-keys::progress :value="50" color="success" />
+                                        <x-keys::progress :value="75" color="warning" size="lg" />
+                                        <x-keys::progress :value="100" color="success" label="Complete!" />
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <h4 class="text-sm font-medium text-foreground/70">Animated & Striped</h4>
+                                        <x-keys::progress :value="60" color="brand" :animated="true" :striped="true" label="Processing..." />
+                                        <x-keys::progress :value="40" color="info" size="sm" :striped="true" />
+                                        <x-keys::progress :value="80" color="danger" :animated="true" status="Error occurred" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- File Upload Examples -->
+                            <div class="bg-surface border border-border rounded-lg p-6">
+                                <h3 class="text-lg font-semibold mb-4">File Upload Component</h3>
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <!-- Basic File Upload -->
+                                    <div class="space-y-4">
+                                        <h4 class="text-sm font-medium text-foreground/70">Basic Upload</h4>
+                                        <x-keys::file-upload
+                                            name="documents"
+                                            accept="image/*,application/pdf"
+                                            label="Upload Documents"
+                                            description="Images and PDF files only"
+                                            :max-size="5120"
+                                            class="mb-4"
+                                        />
+
+                                        <h4 class="text-sm font-medium text-foreground/70">Multiple Files</h4>
+                                        <x-keys::file-upload
+                                            name="gallery"
+                                            accept="image/*"
+                                            :multiple="true"
+                                            :max-files="5"
+                                            :max-size="2048"
+                                            label="Photo Gallery"
+                                            description="Up to 5 images, 2MB each"
+                                            size="sm"
+                                        />
+                                    </div>
+
+                                    <!-- Advanced File Upload -->
+                                    <div class="space-y-4">
+                                        <h4 class="text-sm font-medium text-foreground/70">Large Upload Zone</h4>
+                                        <x-keys::file-upload
+                                            name="media"
+                                            accept="image/*,video/*"
+                                            :multiple="true"
+                                            :max-files="10"
+                                            :max-size="10240"
+                                            label="Media Files"
+                                            description="Images and videos up to 10MB"
+                                            size="lg"
+                                            :auto-upload="false"
+                                            class="mb-4"
+                                        />
+
+                                        <h4 class="text-sm font-medium text-foreground/70">With Existing Files</h4>
+                                        <x-keys::file-upload
+                                            name="attachments"
+                                            :existing-files="[
+                                                ['id' => 1, 'name' => 'report.pdf', 'size' => 1024000, 'url' => '#'],
+                                                ['id' => 2, 'name' => 'image.jpg', 'size' => 512000, 'url' => '#']
+                                            ]"
+                                            label="Attachments"
+                                            size="sm"
+                                        />
+                                    </div>
+                                </div>
+
+                                <!-- Livewire Integration Example -->
+                                <div class="mt-6 pt-6 border-t border-border">
+                                    <h4 class="text-sm font-medium text-foreground/70 mb-4">Livewire Integration (Simulated)</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div class="space-y-2">
+                                            <x-keys::file-upload
+                                                wire:model="profilePicture"
+                                                name="profile_pic"
+                                                accept="image/*"
+                                                :max-size="2048"
+                                                label="Profile Picture"
+                                                description="Will update via Livewire"
+                                            />
+                                            <p class="text-xs text-muted">Note: Livewire binding simulated - no actual backend</p>
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <x-keys::file-upload
+                                                wire:model.live="projectFiles"
+                                                name="project_files"
+                                                :multiple="true"
+                                                :max-files="3"
+                                                accept=".zip,.rar,.7z"
+                                                label="Project Files"
+                                                description="Archive files only"
+                                            />
+                                            <p class="text-xs text-muted">Live binding - updates immediately on selection</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Testing Info -->
+                        <div class="bg-surface border border-border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-3">File Upload Features to Test</h3>
+                            <div class="text-sm text-foreground/70 space-y-2">
+                                <p><strong>📁 Core Functionality:</strong></p>
+                                <ul class="list-disc list-inside space-y-1 ml-4">
+                                    <li>Drag & drop files onto the upload zones</li>
+                                    <li>Click upload zones or "Browse Files" buttons to select files</li>
+                                    <li>File type validation (try uploading invalid file types)</li>
+                                    <li>File size validation (try uploading files larger than limit)</li>
+                                    <li>Multiple file selection and preview generation</li>
+                                </ul>
+                                <p class="mt-3"><strong>🎯 Interactive Elements:</strong></p>
+                                <ul class="list-disc list-inside space-y-1 ml-4">
+                                    <li>Visual drag-over feedback with zone highlighting</li>
+                                    <li>File preview thumbnails for images</li>
+                                    <li>Individual file removal from selected list</li>
+                                    <li>Progress bars during upload simulation</li>
+                                    <li>Error messaging for validation failures</li>
+                                </ul>
+                                <p class="mt-3"><strong>⚙️ Technical Features:</strong></p>
+                                <ul class="list-disc list-inside space-y-1 ml-4">
+                                    <li>Automatic Livewire integration via wire: attributes</li>
+                                    <li>Existing file management with remove functionality</li>
+                                    <li>Responsive design with size variants (sm, md, lg)</li>
+                                    <li>Custom validation rules and file type filtering</li>
+                                    <li>Event-driven architecture for framework integration</li>
+                                </ul>
+                                <p class="mt-3 text-warning"><strong>💡 Note:</strong> File uploads are simulated in this demo. The component includes full Livewire integration and can be connected to real upload endpoints.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Gallery Components Section -->
+                    <section class="space-y-8">
+                        <div class="text-center">
+                            <h2 class="text-2xl font-bold mb-2">Gallery Components</h2>
+                            <p class="text-foreground/60">Interactive image galleries with thumbnail navigation, autoplay, and ecommerce features</p>
+                        </div>
+
+                        <!-- Basic Thumbnail Gallery -->
+                        <div class="bg-surface border border-border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4">Basic Thumbnail Gallery</h3>
+                            <x-keys::gallery
+                                :images="[
+                                    ['src' => 'https://picsum.photos/800/600?random=1', 'alt' => 'Nature landscape', 'caption' => 'Beautiful mountain landscape'],
+                                    ['src' => 'https://picsum.photos/800/600?random=2', 'alt' => 'City skyline', 'caption' => 'Modern city skyline at sunset'],
+                                    ['src' => 'https://picsum.photos/800/600?random=3', 'alt' => 'Ocean view', 'caption' => 'Peaceful ocean waves'],
+                                    ['src' => 'https://picsum.photos/800/600?random=4', 'alt' => 'Forest path', 'caption' => 'Winding forest trail'],
+                                ]"
+                                type="thumbnail"
+                                aspect-ratio="video"
+                                radius="lg"
+                                :lightbox="true"
+                            />
+                        </div>
+
+                        <!-- Ecommerce Gallery with Side Thumbnails -->
+                        <div class="bg-surface border border-border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4">Ecommerce Gallery (Side Thumbnails)</h3>
+                            <x-keys::gallery
+                                :images="[
+                                    [
+                                        'src' => 'https://picsum.photos/600/600?random=10',
+                                        'alt' => 'Premium Watch - Front View',
+                                        'title' => 'Premium Watch - Front View',
+                                        'description' => 'Elegant design with precision craftsmanship'
+                                    ],
+                                    [
+                                        'src' => 'https://picsum.photos/600/600?random=11',
+                                        'alt' => 'Premium Watch - Side View',
+                                        'title' => 'Premium Watch - Side View',
+                                        'description' => 'Sleek profile showing the refined case design'
+                                    ],
+                                    [
+                                        'src' => 'https://picsum.photos/600/600?random=12',
+                                        'alt' => 'Premium Watch - Back View',
+                                        'title' => 'Premium Watch - Back View',
+                                        'description' => 'Transparent case back revealing the intricate mechanism'
+                                    ],
+                                    [
+                                        'src' => 'https://picsum.photos/600/600?random=13',
+                                        'alt' => 'Premium Watch - Detail',
+                                        'title' => 'Premium Watch - Detail',
+                                        'description' => 'Close-up of the precision dial and hands'
+                                    ]
+                                ]"
+                                type="ecommerce"
+                                aspect-ratio="square"
+                                radius="lg"
+                                thumbnail-position="side"
+                                thumbnail-size="md"
+                                :lightbox="true"
+                            />
+                        </div>
+
+                        <!-- Basic Gallery with Autoplay -->
+                        <div class="bg-surface border border-border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4">Basic Gallery with Autoplay</h3>
+                            <x-keys::gallery
+                                :images="[
+                                    ['src' => 'https://picsum.photos/800/400?random=20', 'alt' => 'Abstract art 1'],
+                                    ['src' => 'https://picsum.photos/800/400?random=21', 'alt' => 'Abstract art 2'],
+                                    ['src' => 'https://picsum.photos/800/400?random=22', 'alt' => 'Abstract art 3'],
+                                    ['src' => 'https://picsum.photos/800/400?random=23', 'alt' => 'Abstract art 4'],
+                                    ['src' => 'https://picsum.photos/800/400?random=24', 'alt' => 'Abstract art 5'],
+                                ]"
+                                type="basic"
+                                aspect-ratio="wide"
+                                radius="xl"
+                                :autoplay="true"
+                                :autoplay-delay="4000"
+                                :loop="true"
+                                :show-thumbnails="false"
+                            />
+                        </div>
+
+                        <!-- Compact Gallery with Top Thumbnails -->
+                        <div class="bg-surface border border-border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4">Compact Gallery (Top Thumbnails)</h3>
+                            <x-keys::gallery
+                                :images="[
+                                    ['src' => 'https://picsum.photos/500/500?random=30', 'alt' => 'Product variant 1'],
+                                    ['src' => 'https://picsum.photos/500/500?random=31', 'alt' => 'Product variant 2'],
+                                    ['src' => 'https://picsum.photos/500/500?random=32', 'alt' => 'Product variant 3'],
+                                ]"
+                                type="thumbnail"
+                                aspect-ratio="square"
+                                radius="md"
+                                thumbnail-position="top"
+                                thumbnail-size="sm"
+                            />
+                        </div>
+
+                        <!-- Testing Info -->
+                        <div class="bg-surface border border-border rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-3">Gallery Features to Test</h3>
+                            <div class="text-sm text-foreground/70 space-y-2">
+                                <p><strong>🖼️ Navigation:</strong></p>
+                                <ul class="list-disc list-inside space-y-1 ml-4">
+                                    <li>Click thumbnails to navigate between images</li>
+                                    <li>Use arrow buttons (on basic/ecommerce types) for navigation</li>
+                                    <li>Keyboard navigation: Arrow keys, Home, End, Space (autoplay toggle), Escape</li>
+                                    <li>Touch/swipe gestures on mobile devices</li>
+                                </ul>
+                                <p class="mt-3"><strong>🔄 Autoplay Features:</strong></p>
+                                <ul class="list-disc list-inside space-y-1 ml-4">
+                                    <li>Auto-advancing slideshow with configurable delay</li>
+                                    <li>Pause/play toggle button in top-right corner</li>
+                                    <li>Automatic pause on hover, resume on mouse leave</li>
+                                    <li>Loop option for continuous cycling</li>
+                                </ul>
+                                <p class="mt-3"><strong>🎨 Layout Options:</strong></p>
+                                <ul class="list-disc list-inside space-y-1 ml-4">
+                                    <li>Thumbnail positions: bottom (default), top, side</li>
+                                    <li>Gallery types: thumbnail, ecommerce, basic</li>
+                                    <li>Aspect ratios: auto, square, video, photo, wide</li>
+                                    <li>Thumbnail sizes: xs, sm, md, lg</li>
+                                    <li>Border radius options: none, sm, md, lg, xl, full</li>
+                                </ul>
+                                <p class="mt-3"><strong>🛍️ Ecommerce Features:</strong></p>
+                                <ul class="list-disc list-inside space-y-1 ml-4">
+                                    <li>Image counter display (1/4 format)</li>
+                                    <li>Dynamic image titles and descriptions</li>
+                                    <li>Product variant switching capabilities</li>
+                                    <li>Lightbox integration for detailed viewing</li>
+                                </ul>
+                                <p class="mt-3 text-info"><strong>💡 Technical:</strong> All galleries are fully accessible with ARIA labels, keyboard navigation, and screen reader support. Images are lazy-loaded and responsive.</p>
+                            </div>
+                        </div>
+                    </section>
+
                 </div>
             </div>
         </div>

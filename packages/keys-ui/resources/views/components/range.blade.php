@@ -1,6 +1,8 @@
 @php
     $inputId = $uniqueId;
     $wrapperClasses = $computedContainerClasses;
+    $livewireAttributes = $attributes->whereStartsWith('wire:');
+    $wrapperAttributes = $attributes->whereDoesntStartWith('wire:');
 @endphp
 
 @if($isShorthand())
@@ -9,7 +11,7 @@
             {{ $label }}
         </x-keys::label>
 
-        <div {{ $attributes->except(['class'])->merge(['class' => $wrapperClasses, 'data-range' => 'true']) }}>
+        <div {{ $wrapperAttributes->except(['class'])->merge(['class' => $wrapperClasses, 'data-range' => 'true']) }}>
             {{-- Main range component content --}}
             @include('keys::components.range.content')
         </div>
@@ -19,7 +21,7 @@
         @endif
     </div>
 @else
-    <div {{ $attributes->except(['class'])->merge(['class' => $wrapperClasses, 'data-range' => 'true']) }}>
+    <div {{ $wrapperAttributes->except(['class'])->merge(['class' => $wrapperClasses, 'data-range' => 'true']) }}>
         {{-- Main range component content --}}
         @include('keys::components.range.content')
     </div>
@@ -159,14 +161,17 @@
     <input type="hidden"
            name="{{ $name }}[0]"
            value="{{ $computedValue[0] }}"
-           data-range-input="min" />
+           data-range-input="min"
+           {{ $livewireAttributes }} />
     <input type="hidden"
            name="{{ $name }}[1]"
            value="{{ $computedValue[1] }}"
-           data-range-input="max" />
+           data-range-input="max"
+           {{ $livewireAttributes }} />
 @else
     <input type="hidden"
            name="{{ $name }}"
            value="{{ $computedValue }}"
-           data-range-input="single" />
+           data-range-input="single"
+           {{ $livewireAttributes }} />
 @endif

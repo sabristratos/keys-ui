@@ -120,7 +120,15 @@ class AssetManager
     protected function renderViteDevStyles(): string
     {
         $devServerUrl = $this->config['vite']['dev_server_url'] ?? 'http://localhost:5173';
-        return '<link rel="stylesheet" href="' . $devServerUrl . '/packages/keys-ui/resources/css/keys-ui.css">';
+        $html = '<link rel="stylesheet" href="' . $devServerUrl . '/packages/keys-ui/resources/css/keys-ui.css">' . "\n";
+
+        // Also load style.css for Quill styles in development
+        $styleCssPath = $this->getSpecificAssetPath('css', 'style.css');
+        if ($styleCssPath) {
+            $html .= '<link rel="stylesheet" href="' . asset($styleCssPath) . '">';
+        }
+
+        return $html;
     }
 
     /**
@@ -143,13 +151,20 @@ class AssetManager
      */
     protected function renderProductionStyles(): string
     {
-        $cssPath = $this->getAssetPath('css');
-        if (!$cssPath) {
-            return '';
+        $html = '';
+
+        // Load both CSS files - keys-ui.css and style.css (with Quill styles)
+        $cssFiles = ['keys-ui.css', 'style.css'];
+
+        foreach ($cssFiles as $cssFile) {
+            $cssPath = $this->getSpecificAssetPath('css', $cssFile);
+            if ($cssPath) {
+                $url = $this->shouldUseVersioning() ? $this->addVersionHash($cssPath) : $cssPath;
+                $html .= '<link rel="stylesheet" href="' . asset($url) . '">' . "\n";
+            }
         }
 
-        $url = $this->shouldUseVersioning() ? $this->addVersionHash($cssPath) : $cssPath;
-        return '<link rel="stylesheet" href="' . asset($url) . '">';
+        return $html;
     }
 
     /**
@@ -175,6 +190,17 @@ class AssetManager
     }
 
     /**
+     * Get specific asset path for a given file
+     */
+    protected function getSpecificAssetPath(string $type, string $filename): ?string
+    {
+        $publicPath = $this->config['paths']['public_path'] ?? 'vendor/keys-ui';
+        $fullPath = $publicPath . '/' . $filename;
+
+        return File::exists(public_path($fullPath)) ? $fullPath : null;
+    }
+
+    /**
      * Get asset path from manifest or fallback to configured path
      */
     protected function getAssetPath(string $type): ?string
@@ -193,7 +219,7 @@ class AssetManager
         }
 
         $publicPath = $this->config['paths']['public_path'] ?? 'vendor/keys-ui';
-        $fileName = $this->config['paths'][$type] ?? ($type === 'css' ? 'css/keys-ui.css' : 'js/keys-ui.js');
+        $fileName = $this->config['paths'][$type] ?? ($type === 'css' ? 'style.css' : 'keys-ui.es.js');
 
         $fullPath = $publicPath . '/' . $fileName;
 
