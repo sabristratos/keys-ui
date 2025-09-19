@@ -1,9 +1,21 @@
 {
     "name": "keys/ui",
     "description": "A modern Blade components library for Laravel 12 and Tailwind v4",
-    "version": "1.0.0",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "laravel",
+        "blade",
+        "components",
+        "ui",
+        "tailwind",
+        "tailwindcss",
+        "forms",
+        "buttons",
+        "modals",
+        "design-system"
+    ],
+    "homepage": "https://github.com/sabristratos/keys",
     "authors": [
         {
             "name": "Keys Team",
@@ -36,9 +48,14 @@
             ]
         }
     },
+    "support": {
+        "issues": "https://github.com/sabristratos/keys/issues",
+        "source": "https://github.com/sabristratos/keys",
+        "docs": "https://github.com/sabristratos/keys#readme"
+    },
     "config": {
         "sort-packages": true
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
