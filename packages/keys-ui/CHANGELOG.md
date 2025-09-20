@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.1] - 2025-01-20
+## [1.1.1] - 2025-01-20
 
 ### Fixed
 - **TypeScript Compatibility**: Resolved all TypeScript type errors across component files

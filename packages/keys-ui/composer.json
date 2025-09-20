@@ -1,6 +1,6 @@
 {
     "name": "keys/ui",
-    "version": "1.0.1",
+    "version": "1.1.1",
     "description": "A modern Blade components library for Laravel 12 and Tailwind v4",
     "type": "library",
     "license": "MIT",
