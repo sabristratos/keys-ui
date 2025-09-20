@@ -111,6 +111,7 @@ class KeysUiServiceProvider extends ServiceProvider
             __DIR__.'/../resources/views' => resource_path('views/vendor/keys'),
         ], 'keys-ui-views');
 
+        // Publish both CSS and JS assets together for zero-config setup
         $this->publishes([
             __DIR__.'/../dist' => public_path('vendor/keys-ui'),
         ], 'keys-ui-assets');

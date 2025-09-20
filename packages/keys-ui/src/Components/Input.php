@@ -144,11 +144,12 @@ class Input extends Component
 
     public function iconOffset(): array
     {
+        // Use logical positioning (start/end) for RTL support
         return match ($this->size) {
-            'sm' => ['left' => 'left-2.5', 'right' => 'right-2.5'],
-            'md' => ['left' => 'left-3', 'right' => 'right-3'],
-            'lg' => ['left' => 'left-3.5', 'right' => 'right-3.5'],
-            default => ['left' => 'left-3', 'right' => 'right-3']
+            'sm' => ['left' => 'start-2.5', 'right' => 'end-2.5'],
+            'md' => ['left' => 'start-3', 'right' => 'end-3'],
+            'lg' => ['left' => 'start-3.5', 'right' => 'end-3.5'],
+            default => ['left' => 'start-3', 'right' => 'end-3']
         };
     }
 

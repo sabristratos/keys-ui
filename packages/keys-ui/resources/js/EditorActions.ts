@@ -322,7 +322,7 @@ export class EditorActions extends BaseActionClass<EditorState> {
 
         // Add keyboard navigation for toolbar
         toolbar.addEventListener('keydown', (e) => {
-            this.handleToolbarKeyboard(e, buttons);
+            this.handleToolbarKeyboard(e as KeyboardEvent, buttons);
         });
     }
 

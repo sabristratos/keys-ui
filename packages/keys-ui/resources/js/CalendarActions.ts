@@ -17,6 +17,18 @@ import { DateUtils } from './utils/DateUtils';
 
 type ViewMode = 'calendar' | 'month' | 'year';
 
+interface CalendarDay {
+    date: string;
+    day: number;
+    isCurrentMonth: boolean;
+    isToday: boolean;
+    isSelected: boolean;
+    isDisabled: boolean;
+    isInRange?: boolean;
+    isRangeStart?: boolean;
+    isRangeEnd?: boolean;
+}
+
 interface CalendarState {
     currentMonth: string; // YYYY-MM format
     selectedDate: string | null;
@@ -432,17 +444,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
     /**
      * Generate calendar grid for a given month
      */
-    private generateCalendarGrid(calendar: HTMLElement): Array<Array<{
-        date: string;
-        day: number;
-        isCurrentMonth: boolean;
-        isToday: boolean;
-        isSelected: boolean;
-        isDisabled: boolean;
-        isInRange?: boolean;
-        isRangeStart?: boolean;
-        isRangeEnd?: boolean;
-    }>> {
+    private generateCalendarGrid(calendar: HTMLElement): Array<Array<CalendarDay>> {
         const state = this.getState(calendar);
         if (!state) return [];
 
@@ -561,7 +563,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
         html += '<tbody>';
         weeks.forEach(week => {
             html += '<tr role="row">';
-            week.forEach(day => {
+            week.forEach((day: CalendarDay) => {
                 const buttonClasses = this.getDayButtonClasses(day);
                 const ariaLabel = DateUtils.createDateAriaLabel(day.date, day.isToday, day.isSelected, day.isRangeStart, day.isRangeEnd, day.isInRange);
                 const rangeAttributes = this.getRangeAttributes(day, state);
@@ -1069,7 +1071,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
             html += '<tbody>';
             weeks.forEach(week => {
                 html += '<tr role="row">';
-                week.forEach(day => {
+                week.forEach((day: CalendarDay) => {
                     const buttonClasses = this.getDayButtonClasses(day);
                     const ariaLabel = DateUtils.createDateAriaLabel(day.date, day.isToday, day.isSelected, day.isRangeStart, day.isRangeEnd, day.isInRange);
                     const rangeAttributes = this.getRangeAttributes(day, state);
@@ -1248,7 +1250,7 @@ export class CalendarActions extends BaseActionClass<CalendarState> {
         if (state.currentMonth !== todayMonth) {
             state.currentMonth = todayMonth;
             this.setState(calendar, state);
-            this.renderCalendarDisplay(calendar);
+            this.updateCalendarDisplay(calendar);
         }
     }
 

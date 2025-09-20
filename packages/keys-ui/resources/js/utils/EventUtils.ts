@@ -312,8 +312,8 @@ export class EventUtils {
      * Handle escape key globally
      */
     static handleEscape(handler: (event: KeyboardEvent) => void): () => void {
-        const keyHandler = this.handleKeyPress(['Escape'], handler);
-        return this.addEventListener(document, 'keydown', keyHandler);
+        const keyHandler = this.handleKeyPress(['Escape'], (key: string, event: KeyboardEvent) => handler(event));
+        return this.addEventListener(document, 'keydown', (e: Event) => keyHandler(e as KeyboardEvent));
     }
 
     /**

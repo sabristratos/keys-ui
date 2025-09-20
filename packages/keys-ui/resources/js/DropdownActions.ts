@@ -11,6 +11,7 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
+import { RTLUtils } from './utils/RTLUtils';
 
 interface DropdownState {
     isOpen: boolean;
@@ -544,22 +545,29 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         const align = dropdown.dataset.align || 'start';
         const offset = parseInt(dropdown.dataset.offset || '8');
 
+        // Get RTL-aware positioning
+        const rtlPosition = RTLUtils.getDropdownPosition(
+            position as 'left' | 'right' | 'top' | 'bottom',
+            align as 'start' | 'center' | 'end'
+        );
+
         panel.style.top = '';
         panel.style.bottom = '';
         panel.style.left = '';
         panel.style.right = '';
+        panel.style.transform = '';
 
         const spaceBelow = viewportHeight - rect.bottom;
         const spaceAbove = rect.top;
         const spaceRight = viewportWidth - rect.left;
         const spaceLeft = rect.right;
 
-        let finalPosition = position;
-        let finalAlign = align;
+        let finalPosition = rtlPosition.position;
+        let finalAlign = rtlPosition.align;
 
-        if (position === 'bottom' && spaceBelow < panelRect.height && spaceAbove > panelRect.height) {
+        if (finalPosition === 'bottom' && spaceBelow < panelRect.height && spaceAbove > panelRect.height) {
             finalPosition = 'top';
-        } else if (position === 'top' && spaceAbove < panelRect.height && spaceBelow > panelRect.height) {
+        } else if (finalPosition === 'top' && spaceAbove < panelRect.height && spaceBelow > panelRect.height) {
             finalPosition = 'bottom';
         }
 
@@ -585,14 +593,22 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         if (finalPosition === 'top' || finalPosition === 'bottom') {
             switch (finalAlign) {
                 case 'start':
-                    panel.style.left = '0';
+                    if (RTLUtils.isRTL()) {
+                        panel.style.right = '0';
+                    } else {
+                        panel.style.left = '0';
+                    }
                     break;
                 case 'center':
                     panel.style.left = '50%';
                     panel.style.transform = 'translateX(-50%)';
                     break;
                 case 'end':
-                    panel.style.right = '0';
+                    if (RTLUtils.isRTL()) {
+                        panel.style.left = '0';
+                    } else {
+                        panel.style.right = '0';
+                    }
                     break;
             }
         } else {
@@ -629,6 +645,12 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         const align = submenu.dataset.align || 'start';
         const offset = parseInt(submenu.dataset.offset || '4');
 
+        // Get RTL-aware positioning for submenus
+        const rtlPosition = RTLUtils.getDropdownPosition(
+            position as 'left' | 'right' | 'top' | 'bottom',
+            align as 'start' | 'center' | 'end'
+        );
+
         panel.style.top = '';
         panel.style.bottom = '';
         panel.style.left = '';
@@ -640,11 +662,12 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         const spaceBelow = viewportHeight - rect.bottom;
         const spaceAbove = rect.top;
 
-        let finalPosition = position;
+        let finalPosition = rtlPosition.position;
 
-        if (position === 'right' && spaceRight < panelRect.width && spaceLeft > panelRect.width) {
+        // Auto-flip if there's not enough space
+        if (finalPosition === 'right' && spaceRight < panelRect.width && spaceLeft > panelRect.width) {
             finalPosition = 'left';
-        } else if (position === 'left' && spaceLeft < panelRect.width && spaceRight > panelRect.width) {
+        } else if (finalPosition === 'left' && spaceLeft < panelRect.width && spaceRight > panelRect.width) {
             finalPosition = 'right';
         }
 
@@ -659,7 +682,7 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
                 break;
         }
 
-        switch (align) {
+        switch (rtlPosition.align) {
             case 'start':
                 panel.style.top = '0';
                 break;
@@ -672,6 +695,7 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
                 break;
         }
 
+        // Viewport boundary adjustments
         const finalPanelRect = panel.getBoundingClientRect();
         if (finalPanelRect.bottom > viewportHeight) {
             const overflow = finalPanelRect.bottom - viewportHeight + 8;

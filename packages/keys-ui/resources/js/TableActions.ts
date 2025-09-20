@@ -245,7 +245,7 @@ export class TableActions extends BaseActionClass<TableState> {
         const state = this.getState(table);
         if (!state) return;
 
-        const rowCheckboxes = DOMUtils.querySelectorAll('[data-table-row-select]', table) as NodeListOf<HTMLInputElement>;
+        const rowCheckboxes = DOMUtils.querySelectorAll('[data-table-row-select]', table) as HTMLInputElement[];
 
         if (checkbox.checked) {
             // Select all
@@ -274,7 +274,7 @@ export class TableActions extends BaseActionClass<TableState> {
         const state = this.getState(table);
         if (!state) return;
 
-        const rowCheckboxes = DOMUtils.querySelectorAll('[data-table-row-select]', table) as NodeListOf<HTMLInputElement>;
+        const rowCheckboxes = DOMUtils.querySelectorAll('[data-table-row-select]', table) as HTMLInputElement[];
         const selectAllCheckbox = DOMUtils.querySelector('[data-table-select-all]', table) as HTMLInputElement;
 
         const totalRows = rowCheckboxes.length;
@@ -432,6 +432,8 @@ declare global {
     interface Window {
         TableActions: typeof TableActions;
         Livewire?: {
+            on: (event: string, callback: (data: any) => void) => void;
+            dispatch: (event: string, data?: any) => void;
             find: (id: string) => any;
         };
     }

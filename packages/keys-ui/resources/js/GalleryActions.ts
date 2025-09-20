@@ -35,6 +35,19 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
     }
 
     /**
+     * Bind event listeners - required by BaseActionClass
+     */
+    protected bindEventListeners(): void {
+        // Global keyboard navigation
+        EventUtils.handleDelegatedKeydown('[data-gallery="true"]', (element, event) => {
+            const galleryId = element.dataset.galleryId;
+            if (galleryId) {
+                this.handleKeyboardNavigation(event, galleryId, element);
+            }
+        });
+    }
+
+    /**
      * Initialize a single gallery element
      */
     private initializeGallery(galleryElement: HTMLElement): void {
@@ -42,7 +55,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         if (!galleryId) return;
 
         // Initialize state
-        this.setState(galleryId, {
+        this.setState(galleryElement, {
             currentIndex: 0,
             isAutoplayActive: galleryElement.dataset.autoplay === 'true',
             autoplayInterval: null,
@@ -78,13 +91,13 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const nextButton = galleryElement.querySelector('[data-gallery-action="next"]') as HTMLElement;
 
         if (prevButton) {
-            EventUtils.delegate(prevButton, 'click', () => {
+            EventUtils.addEventListener(prevButton, 'click', () => {
                 this.navigateToImage(galleryId, galleryElement, 'prev');
             });
         }
 
         if (nextButton) {
-            EventUtils.delegate(nextButton, 'click', () => {
+            EventUtils.addEventListener(nextButton, 'click', () => {
                 this.navigateToImage(galleryId, galleryElement, 'next');
             });
         }
@@ -92,14 +105,15 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         // Thumbnail clicks and keyboard navigation
         const thumbnails = galleryElement.querySelectorAll('[data-gallery-thumbnail]');
         thumbnails.forEach((thumbnail, index) => {
-            EventUtils.delegate(thumbnail as HTMLElement, 'click', () => {
+            EventUtils.addEventListener(thumbnail as HTMLElement, 'click', () => {
                 this.goToImage(galleryId, galleryElement, index);
             });
 
             // Keyboard support for thumbnails
-            EventUtils.delegate(thumbnail as HTMLElement, 'keydown', (e: KeyboardEvent) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
+            EventUtils.addEventListener(thumbnail as HTMLElement, 'keydown', (e: Event) => {
+                const keyboardEvent = e as KeyboardEvent;
+                if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') {
+                    keyboardEvent.preventDefault();
                     this.goToImage(galleryId, galleryElement, index);
                 }
             });
@@ -108,25 +122,20 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         // Autoplay toggle
         const autoplayToggle = galleryElement.querySelector('[data-gallery-action="toggle-autoplay"]') as HTMLElement;
         if (autoplayToggle) {
-            EventUtils.delegate(autoplayToggle, 'click', () => {
+            EventUtils.addEventListener(autoplayToggle, 'click', () => {
                 this.toggleAutoplay(galleryId, galleryElement);
             });
         }
-
-        // Keyboard navigation
-        EventUtils.delegate(galleryElement, 'keydown', (e: KeyboardEvent) => {
-            this.handleKeyboardNavigation(e, galleryId, galleryElement);
-        });
 
         // Touch/swipe events
         this.setupTouchEvents(galleryElement, galleryId);
 
         // Pause autoplay on hover
-        EventUtils.delegate(galleryElement, 'mouseenter', () => {
+        EventUtils.addEventListener(galleryElement, 'mouseenter', () => {
             this.pauseAutoplayOnHover(galleryId);
         });
 
-        EventUtils.delegate(galleryElement, 'mouseleave', () => {
+        EventUtils.addEventListener(galleryElement, 'mouseleave', () => {
             this.resumeAutoplayOnHover(galleryId, galleryElement);
         });
     }
@@ -139,27 +148,29 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         if (!mainImage) return;
 
         // Touch start
-        EventUtils.delegate(mainImage as HTMLElement, 'touchstart', (e: TouchEvent) => {
-            const state = this.getState(galleryId);
+        EventUtils.addEventListener(mainImage as HTMLElement, 'touchstart', (e: Event) => {
+            const touchEvent = e as TouchEvent;
+            const state = this.getState(galleryElement);
             if (!state) return;
 
-            state.touchStartX = e.touches[0].clientX;
+            state.touchStartX = touchEvent.touches[0].clientX;
             state.isDragging = true;
-            this.setState(galleryId, state);
-        }, { passive: true });
+            this.setState(galleryElement, state);
+        });
 
         // Touch move
-        EventUtils.delegate(mainImage as HTMLElement, 'touchmove', (e: TouchEvent) => {
-            const state = this.getState(galleryId);
+        EventUtils.addEventListener(mainImage as HTMLElement, 'touchmove', (e: Event) => {
+            const touchEvent = e as TouchEvent;
+            const state = this.getState(galleryElement);
             if (!state?.isDragging) return;
 
-            state.touchEndX = e.touches[0].clientX;
-            this.setState(galleryId, state);
-        }, { passive: true });
+            state.touchEndX = touchEvent.touches[0].clientX;
+            this.setState(galleryElement, state);
+        });
 
         // Touch end
-        EventUtils.delegate(mainImage as HTMLElement, 'touchend', () => {
-            const state = this.getState(galleryId);
+        EventUtils.addEventListener(mainImage as HTMLElement, 'touchend', () => {
+            const state = this.getState(galleryElement);
             if (!state?.isDragging) return;
 
             state.isDragging = false;
@@ -176,7 +187,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
                 }
             }
 
-            this.setState(galleryId, state);
+            this.setState(galleryElement, state);
         });
     }
 
@@ -205,7 +216,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             case 'Escape':
                 e.preventDefault();
                 // Close lightbox if open, or pause autoplay
-                if (this.getState(galleryId)?.isAutoplayActive) {
+                if (this.getState(galleryElement)?.isAutoplayActive) {
                     this.pauseAutoplay(galleryId, galleryElement);
                 }
                 break;
@@ -220,7 +231,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Navigate to previous or next image
      */
     private navigateToImage(galleryId: string, galleryElement: HTMLElement, direction: 'prev' | 'next'): void {
-        const state = this.getState(galleryId);
+        const state = this.getState(galleryElement);
         if (!state) return;
 
         const totalImages = parseInt(galleryElement.dataset.totalImages || '0');
@@ -247,7 +258,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Go to a specific image by index
      */
     private goToImage(galleryId: string, galleryElement: HTMLElement, index: number): void {
-        const state = this.getState(galleryId);
+        const state = this.getState(galleryElement);
         if (!state) return;
 
         const totalImages = parseInt(galleryElement.dataset.totalImages || '0');
@@ -255,7 +266,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
 
         // Update state
         state.currentIndex = index;
-        this.setState(galleryId, state);
+        this.setState(galleryElement, state);
 
         // Update UI
         this.updateImageDisplay(galleryElement, index);
@@ -352,7 +363,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Start autoplay
      */
     private startAutoplay(galleryId: string, galleryElement: HTMLElement): void {
-        const state = this.getState(galleryId);
+        const state = this.getState(galleryElement);
         if (!state) return;
 
         const delay = parseInt(galleryElement.dataset.autoplayDelay || '3000');
@@ -362,7 +373,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         }, delay);
 
         state.isAutoplayActive = true;
-        this.setState(galleryId, state);
+        this.setState(galleryElement, state);
         this.updateAutoplayButton(galleryElement, true);
     }
 
@@ -370,7 +381,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Pause autoplay
      */
     private pauseAutoplay(galleryId: string, galleryElement: HTMLElement): void {
-        const state = this.getState(galleryId);
+        const state = this.getState(galleryElement);
         if (!state) return;
 
         if (state.autoplayInterval) {
@@ -379,7 +390,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         }
 
         state.isAutoplayActive = false;
-        this.setState(galleryId, state);
+        this.setState(galleryElement, state);
         this.updateAutoplayButton(galleryElement, false);
     }
 
@@ -387,7 +398,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Toggle autoplay
      */
     private toggleAutoplay(galleryId: string, galleryElement: HTMLElement): void {
-        const state = this.getState(galleryId);
+        const state = this.getState(galleryElement);
         if (!state) return;
 
         if (state.isAutoplayActive) {
@@ -429,19 +440,22 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Pause autoplay on hover
      */
     private pauseAutoplayOnHover(galleryId: string): void {
-        const state = this.getState(galleryId);
+        const galleryElement = document.querySelector(`[data-gallery-id="${galleryId}"]`) as HTMLElement;
+        if (!galleryElement) return;
+
+        const state = this.getState(galleryElement);
         if (!state?.isAutoplayActive || !state.autoplayInterval) return;
 
         clearInterval(state.autoplayInterval);
         state.autoplayInterval = null;
-        this.setState(galleryId, state);
+        this.setState(galleryElement, state);
     }
 
     /**
      * Resume autoplay when hover ends
      */
     private resumeAutoplayOnHover(galleryId: string, galleryElement: HTMLElement): void {
-        const state = this.getState(galleryId);
+        const state = this.getState(galleryElement);
         if (!state?.isAutoplayActive || state.autoplayInterval) return;
 
         const delay = parseInt(galleryElement.dataset.autoplayDelay || '3000');
@@ -449,14 +463,14 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             this.navigateToImage(galleryId, galleryElement, 'next');
         }, delay);
 
-        this.setState(galleryId, state);
+        this.setState(galleryElement, state);
     }
 
     /**
      * Update accessibility attributes
      */
     private updateAccessibility(galleryElement: HTMLElement, galleryId: string): void {
-        const state = this.getState(galleryId);
+        const state = this.getState(galleryElement);
         if (!state) return;
 
         const totalImages = parseInt(galleryElement.dataset.totalImages || '0');
@@ -691,10 +705,13 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Clean up when gallery is removed
      */
     public cleanup(galleryId: string): void {
-        const state = this.getState(galleryId);
+        const galleryElement = document.querySelector(`[data-gallery-id="${galleryId}"]`) as HTMLElement;
+        if (!galleryElement) return;
+
+        const state = this.getState(galleryElement);
         if (state?.autoplayInterval) {
             clearInterval(state.autoplayInterval);
         }
-        this.removeState(galleryId);
+        this.removeState(galleryElement);
     }
 }

@@ -436,8 +436,8 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
      * Reinitialize tooltips (useful after dynamic content changes)
      */
     private reinitialize(): void {
-        this.tooltipStates.clear();
-        this.initializeTooltips();
+        this.clearAllStates();
+        this.initializeElements();
     }
 
     /**
@@ -479,7 +479,7 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
     /**
      * Public API: Destroy tooltip instance
      */
-    public destroy(tooltipId: string): boolean {
+    public destroyTooltip(tooltipId: string): boolean {
         const tooltip = DOMUtils.getElementById(tooltipId);
         if (tooltip && this.hasState(tooltip)) {
             this.hideTooltip(tooltip);

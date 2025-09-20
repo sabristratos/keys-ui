@@ -68,7 +68,7 @@ export class AddToCartActions extends BaseActionClass<CartState> {
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedInput(
                 '.qty-input',
-                (input, event) => this.handleQuantityInput(input, event)
+                (input, event) => this.handleQuantityInput(input as HTMLInputElement, event)
             )
         );
 
@@ -76,7 +76,7 @@ export class AddToCartActions extends BaseActionClass<CartState> {
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedKeydown(
                 '.qty-input',
-                (input, event) => this.handleQuantityKeydown(input, event)
+                (input, event) => this.handleQuantityKeydown(input as HTMLInputElement, event)
             )
         );
     }
@@ -394,6 +394,7 @@ export class AddToCartActions extends BaseActionClass<CartState> {
 
     private getQuantityInput(button: HTMLElement): HTMLInputElement | null {
         const wrapper = DOMUtils.findClosest(button, '.add-to-cart-wrapper');
+        if (!wrapper) return null;
         return DOMUtils.querySelector('.qty-input', wrapper) as HTMLInputElement;
     }
 

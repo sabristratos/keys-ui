@@ -68,7 +68,7 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedChange(
                 '[data-file-input]',
-                (element, event) => this.handleFileInputChange(element, event)
+                (element, event) => this.handleFileInputChange(element as HTMLInputElement, event)
             )
         );
 
@@ -935,6 +935,7 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
 
         // Get all current previews
         const zone = state.fileUploadZone;
+        if (!zone) return;
         const previews = this.filePreviewsMap.get(zone);
         if (!previews) return;
 

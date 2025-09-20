@@ -188,13 +188,13 @@ export class RangeActions extends BaseActionClass<RangeData> {
      */
     protected bindEventListeners(): void {
         // Global mouse events for dragging
-        EventUtils.addEventListener(document, 'mousemove', (e) => this.handleMove(e));
-        EventUtils.addEventListener(document, 'mouseup', (e) => this.handleEnd(e));
+        EventUtils.addEventListener(document, 'mousemove', (e) => this.handleMove(e as MouseEvent));
+        EventUtils.addEventListener(document, 'mouseup', (e) => this.handleEnd(e as MouseEvent));
 
         // Global touch events for dragging
-        EventUtils.addEventListener(document, 'touchmove', (e) => this.handleMove(e), { passive: false });
-        EventUtils.addEventListener(document, 'touchend', (e) => this.handleEnd(e));
-        EventUtils.addEventListener(document, 'touchcancel', (e) => this.handleEnd(e));
+        EventUtils.addEventListener(document, 'touchmove', (e) => this.handleMove(e as TouchEvent), { passive: false });
+        EventUtils.addEventListener(document, 'touchend', (e) => this.handleEnd(e as TouchEvent));
+        EventUtils.addEventListener(document, 'touchcancel', (e) => this.handleEnd(e as TouchEvent));
     }
 
     /**
@@ -621,7 +621,7 @@ export class RangeActions extends BaseActionClass<RangeData> {
     /**
      * Destroy range component
      */
-    public destroy(container: HTMLElement): void {
+    public destroyRange(container: HTMLElement): void {
         this.removeState(container);
     }
 

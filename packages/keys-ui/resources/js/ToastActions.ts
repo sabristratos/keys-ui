@@ -123,7 +123,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
      * Get global toast state
      */
     private getGlobalState(): ToastState | null {
-        return this.getState(document.documentElement);
+        return this.getState(document.documentElement) || null;
     }
 
     /**
@@ -519,7 +519,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
 
         const eventData = { id: toastId, toast: toastId, ...data };
 
-        EventUtils.dispatchCustomEvent(document, eventName, eventData, {
+        EventUtils.dispatchCustomEvent(document.documentElement, eventName, eventData, {
             bubbles: true,
             cancelable: true
         });

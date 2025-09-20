@@ -1,6 +1,6 @@
 {
   "name": "@keys/ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Modern Blade components library for Laravel",
   "type": "module",
   "main": "dist/keys-ui.umd.js",
@@ -12,6 +12,16 @@
     "src",
     "config"
   ],
+  "exports": {
+    "./css": "./dist/keys-ui.css",
+    "./js": "./dist/keys-ui.umd.js",
+    "./postcss-plugin": "./postcss-plugin.js",
+    ".": {
+      "import": "./dist/keys-ui.es.js",
+      "require": "./dist/keys-ui.umd.js",
+      "style": "./dist/keys-ui.css"
+    }
+  },
   "scripts": {
     "dev": "vite --port 5174",
     "build": "vite build",
@@ -29,7 +39,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "quill": "^2.0.0"
+    "quill": "^2.0.3"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
