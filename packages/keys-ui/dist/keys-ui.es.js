@@ -1,6 +1,102 @@
-import W from "quill";
+import Z from "quill";
 import "quill/dist/quill.snow.css";
-const D = class D {
+class S {
+  static isDebugEnabled() {
+    const t = window.KeysUIConfig;
+    return t ? t.environment === "local" || t.debug === !0 : !1;
+  }
+  /**
+   * Log debug information only in local environment
+   */
+  static debugLog(t, e, a) {
+    if (!this.isDebugEnabled())
+      return;
+    const s = `🔧 Keys UI [${t}]`;
+    a !== void 0 ? console.log(`${s} ${e}`, a) : console.log(`${s} ${e}`);
+  }
+  /**
+   * Log component initialization with element count
+   */
+  static debugComponentInit(t, e, a) {
+    if (!this.isDebugEnabled())
+      return;
+    const s = `🚀 Keys UI [${t}]`, i = `Initialized with ${e} element${e !== 1 ? "s" : ""}`;
+    a && e > 0 ? (console.group(`${s} ${i}`), console.log("Elements:", a), console.groupEnd()) : console.log(`${s} ${i}`);
+  }
+  /**
+   * Log errors and issues with component initialization
+   */
+  static debugError(t, e, a) {
+    if (!this.isDebugEnabled())
+      return;
+    const s = `❌ Keys UI [${t}]`;
+    a !== void 0 ? console.error(`${s} ${e}`, a) : console.error(`${s} ${e}`);
+  }
+  /**
+   * Log warnings for potential issues
+   */
+  static debugWarn(t, e, a) {
+    if (!this.isDebugEnabled())
+      return;
+    const s = `⚠️ Keys UI [${t}]`;
+    a !== void 0 ? console.warn(`${s} ${e}`, a) : console.warn(`${s} ${e}`);
+  }
+  /**
+   * Create a grouped console log for complex operations
+   */
+  static debugGroup(t, e, a) {
+    if (!this.isDebugEnabled())
+      return;
+    const s = `📋 Keys UI [${t}]`;
+    console.group(`${s} ${e}`);
+    try {
+      a();
+    } finally {
+      console.groupEnd();
+    }
+  }
+  /**
+   * Log state changes and updates
+   */
+  static debugState(t, e, a, s) {
+    if (!this.isDebugEnabled())
+      return;
+    const i = `📊 Keys UI [${t}]`, n = a.tagName.toLowerCase() + (a.id ? `#${a.id}` : "") + (a.className ? `.${a.className.split(" ").join(".")}` : "");
+    s !== void 0 ? console.log(`${i} ${e} for ${n}`, s) : console.log(`${i} ${e} for ${n}`);
+  }
+  /**
+   * Log event binding and unbinding
+   */
+  static debugEvent(t, e, a, s) {
+    if (!this.isDebugEnabled())
+      return;
+    const i = `🎯 Keys UI [${t}]`;
+    console.log(`${i} ${e === "bind" ? "Bound" : "Unbound"} '${a}' event listeners to ${s} element${s !== 1 ? "s" : ""}`);
+  }
+  /**
+   * Log performance timing information
+   */
+  static debugTiming(t, e, a) {
+    if (!this.isDebugEnabled())
+      return;
+    const s = performance.now() - a, i = `⏱️ Keys UI [${t}]`;
+    console.log(`${i} ${e} completed in ${s.toFixed(2)}ms`);
+  }
+  /**
+   * Log the overall Keys UI initialization summary
+   */
+  static debugInitSummary(t, e) {
+    var a, s;
+    this.isDebugEnabled() && (console.group("🎉 Keys UI Initialization Complete"), console.log(`✅ Initialized ${t} component types`), console.log(`⏱️ Total initialization time: ${e.toFixed(2)}ms`), console.log(`🔧 Environment: ${((a = window.KeysUIConfig) == null ? void 0 : a.environment) || "unknown"}`), console.log(`📦 Version: ${((s = window.KeysUIConfig) == null ? void 0 : s.version) || "unknown"}`), console.groupEnd());
+  }
+  /**
+   * Check if debug mode is currently active
+   */
+  static isDebugActive() {
+    return this.isDebugEnabled();
+  }
+}
+const A = class A {
   constructor() {
     this.initialized = !1, this.stateManager = /* @__PURE__ */ new Map();
   }
@@ -10,23 +106,39 @@ const D = class D {
    */
   static getInstance() {
     const t = this.name;
-    return D.instances.has(t) || D.instances.set(t, new this()), D.instances.get(t);
+    return A.instances.has(t) || A.instances.set(t, new this()), A.instances.get(t);
   }
   /**
    * Standardized initialization flow
    * Prevents double initialization and provides lifecycle hooks
    */
   init() {
-    var t, e, a;
-    this.initialized || ((t = this.onBeforeInit) == null || t.call(this), this.bindEventListeners(), this.initializeElements(), (e = this.setupDynamicObserver) == null || e.call(this), (a = this.onAfterInit) == null || a.call(this), this.initialized = !0);
+    var e, a, s;
+    if (this.initialized) {
+      S.debugWarn(this.getComponentName(), "Component already initialized, skipping");
+      return;
+    }
+    const t = performance.now();
+    S.debugLog(this.getComponentName(), "Starting initialization..."), (e = this.onBeforeInit) == null || e.call(this);
+    try {
+      this.bindEventListeners(), this.initializeElements(), (a = this.setupDynamicObserver) == null || a.call(this), (s = this.onAfterInit) == null || s.call(this), this.initialized = !0, S.debugTiming(this.getComponentName(), "Initialization", t), S.debugLog(this.getComponentName(), `Successfully initialized with ${this.getStateCount()} managed elements`);
+    } catch (i) {
+      throw S.debugError(this.getComponentName(), "Initialization failed", i), i;
+    }
   }
   /**
    * Standardized cleanup and destroy
    * Handles state cleanup and provides extension point
    */
   destroy() {
-    var t;
-    (t = this.onDestroy) == null || t.call(this), this.stateManager.clear(), this.initialized = !1;
+    var e;
+    if (!this.initialized) {
+      S.debugWarn(this.getComponentName(), "Component not initialized, nothing to destroy");
+      return;
+    }
+    S.debugLog(this.getComponentName(), "Destroying component...");
+    const t = this.getStateCount();
+    (e = this.onDestroy) == null || e.call(this), this.stateManager.clear(), this.initialized = !1, S.debugLog(this.getComponentName(), `Destroyed component with ${t} managed elements`);
   }
   /**
    * State management utilities
@@ -92,9 +204,16 @@ const D = class D {
   getStateCount() {
     return this.stateManager.size;
   }
+  /**
+   * Get the component name for debugging
+   * Uses the class constructor name
+   */
+  getComponentName() {
+    return this.constructor.name;
+  }
 };
-D.instances = /* @__PURE__ */ new Map();
-let b = D;
+A.instances = /* @__PURE__ */ new Map();
+let b = A;
 class r {
   /**
    * Safely find the closest ancestor element matching selector
@@ -512,7 +631,7 @@ class d {
    */
   static createNavigationHandler(t) {
     return (e) => {
-      var i, n, o, l, c, u, h, f, v, g, S;
+      var i, n, o, l, c, u, h, f, v, m, w;
       const { key: a } = e, s = ((i = t.preventDefault) == null ? void 0 : i.includes(a)) ?? !0;
       switch (a) {
         case "ArrowUp":
@@ -540,27 +659,27 @@ class d {
           s && e.preventDefault(), (v = t.onHome) == null || v.call(t);
           break;
         case "End":
-          s && e.preventDefault(), (g = t.onEnd) == null || g.call(t);
+          s && e.preventDefault(), (m = t.onEnd) == null || m.call(t);
           break;
         case "Tab":
-          (S = t.onTab) == null || S.call(t);
+          (w = t.onTab) == null || w.call(t);
           break;
       }
     };
   }
 }
-function j(m, t = "") {
+function K(g, t = "") {
   const e = window.KeysUITranslations;
   if (!e)
     return t;
-  const a = m.split(".");
+  const a = g.split(".");
   let s = e;
   for (const i of a)
     if (s = s == null ? void 0 : s[i], s === void 0)
       return t;
   return s || t;
 }
-class q extends b {
+class O extends b {
   /**
    * Initialize form elements - required by BaseActionClass
    */
@@ -639,7 +758,7 @@ class q extends b {
   async copyToClipboard(t, e) {
     const a = r.querySelector("button", e);
     try {
-      await navigator.clipboard.writeText(t.value), this.showFeedback(t, j("feedback.copied_clipboard", "Copied to clipboard"), "success"), a && await this.showCopySuccess(a, e);
+      await navigator.clipboard.writeText(t.value), this.showFeedback(t, K("feedback.copied_clipboard", "Copied to clipboard"), "success"), a && await this.showCopySuccess(a, e);
     } catch {
       this.fallbackCopyToClipboard(t, e);
     }
@@ -651,7 +770,7 @@ class q extends b {
     const a = r.querySelector("button", e);
     t.select(), t instanceof HTMLInputElement && t.setSelectionRange(0, 99999);
     try {
-      document.execCommand("copy"), this.showFeedback(t, j("feedback.copied_clipboard", "Copied to clipboard"), "success"), a && this.showCopySuccess(a, e);
+      document.execCommand("copy"), this.showFeedback(t, K("feedback.copied_clipboard", "Copied to clipboard"), "success"), a && this.showCopySuccess(a, e);
     } catch {
       this.showFeedback(t, "Copy failed", "error");
     }
@@ -734,8 +853,8 @@ class q extends b {
   onDestroy() {
   }
 }
-q.getInstance();
-const M = class M {
+O.getInstance();
+const $ = class $ {
   /**
    * Check if user prefers reduced motion
    */
@@ -1015,10 +1134,10 @@ const M = class M {
     }, s);
   }
 };
-M.timers = /* @__PURE__ */ new Map(), M.timerCounter = 0;
-let p = M;
+$.timers = /* @__PURE__ */ new Map(), $.timerCounter = 0;
+let p = $;
 typeof window < "u" && (window.AnimationUtils = p);
-class O extends b {
+class R extends b {
   /**
    * Initialize alert elements - required by BaseActionClass
    */
@@ -1220,7 +1339,7 @@ class O extends b {
   onDestroy() {
   }
 }
-O.getInstance();
+R.getInstance();
 const F = class F {
   /**
    * Format Date object to string using custom format
@@ -1480,7 +1599,7 @@ F.MONTH_NAMES = [
   "Dec"
 ];
 let y = F;
-class A extends b {
+class E extends b {
   /**
    * Initialize calendar elements - required by BaseActionClass
    */
@@ -1727,7 +1846,7 @@ class A extends b {
     l.setDate(l.getDate() + (6 - l.getDay()));
     const c = [], u = new Date(o);
     for (; u <= l; ) {
-      const f = this.formatDateString(u), v = u.getMonth() === s - 1 && u.getFullYear() === a, g = {
+      const f = this.formatDateString(u), v = u.getMonth() === s - 1 && u.getFullYear() === a, m = {
         date: f,
         day: u.getDate(),
         isCurrentMonth: v,
@@ -1735,7 +1854,7 @@ class A extends b {
         isSelected: f === e.selectedDate,
         isDisabled: this.isDateDisabled(t, u)
       };
-      e.isRange && (g.isInRange = this.isDateInRange(f, e.startDate, e.endDate), g.isRangeStart = this.isDateRangeStart(f, e.startDate), g.isRangeEnd = this.isDateRangeEnd(f, e.endDate), g.isSelected = g.isRangeStart || g.isRangeEnd), c.push(g), u.setDate(u.getDate() + 1);
+      e.isRange && (m.isInRange = this.isDateInRange(f, e.startDate, e.endDate), m.isRangeStart = this.isDateRangeStart(f, e.startDate), m.isRangeEnd = this.isDateRangeEnd(f, e.endDate), m.isSelected = m.isRangeStart || m.isRangeEnd), c.push(m), u.setDate(u.getDate() + 1);
     }
     const h = [];
     for (let f = 0; f < c.length; f += 7)
@@ -2077,7 +2196,7 @@ class A extends b {
         u += `<th class="calendar-weekday text-center text-muted font-medium p-1" role="columnheader" aria-label="${v}">${h}</th>`;
       }), u += "</tr></thead>", u += "<tbody>", c.forEach((h) => {
         u += '<tr role="row">', h.forEach((f) => {
-          const v = this.getDayButtonClasses(f), g = y.createDateAriaLabel(f.date, f.isToday, f.isSelected, f.isRangeStart, f.isRangeEnd, f.isInRange), S = this.getRangeAttributes(f, e);
+          const v = this.getDayButtonClasses(f), m = y.createDateAriaLabel(f.date, f.isToday, f.isSelected, f.isRangeStart, f.isRangeEnd, f.isInRange), w = this.getRangeAttributes(f, e);
           u += `
                         <td class="calendar-day text-center relative" role="gridcell">
                             <button type="button"
@@ -2086,9 +2205,9 @@ class A extends b {
                                     data-is-current-month="${f.isCurrentMonth}"
                                     ${f.isDisabled ? "disabled" : ""}
                                     aria-selected="${f.isSelected}"
-                                    aria-label="${g}"
+                                    aria-label="${m}"
                                     data-is-today="${f.isToday}"
-                                    ${S}>
+                                    ${w}>
                                 ${f.day}
                             </button>
                         </td>
@@ -2179,11 +2298,11 @@ class A extends b {
   }
 }
 document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => {
-  A.getInstance().init();
-}) : A.getInstance().init();
-window.CalendarActions = A;
-A.getInstance();
-class R extends b {
+  E.getInstance().init();
+}) : E.getInstance().init();
+window.CalendarActions = E;
+E.getInstance();
+class H extends b {
   /**
    * Initialize radio elements - required by BaseActionClass
    */
@@ -2260,8 +2379,8 @@ class R extends b {
   onDestroy() {
   }
 }
-R.getInstance();
-class E extends b {
+H.getInstance();
+class x extends b {
   /**
    * Initialize range elements - required by BaseActionClass
    */
@@ -2562,11 +2681,11 @@ class E extends b {
   }
 }
 document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => {
-  E.getInstance().init();
-}) : E.getInstance().init();
-window.RangeActions = E;
-E.getInstance();
-class H extends b {
+  x.getInstance().init();
+}) : x.getInstance().init();
+window.RangeActions = x;
+x.getInstance();
+class V extends b {
   /**
    * Initialize select elements - required by BaseActionClass
    */
@@ -3031,8 +3150,8 @@ class H extends b {
   onDestroy() {
   }
 }
-H.getInstance();
-class V extends b {
+V.getInstance();
+class N extends b {
   constructor() {
     super(...arguments), this.resizeCleanup = null;
   }
@@ -3270,7 +3389,7 @@ class V extends b {
     this.resizeCleanup && (this.resizeCleanup(), this.resizeCleanup = null);
   }
 }
-V.getInstance();
+N.getInstance();
 class B extends b {
   /**
    * Initialize modal elements - required by BaseActionClass
@@ -3463,7 +3582,7 @@ class B extends b {
   }
 }
 B.getInstance();
-class x extends b {
+class C extends b {
   /**
    * Initialize toast elements - required by BaseActionClass
    */
@@ -3796,11 +3915,11 @@ class x extends b {
   }
 }
 document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => {
-  x.getInstance().init();
-}) : x.getInstance().init();
-window.ToastActions = x;
-x.getInstance();
-const U = class U {
+  C.getInstance().init();
+}) : C.getInstance().init();
+window.ToastActions = C;
+C.getInstance();
+const j = class j {
   /**
    * Detect if the current document is in RTL mode
    */
@@ -4001,9 +4120,9 @@ const U = class U {
         `, document.head.appendChild(t);
   }
 };
-U.cachedDirection = null;
-let w = U;
-class N extends b {
+j.cachedDirection = null;
+let D = j;
+class z extends b {
   /**
    * Initialize dropdown elements - required by BaseActionClass
    */
@@ -4276,15 +4395,15 @@ class N extends b {
   positionDropdown(t) {
     const e = r.querySelector("[data-dropdown-panel]", t), a = r.querySelector("[data-dropdown-trigger]", t);
     if (!e || !a) return;
-    const s = a.getBoundingClientRect(), i = e.getBoundingClientRect(), n = window.innerHeight, o = window.innerWidth, l = t.dataset.position || "bottom", c = t.dataset.align || "start", u = parseInt(t.dataset.offset || "8"), h = w.getDropdownPosition(
+    const s = a.getBoundingClientRect(), i = e.getBoundingClientRect(), n = window.innerHeight, o = window.innerWidth, l = t.dataset.position || "bottom", c = t.dataset.align || "start", u = parseInt(t.dataset.offset || "8"), h = D.getDropdownPosition(
       l,
       c
     );
     e.style.top = "", e.style.bottom = "", e.style.left = "", e.style.right = "", e.style.transform = "";
     const f = n - s.bottom, v = s.top;
     o - s.left, s.right;
-    let g = h.position, S = h.align;
-    switch (g === "bottom" && f < i.height && v > i.height ? g = "top" : g === "top" && v < i.height && f > i.height && (g = "bottom"), g) {
+    let m = h.position, w = h.align;
+    switch (m === "bottom" && f < i.height && v > i.height ? m = "top" : m === "top" && v < i.height && f > i.height && (m = "bottom"), m) {
       case "top":
         e.style.bottom = "100%", e.style.marginBottom = `${u}px`;
         break;
@@ -4298,20 +4417,20 @@ class N extends b {
         e.style.left = "100%", e.style.marginLeft = `${u}px`;
         break;
     }
-    if (g === "top" || g === "bottom")
-      switch (S) {
+    if (m === "top" || m === "bottom")
+      switch (w) {
         case "start":
-          w.isRTL() ? e.style.right = "0" : e.style.left = "0";
+          D.isRTL() ? e.style.right = "0" : e.style.left = "0";
           break;
         case "center":
           e.style.left = "50%", e.style.transform = "translateX(-50%)";
           break;
         case "end":
-          w.isRTL() ? e.style.left = "0" : e.style.right = "0";
+          D.isRTL() ? e.style.left = "0" : e.style.right = "0";
           break;
       }
     else
-      switch (S) {
+      switch (w) {
         case "start":
           e.style.top = "0";
           break;
@@ -4329,15 +4448,15 @@ class N extends b {
   positionSubmenu(t) {
     const e = r.querySelector("[data-submenu-panel]", t), a = r.querySelector("[data-submenu-trigger]", t);
     if (!e || !a) return;
-    const s = a.getBoundingClientRect(), i = e.getBoundingClientRect(), n = window.innerHeight, o = window.innerWidth, l = t.dataset.position || "right", c = t.dataset.align || "start", u = parseInt(t.dataset.offset || "4"), h = w.getDropdownPosition(
+    const s = a.getBoundingClientRect(), i = e.getBoundingClientRect(), n = window.innerHeight, o = window.innerWidth, l = t.dataset.position || "right", c = t.dataset.align || "start", u = parseInt(t.dataset.offset || "4"), h = D.getDropdownPosition(
       l,
       c
     );
     e.style.top = "", e.style.bottom = "", e.style.left = "", e.style.right = "", e.style.transform = "";
     const f = o - s.right, v = s.left;
     n - s.bottom, s.top;
-    let g = h.position;
-    switch (g === "right" && f < i.width && v > i.width ? g = "left" : g === "left" && v < i.width && f > i.width && (g = "right"), g) {
+    let m = h.position;
+    switch (m === "right" && f < i.width && v > i.width ? m = "left" : m === "left" && v < i.width && f > i.width && (m = "right"), m) {
       case "right":
         e.style.left = "100%", e.style.marginLeft = `${u}px`;
         break;
@@ -4356,13 +4475,13 @@ class N extends b {
         e.style.bottom = "0";
         break;
     }
-    const S = e.getBoundingClientRect();
-    if (S.bottom > n) {
-      const $ = S.bottom - n + 8;
-      e.style.transform = `translateY(-${$}px)`;
-    } else if (S.top < 0) {
-      const $ = Math.abs(S.top) + 8;
-      e.style.transform = `translateY(${$}px)`;
+    const w = e.getBoundingClientRect();
+    if (w.bottom > n) {
+      const q = w.bottom - n + 8;
+      e.style.transform = `translateY(-${q}px)`;
+    } else if (w.top < 0) {
+      const q = Math.abs(w.top) + 8;
+      e.style.transform = `translateY(${q}px)`;
     }
   }
   /**
@@ -4396,8 +4515,8 @@ class N extends b {
   onDestroy() {
   }
 }
-N.getInstance();
-class C extends b {
+z.getInstance();
+class I extends b {
   /**
    * Initialize table elements - required by BaseActionClass
    */
@@ -4610,10 +4729,10 @@ class C extends b {
   }
 }
 document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => {
-  C.getInstance().init();
-}) : C.getInstance().init();
-window.TableActions = C;
-C.getInstance();
+  I.getInstance().init();
+}) : I.getInstance().init();
+window.TableActions = I;
+I.getInstance();
 class P extends b {
   /**
    * Initialize button group elements - required by BaseActionClass
@@ -5343,8 +5462,8 @@ class k extends b {
     const s = a.getBoundingClientRect(), i = window.innerHeight, n = window.innerWidth, l = e.getBoundingClientRect().height, c = i - s.bottom - 8, u = s.top - 8, h = 200;
     let f = !1, v = "none";
     l <= c ? f = !1 : l <= u ? f = !0 : u > c ? (f = !0, v = Math.max(u, h) + "px") : (f = !1, v = Math.max(c, h) + "px"), f ? (e.style.bottom = "100%", e.style.top = "auto", e.style.marginBottom = "4px", e.style.marginTop = "0") : (e.style.top = "100%", e.style.bottom = "auto", e.style.marginTop = "4px", e.style.marginBottom = "0"), v !== "none" && (e.style.maxHeight = v, e.style.overflowY = "auto");
-    const g = s.left;
-    g + e.offsetWidth > n ? (e.style.right = "0", e.style.left = "auto") : g < 0 && (e.style.left = "0", e.style.right = "auto");
+    const m = s.left;
+    m + e.offsetWidth > n ? (e.style.right = "0", e.style.left = "auto") : m < 0 && (e.style.left = "0", e.style.right = "auto");
   }
   /**
    * Parse time string into components
@@ -5437,7 +5556,7 @@ document.readyState === "loading" ? document.addEventListener("DOMContentLoaded"
 }) : k.getInstance().init();
 window.TimePickerActions = k;
 k.getInstance();
-class I extends b {
+class L extends b {
   /**
    * Initialize accordion elements - required by BaseActionClass
    */
@@ -5629,11 +5748,11 @@ class I extends b {
   }
 }
 document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => {
-  I.getInstance().init();
-}) : I.getInstance().init();
-window.AccordionActions = I;
-I.getInstance();
-class z extends b {
+  L.getInstance().init();
+}) : L.getInstance().init();
+window.AccordionActions = L;
+L.getInstance();
+class U extends b {
   /**
    * Initialize editor elements - required by BaseActionClass
    */
@@ -5700,7 +5819,7 @@ class z extends b {
     console.log("EditorActions: Final Quill config", l), console.log("EditorActions: Container element", a);
     let c;
     try {
-      c = new W(a, l), console.log("EditorActions: Quill instance created successfully", c);
+      c = new Z(a, l), console.log("EditorActions: Quill instance created successfully", c);
     } catch (h) {
       console.error("EditorActions: Failed to create Quill instance", h);
       return;
@@ -5920,8 +6039,8 @@ class z extends b {
     });
   }
 }
-z.getInstance();
-class L extends b {
+U.getInstance();
+class M extends b {
   /**
    * Initialize date picker elements - required by BaseActionClass
    */
@@ -6247,10 +6366,10 @@ class L extends b {
   }
 }
 document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", () => {
-  L.getInstance().init();
-}) : L.getInstance().init();
-window.DatePickerActions = L;
-L.getInstance();
+  M.getInstance().init();
+}) : M.getInstance().init();
+window.DatePickerActions = M;
+M.getInstance();
 class Y extends b {
   constructor() {
     super(...arguments), this.cleanupFunctions = [];
@@ -6450,12 +6569,12 @@ class Y extends b {
   }
 }
 if (typeof document < "u") {
-  const m = () => {
+  const g = () => {
     Y.getInstance().init();
   };
-  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", m) : m();
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", g) : g();
 }
-class K extends b {
+class Q extends b {
   constructor() {
     super(...arguments), this.cleanupFunctions = [], this.filePreviewsMap = /* @__PURE__ */ new Map();
   }
@@ -7229,7 +7348,7 @@ class K extends b {
     this.cleanupFunctions.forEach((t) => t()), this.cleanupFunctions = [], this.filePreviewsMap.clear(), super.destroy();
   }
 }
-class Q extends b {
+class W extends b {
   /**
    * Initialize gallery elements - required by BaseActionClass
    */
@@ -7580,59 +7699,93 @@ class Q extends b {
   }
 }
 function G() {
-  w.initialize(), q.getInstance().init(), O.getInstance().init(), A.getInstance().init(), R.getInstance().init(), E.getInstance().init(), H.getInstance().init(), V.getInstance().init(), B.getInstance().init(), x.getInstance().init(), N.getInstance().init(), C.getInstance().init(), P.getInstance().init(), T.getInstance().init(), k.getInstance().init(), I.getInstance().init(), z.getInstance().init(), L.getInstance().init(), Y.getInstance().init(), K.getInstance().init(), Q.getInstance().init();
+  const g = performance.now();
+  S.debugLog("KeysUI", "Starting Keys UI initialization..."), D.initialize();
+  const t = [
+    { name: "FormActions", instance: O.getInstance() },
+    { name: "AlertActions", instance: R.getInstance() },
+    { name: "CalendarActions", instance: E.getInstance() },
+    { name: "RadioActions", instance: H.getInstance() },
+    { name: "RangeActions", instance: x.getInstance() },
+    { name: "SelectActions", instance: V.getInstance() },
+    { name: "TabsActions", instance: N.getInstance() },
+    { name: "ModalActions", instance: B.getInstance() },
+    { name: "ToastActions", instance: C.getInstance() },
+    { name: "DropdownActions", instance: z.getInstance() },
+    { name: "TableActions", instance: I.getInstance() },
+    { name: "ButtonGroupActions", instance: P.getInstance() },
+    { name: "TooltipActions", instance: T.getInstance() },
+    { name: "TimePickerActions", instance: k.getInstance() },
+    { name: "AccordionActions", instance: L.getInstance() },
+    { name: "EditorActions", instance: U.getInstance() },
+    { name: "DatePickerActions", instance: M.getInstance() },
+    { name: "AddToCartActions", instance: Y.getInstance() },
+    { name: "FileUploadActions", instance: Q.getInstance() },
+    { name: "GalleryActions", instance: W.getInstance() }
+  ];
+  let e = 0, a = [];
+  t.forEach(({ name: i, instance: n }) => {
+    try {
+      n.init(), e++;
+    } catch (o) {
+      a.push(i), S.debugError("KeysUI", `Failed to initialize ${i}`, o);
+    }
+  });
+  const s = performance.now() - g;
+  S.debugInitSummary(e, s), a.length > 0 && S.debugError("KeysUI", `${a.length} components failed to initialize`, a);
 }
-const Z = {
-  FormActions: q.getInstance(),
-  AlertActions: O.getInstance(),
-  CalendarActions: A.getInstance(),
-  RadioActions: R.getInstance(),
-  RangeActions: E.getInstance(),
-  SelectActions: H.getInstance(),
-  TabsActions: V.getInstance(),
+const _ = {
+  FormActions: O.getInstance(),
+  AlertActions: R.getInstance(),
+  CalendarActions: E.getInstance(),
+  RadioActions: H.getInstance(),
+  RangeActions: x.getInstance(),
+  SelectActions: V.getInstance(),
+  TabsActions: N.getInstance(),
   ModalActions: B.getInstance(),
-  ToastActions: x.getInstance(),
-  DropdownActions: N.getInstance(),
-  TableActions: C.getInstance(),
+  ToastActions: C.getInstance(),
+  DropdownActions: z.getInstance(),
+  TableActions: I.getInstance(),
   ButtonGroupActions: P.getInstance(),
   TooltipActions: T.getInstance(),
   TimePickerActions: k.getInstance(),
-  AccordionActions: I.getInstance(),
-  EditorActions: z.getInstance(),
-  DatePickerActions: L.getInstance(),
+  AccordionActions: L.getInstance(),
+  EditorActions: U.getInstance(),
+  DatePickerActions: M.getInstance(),
   AddToCartActions: Y.getInstance(),
-  FileUploadActions: K.getInstance(),
-  GalleryActions: Q.getInstance(),
+  FileUploadActions: Q.getInstance(),
+  GalleryActions: W.getInstance(),
   init: G,
   initialize: G
   // Alias for consistency
 };
-typeof window < "u" && (window.KeysUI = Z);
+typeof window < "u" && (window.KeysUI = _);
 export {
-  I as AccordionActions,
+  L as AccordionActions,
   Y as AddToCartActions,
-  O as AlertActions,
+  R as AlertActions,
   b as BaseActionClass,
   P as ButtonGroupActions,
-  A as CalendarActions,
+  E as CalendarActions,
   r as DOMUtils,
-  L as DatePickerActions,
-  N as DropdownActions,
-  z as EditorActions,
+  M as DatePickerActions,
+  S as DebugUtils,
+  z as DropdownActions,
+  U as EditorActions,
   d as EventUtils,
-  K as FileUploadActions,
-  q as FormActions,
-  Q as GalleryActions,
+  Q as FileUploadActions,
+  O as FormActions,
+  W as GalleryActions,
   B as ModalActions,
-  w as RTLUtils,
-  R as RadioActions,
-  E as RangeActions,
-  H as SelectActions,
-  C as TableActions,
-  V as TabsActions,
+  D as RTLUtils,
+  H as RadioActions,
+  x as RangeActions,
+  V as SelectActions,
+  I as TableActions,
+  N as TabsActions,
   k as TimePickerActions,
-  x as ToastActions,
+  C as ToastActions,
   T as TooltipActions,
-  Z as default,
+  _ as default,
   G as initializeKeysUI
 };

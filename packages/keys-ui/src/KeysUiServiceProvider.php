@@ -192,20 +192,8 @@ class KeysUiServiceProvider extends ServiceProvider
      */
     protected function registerAssetDirectives(): void
     {
-        Blade::directive('keysAssets', function () {
-            return "<?php echo app('Keys\\UI\\Services\\AssetManager')->renderAssets(); ?>";
-        });
-
-        Blade::directive('keysStyles', function () {
-            return "<?php echo app('Keys\\UI\\Services\\AssetManager')->renderStyles(); ?>";
-        });
-
         Blade::directive('keysScripts', function () {
             return "<?php echo app('Keys\\UI\\Services\\AssetManager')->renderScripts(); ?>";
-        });
-
-        Blade::directive('keysTranslations', function () {
-            return "<?php echo app('Keys\\UI\\Services\\AssetManager')->renderTranslations(); ?>";
         });
     }
 }

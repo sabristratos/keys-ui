@@ -1,6 +1,6 @@
 {
   "name": "@keys/ui",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Modern Blade components library for Laravel",
   "type": "module",
   "main": "dist/keys-ui.umd.js",
@@ -42,6 +42,7 @@
     "quill": "^2.0.3"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^20.0.0",
     "autoprefixer": "^10.4.0",
     "concurrently": "^8.2.0",

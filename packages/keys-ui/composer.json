@@ -1,6 +1,6 @@
 {
     "name": "keys/ui",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "description": "A modern Blade components library for Laravel 12 and Tailwind v4",
     "type": "library",
     "license": "MIT",
@@ -65,7 +65,7 @@
     "prefer-stable": true,
     "scripts": {
         "post-autoload-dump": [
-            "@php -r \"if (class_exists('Illuminate\\\\Foundation\\\\Application')) { exit(0); } else { exit(1); }\" || @php artisan vendor:publish --tag=keys-ui-assets --ansi --force"
+            "@php ./../../artisan vendor:publish --tag=keys-ui-assets --ansi --force --quiet 2>/dev/null || true"
         ]
     }
 }
