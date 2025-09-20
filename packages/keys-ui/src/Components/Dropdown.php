@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Dropdown extends Component
 {
@@ -29,8 +30,8 @@ class Dropdown extends Component
         }
 
 
-        if (!in_array($this->size, ['sm', 'md', 'lg'])) {
-            $this->size = 'md';
+        if (!in_array($this->size, ComponentConstants::DROPDOWN_SIZES)) {
+            $this->size = ComponentConstants::getDefaultSize();
         }
     }
 

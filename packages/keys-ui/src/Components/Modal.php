@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Modal extends Component
 {
@@ -20,8 +21,8 @@ class Modal extends Component
         public ?string $wireModel = null
     ) {
 
-        if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl', 'full'])) {
-            $this->size = 'md';
+        if (!in_array($this->size, ComponentConstants::MODAL_SIZES)) {
+            $this->size = ComponentConstants::getDefaultSize();
         }
 
 

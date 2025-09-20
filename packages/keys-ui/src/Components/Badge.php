@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Badge extends Component
 {
@@ -18,19 +19,15 @@ class Badge extends Component
             $this->id = 'badge-' . uniqid();
         }
 
-        if (!in_array($this->variant, ['simple', 'chip'])) {
+        if (!in_array($this->variant, ComponentConstants::BADGE_VARIANTS)) {
             $this->variant = 'simple';
         }
 
-        if (!in_array($this->size, ['xs', 'sm', 'md'])) {
+        if (!in_array($this->size, ComponentConstants::BADGE_SIZES)) {
             $this->size = 'sm';
         }
 
-        $validColors = [
-            'brand', 'success', 'warning', 'danger', 'neutral',
-            'blue', 'gray', 'red', 'green', 'yellow', 'indigo', 'purple', 'pink'
-        ];
-        if (!in_array($this->color, $validColors)) {
+        if (!ComponentConstants::isValidColorForComponent($this->color, 'badge')) {
             $this->color = 'blue';
         }
 

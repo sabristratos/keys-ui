@@ -71,11 +71,9 @@ export class EditorActions extends BaseActionClass<EditorState> {
      * Initialize a single Quill editor element
      */
     private initializeQuillEditor(editor: HTMLElement): void {
-        console.log('EditorActions: Initializing Quill editor', editor);
 
         const editorId = DOMUtils.getDataAttribute(editor, 'editorId');
         if (!editorId) {
-            console.warn('EditorActions: No editor-id found');
             return;
         }
 
@@ -84,7 +82,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
         const liveRegion = DOMUtils.querySelector(`[data-quill-live-region="true"]`, editor) as HTMLElement;
 
         if (!containerElement) {
-            console.warn('EditorActions: No Quill container element found');
             return;
         }
 
@@ -110,21 +107,15 @@ export class EditorActions extends BaseActionClass<EditorState> {
                 const parsedConfig = JSON.parse(configData);
                 config = { ...config, ...parsedConfig };
             } catch (e) {
-                console.warn('EditorActions: Invalid Quill config JSON', e);
-                console.warn('EditorActions: Using default config');
             }
         }
 
-        console.log('EditorActions: Final Quill config', config);
-        console.log('EditorActions: Container element', containerElement);
 
         // Initialize Quill instance
         let quillInstance: Quill;
         try {
             quillInstance = new Quill(containerElement as HTMLElement, config);
-            console.log('EditorActions: Quill instance created successfully', quillInstance);
         } catch (error) {
-            console.error('EditorActions: Failed to create Quill instance', error);
             return;
         }
 
@@ -134,7 +125,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
                 // Try to parse as HTML first
                 quillInstance.root.innerHTML = initialValue;
             } catch (e) {
-                console.warn('EditorActions: Error setting initial value', e);
             }
         }
 
@@ -155,7 +145,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
         // Set up accessibility features
         this.setupAccessibilityFeatures(state);
 
-        console.log('EditorActions: Quill editor initialized successfully');
     }
 
     /**

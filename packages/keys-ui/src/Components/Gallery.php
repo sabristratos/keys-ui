@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Gallery extends Component
 {
@@ -41,7 +42,7 @@ class Gallery extends Component
         }
 
         // Validate thumbnail size
-        if (!in_array($this->thumbnailSize, ['xs', 'sm', 'md', 'lg'])) {
+        if (!in_array($this->thumbnailSize, ComponentConstants::GALLERY_THUMBNAIL_SIZES)) {
             $this->thumbnailSize = 'sm';
         }
 

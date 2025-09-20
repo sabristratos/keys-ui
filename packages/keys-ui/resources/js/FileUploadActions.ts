@@ -110,25 +110,20 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
 
     protected initializeElements(): void {
         const zones = DOMUtils.findByDataAttribute('file-upload-zone');
-        console.log(`FileUploadActions: Found ${zones.length} file upload zones to initialize`);
         zones.forEach((zone, index) => {
-            console.log(`FileUploadActions: Initializing zone ${index + 1}:`, zone);
             this.initializeZone(zone);
         });
     }
 
     private initializeZone(zone: HTMLElement): void {
         const input = this.findFileInput(zone);
-        console.log(`FileUploadActions: Found input for zone:`, input);
         if (!input) {
-            console.warn('FileUploadActions: No file input found for zone:', zone);
             return;
         }
 
         const previewAttr = DOMUtils.getDataAttribute(zone, 'preview');
         const progressAttr = DOMUtils.getDataAttribute(zone, 'progress');
         const autoUploadAttr = DOMUtils.getDataAttribute(zone, 'auto-upload');
-        console.log('FileUploadActions: Data attributes - preview:', previewAttr, 'progress:', progressAttr, 'auto-upload:', autoUploadAttr);
 
         const state: FileUploadState = {
             files: [],
@@ -181,9 +176,7 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
     }
 
     private handleDropZoneClick(zone: HTMLElement, event: MouseEvent): void {
-        console.log('FileUploadActions: Drop zone clicked:', zone, event);
         if (DOMUtils.isDisabled(zone)) {
-            console.log('FileUploadActions: Zone is disabled, ignoring click');
             return;
         }
 
@@ -196,11 +189,9 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
             const clickedElement = target.closest('button, a, [role="button"]:not([data-file-upload-zone])');
 
             if (clickedElement && !target.closest('.pointer-events-none')) {
-                console.log('FileUploadActions: Clicked on nested interactive element, ignoring');
                 return;
             }
 
-            console.log('FileUploadActions: Valid drop zone click, triggering file select');
             this.triggerFileSelect(zone);
         }
     }
@@ -219,29 +210,23 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
 
     private triggerFileSelect(zone: HTMLElement): void {
         const input = this.findFileInput(zone);
-        console.log('FileUploadActions: Found input for trigger:', input);
         if (input) {
-            console.log('FileUploadActions: Triggering input click');
             input.click();
             // Announce to screen readers
             this.announceToScreenReader('File selection dialog opened');
         } else {
-            console.warn('FileUploadActions: No input found for zone trigger');
         }
     }
 
     // Browse button functionality removed - now handled by drop zone click
 
     private handleFileInputChange(input: HTMLInputElement, event: Event): void {
-        console.log('FileUploadActions: File input change detected:', input, event);
         // Find the sibling zone within the same wrapper
         const wrapper = input.parentElement;
         const zone = wrapper ? wrapper.querySelector('[data-file-upload-zone]') as HTMLElement : null;
-        console.log('FileUploadActions: Found zone for file input:', zone);
         if (!zone) return;
 
         const files = Array.from(input.files || []);
-        console.log('FileUploadActions: Selected files:', files);
         this.processFiles(zone, files);
     }
 
@@ -285,45 +270,35 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
     }
 
     private handleRemoveFile(button: HTMLElement, event: MouseEvent): void {
-        console.log('FileUploadActions: Remove button clicked:', button, event);
         event.stopPropagation();
 
         const fileId = button.getAttribute('data-remove-file');
-        console.log('FileUploadActions: File ID to remove:', fileId);
 
         // The preview area is outside the zone, so we need to find the zone via the wrapper
         const previewArea = DOMUtils.findClosest(button, '[data-file-previews]');
         const wrapper = previewArea?.parentElement;
         const zone = wrapper ? wrapper.querySelector('[data-file-upload-zone]') as HTMLElement : null;
 
-        console.log('FileUploadActions: Found preview area:', previewArea);
-        console.log('FileUploadActions: Found wrapper:', wrapper);
-        console.log('FileUploadActions: Found zone for removal:', zone);
 
         if (zone && fileId) {
             this.removeFile(zone, fileId);
         } else {
-            console.warn('FileUploadActions: Could not find zone or fileId for removal');
         }
     }
 
     private handleRemoveExistingFile(button: HTMLElement, event: MouseEvent): void {
-        console.log('FileUploadActions: Remove existing file button clicked:', button, event);
         event.stopPropagation();
 
         const fileId = button.getAttribute('data-remove-existing-file');
-        console.log('FileUploadActions: File ID to remove:', fileId);
 
         // Emit custom event for parent component to handle
         EventUtils.dispatchCustomEvent(button, 'file-upload:remove-existing', {
             fileId: fileId
         });
 
-        console.log('FileUploadActions: Dispatched remove-existing event for file:', fileId);
     }
 
     private handleAddMoreFiles(button: HTMLElement, event: MouseEvent): void {
-        console.log('FileUploadActions: Add more files button clicked:', button, event);
         event.stopPropagation();
 
         // Find the zone through the preview area
@@ -331,32 +306,25 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
         const wrapper = previewArea?.parentElement;
         const zone = wrapper ? wrapper.querySelector('[data-file-upload-zone]') as HTMLElement : null;
 
-        console.log('FileUploadActions: Found zone for add more button:', zone);
         if (!zone) {
-            console.warn('FileUploadActions: No zone found for add more button');
             return;
         }
 
         // Trigger file selection
         const input = this.findFileInput(zone);
         if (input) {
-            console.log('FileUploadActions: Triggering input click for add more');
             input.click();
             this.announceToScreenReader('File selection dialog opened for additional files');
         } else {
-            console.warn('FileUploadActions: No input found for add more button');
         }
     }
 
     private processFiles(zone: HTMLElement, files: File[]): void {
-        console.log('FileUploadActions: Processing files:', files);
         const state = this.getState(zone);
-        console.log('FileUploadActions: Current state:', state);
         if (!state) return;
 
         // Validate files
         const validationResult = this.validateFiles(files, state.validationRules, state.files.length);
-        console.log('FileUploadActions: Validation result:', validationResult);
         if (!validationResult.valid) {
             this.showError(zone, validationResult.errors.join(', '));
             return;
@@ -364,7 +332,6 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
 
         // Add files to state
         const newFiles = validationResult.validFiles;
-        console.log('FileUploadActions: Adding new files to state:', newFiles);
 
         // Check if we need to clear existing files (single file mode)
         const input = this.findFileInput(zone);
@@ -383,9 +350,7 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
         this.setState(zone, state);
 
         // Create previews if enabled
-        console.log('FileUploadActions: Preview enabled?', state.preview);
         if (state.preview) {
-            console.log('FileUploadActions: Creating file previews for:', newFiles);
             this.createFilePreviews(zone, newFiles);
         }
 
@@ -475,7 +440,6 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
     private createFilePreviews(zone: HTMLElement, files: File[]): void {
         const previewContainer = zone.parentElement?.querySelector('[data-preview-list]') as HTMLElement;
         if (!previewContainer) {
-            console.warn('FileUploadActions: Preview container not found');
             return;
         }
 
@@ -847,11 +811,9 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
                     };
 
                     preview.preview = e.target.result as string;
-                    console.log('FileUploadActions: Image preview loaded for:', preview.id);
                 }
             };
             reader.onerror = () => {
-                console.error('FileUploadActions: Failed to read image file:', preview.file.name);
                 // Remove skeleton loader on error
                 if (thumbnail) {
                     thumbnail.classList.remove('skeleton-loader');
@@ -885,7 +847,6 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
     private updatePreviewLayout(zone: HTMLElement): void {
         const previewContainer = zone.parentElement?.querySelector('[data-preview-list]') as HTMLElement;
         if (!previewContainer) {
-            console.warn('FileUploadActions: Preview container not found for layout update');
             return;
         }
 
@@ -901,7 +862,6 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
         const isImageOnlyUpload = hasImages && imageCount === totalFiles;
         const isMixedUpload = hasImages && imageCount < totalFiles;
 
-        console.log('FileUploadActions: Layout detection - Images:', imageCount, 'Total:', totalFiles, 'Image-only:', isImageOnlyUpload);
 
         // Update layout classes
         previewContainer.classList.remove('image-grid-layout', 'file-list-layout', 'mixed-layout');
@@ -964,18 +924,14 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
     private generateImagePreview(file: File, fileId: string, container: HTMLElement): void {
         // This is now handled by loadImagePreview in the initializePreviewItem method
         // Keep for backward compatibility but functionality moved to template-based approach
-        console.log('FileUploadActions: Image preview generation handled by template system');
     }
 
     private removeFile(zone: HTMLElement, fileId: string): void {
-        console.log('FileUploadActions: removeFile called with zone:', zone, 'fileId:', fileId);
         const state = this.getState(zone);
         if (!state) {
-            console.warn('FileUploadActions: No state found for zone');
             return;
         }
 
-        console.log('FileUploadActions: Current files before removal:', state.files);
 
         // Get file name for announcement
         const fileToRemove = state.files.find(file => this.generateFileId(file) === fileId);
@@ -985,21 +941,17 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
         state.files = state.files.filter(file => this.generateFileId(file) !== fileId);
         this.setState(zone, state);
 
-        console.log('FileUploadActions: Files after removal:', state.files);
 
         // Remove preview
         const previews = this.filePreviewsMap.get(zone);
         if (previews) {
             previews.delete(fileId);
-            console.log('FileUploadActions: Removed from previews map');
         }
 
         // Remove from DOM
         const previewElement = zone.parentElement?.querySelector(`[data-file-id="${fileId}"]`);
-        console.log('FileUploadActions: Found preview element to remove:', previewElement);
         if (previewElement) {
             DOMUtils.removeElement(previewElement as HTMLElement);
-            console.log('FileUploadActions: Removed preview element from DOM');
         }
 
         // Update Livewire if applicable
@@ -1113,7 +1065,6 @@ export class FileUploadActions extends BaseActionClass<FileUploadState> {
         if (!wrapper) return null;
 
         const input = wrapper.querySelector('[data-file-input]') as HTMLInputElement;
-        console.log('FileUploadActions: Looking for input in wrapper:', wrapper, 'found:', input);
         return input || null;
     }
 

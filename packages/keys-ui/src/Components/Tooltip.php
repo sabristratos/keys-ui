@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Tooltip extends Component
 {
@@ -31,7 +32,7 @@ class Tooltip extends Component
         }
 
         // Validate size
-        if (!in_array($this->size, ['sm', 'md', 'lg'])) {
+        if (!in_array($this->size, ComponentConstants::TOOLTIP_SIZES)) {
             $this->size = 'md';
         }
 

@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Toggle Test</title>
-    @keysAssets()
+    <keys:scripts />
 </head>
 <body>
     <div class="p-8">

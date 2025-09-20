@@ -4,6 +4,7 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Icon extends Component
 {
@@ -12,8 +13,8 @@ class Icon extends Component
         public string $size = 'md',
         public ?string $fallback = 'heroicon-o-question-mark-circle'
     ) {
-        if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
-            $this->size = 'md';
+        if (!ComponentConstants::isValidSize($this->size)) {
+            $this->size = ComponentConstants::getDefaultSize();
         }
     }
 

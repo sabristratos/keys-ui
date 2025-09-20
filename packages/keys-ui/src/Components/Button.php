@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Button extends Component
 {
@@ -26,15 +27,15 @@ class Button extends Component
             $this->iconLeft = $this->icon;
         }
 
-        if (!in_array($this->variant, ['brand', 'danger', 'warning', 'success', 'info', 'neutral', 'ghost', 'outline'])) {
-            $this->variant = 'brand';
+        if (!in_array($this->variant, ComponentConstants::BUTTON_VARIANTS)) {
+            $this->variant = ComponentConstants::getDefaultColor();
         }
 
-        if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
-            $this->size = 'md';
+        if (!ComponentConstants::isValidSize($this->size)) {
+            $this->size = ComponentConstants::getDefaultSize();
         }
 
-        if (!in_array($this->loadingAnimation, ['spinner', 'dots', 'pulse'])) {
+        if (!in_array($this->loadingAnimation, ComponentConstants::BUTTON_LOADING_ANIMATIONS)) {
             $this->loadingAnimation = 'spinner';
         }
     }
@@ -70,15 +71,15 @@ class Button extends Component
     public function variantClasses(): string
     {
         return match ($this->variant) {
-            'brand' => 'bg-brand text-foreground-brand hover:bg-brand-hover active:bg-brand-active disabled:bg-brand-disabled focus-visible:ring-brand',
-            'danger' => 'bg-danger text-foreground-danger hover:bg-danger-hover active:bg-danger-active disabled:bg-danger-disabled focus-visible:ring-danger',
-            'warning' => 'bg-warning text-foreground-warning hover:bg-warning-hover active:bg-warning-active disabled:bg-warning-disabled focus-visible:ring-warning',
-            'success' => 'bg-success text-foreground-success hover:bg-success-hover active:bg-success-active disabled:bg-success-disabled focus-visible:ring-success',
-            'info' => 'bg-info text-foreground-info hover:bg-info-hover active:bg-info-active disabled:bg-info-disabled focus-visible:ring-info',
-            'neutral' => 'bg-neutral text-foreground-neutral hover:bg-neutral-hover active:bg-neutral-active disabled:bg-neutral-disabled focus-visible:ring-neutral',
-            'ghost' => 'bg-transparent text-foreground hover:bg-surface active:bg-border disabled:text-neutral-disabled focus-visible:ring-neutral',
+            'brand' => 'border border-brand bg-brand text-foreground-brand hover:border-brand-hover hover:bg-brand-hover active:border-brand-active active:bg-brand-active disabled:border-brand-disabled disabled:bg-brand-disabled focus-visible:ring-brand',
+            'danger' => 'border border-danger bg-danger text-foreground-danger hover:border-danger-hover hover:bg-danger-hover active:border-danger-active active:bg-danger-active disabled:border-danger-disabled disabled:bg-danger-disabled focus-visible:ring-danger',
+            'warning' => 'border border-warning bg-warning text-foreground-warning hover:border-warning-hover hover:bg-warning-hover active:border-warning-active active:bg-warning-active disabled:border-warning-disabled disabled:bg-warning-disabled focus-visible:ring-warning',
+            'success' => 'border border-success bg-success text-foreground-success hover:border-success-hover hover:bg-success-hover active:border-success-active active:bg-success-active disabled:border-success-disabled disabled:bg-success-disabled focus-visible:ring-success',
+            'info' => 'border border-info bg-info text-foreground-info hover:border-info-hover hover:bg-info-hover active:border-info-active active:bg-info-active disabled:border-info-disabled disabled:bg-info-disabled focus-visible:ring-info',
+            'neutral' => 'border border-neutral bg-neutral text-foreground-neutral hover:border-neutral-hover hover:bg-neutral-hover active:border-neutral-active active:bg-neutral-active disabled:border-neutral-disabled disabled:bg-neutral-disabled focus-visible:ring-neutral',
+            'ghost' => 'border border-transparent bg-transparent text-foreground hover:bg-surface active:bg-border disabled:text-neutral-disabled focus-visible:ring-neutral',
             'outline' => 'bg-transparent border border-border text-foreground hover:bg-surface active:bg-border disabled:text-neutral-disabled focus-visible:ring-neutral',
-            default => 'bg-brand text-foreground-brand hover:bg-brand-hover active:bg-brand-active disabled:bg-brand-disabled focus-visible:ring-brand'
+            default => 'border border-brand bg-brand text-foreground-brand hover:border-brand-hover hover:bg-brand-hover active:border-brand-active active:bg-brand-active disabled:border-brand-disabled disabled:bg-brand-disabled focus-visible:ring-brand'
         };
     }
 

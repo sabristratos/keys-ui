@@ -7,12 +7,14 @@
  * - Single and multiple selection
  * - Chip creation and removal
  * - Click outside to close
+ *
  */
 
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
 import { AnimationUtils } from './utils/AnimationUtils';
+import { FloatingManager, FloatingInstance } from './utils/FloatingManager';
 
 interface SelectOption {
     element: HTMLElement;
@@ -29,6 +31,7 @@ interface SelectState {
     searchTerm: string;
     focusedIndex: number;
     filteredOptions: SelectOption[];
+    floating?: FloatingInstance;
 }
 
 export class SelectActions extends BaseActionClass<SelectState> {
@@ -79,7 +82,7 @@ export class SelectActions extends BaseActionClass<SelectState> {
      */
     protected bindEventListeners(): void {
         // Handle all click events with a single delegated listener
-        EventUtils.handleDelegatedClick('[data-remove-chip], [data-select-clear], [data-select-option], [data-select-trigger], [data-select-search]', (element, event) => {
+        EventUtils.handleDelegatedClick('[data-remove-chip], [data-select-clear], [data-select-option], [data-select-trigger]', (element, event) => {
             if (element.matches('[data-remove-chip]')) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -121,11 +124,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
                 }
                 return;
             }
-
-            if (element.matches('[data-select-search]')) {
-                event.stopPropagation();
-                return; // Don't close dropdown when clicking search input
-            }
         });
 
         // Handle click outside to close dropdowns
@@ -134,28 +132,34 @@ export class SelectActions extends BaseActionClass<SelectState> {
 
             // Check if the click was inside any select element
             if (target && target instanceof Element) {
-                const searchContainer = target.closest('[data-select-search]')?.parentElement;
-                if (searchContainer && DOMUtils.querySelector('[data-select-search]', searchContainer)) {
-                    event.stopPropagation();
-                    return; // Don't close dropdown when clicking search container
+                // Check if click is within any select dropdown or related elements
+                const withinSelectElement = target.closest('[data-select="true"], [data-select-dropdown], [data-select-search], [data-remove-chip], [data-select-clear], [data-select-option], [data-select-trigger]');
+
+                // Also check if clicking on input elements within search areas
+                const isInputElement = target.matches('input, button') && target.closest('[data-select="true"]');
+
+                // If click is inside select component or dropdown area, don't close
+                if (withinSelectElement || isInputElement) {
+                    return;
                 }
 
-                const closestSelectElement = target.closest('[data-remove-chip], [data-select-clear], [data-select-option], [data-select-trigger], [data-select-search]');
-
-                // If click is not inside any select element, close all dropdowns
-                if (!closestSelectElement) {
-                    this.closeAllDropdowns();
-                }
+                // Otherwise, close all dropdowns (outside click)
+                this.closeAllDropdowns();
             }
         });
 
-        // Handle search input
-        EventUtils.handleDelegatedInput('[data-select-search]', (searchInput, event) => {
+        // Handle search input - target actual input elements within select dropdowns
+        EventUtils.handleDelegatedInput('input[type="text"]', (searchInput, event) => {
+            // Only handle inputs within select components that have search functionality
             const select = DOMUtils.findClosest(searchInput, '[data-select="true"]');
-            if (select) {
+            const isSearchable = select && select.dataset.searchable === 'true';
+            const isInDropdown = searchInput.closest('[data-select-dropdown]');
+
+            if (select && isSearchable && isInDropdown) {
                 this.handleSearch(select, searchInput.value);
             }
         });
+
 
         // Handle keyboard navigation
         EventUtils.handleDelegatedKeydown('[data-select="true"]', (select, event) => {
@@ -230,7 +234,13 @@ export class SelectActions extends BaseActionClass<SelectState> {
 
         if (dropdown) {
             dropdown.classList.remove('hidden');
-            this.positionDropdown(select);
+
+            // Handle floating or regular positioning
+            if (this.isFloatingEnabled(select)) {
+                this.setupFloating(select, dropdown);
+            } else {
+                this.positionDropdown(select);
+            }
         }
 
         if (trigger) {
@@ -255,7 +265,12 @@ export class SelectActions extends BaseActionClass<SelectState> {
      */
     private closeDropdown(select: HTMLElement): void {
         const state = this.getState(select);
-        if (!state || !state.isOpen) return;
+        if (!state || !state.isOpen) {
+            return;
+        }
+
+        // Clean up floating
+        this.cleanupFloating(select);
 
         state.isOpen = false;
         state.searchTerm = '';
@@ -861,11 +876,93 @@ export class SelectActions extends BaseActionClass<SelectState> {
     }
 
     /**
+     * Check if floating is enabled for select (always true now)
+     */
+    private isFloatingEnabled(select: HTMLElement): boolean {
+        // Always use Floating UI
+        return true;
+    }
+
+    /**
+     * Setup floating for dropdown using Floating UI
+     */
+    private setupFloating(select: HTMLElement, dropdown: HTMLElement): void {
+        const state = this.getState(select);
+        if (!state) return;
+
+        // Clean up existing floating first
+        this.cleanupFloating(select);
+
+        const trigger = DOMUtils.querySelector('[data-select-trigger]', select) as HTMLElement;
+        if (!trigger) return;
+
+        // Parse configuration from data attributes
+        const placement = select.dataset.floatingPlacement || 'bottom-start';
+        const offset = parseInt(select.dataset.floatingOffset || '4', 10);
+
+        // Create floating element with enhanced Floating UI features
+        const floating = FloatingManager.getInstance().createFloating(trigger, dropdown, {
+            placement: placement as any,
+            offset,
+            flip: {
+                fallbackStrategy: 'bestFit',
+                padding: 8
+            },
+            shift: {
+                padding: 8,
+                crossAxis: true
+            },
+            size: {
+                apply: ({ availableHeight }) => {
+                    // Limit dropdown height based on available space
+                    const optionsContainer = DOMUtils.querySelector('[data-select-options]', dropdown);
+                    if (optionsContainer) {
+                        Object.assign(optionsContainer.style, {
+                            maxHeight: `${Math.min(availableHeight - 20, 320)}px`,
+                            overflowY: 'auto'
+                        });
+                    }
+                }
+            },
+            hide: {
+                strategy: 'escaped'
+            },
+            autoUpdate: {
+                ancestorScroll: true,
+                ancestorResize: true,
+                elementResize: true,
+                layoutShift: true
+            }
+        });
+
+        state.floating = floating;
+        this.setState(select, state);
+    }
+
+    /**
+     * Clean up floating for select
+     */
+    private cleanupFloating(select: HTMLElement): void {
+        const state = this.getState(select);
+        if (!state) return;
+
+        // Clean up floating
+        if (state.floating) {
+            state.floating.cleanup();
+            state.floating = undefined;
+        }
+
+        this.setState(select, state);
+    }
+
+    /**
      * Clean up SelectActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // SelectActions doesn't have additional cleanup beyond base class
-        // Event listeners and observers are automatically cleaned up
+        // Clean up floating instances
+        this.getAllStates().forEach((state, select) => {
+            this.cleanupFloating(select);
+        });
     }
 }
 

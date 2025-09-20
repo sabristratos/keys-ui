@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Avatar extends Component
 {
@@ -23,23 +24,22 @@ class Avatar extends Component
         }
 
 
-        if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
-            $this->size = 'md';
+        if (!ComponentConstants::isValidSize($this->size)) {
+            $this->size = ComponentConstants::getDefaultSize();
         }
 
 
-        if (!in_array($this->shape, ['circle', 'square'])) {
+        if (!in_array($this->shape, ComponentConstants::AVATAR_SHAPES)) {
             $this->shape = 'circle';
         }
 
 
-        $validColors = ['brand', 'success', 'warning', 'danger', 'neutral', 'red', 'green', 'blue', 'purple', 'yellow', 'teal', 'orange'];
-        if (!in_array($this->color, $validColors)) {
+        if (!ComponentConstants::isValidColorForComponent($this->color, 'avatar')) {
             $this->color = 'neutral';
         }
 
 
-        if ($this->status && !in_array($this->status, ['online', 'offline', 'away', 'busy'])) {
+        if ($this->status && !in_array($this->status, ComponentConstants::AVATAR_STATUS)) {
             $this->status = null;
         }
     }

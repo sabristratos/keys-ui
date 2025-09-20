@@ -64,8 +64,18 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "scripts": {
+        "post-install-cmd": [
+            "@keys:build-assets"
+        ],
+        "post-update-cmd": [
+            "@keys:build-assets"
+        ],
         "post-autoload-dump": [
-            "@php ./../../artisan vendor:publish --tag=keys-ui-assets --ansi --force --quiet 2>/dev/null || true"
+            "@keys:build-assets"
+        ],
+        "keys:build-assets": [
+            "cd packages/keys-ui && npm install --silent 2>/dev/null || true",
+            "cd packages/keys-ui && npm run build --silent 2>/dev/null || true"
         ]
     }
 }

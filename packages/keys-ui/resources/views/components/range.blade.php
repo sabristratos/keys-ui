@@ -16,6 +16,10 @@
             @include('keys::components.range.content')
         </div>
 
+        @if($hint)
+            <p class="text-xs text-muted">{{ $hint }}</p>
+        @endif
+
         @if($showErrors && $hasError())
             <x-keys::error :messages="$errors" />
         @endif

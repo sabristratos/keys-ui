@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Loading extends Component
 {
@@ -10,12 +11,12 @@ class Loading extends Component
         public string $animation = 'spinner',
         public string $size = 'md'
     ) {
-        if (!in_array($this->animation, ['spinner', 'dots', 'pulse'])) {
+        if (!in_array($this->animation, ComponentConstants::LOADING_ANIMATIONS)) {
             $this->animation = 'spinner';
         }
 
-        if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
-            $this->size = 'md';
+        if (!ComponentConstants::isValidSize($this->size)) {
+            $this->size = ComponentConstants::getDefaultSize();
         }
     }
 

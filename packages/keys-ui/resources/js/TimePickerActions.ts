@@ -13,6 +13,7 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
+import { FloatingManager, FloatingInstance } from './utils/FloatingManager';
 
 interface TimePickerState {
     isOpen: boolean;
@@ -26,6 +27,7 @@ interface TimePickerState {
     minTime: string | null;
     maxTime: string | null;
     value: string | null;
+    floating?: FloatingInstance;
 }
 
 interface ParsedTime {
@@ -276,6 +278,12 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
     private closeDropdown(timepicker: HTMLElement): void {
         const state = this.getState(timepicker);
         if (!state || !state.isOpen) return;
+
+        // Clean up floating instance
+        if (state.floating) {
+            state.floating.cleanup();
+            state.floating = undefined;
+        }
 
         state.isOpen = false;
         this.setState(timepicker, state);
@@ -756,7 +764,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
     }
 
     /**
-     * Position dropdown
+     * Position dropdown using Floating UI
      */
     private positionDropdown(timepicker: HTMLElement): void {
         const dropdown = DOMUtils.querySelector('[data-timepicker-dropdown]', timepicker) as HTMLElement;
@@ -764,76 +772,68 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
 
         if (!dropdown || !trigger) return;
 
-        // Reset positioning to get natural dimensions
-        dropdown.style.top = '';
-        dropdown.style.bottom = '';
-        dropdown.style.marginTop = '';
-        dropdown.style.marginBottom = '';
-        dropdown.style.maxHeight = '';
+        // Setup floating for time picker dropdown
+        this.setupFloating(timepicker, trigger, dropdown);
+    }
 
-        const rect = trigger.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const viewportWidth = window.innerWidth;
+    /**
+     * Setup floating for time picker using Floating UI
+     */
+    private setupFloating(timepicker: HTMLElement, trigger: HTMLElement, dropdown: HTMLElement): void {
+        const state = this.getState(timepicker);
+        if (!state) return;
 
-        // Get dropdown's natural height after reset
-        const dropdownRect = dropdown.getBoundingClientRect();
-        const dropdownHeight = dropdownRect.height;
-
-        const spaceBelow = viewportHeight - rect.bottom - 8; // 8px margin
-        const spaceAbove = rect.top - 8; // 8px margin
-        const minDropdownHeight = 200; // Minimum height for usability
-
-        // Determine positioning strategy
-        let positionAbove = false;
-        let maxHeight = 'none';
-
-        if (dropdownHeight <= spaceBelow) {
-            // Enough space below - position normally
-            positionAbove = false;
-        } else if (dropdownHeight <= spaceAbove) {
-            // Not enough space below but enough above
-            positionAbove = true;
-        } else if (spaceAbove > spaceBelow) {
-            // More space above than below - position above with max height
-            positionAbove = true;
-            maxHeight = Math.max(spaceAbove, minDropdownHeight) + 'px';
-        } else {
-            // More space below - position below with max height
-            positionAbove = false;
-            maxHeight = Math.max(spaceBelow, minDropdownHeight) + 'px';
+        // Clean up existing floating instance
+        if (state.floating) {
+            state.floating.cleanup();
         }
 
-        // Apply positioning
-        if (positionAbove) {
-            dropdown.style.bottom = '100%';
-            dropdown.style.top = 'auto';
-            dropdown.style.marginBottom = '4px';
-            dropdown.style.marginTop = '0';
-        } else {
-            dropdown.style.top = '100%';
-            dropdown.style.bottom = 'auto';
-            dropdown.style.marginTop = '4px';
-            dropdown.style.marginBottom = '0';
+        // Get configuration
+        const position = timepicker.dataset.position || 'bottom';
+        const align = timepicker.dataset.align || 'start';
+        const offset = parseInt(timepicker.dataset.offset || '8');
+
+        // Convert position and align to Floating UI placement
+        let placement: any = position;
+        if (position === 'bottom' || position === 'top') {
+            if (align === 'start') placement = `${position}-start`;
+            else if (align === 'end') placement = `${position}-end`;
         }
 
-        // Apply max height if needed
-        if (maxHeight !== 'none') {
-            dropdown.style.maxHeight = maxHeight;
-            dropdown.style.overflowY = 'auto';
-        }
+        // Create floating element with enhanced Floating UI features
+        const floating = FloatingManager.getInstance().createFloating(trigger, dropdown, {
+            placement,
+            offset,
+            flip: {
+                fallbackStrategy: 'bestFit',
+                padding: 8
+            },
+            shift: {
+                padding: 8,
+                crossAxis: true
+            },
+            size: {
+                apply: ({ availableHeight }) => {
+                    // Apply adaptive height for time picker dropdowns
+                    const minHeight = 200;
+                    const maxHeight = Math.max(availableHeight - 16, minHeight);
+                    dropdown.style.maxHeight = `${maxHeight}px`;
+                    dropdown.style.overflowY = 'auto';
+                }
+            },
+            hide: {
+                strategy: 'escaped'
+            },
+            autoUpdate: {
+                ancestorScroll: true,
+                ancestorResize: true,
+                elementResize: true,
+                layoutShift: true
+            }
+        });
 
-        // Horizontal positioning adjustments for viewport edges
-        const dropdownLeft = rect.left;
-        const dropdownRight = dropdownLeft + dropdown.offsetWidth;
-
-        if (dropdownRight > viewportWidth) {
-            const overflow = dropdownRight - viewportWidth;
-            dropdown.style.right = '0';
-            dropdown.style.left = 'auto';
-        } else if (dropdownLeft < 0) {
-            dropdown.style.left = '0';
-            dropdown.style.right = 'auto';
-        }
+        state.floating = floating;
+        this.setState(timepicker, state);
     }
 
     /**
@@ -966,8 +966,12 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
      * Clean up TimePickerActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // TimePickerActions doesn't have additional cleanup beyond base class
-        // Event listeners and observers are automatically cleaned up
+        // Clean up all floating instances
+        this.getAllStates().forEach((state, timepicker) => {
+            if (state.floating) {
+                state.floating.cleanup();
+            }
+        });
     }
 }
 

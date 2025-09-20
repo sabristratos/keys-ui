@@ -4,6 +4,7 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Radio extends Component
 {
@@ -39,13 +40,16 @@ class Radio extends Component
         }
 
 
-        if (!in_array($this->variant, ['standard', 'bordered', 'colored', 'card'])) {
+        if (!in_array($this->variant, ComponentConstants::FORM_VARIANTS)) {
             $this->variant = 'standard';
         }
 
+        if (!ComponentConstants::isValidSize($this->size)) {
+            $this->size = ComponentConstants::getDefaultSize();
+        }
 
-        if (!in_array($this->color, ['brand', 'success', 'warning', 'danger', 'neutral'])) {
-            $this->color = 'brand';
+        if (!in_array($this->color, ComponentConstants::SEMANTIC_COLORS)) {
+            $this->color = ComponentConstants::getDefaultColor();
         }
 
         if ($this->variant === 'card' && !$this->title && $this->label) {

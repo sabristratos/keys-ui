@@ -24,21 +24,6 @@
                 <span class="calendar-month-year-display">{{ $monthYearDisplay }}</span>
             </x-keys::button>
 
-            <!-- Month Selection Dropdown -->
-            <div class="calendar-month-dropdown absolute top-full left-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-50 hidden"
-                 data-calendar-month-dropdown>
-                <div class="p-2 grid grid-cols-3 gap-1">
-                    <!-- Month options will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Year Selection Dropdown -->
-            <div class="calendar-year-dropdown absolute top-full left-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-50 hidden max-h-64 overflow-y-auto"
-                 data-calendar-year-dropdown>
-                <div class="p-2 space-y-1">
-                    <!-- Year options will be populated by JavaScript -->
-                </div>
-            </div>
         </div>
 
         <x-keys::button

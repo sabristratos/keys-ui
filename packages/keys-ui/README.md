@@ -18,13 +18,26 @@ A modern Blade components library for Laravel 12 and Tailwind v4. Build beautifu
 
 ## Installation
 
-Install the package via Composer:
+Install Keys UI with three simple steps:
 
+### 1. Install Package
 ```bash
 composer require keys/ui
 ```
 
-The package will automatically register its service provider and publish necessary assets.
+### 2. Import CSS
+Add this line to your `resources/css/app.css`:
+```css
+@import "../../vendor/keys/ui/resources/css/keys-ui.css";
+```
+
+### 3. Add Scripts Component
+Add this to your layout file (e.g., `resources/views/layouts/app.blade.php`):
+```blade
+<keys:scripts />
+```
+
+That's it! No build commands, no asset publishing - Keys UI works immediately.
 
 ## Quick Start
 
@@ -60,14 +73,20 @@ Start using components immediately with the `x-keys::` namespace:
 
 ### Asset Integration
 
-Add the Keys UI assets to your layout:
+1. Add CSS import to your `resources/css/app.css`:
+
+```css
+@import "../../vendor/keys/ui/resources/css/keys-ui.css";
+```
+
+2. Add the script component to your layout:
 
 ```blade
 <!DOCTYPE html>
 <html>
 <head>
     <!-- Your existing head content -->
-    @keysAssets()
+    <keys:scripts />
 </head>
 <body>
     <!-- Your content -->

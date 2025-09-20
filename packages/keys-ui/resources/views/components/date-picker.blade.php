@@ -42,11 +42,7 @@
 
     /* Calendar dropdown */
     [data-date-picker="true"] .date-picker-dropdown {
-        position: absolute;
-        top: 100%;
-        left: 0;
         z-index: 50;
-        margin-top: 0.25rem;
         background-color: var(--color-surface);
         border: 1px solid var(--color-border);
         border-radius: var(--radius-lg);
@@ -63,19 +59,6 @@
         opacity: 1;
         transform: translateY(0) scale(1);
         pointer-events: auto;
-    }
-
-    /* Dropdown position variants */
-    [data-date-picker="true"] .date-picker-dropdown.top {
-        top: auto;
-        bottom: 100%;
-        margin-top: 0;
-        margin-bottom: 0.25rem;
-        transform-origin: bottom;
-    }
-
-    [data-date-picker="true"] .date-picker-dropdown.top.open {
-        transform: translateY(0) scale(1);
     }
 
     /* Inline mode */
@@ -173,18 +156,10 @@
     /* Responsive adjustments */
     @media (max-width: 640px) {
         [data-date-picker="true"] .date-picker-dropdown {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.95);
             width: 90%;
             max-width: 360px;
             max-height: 80vh;
             overflow-y: auto;
-        }
-
-        [data-date-picker="true"] .date-picker-dropdown.open {
-            transform: translate(-50%, -50%) scale(1);
         }
 
         [data-date-picker="true"][data-inline="true"] .date-picker-dropdown {

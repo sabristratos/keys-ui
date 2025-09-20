@@ -154,12 +154,22 @@ class Select extends Component
         return $this->id ?? 'select-' . uniqid();
     }
 
+    public function getComputedFloatingData(): array
+    {
+        return [
+            'placement' => 'bottom',
+            'alignment' => 'start',
+            'offset' => 4
+        ];
+    }
+
     public function render()
     {
         return view('keys::components.select', [
             'computedIconSize' => $this->getComputedIconSize(),
             'computedTriggerClasses' => $this->getComputedTriggerClasses(),
             'computedDropdownClasses' => $this->getComputedDropdownClasses(),
+            'computedFloatingData' => $this->getComputedFloatingData(),
             'uniqueId' => $this->getUniqueId(),
         ]);
     }

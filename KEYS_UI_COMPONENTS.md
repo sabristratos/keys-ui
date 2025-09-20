@@ -594,12 +594,11 @@ The package includes TypeScript definitions for interactive components with 20+ 
 ### Asset Integration
 Include Keys UI assets in your Blade templates:
 ```blade
-{{-- Auto-inject all Keys UI assets --}}
-@keysAssets()
+{{-- Auto-inject Keys UI scripts --}}
+<keys:scripts />
 
-{{-- Manual asset inclusion --}}
-<link href="{{ asset('vendor/keys-ui/keys-ui.css') }}" rel="stylesheet">
-<script src="{{ asset('vendor/keys-ui/keys-ui.js') }}"></script>
+{{-- CSS is imported via app.css --}}
+@import "../../vendor/keys/ui/resources/css/keys-ui.css";
 ```
 
 ### Build Commands

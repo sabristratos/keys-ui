@@ -11,7 +11,6 @@
 <style>
     /* Tooltip visibility and animations */
     .keys-tooltip {
-        position: fixed;
         z-index: 9999;
         opacity: 0;
         visibility: hidden;

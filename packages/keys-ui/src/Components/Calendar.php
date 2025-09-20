@@ -5,6 +5,7 @@ namespace Keys\UI\Components;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Calendar extends Component
 {
@@ -153,8 +154,8 @@ class Calendar extends Component
     private function validateProperties(): void
     {
         // Validate size
-        if (!in_array($this->size, ['sm', 'md', 'lg'])) {
-            $this->size = 'md';
+        if (!in_array($this->size, ComponentConstants::CALENDAR_SIZES)) {
+            $this->size = ComponentConstants::getDefaultSize();
         }
     }
 

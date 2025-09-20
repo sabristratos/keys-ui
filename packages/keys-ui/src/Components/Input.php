@@ -21,8 +21,10 @@ class Input extends Component
         public bool $optional = false,
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
+        public ?string $icon = null,  // Alias for iconLeft
         public ?string $iconLeft = null,
         public ?string $iconRight = null,
+        public ?string $hint = null,  // Add support for hint text
         public array $actions = [],
         public bool $clearable = false,
         public bool $copyable = false,
@@ -32,9 +34,12 @@ class Input extends Component
         public string $actionSize = 'xs',
         public bool $hasError = false
     ) {
+        // Handle icon alias for iconLeft
+        if ($this->icon && !$this->iconLeft) {
+            $this->iconLeft = $this->icon;
+        }
 
         $this->id = $this->id ?? $this->name;
-
 
         if (!$this->hasError && $this->hasErrors()) {
             $this->hasError = true;
@@ -80,9 +85,11 @@ class Input extends Component
     public function sizeClasses(): string
     {
         return match ($this->size) {
+            'xs' => 'px-2.5 py-1 text-xs',
             'sm' => 'px-3 py-1.5 text-sm',
             'md' => 'px-3 py-2 text-sm',
             'lg' => 'px-4 py-2.5 text-base',
+            'xl' => 'px-4 py-3 text-base',
             default => 'px-3 py-2 text-sm'
         };
     }
@@ -103,9 +110,11 @@ class Input extends Component
     public function iconSize(): string
     {
         return match ($this->size) {
+            'xs' => 'xs',
             'sm' => 'xs',
             'md' => 'sm',
             'lg' => 'md',
+            'xl' => 'md',
             default => 'sm'
         };
     }
@@ -117,18 +126,22 @@ class Input extends Component
 
         if ($this->iconLeft) {
             $leftPadding = match ($this->size) {
+                'xs' => 'pl-7',
                 'sm' => 'pl-8',
                 'md' => 'pl-10',
                 'lg' => 'pl-12',
+                'xl' => 'pl-12',
                 default => 'pl-10'
             };
         }
 
         if ($this->iconRight || $this->hasActions()) {
             $padding = $this->hasActions() ? $this->actionPadding() : match ($this->size) {
+                'xs' => 'pr-7',
                 'sm' => 'pr-8',
                 'md' => 'pr-10',
                 'lg' => 'pr-12',
+                'xl' => 'pr-12',
                 default => 'pr-10'
             };
             $rightPadding = $padding;
@@ -146,9 +159,11 @@ class Input extends Component
     {
         // Use logical positioning (start/end) for RTL support
         return match ($this->size) {
+            'xs' => ['left' => 'start-2', 'right' => 'end-2'],
             'sm' => ['left' => 'start-2.5', 'right' => 'end-2.5'],
             'md' => ['left' => 'start-3', 'right' => 'end-3'],
             'lg' => ['left' => 'start-3.5', 'right' => 'end-3.5'],
+            'xl' => ['left' => 'start-3.5', 'right' => 'end-3.5'],
             default => ['left' => 'start-3', 'right' => 'end-3']
         };
     }
@@ -188,7 +203,7 @@ class Input extends Component
 
         if ($this->clearable) {
             $autoActions[] = [
-                'type' => 'clear',
+                'action' => 'clear',
                 'icon' => 'heroicon-o-x-mark',
                 'label' => __('keys-ui::keys-ui.actions.clear_input')
             ];
@@ -196,7 +211,7 @@ class Input extends Component
 
         if ($this->copyable) {
             $autoActions[] = [
-                'type' => 'copy',
+                'action' => 'copy',
                 'icon' => 'heroicon-o-clipboard',
                 'label' => __('keys-ui::keys-ui.actions.copy_clipboard'),
                 'icon_success' => 'heroicon-o-check',
@@ -206,7 +221,7 @@ class Input extends Component
 
         if ($this->type === 'password' && $this->showPassword) {
             $autoActions[] = [
-                'type' => 'toggle-password',
+                'action' => 'password_toggle',
                 'icon' => 'heroicon-o-eye',
                 'label' => __('keys-ui::keys-ui.actions.show_password'),
                 'icon_toggle' => 'heroicon-o-eye-slash',
@@ -216,7 +231,7 @@ class Input extends Component
 
         if ($this->externalUrl) {
             $autoActions[] = [
-                'type' => 'external',
+                'action' => 'external',
                 'icon' => 'heroicon-o-arrow-top-right-on-square',
                 'label' => __('keys-ui::keys-ui.actions.open_new_tab'),
                 'url' => $this->externalUrl
@@ -241,13 +256,19 @@ class Input extends Component
         $actions = [];
 
         foreach ($this->getAllActions() as $action) {
+            // Handle both 'type' and 'action' keys for action type
+            $actionType = $action['type'] ?? $action['action'] ?? 'custom';
+
+            // Handle label - use provided label or generate default
+            $label = $action['label'] ?? $action['tooltip'] ?? 'Action';
+
             $computedAction = [
-                'type' => $action['type'],
-                'icon' => $action['icon'],
-                'label' => $action['label'],
+                'type' => $actionType,
+                'icon' => $action['icon'] ?? 'heroicon-o-cursor-arrow-rays',
+                'label' => $label,
                 'is_multi_state' => isset($action['icon_toggle']) || isset($action['icon_success']),
-                'data_action' => $action['type'],
-                'data_icon_default' => $action['icon'],
+                'data_action' => $actionType,
+                'data_icon_default' => $action['icon'] ?? 'heroicon-o-cursor-arrow-rays',
                 'icon_toggle' => $action['icon_toggle'] ?? null,
                 'icon_success' => $action['icon_success'] ?? null,
                 'label_toggle' => $action['label_toggle'] ?? null,

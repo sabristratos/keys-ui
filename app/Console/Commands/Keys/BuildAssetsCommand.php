@@ -110,7 +110,7 @@ class BuildAssetsCommand extends Command
      */
     protected function buildAssets(): bool
     {
-        $command = $this->option('dev') ? 'npm run dev' : 'npm run build:all';
+        $command = $this->option('dev') ? 'npm run dev' : 'npm run build';
 
         $this->info("Running: {$command}");
 
@@ -133,13 +133,57 @@ class BuildAssetsCommand extends Command
     protected function watchAssets(): int
     {
         $this->info('👀 Watching Keys UI assets for changes...');
+        $this->info('🚀 Auto-deployment enabled - assets will be copied to public directory');
         $this->info('Press Ctrl+C to stop watching');
 
-        $result = Process::path($this->packagePath)
-            ->forever()
-            ->run(['npm', 'run', 'watch:all']);
+        // Start vite watcher in background
+        $viteProcess = Process::path($this->packagePath)
+            ->start(['npm', 'run', 'watch']);
 
-        return $result->exitCode();
+        // Watch for changes in dist directory and auto-deploy
+        $distPath = $this->packagePath . '/dist';
+        $publicPath = public_path('vendor/keys-ui');
+
+        // Ensure public directory exists
+        if (!File::isDirectory($publicPath)) {
+            File::makeDirectory($publicPath, 0755, true);
+        }
+
+        $lastModified = [];
+
+        while ($viteProcess->running()) {
+            // Check for changes in dist files
+            $files = ['keys-ui.umd.js', 'keys-ui.es.js', 'style.css'];
+
+            foreach ($files as $file) {
+                $distFile = $distPath . '/' . $file;
+
+                if (File::exists($distFile)) {
+                    $currentModified = File::lastModified($distFile);
+
+                    if (!isset($lastModified[$file]) || $lastModified[$file] !== $currentModified) {
+                        $lastModified[$file] = $currentModified;
+
+                        // Copy changed file to public directory
+                        $targetFile = $file === 'keys-ui.umd.js' ? 'keys-ui.min.js' : $file;
+                        $publicFile = $publicPath . '/' . $targetFile;
+
+                        File::copy($distFile, $publicFile);
+                        $this->line("✅ Deployed: {$targetFile}");
+
+                        // Also copy as original name for completeness
+                        if ($file === 'keys-ui.umd.js') {
+                            File::copy($distFile, $publicPath . '/keys-ui.umd.js');
+                        }
+                    }
+                }
+            }
+
+            // Check every 500ms
+            usleep(500000);
+        }
+
+        return $viteProcess->exitCode();
     }
 
     /**

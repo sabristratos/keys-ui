@@ -15,6 +15,7 @@ import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
 import { AnimationUtils } from './utils/AnimationUtils';
 import { DateUtils } from './utils/DateUtils';
+import { FloatingManager, FloatingInstance } from './utils/FloatingManager';
 
 interface DatePickerState {
     isOpen: boolean;
@@ -28,6 +29,7 @@ interface DatePickerState {
     isInline: boolean;
     isDisabled: boolean;
     position: 'bottom' | 'top';
+    floating?: FloatingInstance;
 }
 
 export class DatePickerActions extends BaseActionClass<DatePickerState> {
@@ -304,6 +306,11 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
         const state = this.getState(datePicker);
         if (!state || !state.isOpen || state.isInline) return;
 
+        // Clean up floating instance
+        if (state.floating) {
+            state.floating.cleanup();
+            state.floating = undefined;
+        }
 
         state.isOpen = false;
         this.setState(datePicker, state);
@@ -324,7 +331,7 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
     }
 
     /**
-     * Update dropdown position based on viewport
+     * Update dropdown position using Floating UI
      */
     private updateDropdownPosition(datePicker: HTMLElement): void {
         const dropdown = DOMUtils.querySelector('[data-date-picker-dropdown]', datePicker) as HTMLElement;
@@ -333,24 +340,62 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
         const state = this.getState(datePicker);
         if (!state) return;
 
-        // Get viewport dimensions
-        const viewportHeight = window.innerHeight;
-        const rect = datePicker.getBoundingClientRect();
-        const dropdownHeight = dropdown.offsetHeight || 400; // Estimate if not visible
+        // Setup floating for date picker dropdown
+        this.setupFloating(datePicker, dropdown);
+    }
 
-        // Calculate space above and below
-        const spaceBelow = viewportHeight - rect.bottom;
-        const spaceAbove = rect.top;
+    /**
+     * Setup floating for date picker using Floating UI
+     */
+    private setupFloating(datePicker: HTMLElement, dropdown: HTMLElement): void {
+        const state = this.getState(datePicker);
+        if (!state) return;
 
-        // Determine position
-        if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
-            dropdown.classList.add('top');
-            state.position = 'top';
-        } else {
-            dropdown.classList.remove('top');
-            state.position = 'bottom';
+        // Clean up existing floating instance
+        if (state.floating) {
+            state.floating.cleanup();
         }
 
+        // Use the date picker element as the trigger (reference element)
+        const input = DOMUtils.querySelector('[data-date-picker-input]', datePicker) as HTMLElement;
+        const trigger = input || datePicker;
+
+        // Get configuration
+        const position = datePicker.dataset.position || 'bottom';
+        const align = datePicker.dataset.align || 'start';
+        const offset = parseInt(datePicker.dataset.offset || '8');
+
+        // Convert position and align to Floating UI placement
+        let placement: any = position;
+        if (position === 'bottom' || position === 'top') {
+            if (align === 'start') placement = `${position}-start`;
+            else if (align === 'end') placement = `${position}-end`;
+        }
+
+        // Create floating element with enhanced Floating UI features
+        const floating = FloatingManager.getInstance().createFloating(trigger, dropdown, {
+            placement,
+            offset,
+            flip: {
+                fallbackStrategy: 'bestFit',
+                padding: 8
+            },
+            shift: {
+                padding: 8,
+                crossAxis: true
+            },
+            hide: {
+                strategy: 'escaped'
+            },
+            autoUpdate: {
+                ancestorScroll: true,
+                ancestorResize: true,
+                elementResize: true,
+                layoutShift: true
+            }
+        });
+
+        state.floating = floating;
         this.setState(datePicker, state);
     }
 
@@ -633,8 +678,12 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
      * Clean up DatePickerActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // DatePickerActions doesn't have additional cleanup beyond base class
-        // Event listeners and observers are automatically cleaned up
+        // Clean up all floating instances
+        this.getAllStates().forEach((state, datePicker) => {
+            if (state.floating) {
+                state.floating.cleanup();
+            }
+        });
     }
 }
 

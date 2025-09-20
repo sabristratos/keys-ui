@@ -24,8 +24,10 @@ class Textarea extends Component
         public bool $optional = false,
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
+        public ?string $icon = null,  // Alias for iconLeft
         public ?string $iconLeft = null,
         public ?string $iconRight = null,
+        public ?string $hint = null,  // Add support for hint text
         public array $actions = [],
         public bool $clearable = false,
         public bool $copyable = false,
@@ -34,9 +36,12 @@ class Textarea extends Component
         public string $actionSize = 'xs',
         public bool $hasError = false
     ) {
+        // Handle icon alias for iconLeft
+        if ($this->icon && !$this->iconLeft) {
+            $this->iconLeft = $this->icon;
+        }
 
         $this->id = $this->id ?? $this->name;
-
 
         if (!$this->hasError && $this->hasErrors()) {
             $this->hasError = true;
@@ -82,9 +87,11 @@ class Textarea extends Component
     public function sizeClasses(): string
     {
         return match ($this->size) {
+            'xs' => 'px-2.5 py-1 text-xs',
             'sm' => 'px-3 py-1.5 text-sm',
             'md' => 'px-3 py-2 text-sm',
             'lg' => 'px-4 py-2.5 text-base',
+            'xl' => 'px-4 py-3 text-base',
             default => 'px-3 py-2 text-sm'
         };
     }

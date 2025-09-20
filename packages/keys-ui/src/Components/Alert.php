@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Alert extends Component
 {
@@ -13,11 +14,11 @@ class Alert extends Component
         public ?string $title = null,
         public bool $dismissible = false
     ) {
-        if (!in_array($this->variant, ['info', 'success', 'warning', 'danger', 'neutral'])) {
+        if (!in_array($this->variant, ComponentConstants::SEMANTIC_COLORS)) {
             $this->variant = 'info';
         }
 
-        if (!in_array($this->size, ['sm', 'md', 'lg'])) {
+        if (!in_array($this->size, ComponentConstants::ALERT_SIZES)) {
             $this->size = 'md';
         }
     }

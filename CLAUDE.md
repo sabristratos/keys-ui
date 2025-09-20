@@ -151,7 +151,7 @@ Components should have comprehensive browser tests covering:
 - CSS opacity toggles provide smooth animations
 
 ### Asset Management
-- Keys UI assets auto-inject via `@keysAssets()` directive
+- Keys UI assets auto-inject via `<keys:scripts />` component
 - Package builds to `dist/` directory, published to `public/vendor/keys-ui/`
 - Development: Use watch mode for real-time updates
 - Production: Always build both package and app assets

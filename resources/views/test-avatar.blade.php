@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Avatar Components Test</title>
-    @keysAssets()
+    <keys:scripts />
 </head>
 <body>
     <div class="p-8 space-y-8">

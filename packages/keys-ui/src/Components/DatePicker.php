@@ -5,6 +5,7 @@ namespace Keys\UI\Components;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class DatePicker extends Component
 {
@@ -140,8 +141,8 @@ class DatePicker extends Component
     private function validateProperties(): void
     {
         // Validate size
-        if (!in_array($this->size, ['sm', 'md', 'lg'])) {
-            $this->size = 'md';
+        if (!in_array($this->size, ComponentConstants::DATEPICKER_SIZES)) {
+            $this->size = ComponentConstants::getDefaultSize();
         }
 
         // Validate monthsToShow

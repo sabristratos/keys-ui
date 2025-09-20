@@ -31,11 +31,12 @@ import { BaseActionClass } from './utils/BaseActionClass';
 import { DOMUtils } from './utils/DOMUtils';
 import { EventUtils } from './utils/EventUtils';
 import { RTLUtils } from './utils/RTLUtils';
+import FloatingManager from './utils/FloatingManager';
 
 export { FormActions, AlertActions, CalendarActions, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, AccordionActions, EditorActions, DatePickerActions, AddToCartActions, FileUploadActions, GalleryActions };
 
 // Export utility classes for external consumption
-export { BaseActionClass, DOMUtils, EventUtils, RTLUtils };
+export { BaseActionClass, DOMUtils, EventUtils, RTLUtils, FloatingManager };
 
 /**
  * Initialize all Keys UI components

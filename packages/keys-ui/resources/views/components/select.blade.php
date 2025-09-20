@@ -10,6 +10,9 @@
             'data-searchable' => $searchable ? 'true' : 'false',
             'data-clearable' => $clearable ? 'true' : 'false',
             'data-disabled' => $disabled ? 'true' : 'false',
+            'data-floating-placement' => $computedFloatingData['placement'],
+            'data-floating-alignment' => $computedFloatingData['alignment'],
+            'data-floating-offset' => $computedFloatingData['offset'],
             'data-name' => $name,
             'data-value' => is_array($value) ? json_encode($value) : $value,
         ], fn($value) => !is_null($value)));

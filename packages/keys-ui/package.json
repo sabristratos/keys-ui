@@ -13,32 +13,22 @@
     "config"
   ],
   "exports": {
-    "./css": "./dist/keys-ui.css",
     "./js": "./dist/keys-ui.umd.js",
-    "./postcss-plugin": "./postcss-plugin.js",
     ".": {
       "import": "./dist/keys-ui.es.js",
-      "require": "./dist/keys-ui.umd.js",
-      "style": "./dist/keys-ui.css"
+      "require": "./dist/keys-ui.umd.js"
     }
   },
   "scripts": {
     "dev": "vite --port 5174",
-    "build": "vite build",
+    "build": "vite build && cp dist/keys-ui.umd.js dist/keys-ui.min.js",
     "watch": "vite build --watch",
     "preview": "vite preview --port 5174",
-    "build:css": "postcss resources/css/keys-ui.css -o dist/keys-ui.css",
-    "watch:css": "postcss resources/css/keys-ui.css -o dist/keys-ui.css --watch",
-    "build:js": "vite build",
-    "watch:js": "vite build --watch",
-    "build:all": "npm run build:css && npm run build:js",
-    "watch:all": "concurrently \"npm run watch:css\" \"npm run watch:js\"",
-    "publish:assets": "php ../../artisan vendor:publish --tag=keys-ui-assets --force",
-    "publish:config": "php ../../artisan vendor:publish --tag=keys-ui-config --force",
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.7.4",
     "quill": "^2.0.3"
   },
   "devDependencies": {

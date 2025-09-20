@@ -12,6 +12,7 @@ import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
 import { RTLUtils } from './utils/RTLUtils';
+import { FloatingManager, FloatingInstance } from './utils/FloatingManager';
 
 interface DropdownState {
     isOpen: boolean;
@@ -19,6 +20,7 @@ interface DropdownState {
     menuItems: HTMLElement[];
     parent?: HTMLElement;
     children: HTMLElement[];
+    floating?: FloatingInstance;
 }
 
 export class DropdownActions extends BaseActionClass<DropdownState> {
@@ -288,6 +290,12 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
 
         this.closeChildSubmenus(dropdown);
 
+        // Clean up floating instance
+        if (state.floating) {
+            state.floating.cleanup();
+            state.floating = undefined;
+        }
+
         state.isOpen = false;
         state.focusedIndex = -1;
         this.setState(dropdown, state);
@@ -314,6 +322,12 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         if (!state || !state.isOpen) return;
 
         this.closeChildSubmenus(submenu);
+
+        // Clean up floating instance
+        if (state.floating) {
+            state.floating.cleanup();
+            state.floating = undefined;
+        }
 
         state.isOpen = false;
         state.focusedIndex = -1;
@@ -528,119 +542,72 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
     }
 
     /**
-     * Position dropdown relative to trigger
+     * Setup floating for dropdown using Floating UI
      */
-    private positionDropdown(dropdown: HTMLElement): void {
-        const panel = DOMUtils.querySelector('[data-dropdown-panel]', dropdown) as HTMLElement;
-        const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
+    private setupFloating(dropdown: HTMLElement, trigger: HTMLElement, panel: HTMLElement): void {
+        const state = this.getState(dropdown);
+        if (!state) return;
 
-        if (!panel || !trigger) return;
+        // Clean up existing floating instance
+        if (state.floating) {
+            state.floating.cleanup();
+        }
 
-        const rect = trigger.getBoundingClientRect();
-        const panelRect = panel.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const viewportWidth = window.innerWidth;
-
+        // Parse configuration from dropdown attributes
         const position = dropdown.dataset.position || 'bottom';
         const align = dropdown.dataset.align || 'start';
         const offset = parseInt(dropdown.dataset.offset || '8');
 
-        // Get RTL-aware positioning
-        const rtlPosition = RTLUtils.getDropdownPosition(
-            position as 'left' | 'right' | 'top' | 'bottom',
-            align as 'start' | 'center' | 'end'
-        );
-
-        panel.style.top = '';
-        panel.style.bottom = '';
-        panel.style.left = '';
-        panel.style.right = '';
-        panel.style.transform = '';
-
-        const spaceBelow = viewportHeight - rect.bottom;
-        const spaceAbove = rect.top;
-        const spaceRight = viewportWidth - rect.left;
-        const spaceLeft = rect.right;
-
-        let finalPosition = rtlPosition.position;
-        let finalAlign = rtlPosition.align;
-
-        if (finalPosition === 'bottom' && spaceBelow < panelRect.height && spaceAbove > panelRect.height) {
-            finalPosition = 'top';
-        } else if (finalPosition === 'top' && spaceAbove < panelRect.height && spaceBelow > panelRect.height) {
-            finalPosition = 'bottom';
+        // Convert position and align to Floating UI placement
+        let placement: any = position;
+        if (position === 'bottom' || position === 'top') {
+            if (align === 'start') placement = `${position}-start`;
+            else if (align === 'end') placement = `${position}-end`;
+        } else if (position === 'left' || position === 'right') {
+            if (align === 'start') placement = `${position}-start`;
+            else if (align === 'end') placement = `${position}-end`;
         }
 
-        switch (finalPosition) {
-            case 'top':
-                panel.style.bottom = '100%';
-                panel.style.marginBottom = `${offset}px`;
-                break;
-            case 'bottom':
-                panel.style.top = '100%';
-                panel.style.marginTop = `${offset}px`;
-                break;
-            case 'left':
-                panel.style.right = '100%';
-                panel.style.marginRight = `${offset}px`;
-                break;
-            case 'right':
-                panel.style.left = '100%';
-                panel.style.marginLeft = `${offset}px`;
-                break;
-        }
-
-        if (finalPosition === 'top' || finalPosition === 'bottom') {
-            switch (finalAlign) {
-                case 'start':
-                    if (RTLUtils.isRTL()) {
-                        panel.style.right = '0';
-                    } else {
-                        panel.style.left = '0';
-                    }
-                    break;
-                case 'center':
-                    panel.style.left = '50%';
-                    panel.style.transform = 'translateX(-50%)';
-                    break;
-                case 'end':
-                    if (RTLUtils.isRTL()) {
-                        panel.style.left = '0';
-                    } else {
-                        panel.style.right = '0';
-                    }
-                    break;
+        // Create floating element with enhanced Floating UI features
+        const floating = FloatingManager.getInstance().createFloating(trigger, panel, {
+            placement,
+            offset,
+            flip: {
+                fallbackStrategy: 'bestFit',
+                padding: 8
+            },
+            shift: {
+                padding: 8,
+                crossAxis: true
+            },
+            hide: {
+                strategy: 'escaped'
+            },
+            autoUpdate: {
+                ancestorScroll: true,
+                ancestorResize: true,
+                elementResize: true,
+                layoutShift: true
             }
-        } else {
-            switch (finalAlign) {
-                case 'start':
-                    panel.style.top = '0';
-                    break;
-                case 'center':
-                    panel.style.top = '50%';
-                    panel.style.transform = 'translateY(-50%)';
-                    break;
-                case 'end':
-                    panel.style.bottom = '0';
-                    break;
-            }
-        }
+        });
+
+        state.floating = floating;
+        this.setState(dropdown, state);
     }
 
     /**
-     * Position submenu relative to trigger
+     * Setup floating for submenu using Floating UI
      */
-    private positionSubmenu(submenu: HTMLElement): void {
-        const panel = DOMUtils.querySelector('[data-submenu-panel]', submenu) as HTMLElement;
-        const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
+    private setupSubmenuFloating(submenu: HTMLElement, trigger: HTMLElement, panel: HTMLElement): void {
+        const state = this.getState(submenu);
+        if (!state) return;
 
-        if (!panel || !trigger) return;
+        // Clean up existing floating instance
+        if (state.floating) {
+            state.floating.cleanup();
+        }
 
-        const rect = trigger.getBoundingClientRect();
-        const panelRect = panel.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const viewportWidth = window.innerWidth;
-
+        // Parse configuration from submenu attributes
         const position = submenu.dataset.position || 'right';
         const align = submenu.dataset.align || 'start';
         const offset = parseInt(submenu.dataset.offset || '4');
@@ -651,59 +618,70 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
             align as 'start' | 'center' | 'end'
         );
 
-        panel.style.top = '';
-        panel.style.bottom = '';
-        panel.style.left = '';
-        panel.style.right = '';
-        panel.style.transform = '';
-
-        const spaceRight = viewportWidth - rect.right;
-        const spaceLeft = rect.left;
-        const spaceBelow = viewportHeight - rect.bottom;
-        const spaceAbove = rect.top;
-
-        let finalPosition = rtlPosition.position;
-
-        // Auto-flip if there's not enough space
-        if (finalPosition === 'right' && spaceRight < panelRect.width && spaceLeft > panelRect.width) {
-            finalPosition = 'left';
-        } else if (finalPosition === 'left' && spaceLeft < panelRect.width && spaceRight > panelRect.width) {
-            finalPosition = 'right';
+        // Convert position and align to Floating UI placement
+        let placement: any = rtlPosition.position;
+        if (rtlPosition.position === 'right' || rtlPosition.position === 'left') {
+            if (rtlPosition.align === 'start') placement = `${rtlPosition.position}-start`;
+            else if (rtlPosition.align === 'end') placement = `${rtlPosition.position}-end`;
+        } else if (rtlPosition.position === 'top' || rtlPosition.position === 'bottom') {
+            if (rtlPosition.align === 'start') placement = `${rtlPosition.position}-start`;
+            else if (rtlPosition.align === 'end') placement = `${rtlPosition.position}-end`;
         }
 
-        switch (finalPosition) {
-            case 'right':
-                panel.style.left = '100%';
-                panel.style.marginLeft = `${offset}px`;
-                break;
-            case 'left':
-                panel.style.right = '100%';
-                panel.style.marginRight = `${offset}px`;
-                break;
-        }
+        // Create floating element with enhanced Floating UI features for submenu
+        const floating = FloatingManager.getInstance().createFloating(trigger, panel, {
+            placement,
+            offset,
+            flip: {
+                fallbackStrategy: 'bestFit',
+                padding: 8
+            },
+            shift: {
+                padding: 8,
+                crossAxis: true
+            },
+            hide: {
+                strategy: 'escaped'
+            },
+            autoUpdate: {
+                ancestorScroll: true,
+                ancestorResize: true,
+                elementResize: true,
+                layoutShift: true
+            }
+        });
 
-        switch (rtlPosition.align) {
-            case 'start':
-                panel.style.top = '0';
-                break;
-            case 'center':
-                panel.style.top = '50%';
-                panel.style.transform = 'translateY(-50%)';
-                break;
-            case 'end':
-                panel.style.bottom = '0';
-                break;
-        }
+        state.floating = floating;
+        this.setState(submenu, state);
+    }
 
-        // Viewport boundary adjustments
-        const finalPanelRect = panel.getBoundingClientRect();
-        if (finalPanelRect.bottom > viewportHeight) {
-            const overflow = finalPanelRect.bottom - viewportHeight + 8;
-            panel.style.transform = `translateY(-${overflow}px)`;
-        } else if (finalPanelRect.top < 0) {
-            const overflow = Math.abs(finalPanelRect.top) + 8;
-            panel.style.transform = `translateY(${overflow}px)`;
-        }
+    /**
+     * Position dropdown relative to trigger using Floating UI
+     */
+    private positionDropdown(dropdown: HTMLElement): void {
+        const panel = DOMUtils.querySelector('[data-dropdown-panel]', dropdown) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
+
+        if (!panel || !trigger) return;
+
+        const state = this.getState(dropdown);
+        if (!state) return;
+
+        // Setup floating element with Floating UI
+        this.setupFloating(dropdown, trigger, panel);
+    }
+
+    /**
+     * Position submenu relative to trigger using Floating UI
+     */
+    private positionSubmenu(submenu: HTMLElement): void {
+        const panel = DOMUtils.querySelector('[data-submenu-panel]', submenu) as HTMLElement;
+        const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
+
+        if (!panel || !trigger) return;
+
+        // Setup floating element with Floating UI for submenu
+        this.setupSubmenuFloating(submenu, trigger, panel);
     }
 
     /**
@@ -744,8 +722,12 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
      * Clean up DropdownActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // DropdownActions doesn't have additional cleanup beyond base class
-        // Event listeners and observers are automatically cleaned up
+        // Clean up all floating instances
+        this.getAllStates().forEach((state, dropdown) => {
+            if (state.floating) {
+                state.floating.cleanup();
+            }
+        });
     }
 }
 

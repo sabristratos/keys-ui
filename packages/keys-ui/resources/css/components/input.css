@@ -1,0 +1,207 @@
+/* ============================================
+   Input Component Styles
+   ============================================ */
+
+/* Input icon positioning - Left icons */
+.input-icon-left {
+    position: absolute !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Input icon positioning - Right icons */
+.input-icon-right {
+    position: absolute !important;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Icon positioning for different input sizes */
+.input-icon-sm {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+}
+
+.input-icon-md {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+.input-icon-lg {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+}
+
+/* Input action buttons container */
+.input-actions-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding-right: 0.5rem;
+}
+
+/* Input with left icon - padding adjustments */
+.input-with-left-icon-sm {
+    padding-left: 2rem;
+}
+
+.input-with-left-icon-md {
+    padding-left: 2.5rem;
+}
+
+.input-with-left-icon-lg {
+    padding-left: 3rem;
+}
+
+/* Input with right icon - padding adjustments */
+.input-with-right-icon-sm {
+    padding-right: 2rem;
+}
+
+.input-with-right-icon-md {
+    padding-right: 2.5rem;
+}
+
+.input-with-right-icon-lg {
+    padding-right: 3rem;
+}
+
+/* Input with actions - dynamic padding based on action count */
+.input-with-actions {
+    /* Padding will be calculated dynamically by the component */
+}
+
+/* Action button positioning improvements */
+.input-action {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+}
+
+/* Ensure icons are properly centered regardless of input height */
+.input-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+}
+
+/* Fix for different input heights and icon alignment */
+.input-field-container {
+    position: relative;
+}
+
+.input-field-container .input-icon-left,
+.input-field-container .input-icon-right {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    top: 0;
+}
+
+/* Prevent icon overlap with input text */
+.input-icon-spacing-left {
+    left: 0.75rem; /* 12px */
+}
+
+.input-icon-spacing-right {
+    right: 0.75rem; /* 12px */
+}
+
+/* Size-specific icon spacing */
+.input-sm .input-icon-spacing-left {
+    left: 0.625rem; /* 10px */
+}
+
+.input-sm .input-icon-spacing-right {
+    right: 0.625rem; /* 10px */
+}
+
+.input-lg .input-icon-spacing-left {
+    left: 0.875rem; /* 14px */
+}
+
+.input-lg .input-icon-spacing-right {
+    right: 0.875rem; /* 14px */
+}
+
+/* Action button container positioning for different sizes */
+.input-actions-sm {
+    right: 0.5rem;
+}
+
+.input-actions-md {
+    right: 0.5rem;
+}
+
+.input-actions-lg {
+    right: 0.5rem;
+}
+
+/* Ensure actions don't overlap with text */
+.input-with-actions-padding {
+    /* This will be calculated dynamically based on number of actions */
+}
+
+/* Input states and interactions */
+.input-field-container:focus-within .input-icon-left,
+.input-field-container:focus-within .input-icon-right {
+    color: var(--color-brand);
+}
+
+/* Hover effects for action buttons */
+.input-action:hover {
+    transform: scale(1.05);
+}
+
+/* Loading state for action buttons */
+.input-action[data-loading="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Clear button specific styles */
+.input-action[data-action="clear"] {
+    color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+}
+
+.input-action[data-action="clear"]:hover {
+    color: var(--color-danger-500);
+}
+
+/* Copy button success state */
+.input-action[data-action="copy"][data-state="success"] {
+    color: var(--color-success-500);
+}
+
+/* Password toggle states */
+.input-action[data-action="toggle-password"] {
+    color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+}
+
+.input-action[data-action="toggle-password"]:hover {
+    color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+}
+
+/* External link button */
+.input-action[data-action="external"] {
+    color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+}
+
+.input-action[data-action="external"]:hover {
+    color: var(--color-brand-500);
+}

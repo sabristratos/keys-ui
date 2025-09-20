@@ -26,6 +26,10 @@
             @include('keys::partials.textarea-field')
         </div>
 
+        @if($hint)
+            <p class="mt-1 text-xs text-muted">{{ $hint }}</p>
+        @endif
+
         @if($showErrors && !is_null($errors))
             <x-keys::error :messages="$errors" />
         @endif

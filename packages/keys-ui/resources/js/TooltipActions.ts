@@ -13,6 +13,7 @@ import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
 import { AnimationUtils } from './utils/AnimationUtils';
+import { FloatingManager, FloatingInstance } from './utils/FloatingManager';
 
 interface TooltipState {
     isVisible: boolean;
@@ -22,13 +23,9 @@ interface TooltipState {
     delay: number;
     showTimer?: number;
     hideTimer?: number;
+    floating?: FloatingInstance;
 }
 
-interface TooltipPosition {
-    top: number;
-    left: number;
-    placement: 'top' | 'bottom' | 'left' | 'right';
-}
 
 export class TooltipActions extends BaseActionClass<TooltipState> {
 
@@ -278,6 +275,12 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
         const state = this.getState(tooltip);
         if (!state || !state.isVisible) return;
 
+        // Clean up floating instance
+        if (state.floating) {
+            state.floating.cleanup();
+            state.floating = undefined;
+        }
+
         // Use AnimationUtils for fade out animation
         AnimationUtils.fadeOut(tooltip, {
             duration: 150,
@@ -304,108 +307,58 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
     }
 
     /**
-     * Position tooltip relative to trigger
+     * Position tooltip relative to trigger using Floating UI
      */
     private positionTooltip(trigger: HTMLElement, tooltip: HTMLElement): void {
-        const triggerRect = trigger.getBoundingClientRect();
+        const state = this.getState(tooltip);
+        if (!state) return;
 
-        // Temporarily show tooltip to get accurate dimensions
-        const originalVisibility = tooltip.style.visibility;
-        const originalOpacity = tooltip.style.opacity;
-        tooltip.style.visibility = 'hidden';
-        tooltip.style.opacity = '1';
-        tooltip.style.position = 'fixed';
-        tooltip.style.top = '-9999px';
-        tooltip.style.left = '-9999px';
-
-        const tooltipRect = tooltip.getBoundingClientRect();
-        const viewport = {
-            width: window.innerWidth,
-            height: window.innerHeight
-        };
-
-        // Restore original state
-        tooltip.style.visibility = originalVisibility;
-        tooltip.style.opacity = originalOpacity;
-
-        const preferredPlacement = tooltip.getAttribute('data-placement') as 'top' | 'bottom' | 'left' | 'right' || 'top';
-        const position = this.calculateOptimalPosition(triggerRect, tooltipRect, viewport, preferredPlacement);
-
-        tooltip.style.position = 'fixed';
-        tooltip.style.top = `${position.top}px`;
-        tooltip.style.left = `${position.left}px`;
-        tooltip.setAttribute('data-placement', position.placement);
+        // Always use Floating UI
+        this.setupFloating(trigger, tooltip);
     }
 
     /**
-     * Calculate optimal tooltip position with collision detection
+     * Setup floating for tooltip using Floating UI
      */
-    private calculateOptimalPosition(
-        triggerRect: DOMRect,
-        tooltipRect: DOMRect,
-        viewport: { width: number; height: number },
-        preferredPlacement: 'top' | 'bottom' | 'left' | 'right'
-    ): TooltipPosition {
-        const gap = 8; // Distance between trigger and tooltip
+    private setupFloating(trigger: HTMLElement, tooltip: HTMLElement): void {
+        const state = this.getState(tooltip);
+        if (!state) return;
 
-        const positions = {
-            top: {
-                top: triggerRect.top - tooltipRect.height - gap,
-                left: triggerRect.left + (triggerRect.width - tooltipRect.width) / 2,
-                placement: 'top' as const
-            },
-            bottom: {
-                top: triggerRect.bottom + gap,
-                left: triggerRect.left + (triggerRect.width - tooltipRect.width) / 2,
-                placement: 'bottom' as const
-            },
-            left: {
-                top: triggerRect.top + (triggerRect.height - tooltipRect.height) / 2,
-                left: triggerRect.left - tooltipRect.width - gap,
-                placement: 'left' as const
-            },
-            right: {
-                top: triggerRect.top + (triggerRect.height - tooltipRect.height) / 2,
-                left: triggerRect.right + gap,
-                placement: 'right' as const
-            }
-        };
-
-        // Check if preferred position fits
-        const preferred = positions[preferredPlacement];
-        if (this.positionFitsInViewport(preferred, tooltipRect, viewport)) {
-            return preferred;
+        // Clean up existing floating instance
+        if (state.floating) {
+            state.floating.cleanup();
         }
 
-        // Try alternative positions
-        const alternatives = Object.values(positions).filter(pos => pos.placement !== preferredPlacement);
-        for (const position of alternatives) {
-            if (this.positionFitsInViewport(position, tooltipRect, viewport)) {
-                return position;
+        const placement = tooltip.getAttribute('data-placement') || 'top';
+        const arrow = DOMUtils.querySelector('[data-tooltip-arrow]', tooltip);
+
+        // Create floating element with enhanced Floating UI features
+        const floating = FloatingManager.getInstance().createFloating(trigger, tooltip, {
+            placement: placement as any,
+            offset: 8,
+            flip: {
+                fallbackStrategy: 'bestFit',
+                padding: 8
+            },
+            shift: {
+                padding: 8,
+                crossAxis: true
+            },
+            arrow: arrow || undefined,
+            hide: {
+                strategy: 'referenceHidden'
+            },
+            autoUpdate: {
+                ancestorScroll: true,
+                ancestorResize: true,
+                elementResize: true,
+                layoutShift: true
             }
-        }
+        });
 
-        // Fallback: use preferred position with constraints
-        return {
-            top: Math.max(gap, Math.min(preferred.top, viewport.height - tooltipRect.height - gap)),
-            left: Math.max(gap, Math.min(preferred.left, viewport.width - tooltipRect.width - gap)),
-            placement: preferred.placement
-        };
+        state.floating = floating;
     }
 
-    /**
-     * Check if position fits in viewport
-     */
-    private positionFitsInViewport(
-        position: { top: number; left: number },
-        tooltipRect: DOMRect,
-        viewport: { width: number; height: number }
-    ): boolean {
-        return position.top >= 0 &&
-               position.left >= 0 &&
-               position.top + tooltipRect.height <= viewport.height &&
-               position.left + tooltipRect.width <= viewport.width;
-    }
 
     /**
      * Dispatch tooltip events
@@ -493,8 +446,12 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
      * Clean up TooltipActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // TooltipActions doesn't have additional cleanup beyond base class
-        // Event listeners and observers are automatically cleaned up
+        // Clean up all floating instances
+        this.getAllStates().forEach((state, tooltip) => {
+            if (state.floating) {
+                state.floating.cleanup();
+            }
+        });
     }
 }
 

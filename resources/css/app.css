@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import '../../packages/keys-ui/resources/css/keys-ui.css';
+@import '../../vendor/keys/ui/resources/css/keys-ui.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

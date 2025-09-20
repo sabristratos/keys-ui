@@ -4,6 +4,7 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Toggle extends Component
 {
@@ -18,6 +19,7 @@ class Toggle extends Component
         public string $size = 'md',
         public ?string $label = null,
         public ?string $description = null,
+        public ?string $hint = null,  // Add hint support
         public string $labelPosition = 'right',
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
@@ -32,13 +34,12 @@ class Toggle extends Component
             $this->hasError = true;
         }
 
-        $validColors = ['brand', 'success', 'warning', 'danger', 'neutral', 'red', 'green', 'purple', 'yellow', 'teal', 'orange'];
-        if (!in_array($this->color, $validColors)) {
-            $this->color = 'brand';
+        if (!ComponentConstants::isValidColorForComponent($this->color, 'toggle')) {
+            $this->color = ComponentConstants::getDefaultColor();
         }
 
-        if (!in_array($this->size, ['sm', 'md', 'lg'])) {
-            $this->size = 'md';
+        if (!ComponentConstants::isValidSize($this->size)) {
+            $this->size = ComponentConstants::getDefaultSize();
         }
 
         if (!in_array($this->labelPosition, ['left', 'right'])) {
@@ -82,9 +83,11 @@ class Toggle extends Component
     public function trackClasses(): string
     {
         $sizeClasses = match ($this->size) {
+            'xs' => 'w-7 h-4',
             'sm' => 'w-9 h-5',
             'md' => 'w-11 h-6',
             'lg' => 'w-14 h-7',
+            'xl' => 'w-16 h-8',
             default => 'w-11 h-6'
         };
 
@@ -144,16 +147,20 @@ class Toggle extends Component
     public function getThumbClasses(): string
     {
         $thumbSize = match ($this->size) {
+            'xs' => 'after:h-3 after:w-3',
             'sm' => 'after:h-4 after:w-4',
             'md' => 'after:h-5 after:w-5',
             'lg' => 'after:h-6 after:w-6',
+            'xl' => 'after:h-7 after:w-7',
             default => 'after:h-5 after:w-5'
         };
 
         $translateDistance = match ($this->size) {
+            'xs' => 'peer-checked:after:translate-x-3',
             'sm' => 'peer-checked:after:translate-x-4',
             'md' => 'peer-checked:after:translate-x-5',
             'lg' => 'peer-checked:after:translate-x-7',
+            'xl' => 'peer-checked:after:translate-x-8',
             default => 'peer-checked:after:translate-x-5'
         };
 
