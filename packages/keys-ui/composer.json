@@ -1,5 +1,6 @@
 {
     "name": "keys/ui",
+    "version": "1.0.1",
     "description": "A modern Blade components library for Laravel 12 and Tailwind v4",
     "type": "library",
     "license": "MIT",
@@ -25,7 +26,8 @@
     "require": {
         "php": "^8.2",
         "illuminate/support": "^12.0",
-        "illuminate/view": "^12.0"
+        "illuminate/view": "^12.0",
+        "blade-ui-kit/blade-heroicons": "^2.3"
     },
     "require-dev": {
         "orchestra/testbench": "^10.0",
@@ -54,8 +56,16 @@
         "docs": "https://github.com/sabristratos/keys#readme"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "scripts": {
+        "post-autoload-dump": [
+            "@php -r \"if (class_exists('Illuminate\\\\Foundation\\\\Application')) { exit(0); } else { exit(1); }\" || @php artisan vendor:publish --tag=keys-ui-assets --ansi --force"
+        ]
+    }
 }
