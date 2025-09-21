@@ -33,6 +33,7 @@ Quick reference for all Keys UI components with their features and syntax.
 <x-keys::button variant="danger" size="lg">Delete</x-keys::button>
 <x-keys::button icon="heroicon-o-plus" />
 <x-keys::button icon="heroicon-o-eye" icon-toggle="heroicon-o-eye-slash">Toggle</x-keys::button>
+<x-keys::button loading loading-animation="dots">Processing</x-keys::button>
 ```
 
 **Props:**
@@ -44,6 +45,7 @@ Quick reference for all Keys UI components with their features and syntax.
 - `icon-success`: Icon for success state
 - `label-toggle|label-success`: Alternative labels for states
 - `disabled|loading`: Boolean states
+- `loading-animation`: spinner|dots (default: spinner)
 - `href`: Makes button a link
 - `type`: Button type (default: button)
 
@@ -141,18 +143,25 @@ Quick reference for all Keys UI components with their features and syntax.
 - `cols`: Number of columns
 
 ### Toggle
-**Switch/toggle input**
+**Switch/toggle input with advanced features**
 
 ```blade
 <x-keys::toggle name="notifications" label="Enable notifications" />
 <x-keys::toggle checked size="lg" color="success" />
+<x-keys::toggle name="settings" description="Configure app behavior" />
+<x-keys::toggle name="premium" label-position="left" actions="[['type' => 'info', 'icon' => 'heroicon-o-information-circle']]" />
 ```
 
 **Props:**
-- `name|id|checked|disabled`: Standard attributes
-- `size`: sm|md|lg (default: md)
-- `color`: brand|success|warning|danger|neutral (default: brand)
-- `label|description`: Content options
+- `name|id|value|checked|disabled|required`: Standard attributes
+- `size`: xs|sm|md|lg|xl (default: md)
+- `color`: brand|success|warning|danger|neutral|red|green|purple|yellow|teal|orange (default: brand)
+- `label|description|hint`: Content options
+- `label-position`: left|right (default: right)
+- `actions`: Action buttons array
+- `action-variant|action-size`: Action styling
+- `errors`: Error messages (string|array|Collection)
+- `show-errors`: Display error messages (default: true)
 
 ## Display Components
 
@@ -247,7 +256,7 @@ Quick reference for all Keys UI components with their features and syntax.
 - `icon`: Custom icon
 
 ### Card
-**Content containers**
+**Content containers with interactive and selectable states**
 
 ```blade
 <x-keys::card>
@@ -255,11 +264,25 @@ Quick reference for all Keys UI components with their features and syntax.
     Card content goes here
     <x-slot:footer>Card footer</x-slot:footer>
 </x-keys::card>
+
+<x-keys::card variant="elevated" interactive selected>
+    Interactive and selected card
+</x-keys::card>
+
+<x-keys::card href="/profile" interactive>
+    Clickable card that links to profile
+</x-keys::card>
 ```
 
 **Props:**
-- `variant`: default|bordered|elevated
-- `padding`: Boolean for content padding
+- `variant`: default|elevated|outlined|filled (default: default)
+- `padding`: none|xs|sm|md|lg|xl (default: md)
+- `rounded`: none|xs|sm|md|lg|xl|2xl|3xl (default: md)
+- `shadow`: none|xs|sm|md|lg|xl|2xl (default: sm)
+- `interactive`: Enable hover and focus states (default: false)
+- `selected`: Mark card as selected with data attribute (default: false)
+- `href`: Make card clickable with link behavior
+- `disabled`: Disable card interactions (default: false)
 
 ### Modal
 **Dialog overlays**
@@ -280,17 +303,67 @@ Quick reference for all Keys UI components with their features and syntax.
 - `size`: sm|md|lg|xl (default: md)
 - `closable`: Enable close button (default: true)
 
+### Popover
+**Advanced popover/tooltip with positioning and interaction options**
+
+```blade
+<x-keys::popover title="Helpful Information" placement="top" trigger="click">
+    <x-slot:trigger>
+        <x-keys::button>Click me</x-keys::button>
+    </x-slot:trigger>
+    This is detailed content that appears in the popover.
+</x-keys::popover>
+
+<x-keys::popover placement="right" align="start" trigger="hover" size="lg" arrow>
+    <x-slot:trigger>
+        <x-keys::button>Hover me</x-keys::button>
+    </x-slot:trigger>
+    Hover content with custom positioning
+</x-keys::popover>
+```
+
+**Props:**
+- `id`: Popover identifier (auto-generated if not provided)
+- `placement`: top|bottom|left|right (default: bottom)
+- `align`: start|center|end (default: center)
+- `size`: sm|md|lg (default: md)
+- `trigger`: click|hover|focus|manual (default: click)
+- `arrow`: Show positioning arrow (default: true)
+- `dismissible`: Enable dismiss functionality (default: true, auto-enabled for click/focus)
+- `close-on-outside-click`: Close when clicking outside (default: true)
+- `close-on-escape`: Close on Escape key (default: true)
+- `delay|hide-delay`: Show/hide delays in milliseconds (default: 0)
+- `offset`: Offset from target element (default: 8)
+- `title`: Popover title
+- `disabled`: Disable popover (default: false)
+- `modal`: Modal behavior (default: false)
+
 ## Layout Components
 
 ### Tabs
-**Tabbed interface**
+**Tabbed interface with individual tab and panel components**
 
 ```blade
 <x-keys::tabs>
     <x-keys::tabs.tab name="tab1" label="Tab 1" active>Content 1</x-keys::tabs.tab>
     <x-keys::tabs.tab name="tab2" label="Tab 2">Content 2</x-keys::tabs.tab>
 </x-keys::tabs>
+
+{{-- Alternative panel structure --}}
+<x-keys::tabs>
+    {{-- Tab headers --}}
+    <x-keys::tabs.tab name="overview" label="Overview" />
+    <x-keys::tabs.tab name="details" label="Details" />
+
+    {{-- Tab panels --}}
+    <x-keys::tabs.panel name="overview">Overview content</x-keys::tabs.panel>
+    <x-keys::tabs.panel name="details">Details content</x-keys::tabs.panel>
+</x-keys::tabs>
 ```
+
+**Sub-components:**
+- `<x-keys::tabs.tab>` - Individual tab header with content
+- `<x-keys::tabs.panel>` - Separate tab panel content
 
 ### Accordion
 **Collapsible content sections**
@@ -326,7 +399,7 @@ Quick reference for all Keys UI components with their features and syntax.
 </x-keys::table>
 
 {{-- Loading state --}}
-<x-keys::table.loading />
+<x-keys::table.loading-state />
 
 {{-- Empty state --}}
 <x-keys::table.empty-state
@@ -443,8 +516,8 @@ Quick reference for all Keys UI components with their features and syntax.
 **Time selection**
 
 ```blade
-<x-keys::time-picker name="time" />
-<x-keys::time-picker name="time" format="12" />
+<x-keys::timepicker name="time" />
+<x-keys::timepicker name="time" format="12" />
 ```
 
 ### FileUpload
@@ -456,12 +529,30 @@ Quick reference for all Keys UI components with their features and syntax.
 ```
 
 ### Range
-**Range slider input**
+**Range slider input with dual range support**
 
 ```blade
-<x-keys::range name="volume" min="0" max="100" />
-<x-keys::range name="price_range" dual />
+<x-keys::range name="volume" min="0" max="100" value="50" />
+<x-keys::range name="price_range" dual min="0" max="1000" :value="[200, 800]" />
+<x-keys::range name="rating" min="1" max="5" step="0.5" show-values />
+<x-keys::range name="quantity" min="0" max="100" :ticks="[0, 25, 50, 75, 100]" show-ticks />
 ```
+
+**Props:**
+- `name|id`: Standard form attributes
+- `value`: Single value or array for dual range
+- `min-value|max-value`: For dual range (overrides value array)
+- `min|max`: Range boundaries (default: 0-100)
+- `step`: Increment step (default: 1)
+- `dual`: Enable dual range mode (default: false)
+- `ticks`: Array of tick marks with values/labels
+- `show-values`: Display current values (default: false)
+- `show-ticks`: Display tick marks (default: false)
+- `size`: xs|sm|md|lg|xl (default: md)
+- `disabled|required`: Boolean states
+- `label|optional`: Shorthand mode
+- `errors`: Error messages (string|array|Collection)
+- `icon|hint`: Additional content options
 
 ### Editor
 **Rich text editor**
@@ -486,6 +577,55 @@ Quick reference for all Keys UI components with their features and syntax.
 <x-keys::progress value="75" />
 <x-keys::progress value="50" color="success" size="lg" />
 ```
+
+### Gallery
+**Advanced image gallery with multiple layouts and features**
+
+```blade
+{{-- Basic thumbnail gallery --}}
+<x-keys::gallery type="thumbnail" :images="[
+    ['src' => 'image1.jpg', 'alt' => 'Image 1'],
+    ['src' => 'image2.jpg', 'alt' => 'Image 2', 'caption' => 'Beautiful scenery'],
+    ['src' => 'image3.jpg', 'alt' => 'Image 3']
+]" />
+
+{{-- E-commerce gallery with thumbnails --}}
+<x-keys::gallery type="ecommerce" layout="default" aspect-ratio="square"
+    thumbnail-position="side" lightbox autoplay />
+
+{{-- Masonry layout gallery --}}
+<x-keys::gallery layout="masonry" masonry-columns="300px" lightbox />
+
+{{-- Grid layout gallery --}}
+<x-keys::gallery layout="grid" grid-columns="4" aspect-ratio="video" />
+```
+
+**Props:**
+- `images`: Array of image objects with src, alt, caption, thumbnail, etc.
+- `type`: basic|thumbnail|ecommerce (default: thumbnail)
+- `layout`: default|masonry|grid (default: default)
+- `aspect-ratio`: auto|square|video|photo|wide (default: auto)
+- `radius`: none|sm|md|lg|xl|full (default: lg)
+- `thumbnail-position`: bottom|side|top|overlay|overlay-top (default: bottom)
+- `thumbnail-size`: xs|sm|md|lg (default: sm)
+- `grid-columns`: 1-6 (default: 3)
+- `masonry-columns`: CSS column width (default: 300px)
+- `show-thumbnails`: Show thumbnail navigation (default: true)
+- `autoplay`: Enable autoplay for main image (default: false)
+- `autoplay-delay`: Autoplay delay in milliseconds (default: 3000)
+- `loop`: Loop through images (default: true)
+- `lightbox`: Enable lightbox functionality (default: false)
+- `id`: Gallery identifier (auto-generated if not provided)
+
+**Features:**
+- Multiple layout options (default, masonry, grid)
+- Thumbnail navigation with positioning options
+- Lightbox support with keyboard navigation
+- Autoplay functionality for showcasing
+- Responsive design with mobile optimization
+- E-commerce focused variant with enhanced UX
+- Masonry layout for Pinterest-style displays
+- Grid layout for uniform image presentation
 
 ### AddToCart
 **E-commerce add to cart button**
@@ -567,6 +707,23 @@ Quick reference for all Keys UI components with their features and syntax.
 - `spacing`: none|xs|sm|md|lg|xl (default: md)
 - `alignment`: left|center|right (default: center)
 - `icon`: Icon name for icon variant
+
+### Scripts
+**Asset injection component for Keys UI JavaScript functionality**
+
+```blade
+{{-- Auto-inject all Keys UI scripts --}}
+<x-keys::scripts />
+```
+
+**Purpose:**
+- Automatically injects all necessary JavaScript for Keys UI components
+- Provides TypeScript-compiled functionality for interactive components
+- Handles component initialization and event delegation
+- Required for components with JavaScript features (Select, Modal, Gallery, etc.)
+
+**Usage:**
+Place this component in your layout's `<head>` or before the closing `</body>` tag. The component automatically detects which scripts are needed based on the components used on the page.
 
 ## Component Features
 
