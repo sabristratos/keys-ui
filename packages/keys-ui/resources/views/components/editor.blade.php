@@ -5,10 +5,19 @@
 
     $editorWrapperAttributes = $attributes->whereDoesntStartWith('wire:');
     $editorAttributes = $attributes->whereStartsWith('wire:');
+    $isLivewireEnabled = $editorAttributes->isNotEmpty();
 
     $editorContainerAttributes = $editorAttributes->merge([
         'class' => $editorClasses
     ])->merge($dataAttributes);
+
+    // Add Livewire data attributes when enabled
+    if ($isLivewireEnabled) {
+        $editorContainerAttributes = $editorContainerAttributes->merge([
+            'data-livewire-enabled' => 'true',
+            'data-livewire-mode' => 'true',
+        ]);
+    }
 
     // Build accessibility attributes for the editor container
     $editorAccessibilityAttrs = '';

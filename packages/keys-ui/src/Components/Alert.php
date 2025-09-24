@@ -12,7 +12,8 @@ class Alert extends Component
         public string $size = 'md',
         public ?string $icon = null,
         public ?string $title = null,
-        public bool $dismissible = false
+        public bool $dismissible = false,
+        public ?string $id = null
     ) {
         if (!in_array($this->variant, ComponentConstants::SEMANTIC_COLORS)) {
             $this->variant = 'info';
@@ -20,6 +21,10 @@ class Alert extends Component
 
         if (!in_array($this->size, ComponentConstants::ALERT_SIZES)) {
             $this->size = 'md';
+        }
+
+        if ($this->dismissible && !$this->id) {
+            $this->id = 'alert-' . uniqid();
         }
     }
 
@@ -110,8 +115,35 @@ class Alert extends Component
     }
 
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-alert' => 'true',
+            'data-variant' => $this->variant,
+            'data-size' => $this->size,
+        ];
+
+        if ($this->dismissible) {
+            $attributes['data-dismissible'] = 'true';
+            $attributes['data-alert-id'] = $this->id;
+        }
+
+        if ($this->icon || $this->defaultIcon()) {
+            $attributes['data-has-icon'] = 'true';
+            $attributes['data-icon'] = $this->iconName();
+        }
+
+        if ($this->title) {
+            $attributes['data-has-title'] = 'true';
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
-        return view('keys::components.alert');
+        return view('keys::components.alert', [
+            'dataAttributes' => $this->getDataAttributes(),
+        ]);
     }
 }

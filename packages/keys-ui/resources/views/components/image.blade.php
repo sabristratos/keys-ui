@@ -1,5 +1,18 @@
+@php
+    $imageId = 'image-' . uniqid();
+    $lightboxAttributes = $lightbox ? [
+        'data-lightbox-container' => 'true',
+        'data-lightbox-image' => 'true',
+        'data-lightbox-trigger' => $imageId,
+        'role' => 'button',
+        'tabindex' => '0',
+        'aria-label' => 'View ' . $alt . ' in lightbox',
+        'style' => 'cursor: pointer;'
+    ] : [];
+@endphp
+
 @if($hasCaption())
-    <figure {{ $attributes->merge(['class' => $figureClasses()]) }}>
+    <figure {{ $attributes->merge(['class' => $figureClasses()])->merge($lightboxAttributes) }}>
         <div class="{{ $containerClasses() }}">
             <img
                 src="{{ $src }}"
@@ -7,6 +20,10 @@
                 class="{{ $imageClasses() }}"
                 @if($lazy) loading="lazy" @endif
                 @if($placeholder) style="background: {{ $placeholder }};" @endif
+                @if($lightbox)
+                    data-filename="{{ basename($src) }}"
+                    data-filetype="image"
+                @endif
             />
 
             @if($hasOverlay())
@@ -21,13 +38,17 @@
         </figcaption>
     </figure>
 @else
-    <div {{ $attributes->merge(['class' => $containerClasses()]) }}>
+    <div {{ $attributes->merge(['class' => $containerClasses()])->merge($lightboxAttributes) }}>
         <img
             src="{{ $src }}"
             alt="{{ $alt }}"
             class="{{ $imageClasses() }}"
             @if($lazy) loading="lazy" @endif
             @if($placeholder) style="background: {{ $placeholder }};" @endif
+            @if($lightbox)
+                data-filename="{{ basename($src) }}"
+                data-filetype="image"
+            @endif
         />
 
         @if($hasOverlay())

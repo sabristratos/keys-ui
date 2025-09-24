@@ -7,6 +7,7 @@
 
 import { FormActions } from './FormActions';
 import { AlertActions } from './AlertActions';
+import { BadgeActions } from './BadgeActions';
 import { CalendarActions } from './CalendarActions';
 import { RadioActions } from './RadioActions';
 import { RangeActions } from './RangeActions';
@@ -23,8 +24,11 @@ import { AccordionActions } from './AccordionActions';
 import { EditorActions } from './EditorActions';
 import { DatePickerActions } from './DatePickerActions';
 import { AddToCartActions } from './AddToCartActions';
-import { FileUploadActions } from './FileUploadActions';
 import { GalleryActions } from './GalleryActions';
+import { PopoverActions } from './PopoverActions';
+
+// Import Quill to expose globally for EditorActions
+import Quill from 'quill';
 
 // Import utility classes for external use
 import { BaseActionClass } from './utils/BaseActionClass';
@@ -33,7 +37,7 @@ import { EventUtils } from './utils/EventUtils';
 import { RTLUtils } from './utils/RTLUtils';
 import FloatingManager from './utils/FloatingManager';
 
-export { FormActions, AlertActions, CalendarActions, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, AccordionActions, EditorActions, DatePickerActions, AddToCartActions, FileUploadActions, GalleryActions };
+export { FormActions, AlertActions, BadgeActions, CalendarActions, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, AccordionActions, EditorActions, DatePickerActions, AddToCartActions, GalleryActions, PopoverActions };
 
 // Export utility classes for external consumption
 export { BaseActionClass, DOMUtils, EventUtils, RTLUtils, FloatingManager };
@@ -49,6 +53,8 @@ export function initializeKeysUI(): void {
     FormActions.getInstance().init();
 
     AlertActions.getInstance().init();
+
+    BadgeActions.getInstance().init();
 
     CalendarActions.getInstance().init();
 
@@ -82,9 +88,10 @@ export function initializeKeysUI(): void {
 
     AddToCartActions.getInstance().init();
 
-    FileUploadActions.getInstance().init();
 
     GalleryActions.getInstance().init();
+
+    PopoverActions.getInstance().init();
 
 }
 
@@ -94,6 +101,7 @@ export function initializeKeysUI(): void {
 const KeysUI = {
     FormActions: FormActions.getInstance(),
     AlertActions: AlertActions.getInstance(),
+    BadgeActions: BadgeActions.getInstance(),
     CalendarActions: CalendarActions.getInstance(),
     RadioActions: RadioActions.getInstance(),
     RangeActions: RangeActions.getInstance(),
@@ -110,8 +118,10 @@ const KeysUI = {
     EditorActions: EditorActions.getInstance(),
     DatePickerActions: DatePickerActions.getInstance(),
     AddToCartActions: AddToCartActions.getInstance(),
-    FileUploadActions: FileUploadActions.getInstance(),
     GalleryActions: GalleryActions.getInstance(),
+    PopoverActions: PopoverActions.getInstance(),
+    // Expose Quill for EditorActions to use
+    Quill: Quill,
     init: initializeKeysUI,
     initialize: initializeKeysUI // Alias for consistency
 };
@@ -122,4 +132,8 @@ export default KeysUI;
 // Also expose on window for UMD builds
 if (typeof window !== 'undefined') {
     (window as any).KeysUI = KeysUI;
+    // Expose Quill globally for EditorActions compatibility
+    (window as any).Quill = Quill;
+    // Expose manual sync method for debugging
+    (window as any).manualSyncEditor = () => KeysUI.EditorActions.manualSync();
 }

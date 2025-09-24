@@ -34,7 +34,8 @@ class ComponentConstants
         'pink',
         'gray',
         'teal',
-        'orange'
+        'orange',
+        'dark'
     ];
 
     /**
@@ -102,7 +103,7 @@ class ComponentConstants
     /**
      * Badge variants
      */
-    public const BADGE_VARIANTS = ['simple', 'chip'];
+    public const BADGE_VARIANTS = ['simple', 'chip', 'subtle'];
 
     /**
      * Checkbox/Radio variants

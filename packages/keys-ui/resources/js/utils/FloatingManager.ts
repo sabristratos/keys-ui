@@ -154,7 +154,7 @@ export class FloatingManager {
                 boundary: shiftOptions.boundary || options.boundary,
                 rootBoundary: shiftOptions.rootBoundary || options.rootBoundary || 'viewport',
                 padding: shiftOptions.padding || 8,
-                limiter: shiftOptions.limiter,
+                limiter: shiftOptions.limiter as any,
                 crossAxis: shiftOptions.crossAxis !== false
             }));
         }

@@ -226,18 +226,128 @@ Quick reference for all Keys UI components with their features and syntax.
 - `id`: Custom ID (auto-generated for dismissible)
 
 ### Icon
-**Icon display with Heroicon support**
+**Icon display with Heroicon support and custom SVG icons**
 
 ```blade
+{{-- Heroicons (built-in) --}}
 <x-keys::icon name="heroicon-o-heart" />
 <x-keys::icon name="heroicon-s-star" size="lg" />
+
+{{-- Custom icons --}}
+<x-keys::icon name="custom-logo" />
+<x-keys::icon name="company-icon" size="xl" />
 <x-keys::icon name="custom-icon" fallback="heroicon-o-question-mark-circle" />
 ```
 
+#### Custom Icon Setup
+
+**1. File Structure:**
+Create a `resources/icons/` directory in your Laravel project:
+```
+resources/
+├── icons/
+│   ├── custom-logo.svg
+│   ├── company-icon.svg
+│   ├── social-media/
+│   │   ├── facebook.svg
+│   │   ├── twitter.svg
+│   │   └── linkedin.svg
+│   └── ui/
+│       ├── arrow-custom.svg
+│       └── check-custom.svg
+```
+
+**2. SVG Requirements:**
+- Files must be valid SVG format with `.svg` extension
+- Remove width/height attributes to allow CSS sizing
+- Use `viewBox` attribute for proper scaling
+- Optimize SVGs for web (remove unnecessary elements)
+
+**3. Naming Convention:**
+- Use kebab-case: `custom-icon.svg`
+- Descriptive names: `company-logo.svg`, `arrow-right-custom.svg`
+- Avoid `heroicon-` prefix (reserved for Heroicons)
+
+#### Usage Examples
+
+```blade
+{{-- Basic custom icon --}}
+<x-keys::icon name="custom-logo" />
+
+{{-- Custom icon with size --}}
+<x-keys::icon name="company-icon" size="xl" />
+
+{{-- Custom icon with fallback --}}
+<x-keys::icon name="rare-icon" fallback="heroicon-o-exclamation-triangle" />
+
+{{-- Subdirectory icons (use forward slash) --}}
+<x-keys::icon name="social-media/facebook" size="lg" />
+<x-keys::icon name="ui/check-custom" />
+
+{{-- Mix custom and Heroicons --}}
+<div class="flex items-center gap-2">
+    <x-keys::icon name="custom-logo" size="md" />
+    <x-keys::icon name="heroicon-o-arrow-right" size="sm" />
+    <x-keys::icon name="company-badge" size="md" />
+</div>
+```
+
+#### Example SVG Format
+
+```svg
+<!-- Good: Optimized SVG for Keys UI -->
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"
+        fill="currentColor"/>
+</svg>
+
+<!-- Avoid: Fixed dimensions -->
+<svg width="24" height="24" viewBox="0 0 24 24">
+  <!-- content -->
+</svg>
+```
+
+#### Best Practices
+
+**Icon Organization:**
+- Group related icons in subdirectories
+- Use consistent naming across your project
+- Keep a documented list of available custom icons
+- Version control your icon assets
+
+**Performance:**
+- Optimize SVGs before adding (remove unnecessary paths, comments, metadata)
+- Use `fill="currentColor"` for icons that should inherit text color
+- Keep file sizes small (typically under 2KB per icon)
+- Consider icon fonts for large icon sets
+
+**Accessibility:**
+- Use descriptive names that indicate the icon's purpose
+- Ensure adequate color contrast when using colored icons
+- Provide alternative text context in the surrounding UI
+
+#### Troubleshooting
+
+**Icon not displaying:**
+1. Check file path: `resources/icons/your-icon.svg`
+2. Verify SVG format is valid
+3. Ensure file permissions allow reading
+4. Check for typos in icon name
+
+**Icon sizing issues:**
+1. Remove `width` and `height` attributes from SVG
+2. Ensure `viewBox` is properly set
+3. Use `fill="currentColor"` for color inheritance
+
+**Fallback behavior:**
+- If custom icon doesn't exist, fallback icon will be used
+- If no fallback specified, defaults to `heroicon-o-question-mark-circle`
+- Fallback icons must be valid Heroicon names
+
 **Props:**
-- `name`: Icon name (heroicon-* or custom)
+- `name`: Icon name (heroicon-* or custom path)
 - `size`: xs|sm|md|lg|xl (default: md)
-- `fallback`: Fallback icon name
+- `fallback`: Fallback icon name (Heroicon)
 
 ### Alert
 **Alert messages and notifications**
@@ -285,23 +395,193 @@ Quick reference for all Keys UI components with their features and syntax.
 - `disabled`: Disable card interactions (default: false)
 
 ### Modal
-**Dialog overlays**
+**Advanced dialog overlays with animation and Livewire integration**
 
 ```blade
-<x-keys::modal name="confirm-modal" title="Confirm Action">
-    Are you sure you want to continue?
+{{-- Basic modal with header and footer slots --}}
+<x-keys::modal id="confirm-modal" size="md">
+    <x-slot:header>
+        <h3 class="text-lg font-semibold">Confirm Action</h3>
+        <button data-modal-close class="text-neutral-400 hover:text-neutral-600">
+            <x-keys::icon name="heroicon-o-x-mark" size="sm" />
+        </button>
+    </x-slot:header>
+
+    Are you sure you want to continue with this action?
+
     <x-slot:footer>
-        <x-keys::button variant="ghost">Cancel</x-keys::button>
+        <x-keys::button variant="ghost" data-modal-close>Cancel</x-keys::button>
         <x-keys::button variant="danger">Confirm</x-keys::button>
     </x-slot:footer>
+</x-keys::modal>
+
+{{-- Livewire-integrated modal --}}
+<x-keys::modal
+    id="user-form"
+    size="lg"
+    wire:model="showUserModal"
+    wire:open="openUserModal"
+    wire:close="closeUserModal"
+    scrollable
+>
+    <x-slot:header>
+        <h3>Edit User</h3>
+    </x-slot:header>
+
+    <livewire:user-form :user="$selectedUser" />
+
+    <x-slot:footer>
+        <x-keys::button wire:click="saveUser" variant="brand">Save</x-keys::button>
+    </x-slot:footer>
+</x-keys::modal>
+
+{{-- Full-screen modal with no animation --}}
+<x-keys::modal
+    id="gallery-modal"
+    size="full"
+    backdrop="dark"
+    :animate="false"
+    :centered="false"
+>
+    <div class="h-full flex items-center justify-center">
+        <x-keys::gallery :images="$galleryImages" lightbox />
+    </div>
 </x-keys::modal>
 ```
 
 **Props:**
-- `name`: Modal identifier
-- `title`: Modal title
-- `size`: sm|md|lg|xl (default: md)
-- `closable`: Enable close button (default: true)
+- `id` (required): Modal identifier for JavaScript control
+- `size`: xs|sm|md|lg|xl|full (default: md) - Modal width/sizing
+- `closedby`: any|closerequest|none (default: any) - How modal can be closed
+- `backdrop`: blur|dark|none (default: blur) - Backdrop styling
+- `centered`: boolean (default: true) - Center modal vertically
+- `scrollable`: boolean (default: false) - Enable scrollable content
+- `animate`: boolean (default: true) - Enable entry/exit animations
+- `lazy`: boolean (default: false) - Lazy load modal content
+- `persistent`: boolean (default: false) - Prevent accidental closing
+- `trapFocus`: boolean (default: true) - Trap focus within modal
+- `wireModel`: string - Livewire model for open/close state
+
+**Livewire Integration:**
+- `wire:model`: Bind modal state to Livewire property
+- `wire:open`: Livewire method called when modal opens
+- `wire:close`: Livewire method called when modal closes
+- `wire:escape`: Livewire method called on escape key
+- `wire:cancel`: Livewire method called on cancel event
+- `@open`: Alpine.js expression for open event
+- `@close`: Alpine.js expression for close event
+
+**Livewire Modal Management (Keys Facade):**
+```php
+// Basic modal operations
+use Keys\UI\Facades\Keys;
+
+// Show a modal with data
+Keys::showModal('user-form', ['user' => $user]);
+
+// Close specific modal
+Keys::closeModal('user-form');
+
+// Close all modals
+Keys::closeAllModals();
+
+// Check if modal is open
+if (Keys::isModalOpen('user-form')) {
+    // Handle modal state
+}
+
+// Fluent API - Configure and show modal
+Keys::modal('confirm-delete')
+    ->title('Delete User')
+    ->message('Are you sure you want to delete this user?')
+    ->size('sm')
+    ->onConfirm('deleteUser')
+    ->onCancel('cancelDelete')
+    ->show();
+
+// Load Livewire component in modal
+Keys::modal('edit-profile')
+    ->title('Edit Profile')
+    ->component('profile-form', ['user' => $user])
+    ->size('lg')
+    ->scrollable()
+    ->show();
+
+// Preset modal types
+Keys::modal('confirm-action')::confirm()
+    ->title('Custom Confirmation')
+    ->message('This action cannot be undone.')
+    ->onConfirm('performAction')
+    ->show();
+
+Keys::modal('alert-info')::alert()
+    ->title('Information')
+    ->message('Your changes have been saved.')
+    ->show();
+
+Keys::modal('user-form')::form()
+    ->component('user-form', ['mode' => 'create'])
+    ->show();
+```
+
+**In Livewire Component:**
+```php
+class UserManager extends Component
+{
+    public function showEditModal($userId)
+    {
+        $user = User::find($userId);
+
+        Keys::modal('edit-user')
+            ->title('Edit User: ' . $user->name)
+            ->component('user-form', ['user' => $user])
+            ->size('lg')
+            ->onConfirm('refreshUserList')
+            ->show();
+    }
+
+    public function deleteUser($userId)
+    {
+        Keys::modal('confirm-delete')
+            ->title('Delete User')
+            ->message('This will permanently delete the user and all associated data.')
+            ->onConfirm('performDelete(' . $userId . ')')
+            ->size('sm')
+            ->show();
+    }
+
+    public function performDelete($userId)
+    {
+        User::find($userId)->delete();
+        Keys::closeModal('confirm-delete');
+        $this->dispatch('user-deleted');
+    }
+}
+```
+
+**JavaScript API:**
+```javascript
+// Open modal programmatically
+document.getElementById('modal-id').showModal();
+
+// Close modal
+document.getElementById('modal-id').close();
+
+// Livewire events
+Livewire.dispatch('openModal', { id: 'modal-id' });
+Livewire.dispatch('closeModal', { id: 'modal-id' });
+```
+
+**Features:**
+- Native HTML dialog element with progressive enhancement
+- Smooth CSS animations with scale and fade effects
+- Focus trap management for accessibility
+- Backdrop click and escape key handling
+- Livewire reactive state management
+- Lazy loading for performance optimization
+- Multiple size variants including full-screen
+- Scrollable content support for long forms
+- Event system for custom open/close handling
 
 ### Popover
 **Advanced popover/tooltip with positioning and interaction options**

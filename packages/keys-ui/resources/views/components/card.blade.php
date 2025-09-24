@@ -9,7 +9,7 @@
             $interactiveClasses() . ' ' .
             $disabledClasses()
         )
-    ]);
+    ])->merge($dataAttributes);
 
     if ($elementType() === 'a') {
         $elementAttributes = $elementAttributes->merge([

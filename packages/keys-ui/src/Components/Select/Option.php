@@ -15,9 +15,12 @@ class Option extends Component
         public bool $disabled = false,
         public bool $selected = false
     ) {
-        $this->label = $this->label ?? $this->value;
+        $this->label = $this->label ?? $this->value ?? '';
     }
 
+    /**
+     * Generate CSS classes for option element
+     */
     public function optionClasses(): string
     {
         $base = 'flex items-center w-full px-3 py-2 mx-0.5 my-0.5 text-sm text-left cursor-pointer transition-colors duration-150 rounded-md';
@@ -33,77 +36,74 @@ class Option extends Component
         return $base . ' text-foreground';
     }
 
+    /**
+     * Generate CSS classes for icon container
+     */
     public function iconClasses(): string
     {
         return 'flex-shrink-0 mr-2';
     }
 
+    /**
+     * Generate CSS classes for content container
+     */
     public function contentClasses(): string
     {
         return 'flex-1 min-w-0';
     }
 
+    /**
+     * Generate CSS classes for label text
+     */
     public function labelClasses(): string
     {
         return 'block font-medium truncate';
     }
 
+    /**
+     * Generate CSS classes for description text
+     */
     public function descriptionClasses(): string
     {
         return 'block text-xs text-muted mt-0.5 truncate';
     }
 
+    /**
+     * Generate CSS classes for checkmark icon
+     */
     public function checkmarkClasses(): string
     {
         $base = 'flex-shrink-0 ml-2 transition-opacity duration-150';
         return $base . ($this->selected ? ' opacity-100' : ' opacity-0');
     }
 
+    /**
+     * Check if option has label content
+     */
     public function hasContent(): bool
     {
         return !empty(trim($this->label ?? ''));
     }
 
+    /**
+     * Check if option has description
+     */
     public function hasDescription(): bool
     {
         return !empty(trim($this->description ?? ''));
     }
 
+    /**
+     * Check if option has icon
+     */
     public function hasIcon(): bool
     {
         return !empty(trim($this->icon ?? ''));
     }
 
-    public function getComputedOptionClasses(): string
-    {
-        return $this->optionClasses();
-    }
-
-    public function getComputedIconClasses(): string
-    {
-        return $this->iconClasses();
-    }
-
-    public function getComputedContentClasses(): string
-    {
-        return $this->contentClasses();
-    }
-
-    public function getComputedLabelClasses(): string
-    {
-        return $this->labelClasses();
-    }
-
-    public function getComputedDescriptionClasses(): string
-    {
-        return $this->descriptionClasses();
-    }
-
-    public function getComputedCheckmarkClasses(): string
-    {
-        return $this->checkmarkClasses();
-    }
-
+    /**
+     * Get searchable text for filtering
+     */
     public function getSearchableText(): string
     {
         $text = $this->label ?? '';
@@ -113,20 +113,26 @@ class Option extends Component
         return strtolower(trim($text));
     }
 
+    /**
+     * Get display label with fallback hierarchy
+     */
     public function getDisplayLabel(): string
     {
-        return $this->displayLabel ?? $this->label ?? $this->value ?? '';
+        return $this->displayLabel ?? $this->label ?? '';
     }
 
+    /**
+     * Render the component view
+     */
     public function render()
     {
         return view('keys::components.select.option', [
-            'computedOptionClasses' => $this->getComputedOptionClasses(),
-            'computedIconClasses' => $this->getComputedIconClasses(),
-            'computedContentClasses' => $this->getComputedContentClasses(),
-            'computedLabelClasses' => $this->getComputedLabelClasses(),
-            'computedDescriptionClasses' => $this->getComputedDescriptionClasses(),
-            'computedCheckmarkClasses' => $this->getComputedCheckmarkClasses(),
+            'computedOptionClasses' => $this->optionClasses(),
+            'computedIconClasses' => $this->iconClasses(),
+            'computedContentClasses' => $this->contentClasses(),
+            'computedLabelClasses' => $this->labelClasses(),
+            'computedDescriptionClasses' => $this->descriptionClasses(),
+            'computedCheckmarkClasses' => $this->checkmarkClasses(),
             'searchableText' => $this->getSearchableText(),
             'displayLabel' => $this->getDisplayLabel(),
         ]);

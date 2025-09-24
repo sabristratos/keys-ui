@@ -4,7 +4,7 @@
 @endphp
 
 
-<label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $combinedClasses()]) }}>
+<label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $combinedClasses()])->merge($dataAttributes) }}>
     
     <input
         type="checkbox"

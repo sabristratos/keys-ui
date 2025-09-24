@@ -174,8 +174,39 @@ class Avatar extends Component
         return 'flex items-center justify-center w-full h-full font-medium select-none';
     }
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-avatar' => 'true',
+            'data-size' => $this->size,
+            'data-shape' => $this->shape,
+        ];
+
+        if ($this->status) {
+            $attributes['data-status'] = $this->status;
+        }
+
+        if ($this->border) {
+            $attributes['data-border'] = 'true';
+        }
+
+        if ($this->src) {
+            $attributes['data-has-image'] = 'true';
+        } else {
+            $attributes['data-fallback-type'] = $this->name ? 'initials' : 'icon';
+        }
+
+        if ($this->color) {
+            $attributes['data-color'] = $this->color;
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
-        return view('keys::components.avatar');
+        return view('keys::components.avatar', [
+            'dataAttributes' => $this->getDataAttributes(),
+        ]);
     }
 }

@@ -302,6 +302,250 @@ packages/keys-ui/resources/js/SelectActions.ts
 
 The Select component follows all Keys UI patterns while providing modern dropdown functionality that works seamlessly with Laravel forms and validation.
 
+## Data Attributes System for Enhanced Customization
+
+Keys UI components now include comprehensive data attributes for precise targeting and customization. This system provides developers with granular control over component styling and behavior without requiring component modifications.
+
+### Data Attribute Naming Convention
+
+All Keys UI components follow a consistent data attribute naming pattern:
+
+- **Component Identification**: `data-keys-[component]="true"` (e.g., `data-keys-button`, `data-keys-input`)
+- **State Attributes**: `data-[state]` for dynamic states (e.g., `data-disabled`, `data-checked`, `data-loading`)
+- **Variant Attributes**: `data-variant="[variant-name]"` for styling variants
+- **Size Attributes**: `data-size="[size]"` for component sizes
+- **Feature Flags**: Component-specific attributes (e.g., `data-has-icon`, `data-multiple`)
+
+### Core Form Components with Data Attributes
+
+#### Button Component
+```html
+<!-- Standard button -->
+<button data-keys-button="true" data-variant="brand" data-size="md" data-element-type="button">
+  Save Changes
+</button>
+
+<!-- Icon-only button -->
+<button data-keys-button="true" data-variant="ghost" data-size="sm" data-icon-only="true" data-has-icon="true">
+  <icon />
+</button>
+
+<!-- Multi-state button -->
+<button data-keys-button="true" data-multi-state="true" data-icon-default="eye" data-icon-toggle="eye-slash">
+  Toggle Password
+</button>
+```
+
+#### Input Component
+```html
+<!-- Text input with icon -->
+<input data-keys-input="true" data-type="text" data-size="md" data-has-icon-left="true" data-icon-left="search" />
+
+<!-- Input with error state -->
+<input data-keys-input="true" data-type="email" data-invalid="true" data-required="true" />
+
+<!-- Input with actions -->
+<input data-keys-input="true" data-has-actions="true" data-clearable="true" data-copyable="true" />
+```
+
+#### Select Component
+```html
+<!-- Basic select -->
+<div data-keys-select="true" data-size="md" data-multiple="false" data-searchable="false">
+  <!-- Select content -->
+</div>
+
+<!-- Multi-select with search -->
+<div data-keys-select="true" data-multiple="true" data-searchable="true" data-selected-count="3" data-has-selection="true">
+  <!-- Select content -->
+</div>
+```
+
+#### Checkbox & Radio Components
+```html
+<!-- Checkbox card variant -->
+<label data-keys-checkbox="true" data-variant="card" data-color="brand" data-checked="true" data-has-content="true">
+  <!-- Checkbox content -->
+</label>
+
+<!-- Radio with icon -->
+<label data-keys-radio="true" data-variant="standard" data-has-icon="true" data-icon="star" data-value="premium">
+  <!-- Radio content -->
+</label>
+```
+
+### Display Components with Data Attributes
+
+#### Badge Component
+```html
+<!-- Simple badge -->
+<span data-keys-badge="true" data-variant="simple" data-color="success" data-size="sm">
+  Verified
+</span>
+
+<!-- Dismissible chip badge -->
+<button data-keys-badge="true" data-variant="chip" data-dismissible="true" data-icon-only="false">
+  React
+</button>
+```
+
+#### Avatar Component
+```html
+<!-- Avatar with image -->
+<div data-keys-avatar="true" data-size="md" data-shape="circle" data-has-image="true" data-status="online">
+  <!-- Avatar content -->
+</div>
+
+<!-- Initials avatar -->
+<div data-keys-avatar="true" data-size="lg" data-fallback-type="initials" data-color="brand">
+  <!-- Avatar content -->
+</div>
+```
+
+#### Alert Component
+```html
+<!-- Alert with title -->
+<div data-keys-alert="true" data-variant="warning" data-size="md" data-has-icon="true" data-has-title="true" data-dismissible="true">
+  <!-- Alert content -->
+</div>
+```
+
+#### Modal Component
+```html
+<!-- Animated modal -->
+<dialog data-keys-modal="true" data-size="md" data-animate="true" data-scrollable="false" data-livewire-enabled="true">
+  <!-- Modal content -->
+</dialog>
+```
+
+### CSS Targeting Examples
+
+The data attributes enable precise CSS targeting for custom styling:
+
+```css
+/* Target specific button states */
+[data-keys-button][data-loading="true"] {
+  cursor: wait;
+}
+
+[data-keys-button][data-icon-only="true"] {
+  border-radius: 50%;
+}
+
+/* Target input states */
+[data-keys-input][data-invalid="true"] {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+[data-keys-input][data-has-value="true"] + label {
+  transform: translateY(-24px) scale(0.875);
+}
+
+/* Target component variants */
+[data-keys-checkbox][data-variant="card"][data-checked="true"] {
+  background: linear-gradient(135deg, var(--color-brand), var(--color-brand-hover));
+}
+
+/* Target component sizes */
+[data-keys-avatar][data-size="xl"] {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* Target feature combinations */
+[data-keys-select][data-multiple="true"][data-searchable="true"] .dropdown {
+  min-height: 200px;
+}
+```
+
+### JavaScript Integration
+
+Data attributes provide reliable selectors for JavaScript functionality:
+
+```javascript
+// Target specific components
+document.querySelectorAll('[data-keys-button][data-multi-state="true"]')
+document.querySelectorAll('[data-keys-input][data-clearable="true"]')
+document.querySelectorAll('[data-keys-modal][data-animate="true"]')
+
+// React to state changes
+const buttons = document.querySelectorAll('[data-keys-button]');
+buttons.forEach(button => {
+  if (button.dataset.loading === 'true') {
+    button.setAttribute('aria-busy', 'true');
+  }
+});
+
+// Framework integration
+// Alpine.js
+<div x-data="{}" x-show="$el.dataset.keysModal === 'true'">
+
+// Livewire
+wire:loading.attr="data-loading=true"
+```
+
+### Testing Integration
+
+Data attributes provide stable selectors for E2E testing:
+
+```javascript
+// Playwright/Cypress selectors
+await page.click('[data-keys-button][data-variant="danger"]');
+await page.fill('[data-keys-input][data-type="email"]', 'test@example.com');
+await page.check('[data-keys-checkbox][data-value="terms"]');
+
+// Wait for state changes
+await page.waitForSelector('[data-keys-modal][data-animate="true"][open]');
+```
+
+### Benefits for Developers
+
+1. **Precise Targeting**: Style specific component states without complex CSS selectors
+2. **State Awareness**: React to component states in CSS and JavaScript
+3. **Framework Agnostic**: Works with any CSS framework or JavaScript library
+4. **Stable Testing**: Reliable selectors that don't break with design changes
+5. **Performance**: Efficient attribute-based selectors
+6. **Maintainability**: Clear, semantic attribute names that self-document
+
+### Implementation Pattern
+
+When adding data attributes to new components, follow this pattern:
+
+```php
+// In component class
+public function getDataAttributes(): array
+{
+    $attributes = [
+        'data-keys-[component]' => 'true',
+        'data-variant' => $this->variant,
+        'data-size' => $this->size,
+    ];
+
+    // Add conditional state attributes
+    if ($this->disabled) {
+        $attributes['data-disabled'] = 'true';
+    }
+
+    return $attributes;
+}
+
+// In render method
+public function render()
+{
+    return view('keys::components.[component]', [
+        'dataAttributes' => $this->getDataAttributes(),
+    ]);
+}
+```
+
+```blade
+{{-- In component template --}}
+<div {{ $attributes->merge(['class' => $classes()])->merge($dataAttributes) }}>
+    {{-- Component content --}}
+</div>
+```
+
+This comprehensive data attributes system enhances Keys UI's flexibility while maintaining clean, semantic markup that developers can easily target and customize.
+
 ### Badge Component (NEW)
 The Keys UI Badge component provides status indicators and tags with auto icon-only detection functionality:
 

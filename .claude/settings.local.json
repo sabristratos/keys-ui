@@ -45,7 +45,19 @@
       "Bash(del \"C:\\Users\\chaab\\Herd\\key-ui\\packages\\keys-ui\\resources\\css\\quill-theme.css\")",
       "WebFetch(domain:livewire.laravel.com)",
       "WebFetch(domain:wireui.dev)",
-      "WebFetch(domain:floating-ui.com)"
+      "WebFetch(domain:floating-ui.com)",
+      "Bash(findstr:*)",
+      "WebFetch(domain:codepen.io)",
+      "Bash(git push:*)",
+      "mcp__playwright__browser_wait_for",
+      "WebFetch(domain:quilljs.com)",
+      "WebFetch(domain:www.dasun.dev)",
+      "WebFetch(domain:dev.to)",
+      "mcp__laravel-boost__database-schema",
+      "mcp__laravel-boost__list-routes",
+      "Read(//c/Users/chaab/**)",
+      "mcp__laravel-boost__read-log-entries",
+      "mcp__laravel-boost__get-config"
     ]
   },
   "enableAllProjectMcpServers": true,

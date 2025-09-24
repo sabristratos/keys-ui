@@ -306,6 +306,77 @@ class Input extends Component
         };
     }
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-input' => 'true',
+            'data-type' => $this->type,
+            'data-size' => $this->size,
+        ];
+
+        // State attributes
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
+        }
+
+        if ($this->readonly) {
+            $attributes['data-readonly'] = 'true';
+        }
+
+        if ($this->required) {
+            $attributes['data-required'] = 'true';
+        }
+
+        if ($this->hasError()) {
+            $attributes['data-invalid'] = 'true';
+        }
+
+        // Icon attributes
+        if ($this->iconLeft) {
+            $attributes['data-has-icon-left'] = 'true';
+            $attributes['data-icon-left'] = $this->iconLeft;
+        }
+
+        if ($this->iconRight) {
+            $attributes['data-has-icon-right'] = 'true';
+            $attributes['data-icon-right'] = $this->iconRight;
+        }
+
+        if ($this->iconLeft || $this->iconRight) {
+            $attributes['data-has-icon'] = 'true';
+        }
+
+        // Action attributes
+        if ($this->hasActions()) {
+            $attributes['data-has-actions'] = 'true';
+            $attributes['data-actions-count'] = count($this->getAllActions());
+        }
+
+        // Feature flags
+        if ($this->clearable) {
+            $attributes['data-clearable'] = 'true';
+        }
+
+        if ($this->copyable) {
+            $attributes['data-copyable'] = 'true';
+        }
+
+        if ($this->type === 'password' && $this->showPassword) {
+            $attributes['data-password-toggle'] = 'true';
+        }
+
+        if ($this->externalUrl) {
+            $attributes['data-external-url'] = $this->externalUrl;
+        }
+
+        // Value state (for dynamic styling)
+        if (!empty($this->value)) {
+            $attributes['data-has-value'] = 'true';
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
         return view('keys::components.input', [
@@ -314,6 +385,7 @@ class Input extends Component
             'computedActionData' => $this->getComputedActionData(),
             'computedIconOffsets' => $this->getComputedIconOffsets(),
             'computedIconPosition' => $this->getComputedIconPosition(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

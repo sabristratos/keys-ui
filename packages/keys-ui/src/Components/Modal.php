@@ -221,6 +221,36 @@ class Modal extends Component
         return $events;
     }
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-modal' => 'true',
+            'data-size' => $this->size,
+        ];
+
+        if ($this->backdrop !== 'blur') {
+            $attributes['data-backdrop'] = $this->backdrop;
+        }
+
+        if ($this->animate) {
+            $attributes['data-animate'] = 'true';
+        }
+
+        if ($this->scrollable) {
+            $attributes['data-scrollable'] = 'true';
+        }
+
+        if ($this->lazy) {
+            $attributes['data-lazy'] = 'true';
+        }
+
+        if ($this->isLivewireEnabled()) {
+            $attributes['data-livewire-enabled'] = 'true';
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
         return view('keys::components.modal', [
@@ -232,6 +262,7 @@ class Modal extends Component
             'computedFooterClasses' => $this->getComputedFooterClasses(),
             'livewireAttributes' => $this->getLivewireAttributes(),
             'eventAttributes' => $this->getEventAttributes(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

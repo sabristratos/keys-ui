@@ -106,34 +106,34 @@
     --input: light-dark(var(--color-neutral-50), var(--color-neutral-950));
     --muted: light-dark(var(--color-neutral-600), var(--color-neutral-400));
 
-    /* Semantic Colors - Responsive to color scheme */
-    --brand: light-dark(var(--color-brand-500), var(--color-brand-400));
-    --brand-hover: light-dark(var(--color-brand-600), var(--color-brand-300));
-    --brand-active: light-dark(var(--color-brand-700), var(--color-brand-200));
+    /* Semantic Colors - Consistent across themes */
+    --brand: var(--color-brand-500);
+    --brand-hover: var(--color-brand-600);
+    --brand-active: var(--color-brand-700);
     --brand-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
     --foreground-brand: white;
 
-    --danger: light-dark(var(--color-danger-500), var(--color-danger-400));
-    --danger-hover: light-dark(var(--color-danger-600), var(--color-danger-300));
-    --danger-active: light-dark(var(--color-danger-700), var(--color-danger-200));
+    --danger: var(--color-danger-500);
+    --danger-hover: var(--color-danger-600);
+    --danger-active: var(--color-danger-700);
     --danger-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
     --foreground-danger: white;
 
-    --warning: light-dark(var(--color-warning-500), var(--color-warning-400));
-    --warning-hover: light-dark(var(--color-warning-600), var(--color-warning-300));
-    --warning-active: light-dark(var(--color-warning-700), var(--color-warning-200));
+    --warning: var(--color-warning-500);
+    --warning-hover: var(--color-warning-600);
+    --warning-active: var(--color-warning-700);
     --warning-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --foreground-warning: light-dark(var(--color-neutral-900), var(--color-neutral-900));
+    --foreground-warning: var(--color-neutral-900);
 
-    --success: light-dark(var(--color-success-500), var(--color-success-400));
-    --success-hover: light-dark(var(--color-success-600), var(--color-success-300));
-    --success-active: light-dark(var(--color-success-700), var(--color-success-200));
+    --success: var(--color-success-500);
+    --success-hover: var(--color-success-600);
+    --success-active: var(--color-success-700);
     --success-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
     --foreground-success: white;
 
-    --info: light-dark(var(--color-info-500), var(--color-info-400));
-    --info-hover: light-dark(var(--color-info-600), var(--color-info-300));
-    --info-active: light-dark(var(--color-info-700), var(--color-info-200));
+    --info: var(--color-info-500);
+    --info-hover: var(--color-info-600);
+    --info-active: var(--color-info-700);
     --info-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
     --foreground-info: white;
 
@@ -301,142 +301,4 @@
     background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
 }
 
-/* Gallery Component Styles */
-[data-gallery="true"] {
-    /* Ensure proper positioning for absolute elements */
-}
-
-.gallery-slide {
-    z-index: 1;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.gallery-slide.active {
-    z-index: 2;
-}
-
-.gallery-thumbnail.active {
-    border-color: var(--color-brand-500);
-    transform: scale(1.05);
-}
-
-.gallery-thumbnail:hover {
-    transform: scale(1.02);
-}
-
-.gallery-thumbnail:focus {
-    outline: 2px solid var(--color-brand-500);
-    outline-offset: 2px;
-}
-
-.gallery-navigation button:hover {
-    background-color: rgba(255, 255, 255, 0.95);
-}
-
-.gallery-autoplay-controls .play-icon.show,
-.gallery-autoplay-controls .pause-icon.show {
-    display: block;
-}
-
-.gallery-autoplay-controls .play-icon.hide,
-.gallery-autoplay-controls .pause-icon.hide {
-    display: none;
-}
-
-/* Touch-friendly navigation on mobile */
-@media (max-width: 768px) {
-    .gallery-navigation button {
-        width: 2.5rem;
-        height: 2.5rem;
-    }
-
-    .gallery-thumbnails {
-        gap: 0.5rem;
-    }
-
-    .gallery-thumbnail {
-        width: 3rem;
-        height: 3rem;
-    }
-}
-
-/* Ecommerce-specific styles */
-.gallery-ecommerce .gallery-main {
-    min-height: 400px;
-}
-
-/* Side thumbnail layout adjustments */
-.gallery-container:has(.gallery-thumbnails) .gallery-main-container {
-    flex: 1;
-}
-
-[data-gallery-type="thumbnail"] .gallery-thumbnails {
-    max-width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-[data-gallery-type="thumbnail"] .gallery-thumbnails::-webkit-scrollbar {
-    display: none;
-}
-
-/* Focus indicators for gallery navigation */
-[data-gallery="true"]:focus {
-    outline: 2px solid var(--color-brand-500);
-    outline-offset: 2px;
-}
-
-/* Loading and error states */
-.gallery-image-loading {
-    position: relative;
-}
-
-.gallery-image-loading::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--color-surface);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-}
-
-.gallery-image-loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 2rem;
-    height: 2rem;
-    margin: -1rem 0 0 -1rem;
-    border: 2px solid var(--color-neutral-200);
-    border-top-color: var(--color-brand-500);
-    border-radius: 50%;
-    animation: gallery-spin 1s linear infinite;
-    z-index: 11;
-}
-
-.gallery-image-error {
-    position: relative;
-}
-
-.gallery-error-placeholder {
-    z-index: 10;
-}
-
-.gallery-thumbnail-error {
-    position: relative;
-}
-
-.gallery-thumbnail-error-placeholder {
-    z-index: 10;
-}
-
-/* Loading animation */
-@keyframes gallery-spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
+/* Gallery styles moved to component-level inline CSS for better encapsulation */

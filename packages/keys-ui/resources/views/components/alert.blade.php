@@ -2,13 +2,7 @@
     $elementAttributes = $attributes->merge([
         'class' => trim($baseClasses() . ' ' . $variantClasses() . ' ' . $sizeClasses()),
         'role' => 'alert'
-    ]);
-
-    if ($dismissible) {
-        $elementAttributes = $elementAttributes->merge([
-            'data-dismissible' => 'true'
-        ]);
-    }
+    ])->merge($dataAttributes);
 @endphp
 
 <div {{ $elementAttributes }}>

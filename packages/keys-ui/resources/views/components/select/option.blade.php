@@ -5,7 +5,7 @@
             'role' => 'option',
             'data-value' => $value,
             'data-display-label' => $displayLabel,
-            'data-searchable-text' => $getSearchableText(),
+            'data-searchable-text' => $searchableText,
             'aria-selected' => $selected ? 'true' : 'false',
             'tabindex' => $disabled ? null : '0',
         ]);
@@ -20,20 +20,16 @@
     data-select-option
     {{ $optionAttributes }}
 >
-    
     @if($hasIcon())
         <div class="{{ $computedIconClasses }}">
             <x-keys::icon name="{{ $icon }}" size="sm" />
         </div>
     @endif
 
-    
     <div class="{{ $computedContentClasses }}">
         @if($slot->isNotEmpty())
-            
             {{ $slot }}
         @else
-            
             @if($hasContent())
                 <div class="{{ $computedLabelClasses }}">
                     {{ $label }}
@@ -47,7 +43,6 @@
         @endif
     </div>
 
-    
     <div class="{{ $computedCheckmarkClasses }}">
         <x-keys::icon name="heroicon-o-check" size="sm" class="text-brand" />
     </div>

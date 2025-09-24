@@ -78,7 +78,7 @@ class Button extends Component
             'info' => 'border border-info bg-info text-foreground-info hover:border-info-hover hover:bg-info-hover active:border-info-active active:bg-info-active disabled:border-info-disabled disabled:bg-info-disabled focus-visible:ring-info',
             'neutral' => 'border border-neutral bg-neutral text-foreground-neutral hover:border-neutral-hover hover:bg-neutral-hover active:border-neutral-active active:bg-neutral-active disabled:border-neutral-disabled disabled:bg-neutral-disabled focus-visible:ring-neutral',
             'ghost' => 'border border-transparent bg-transparent text-foreground hover:bg-surface active:bg-border disabled:text-neutral-disabled focus-visible:ring-neutral',
-            'outline' => 'bg-transparent border border-border text-foreground hover:bg-surface active:bg-border disabled:text-neutral-disabled focus-visible:ring-neutral',
+            'outline' => 'bg-transparent border border-border text-foreground hover:border-brand hover:bg-brand hover:text-foreground-brand active:bg-border disabled:text-neutral-disabled focus-visible:ring-neutral',
             default => 'border border-brand bg-brand text-foreground-brand hover:border-brand-hover hover:bg-brand-hover active:border-brand-active active:bg-brand-active disabled:border-brand-disabled disabled:bg-brand-disabled focus-visible:ring-brand'
         };
     }
@@ -139,9 +139,26 @@ class Button extends Component
 
     public function getDataAttributes(): array
     {
-        $attributes = [];
+        $attributes = [
+            'data-keys-button' => 'true',
+            'data-variant' => $this->variant,
+            'data-size' => $this->size,
+            'data-element-type' => $this->elementType(),
+        ];
 
+        // Add state attributes
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
+        }
+
+        if ($this->loading) {
+            $attributes['data-loading'] = 'true';
+            $attributes['data-loading-animation'] = $this->loadingAnimation;
+        }
+
+        // Multi-state functionality (preserve existing behavior)
         if ($this->isMultiState()) {
+            $attributes['data-multi-state'] = 'true';
             $attributes['data-icon-default'] = $this->iconLeft;
 
             if ($this->iconToggle) {
@@ -161,7 +178,26 @@ class Button extends Component
             }
         }
 
+        // Icon state
+        if ($this->iconLeft || $this->iconRight) {
+            $attributes['data-has-icon'] = 'true';
+        }
+
+        // Link specific attributes
+        if ($this->isLink()) {
+            $attributes['data-href'] = $this->href;
+        }
+
         return $attributes;
+    }
+
+    public function getDataAttributesForSlot(string $slotContent = ''): array
+    {
+        $isIconOnly = $this->isIconOnly($slotContent);
+
+        return [
+            'data-icon-only' => $isIconOnly ? 'true' : 'false',
+        ];
     }
 
     public function render()

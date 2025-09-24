@@ -251,11 +251,62 @@ class Toggle extends Component
         return $this->label || $this->description;
     }
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-toggle' => 'true',
+            'data-size' => $this->size,
+            'data-color' => $this->color,
+        ];
+
+        // State attributes
+        if ($this->checked) {
+            $attributes['data-checked'] = 'true';
+        }
+
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
+        }
+
+        if ($this->required) {
+            $attributes['data-required'] = 'true';
+        }
+
+        if ($this->hasError()) {
+            $attributes['data-invalid'] = 'true';
+        }
+
+        // Content attributes
+        if ($this->hasContent()) {
+            $attributes['data-has-content'] = 'true';
+        }
+
+        if ($this->label) {
+            $attributes['data-has-label'] = 'true';
+        }
+
+        if ($this->description) {
+            $attributes['data-has-description'] = 'true';
+        }
+
+        // Actions
+        if ($this->hasActions()) {
+            $attributes['data-has-actions'] = 'true';
+            $attributes['data-actions-count'] = count($this->actions);
+        }
+
+        // Value
+        $attributes['data-value'] = $this->value;
+
+        return $attributes;
+    }
+
     public function render()
     {
         return view('keys::components.toggle', [
             'computedActionSize' => $this->getComputedActionSize(),
             'computedActionData' => $this->getComputedActionData(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

@@ -237,6 +237,43 @@ class Range extends Component
         return $this->id ?? 'range-' . uniqid();
     }
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-range' => 'true',
+            'data-size' => $this->size,
+            'data-min' => $this->min,
+            'data-max' => $this->max,
+            'data-step' => $this->step,
+            'data-value' => $this->value,
+        ];
+
+        // State attributes
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
+        }
+
+        if ($this->required) {
+            $attributes['data-required'] = 'true';
+        }
+
+        if ($this->hasError()) {
+            $attributes['data-invalid'] = 'true';
+        }
+
+        // Feature attributes
+        if ($this->showValues) {
+            $attributes['data-show-values'] = 'true';
+        }
+
+        if (!empty($this->ticks)) {
+            $attributes['data-show-ticks'] = 'true';
+            $attributes['data-ticks-count'] = count($this->ticks);
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
         return view('keys::components.range', [
@@ -248,6 +285,7 @@ class Range extends Component
             'computedFillClasses' => $this->getComputedFillClasses(),
             'computedContainerClasses' => $this->getComputedContainerClasses(),
             'uniqueId' => $this->getUniqueId(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

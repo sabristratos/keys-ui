@@ -1,4 +1,5 @@
-<div {{ $editorContainerAttributes }}>
+{{-- Outer editor wrapper with wire:ignore to prevent Livewire morphing --}}
+<div {{ $editorContainerAttributes }} @if($isLivewireEnabled ?? false) wire:ignore @endif>
     {{-- ARIA Live Region for Screen Reader Announcements --}}
     <div
         id="{{ $liveRegionId }}"
@@ -15,7 +16,19 @@
         data-quill-container="true"
         style="min-height: {{ $editorHeight }}"
         data-quill-config="{{ json_encode($quillConfig) }}"
-        data-quill-value="{{ $value }}"
+        data-quill-value="{{ json_encode($value) }}"
+        @if($isLivewireEnabled ?? false)
+            {{ $editorAttributes ?? collect() }}
+            @php
+                $wireModelName = $editorAttributes->whereStartsWith('wire:model')->first();
+            @endphp
+            @if($wireModelName)
+                data-wire-model="{{ $wireModelName }}"
+                data-livewire-property="{{ $wireModelName }}"
+            @endif
+        @else
+            data-editor-sync-target="{{ $hiddenInputId }}"
+        @endif
         {!! $editorAccessibilityAttrs !!}
         tabindex="0"
     ></div>
@@ -29,16 +42,16 @@
             </div>
         </div>
     @endif
-
-    {{-- Hidden Input for Form Submission --}}
-    @if($name)
-        <input
-            type="hidden"
-            id="{{ $hiddenInputId }}"
-            name="{{ $name }}"
-            value="{{ $value }}"
-            data-quill-input="true"
-            @if($required) required @endif
-        />
-    @endif
 </div>
+
+{{-- Hidden Input for Form Submission (only for non-Livewire forms) --}}
+@if($name && !($isLivewireEnabled ?? false))
+    <input
+        type="hidden"
+        id="{{ $hiddenInputId }}"
+        name="{{ $name }}"
+        value="{{ $value }}"
+        data-quill-input="true"
+        @if($required) required @endif
+    />
+@endif

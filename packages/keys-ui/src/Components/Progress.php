@@ -135,10 +135,46 @@ class Progress extends Component
         ];
     }
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-progress' => 'true',
+            'data-variant' => $this->variant,
+            'data-size' => $this->size,
+            'data-color' => $this->color,
+            'data-value' => $this->value,
+            'data-max' => $this->max,
+            'data-percent' => $this->getPercentage(),
+        ];
+
+        if ($this->striped) {
+            $attributes['data-striped'] = 'true';
+        }
+
+        if ($this->animated) {
+            $attributes['data-animated'] = 'true';
+        }
+
+        if ($this->showValue) {
+            $attributes['data-show-value'] = 'true';
+        }
+
+        if ($this->showPercentage) {
+            $attributes['data-show-percentage'] = 'true';
+        }
+
+        if ($this->status) {
+            $attributes['data-status'] = $this->status;
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
         return view('keys::components.progress', [
             'computedData' => $this->getComputedData(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

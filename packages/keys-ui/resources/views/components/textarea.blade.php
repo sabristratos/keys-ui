@@ -12,7 +12,7 @@
         'required' => $required,
         'rows' => $rows,
         'cols' => $cols,
-    ], fn($value) => !is_null($value)));
+    ], fn($value) => !is_null($value)))->merge($dataAttributes);
 
 @endphp
 

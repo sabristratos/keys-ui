@@ -18,7 +18,8 @@
         ]);
     }
 
-    $elementAttributes = $elementAttributes->merge($getDataAttributes());
+    // Merge data attributes with slot-dependent attributes
+    $elementAttributes = $elementAttributes->merge($getDataAttributes())->merge($getDataAttributesForSlot($slotContent));
 @endphp
 
 <{{ $elementType() }} {{ $elementAttributes }}>

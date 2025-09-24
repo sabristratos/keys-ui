@@ -13,7 +13,7 @@
         $dialogAttributes = $dialogAttributes->merge(['data-modal-animate' => true]);
     }
 
-    $dialogAttributes = $dialogAttributes->merge($eventAttributes);
+    $dialogAttributes = $dialogAttributes->merge($eventAttributes)->merge($dataAttributes);
 @endphp
 
 <dialog {{ $dialogAttributes }}>
@@ -58,7 +58,7 @@
         dialog[data-modal-animate] {
             opacity: 0;
             transform: scale(0.95);
-            transition: opacity 200ms ease-out, transform 200ms ease-out, overlay 200ms ease-out allow-discrete, display 200ms ease-out allow-discrete;
+            transition: opacity 200ms ease-out, transform 200ms ease-out;
         }
 
         dialog[data-modal-animate][open] {
@@ -68,11 +68,17 @@
 
         dialog[data-modal-animate]::backdrop {
             opacity: 0;
-            transition: opacity 200ms ease-out, overlay 200ms ease-out allow-discrete, display 200ms ease-out allow-discrete;
+            transition: opacity 150ms ease-out;
         }
 
         dialog[data-modal-animate][open]::backdrop {
             opacity: 1;
+        }
+
+        /* Ensure backdrop is completely removed when modal is closed */
+        dialog[data-modal-animate]:not([open])::backdrop {
+            opacity: 0;
+            pointer-events: none;
         }
 
         /* Starting style for entry animation */

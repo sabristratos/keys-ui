@@ -34,7 +34,9 @@ class Textarea extends Component
         public ?string $externalUrl = null,
         public string $actionVariant = 'ghost',
         public string $actionSize = 'xs',
-        public bool $hasError = false
+        public bool $hasError = false,
+        public bool $showCharacterCount = false,
+        public ?int $maxLength = null
     ) {
         // Handle icon alias for iconLeft
         if ($this->icon && !$this->iconLeft) {
@@ -293,6 +295,72 @@ class Textarea extends Component
         };
     }
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-textarea' => 'true',
+            'data-size' => $this->size,
+        ];
+
+        // State attributes
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
+        }
+
+        if ($this->readonly) {
+            $attributes['data-readonly'] = 'true';
+        }
+
+        if ($this->required) {
+            $attributes['data-required'] = 'true';
+        }
+
+        if ($this->hasError()) {
+            $attributes['data-invalid'] = 'true';
+        }
+
+        // Feature attributes
+        if ($this->autoResize) {
+            $attributes['data-auto-resize'] = 'true';
+        }
+
+        if ($this->showCharacterCount) {
+            $attributes['data-show-character-count'] = 'true';
+        }
+
+        if ($this->maxLength) {
+            $attributes['data-max-length'] = $this->maxLength;
+        }
+
+        // Icon attributes
+        if ($this->iconLeft) {
+            $attributes['data-has-icon-left'] = 'true';
+            $attributes['data-icon-left'] = $this->iconLeft;
+        }
+
+        if ($this->iconRight) {
+            $attributes['data-has-icon-right'] = 'true';
+            $attributes['data-icon-right'] = $this->iconRight;
+        }
+
+        if ($this->iconLeft || $this->iconRight) {
+            $attributes['data-has-icon'] = 'true';
+        }
+
+        // Actions
+        if ($this->hasActions()) {
+            $attributes['data-has-actions'] = 'true';
+            $attributes['data-actions-count'] = count($this->getAllActions());
+        }
+
+        // Value state
+        if (!empty($this->value)) {
+            $attributes['data-has-value'] = 'true';
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
         return view('keys::components.textarea', [
@@ -301,6 +369,7 @@ class Textarea extends Component
             'computedActionData' => $this->getComputedActionData(),
             'computedIconOffsets' => $this->getComputedIconOffsets(),
             'computedIconPosition' => $this->getComputedIconPosition(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

@@ -36,11 +36,37 @@ class Toast extends Component
         return 'pointer-events-auto transform transition-all duration-300 ease-out opacity-0 scale-95 translate-y-2';
     }
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-toast' => 'true',
+            'data-variant' => $this->variant,
+            'data-position' => $this->position,
+        ];
+
+        if ($this->dismissible) {
+            $attributes['data-dismissible'] = 'true';
+        }
+
+        if ($this->autoHide) {
+            $attributes['data-auto-hide'] = 'true';
+            $attributes['data-timeout'] = $this->timeout;
+        }
+
+        if ($this->icon) {
+            $attributes['data-has-icon'] = 'true';
+            $attributes['data-icon'] = $this->icon;
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
         return view('keys::components.toast', [
             'computedContainerClasses' => $this->containerClasses(),
             'computedToastClasses' => $this->toastClasses(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

@@ -1,0 +1,131 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader --no-dev
+
+      - name: Install NPM dependencies (root)
+        run: npm ci
+
+      - name: Install NPM dependencies (Keys UI package)
+        run: |
+          cd packages/keys-ui
+          npm ci
+
+      - name: Copy environment file
+        run: cp .env.example .env
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run full test suite
+        run: php artisan test
+
+      - name: Run code style check
+        run: ./vendor/bin/pint --test
+
+      - name: Sync package versions
+        run: |
+          cd packages/keys-ui
+          echo "🔄 Syncing package versions..."
+          npm run sync-version
+          echo "✅ Versions synchronized"
+
+      - name: Run TypeScript type checking
+        run: |
+          cd packages/keys-ui
+          echo "🔍 Running TypeScript type checking..."
+          npm run typecheck
+          echo "✅ TypeScript validation passed"
+
+      - name: Build production assets
+        run: |
+          cd packages/keys-ui
+          echo "🏗️  Building production assets..."
+          npm run ci
+          echo "✅ Production build completed"
+
+      - name: Build and publish assets
+        run: php artisan keys:build --publish
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_number=${VERSION#v}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: Keys UI ${{ steps.version.outputs.version }}
+          body: |
+            ## Keys UI ${{ steps.version.outputs.version_number }}
+
+            ### What's Changed
+            - See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/packages/keys-ui/CHANGELOG.md) for detailed changes
+
+            ### Installation
+            ```bash
+            composer require keys/ui:^${{ steps.version.outputs.version_number }}
+            ```
+
+            ### Assets
+            - JavaScript (UMD): `dist/keys-ui.umd.js`
+            - JavaScript (ES): `dist/keys-ui.es.js`
+            - CSS: `dist/style.css`
+
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.version.outputs.version }}...HEAD
+
+            ---
+
+            🚀 **Packagist will automatically detect this release and update within a few minutes.**
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: keys-ui-build-${{ steps.version.outputs.version }}
+          path: |
+            packages/keys-ui/dist/
+            public/vendor/keys-ui/
+          retention-days: 30

@@ -1,33 +1,41 @@
 @php
-    $livewireAttributes = $attributes->whereStartsWith('wire:');
-    $wrapperAttributes = $attributes->whereDoesntStartWith('wire:');
+    $wireOnlyAttributes = $attributes->whereStartsWith('wire:');
+    $nonWireAttributes = $attributes->whereDoesntStartWith('wire:');
+    $isLivewireEnabled = $wireOnlyAttributes->isNotEmpty();
+    $wireModelName = $wireOnlyAttributes->whereStartsWith('wire:model')->first();
 
-    $selectAttributes = $wrapperAttributes
+    // Add Livewire data attributes when enabled
+    if ($isLivewireEnabled) {
+        $dataAttributes = array_merge($dataAttributes, [
+            'data-livewire-enabled' => 'true',
+            'data-livewire-mode' => 'true',
+        ]);
+
+        if ($wireModelName) {
+            $dataAttributes['data-wire-model'] = $wireModelName;
+            $dataAttributes['data-livewire-property'] = $wireModelName;
+        }
+    }
+
+    $selectAttributes = $nonWireAttributes
         ->except(['class'])
-        ->merge(array_filter([
-            'data-select' => 'true',
-            'data-multiple' => $multiple ? 'true' : 'false',
-            'data-searchable' => $searchable ? 'true' : 'false',
-            'data-clearable' => $clearable ? 'true' : 'false',
-            'data-disabled' => $disabled ? 'true' : 'false',
-            'data-floating-placement' => $computedFloatingData['placement'],
-            'data-floating-alignment' => $computedFloatingData['alignment'],
-            'data-floating-offset' => $computedFloatingData['offset'],
-            'data-name' => $name,
-            'data-value' => is_array($value) ? json_encode($value) : $value,
-        ], fn($value) => !is_null($value)));
+        ->merge($dataAttributes);
 
     $hiddenInputName = $multiple ? ($name . '[]') : $name;
 @endphp
 
 @if($isShorthand())
-    <div {{ $wrapperAttributes->only('class') }}>
+    <div {{ $attributes->only('class') }}>
         <x-keys::label :for="$uniqueId" :required="$required" :optional="$optional">
             {{ $label }}
         </x-keys::label>
 
         <div class="relative mt-1" {{ $selectAttributes }}>
-            @include('keys::partials.select-field', ['livewireAttributes' => $livewireAttributes])
+            @include('keys::partials.select-field', [
+                'wireAttributes' => $wireOnlyAttributes,
+                'isLivewireEnabled' => $isLivewireEnabled,
+                'wireModelName' => $wireModelName
+            ])
         </div>
 
         @if($showErrors && !is_null($errors))
@@ -35,7 +43,11 @@
         @endif
     </div>
 @else
-    <div class="relative" {{ $wrapperAttributes->only('class') }} {{ $selectAttributes }}>
-        @include('keys::partials.select-field', ['livewireAttributes' => $livewireAttributes])
+    <div class="relative" {{ $attributes->only('class') }} {{ $selectAttributes }}>
+        @include('keys::partials.select-field', [
+            'wireAttributes' => $wireOnlyAttributes,
+            'isLivewireEnabled' => $isLivewireEnabled,
+            'wireModelName' => $wireModelName
+        ])
     </div>
 @endif

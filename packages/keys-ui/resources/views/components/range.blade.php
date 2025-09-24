@@ -11,7 +11,7 @@
             {{ $label }}
         </x-keys::label>
 
-        <div {{ $wrapperAttributes->except(['class'])->merge(['class' => $wrapperClasses, 'data-range' => 'true']) }}>
+        <div {{ $wrapperAttributes->except(['class'])->merge(['class' => $wrapperClasses, 'data-range' => 'true'])->merge($dataAttributes) }}>
             {{-- Main range component content --}}
             @include('keys::components.range.content')
         </div>
@@ -25,7 +25,7 @@
         @endif
     </div>
 @else
-    <div {{ $wrapperAttributes->except(['class'])->merge(['class' => $wrapperClasses, 'data-range' => 'true']) }}>
+    <div {{ $wrapperAttributes->except(['class'])->merge(['class' => $wrapperClasses, 'data-range' => 'true'])->merge($dataAttributes) }}>
         {{-- Main range component content --}}
         @include('keys::components.range.content')
     </div>

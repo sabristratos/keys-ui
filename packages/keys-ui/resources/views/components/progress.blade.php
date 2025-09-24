@@ -5,7 +5,7 @@
     $isComplete = $computedData['is_complete'];
 @endphp
 
-<div {{ $attributes->merge(['class' => $baseClasses()]) }}>
+<div {{ $attributes->merge(['class' => $baseClasses()])->merge($dataAttributes) }}>
     @if($label || $showValue || $showPercentage)
         <div class="progress-header flex items-center justify-between mb-2">
             @if($label)

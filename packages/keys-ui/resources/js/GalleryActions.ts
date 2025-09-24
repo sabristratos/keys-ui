@@ -13,6 +13,17 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
+import LightboxActions from './LightboxActions';
+
+interface GalleryImage {
+    id: string;
+    src: string;
+    alt: string;
+    caption?: string | null;
+    thumbnail: string;
+    title?: string | null;
+    description?: string | null;
+}
 
 interface GalleryState {
     currentIndex: number;
@@ -21,14 +32,27 @@ interface GalleryState {
     touchStartX: number;
     touchEndX: number;
     isDragging: boolean;
+    totalImages: number;
+    images: GalleryImage[];
 }
 
 export class GalleryActions extends BaseActionClass<GalleryState> {
+    private lightboxActions: LightboxActions;
+
+    constructor() {
+        super();
+        this.lightboxActions = new LightboxActions();
+        // Auto-initialize when constructed
+        this.init();
+    }
 
     /**
      * Initialize gallery elements - required by BaseActionClass
      */
     protected initializeElements(): void {
+        // Initialize lightbox first
+        this.lightboxActions.init();
+
         DOMUtils.findByDataAttribute('gallery', 'true').forEach(gallery => {
             this.initializeGallery(gallery);
         });
@@ -48,11 +72,39 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
     }
 
     /**
+     * Extract image data from gallery DOM elements
+     */
+    private extractImageData(galleryElement: HTMLElement): GalleryImage[] {
+        const images: GalleryImage[] = [];
+        const slideElements = galleryElement.querySelectorAll('[data-gallery-slide]');
+
+        slideElements.forEach((slide, index) => {
+            const imgElement = slide.querySelector('img');
+            if (imgElement) {
+                images.push({
+                    id: slide.getAttribute('data-gallery-slide') || `img-${index}`,
+                    src: imgElement.src,
+                    alt: imgElement.alt || `Image ${index + 1}`,
+                    caption: imgElement.getAttribute('data-caption'),
+                    thumbnail: imgElement.src, // Default to same as src
+                    title: imgElement.getAttribute('data-title'),
+                    description: imgElement.getAttribute('data-description')
+                });
+            }
+        });
+
+        return images;
+    }
+
+    /**
      * Initialize a single gallery element
      */
     private initializeGallery(galleryElement: HTMLElement): void {
         const galleryId = galleryElement.dataset.galleryId;
         if (!galleryId) return;
+
+        const totalImages = parseInt(galleryElement.dataset.totalImages || '0');
+        const images = this.extractImageData(galleryElement);
 
         // Initialize state
         this.setState(galleryElement, {
@@ -61,7 +113,9 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             autoplayInterval: null,
             touchStartX: 0,
             touchEndX: 0,
-            isDragging: false
+            isDragging: false,
+            totalImages,
+            images
         });
 
         // Set up event listeners
@@ -210,20 +264,77 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
                 break;
             case 'End':
                 e.preventDefault();
-                const totalImages = parseInt(galleryElement.dataset.totalImages || '0');
-                this.goToImage(galleryId, galleryElement, totalImages - 1);
+                const state = this.getState(galleryElement);
+                if (state) {
+                    this.goToImage(galleryId, galleryElement, state.totalImages - 1);
+                }
                 break;
             case 'Escape':
                 e.preventDefault();
-                // Close lightbox if open, or pause autoplay
-                if (this.getState(galleryElement)?.isAutoplayActive) {
-                    this.pauseAutoplay(galleryId, galleryElement);
-                }
+                this.handleEscapeKey(galleryId, galleryElement);
                 break;
             case ' ':
+            case 'Spacebar':
                 e.preventDefault();
                 this.toggleAutoplay(galleryId, galleryElement);
                 break;
+            case 'Enter':
+                // Allow Enter key to activate focused thumbnail
+                const target = e.target as HTMLElement;
+                if (target.hasAttribute('data-gallery-thumbnail')) {
+                    e.preventDefault();
+                    const thumbnailIndex = parseInt(target.getAttribute('data-gallery-thumbnail') || '0');
+                    this.goToImage(galleryId, galleryElement, thumbnailIndex);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Handle escape key with proper lightbox and autoplay logic
+     */
+    private handleEscapeKey(galleryId: string, galleryElement: HTMLElement): void {
+        const isLightboxEnabled = galleryElement.dataset.lightbox === 'true';
+        const state = this.getState(galleryElement);
+
+        // If lightbox is enabled, close it first
+        if (isLightboxEnabled) {
+            this.closeLightbox(galleryElement);
+        } else if (state?.isAutoplayActive) {
+            // Otherwise, pause autoplay if active
+            this.pauseAutoplay(galleryId, galleryElement);
+        }
+
+        // Announce action to screen readers
+        this.announceAction(galleryElement, 'Gallery navigation closed');
+    }
+
+    /**
+     * Close lightbox using the unified LightboxActions
+     */
+    private closeLightbox(galleryElement: HTMLElement): void {
+        // Use the unified lightbox system
+        const state = (this.lightboxActions as any).getState(galleryElement);
+        if (state && state.isOpen) {
+            // The lightbox will handle the closing automatically
+            this.emitGalleryEvent(galleryElement, 'gallery:lightboxClose', {});
+            this.announceAction(galleryElement, 'Lightbox closed');
+        }
+    }
+
+    /**
+     * Announce actions to screen readers
+     */
+    private announceAction(galleryElement: HTMLElement, message: string): void {
+        const liveRegion = galleryElement.querySelector('[data-gallery-live]') as HTMLElement;
+        if (liveRegion) {
+            liveRegion.textContent = message;
+            // Clear after a short delay
+            setTimeout(() => {
+                if (liveRegion.textContent === message) {
+                    liveRegion.textContent = '';
+                }
+            }, 1000);
         }
     }
 
@@ -409,29 +520,34 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
     }
 
     /**
-     * Update autoplay button icon and aria-pressed state
+     * Update autoplay button state using Button component's multi-state functionality
      */
     private updateAutoplayButton(galleryElement: HTMLElement, isPlaying: boolean): void {
         const autoplayButton = galleryElement.querySelector('.gallery-autoplay-toggle') as HTMLElement;
-        const playIcon = galleryElement.querySelector('.play-icon') as HTMLElement;
-        const pauseIcon = galleryElement.querySelector('.pause-icon') as HTMLElement;
 
         if (autoplayButton) {
+            // Update aria attributes
             autoplayButton.setAttribute('aria-pressed', isPlaying.toString());
             autoplayButton.setAttribute('aria-label', isPlaying ? 'Pause autoplay' : 'Resume autoplay');
-        }
 
-        if (playIcon && pauseIcon) {
-            if (isPlaying) {
-                playIcon.classList.add('show');
-                playIcon.classList.remove('hide');
-                pauseIcon.classList.add('hide');
-                pauseIcon.classList.remove('show');
-            } else {
-                playIcon.classList.add('hide');
-                playIcon.classList.remove('show');
-                pauseIcon.classList.add('show');
-                pauseIcon.classList.remove('hide');
+            // Use Button component's icon toggle functionality
+            const defaultIcon = autoplayButton.querySelector('.button-icon-default') as HTMLElement;
+            const toggleIcon = autoplayButton.querySelector('.button-icon-toggle') as HTMLElement;
+
+            if (defaultIcon && toggleIcon) {
+                if (isPlaying) {
+                    // Show pause icon (default)
+                    defaultIcon.classList.remove('opacity-0');
+                    defaultIcon.classList.add('opacity-100');
+                    toggleIcon.classList.remove('opacity-100');
+                    toggleIcon.classList.add('opacity-0');
+                } else {
+                    // Show play icon (toggle)
+                    defaultIcon.classList.remove('opacity-100');
+                    defaultIcon.classList.add('opacity-0');
+                    toggleIcon.classList.remove('opacity-0');
+                    toggleIcon.classList.add('opacity-100');
+                }
             }
         }
     }
@@ -546,6 +662,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             imgElement.addEventListener('error', () => {
                 this.setImageLoadingState(imgElement, false);
                 this.setImageErrorState(imgElement, true);
+                this.handleImageError(imgElement, galleryElement);
                 console.warn(`Failed to load gallery image: ${imgElement.src}`);
             });
         });
@@ -699,6 +816,57 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
                 }
             }
         });
+    }
+
+    /**
+     * Handle image load errors with retry logic
+     */
+    private handleImageError(imgElement: HTMLImageElement, galleryElement: HTMLElement): void {
+        const retryCount = parseInt(imgElement.dataset.retryCount || '0');
+        const maxRetries = 2;
+
+        if (retryCount < maxRetries) {
+            // Increment retry count
+            imgElement.dataset.retryCount = (retryCount + 1).toString();
+
+            // Retry loading after a short delay
+            setTimeout(() => {
+                const originalSrc = imgElement.src;
+                imgElement.src = '';
+                imgElement.src = originalSrc + '?retry=' + retryCount;
+            }, 1000 * (retryCount + 1)); // Exponential backoff
+        } else {
+            // Check if all images failed to load
+            this.checkGalleryHealth(galleryElement);
+
+            // Announce error to screen readers
+            this.announceAction(galleryElement, 'Image failed to load');
+        }
+    }
+
+    /**
+     * Check if gallery has too many failed images
+     */
+    private checkGalleryHealth(galleryElement: HTMLElement): void {
+        const totalImages = galleryElement.querySelectorAll('.gallery-slide img').length;
+        const failedImages = galleryElement.querySelectorAll('.gallery-image-error').length;
+
+        // If more than half the images failed, show gallery-wide error
+        if (failedImages > totalImages / 2) {
+            this.setGalleryErrorState(galleryElement, true);
+        }
+    }
+
+    /**
+     * Set error state for entire gallery
+     */
+    private setGalleryErrorState(galleryElement: HTMLElement, hasError: boolean): void {
+        if (hasError) {
+            galleryElement.classList.add('gallery-has-errors');
+            this.announceAction(galleryElement, 'Gallery has loading issues. Some images may not be available.');
+        } else {
+            galleryElement.classList.remove('gallery-has-errors');
+        }
     }
 
     /**

@@ -14,6 +14,8 @@
         'required' => $required,
     ], fn($value) => !is_null($value)));
 
+    // Merge data attributes
+    $inputAttributes = $inputAttributes->merge($dataAttributes);
 @endphp
 
 @if($isShorthand())

@@ -10,10 +10,13 @@ class Gallery extends Component
     public function __construct(
         public array $images = [],
         public string $type = 'thumbnail',
+        public string $layout = 'default',
         public string $aspectRatio = 'auto',
         public string $radius = 'lg',
         public string $thumbnailPosition = 'bottom',
         public string $thumbnailSize = 'sm',
+        public int $gridColumns = 3,
+        public string $masonryColumns = '300px',
         public bool $showThumbnails = true,
         public bool $autoplay = false,
         public bool $loop = true,
@@ -24,6 +27,11 @@ class Gallery extends Component
         // Validate type
         if (!in_array($this->type, ['basic', 'thumbnail', 'ecommerce'])) {
             $this->type = 'thumbnail';
+        }
+
+        // Validate layout
+        if (!in_array($this->layout, ['default', 'masonry', 'grid'])) {
+            $this->layout = 'default';
         }
 
         // Validate aspect ratio
@@ -37,8 +45,13 @@ class Gallery extends Component
         }
 
         // Validate thumbnail position
-        if (!in_array($this->thumbnailPosition, ['bottom', 'side', 'top'])) {
+        if (!in_array($this->thumbnailPosition, ['bottom', 'side', 'top', 'overlay', 'overlay-top'])) {
             $this->thumbnailPosition = 'bottom';
+        }
+
+        // Validate grid columns
+        if ($this->gridColumns < 1 || $this->gridColumns > 6) {
+            $this->gridColumns = 3;
         }
 
         // Validate thumbnail size
@@ -91,6 +104,11 @@ class Gallery extends Component
      */
     public function shouldShowThumbnails(): bool
     {
+        // Alternative layouts (masonry/grid) don't use thumbnails - they show all images directly
+        if ($this->isAlternativeLayout()) {
+            return false;
+        }
+
         return $this->showThumbnails && count($this->images) > 1;
     }
 
@@ -134,10 +152,12 @@ class Gallery extends Component
         $baseClasses = 'gallery-thumbnails';
 
         $layoutClasses = match ($this->thumbnailPosition) {
-            'bottom' => 'flex flex-wrap gap-2 mt-4 justify-center',
-            'top' => 'flex flex-wrap gap-2 mb-4 justify-center',
-            'side' => 'flex flex-col gap-2 ml-4',
-            default => 'flex flex-wrap gap-2 mt-4 justify-center'
+            'bottom' => 'flex flex-wrap gap-2 mt-4 justify-center p-1',
+            'top' => 'flex flex-wrap gap-2 mb-4 justify-center p-1',
+            'side' => 'flex flex-col gap-2 ml-4 p-1',
+            'overlay' => 'flex items-center gap-2 p-2 bg-black/20 backdrop-blur-sm rounded-lg overflow-x-auto scrollbar-hide',
+            'overlay-top' => 'flex items-center gap-2 p-2 bg-black/20 backdrop-blur-sm rounded-lg overflow-x-auto scrollbar-hide',
+            default => 'flex flex-wrap gap-2 mt-4 justify-center p-1'
         };
 
         return trim("{$baseClasses} {$layoutClasses}");
@@ -148,7 +168,13 @@ class Gallery extends Component
      */
     public function thumbnailClasses(): string
     {
-        $baseClasses = 'gallery-thumbnail cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-brand-500';
+        $baseClasses = 'gallery-thumbnail relative cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-brand-500 overflow-hidden';
+
+        // Add flex-shrink-0 for overlay position to prevent thumbnails from shrinking
+        if ($this->thumbnailPosition === 'overlay') {
+            $baseClasses .= ' flex-shrink-0';
+        }
+
         $sizeClasses = $this->thumbnailSizeClasses();
         $radiusClasses = match ($this->radius) {
             'none' => '',
@@ -221,6 +247,44 @@ class Gallery extends Component
     }
 
     /**
+     * Generate layout wrapper classes
+     */
+    public function layoutWrapperClasses(): string
+    {
+        return match ($this->layout) {
+            'masonry' => 'gallery-masonry-container',
+            'grid' => 'gallery-grid-container',
+            default => 'gallery-default-layout'
+        };
+    }
+
+    /**
+     * Generate grid-specific classes
+     */
+    public function gridLayoutClasses(): string
+    {
+        $columnClasses = match ($this->gridColumns) {
+            1 => 'grid-cols-1',
+            2 => 'grid-cols-1 sm:grid-cols-2',
+            3 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+            4 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+            5 => 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5',
+            6 => 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6',
+            default => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+        };
+
+        return "grid gap-4 {$columnClasses}";
+    }
+
+    /**
+     * Check if layout is alternative (masonry/grid)
+     */
+    public function isAlternativeLayout(): bool
+    {
+        return in_array($this->layout, ['masonry', 'grid']);
+    }
+
+    /**
      * Get computed gallery data for JavaScript
      */
     public function getComputedGalleryData(): array
@@ -228,11 +292,14 @@ class Gallery extends Component
         return [
             'gallery_id' => $this->id,
             'gallery_type' => $this->type,
+            'gallery_layout' => $this->layout,
             'autoplay' => $this->autoplay,
             'autoplay_delay' => $this->autoplayDelay,
             'loop' => $this->loop,
             'total_images' => count($this->images),
             'lightbox' => $this->lightbox,
+            'grid_columns' => $this->gridColumns,
+            'masonry_columns' => $this->masonryColumns,
         ];
     }
 

@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ['8.2', '8.3']
+        node-version: ['18', '20']
+      fail-fast: false
+
+    name: PHP ${{ matrix.php-version }} - Node ${{ matrix.node-version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Install NPM dependencies (root)
+        run: npm ci
+
+      - name: Install NPM dependencies (Keys UI package)
+        run: |
+          cd packages/keys-ui
+          npm ci
+
+      - name: Copy environment file
+        run: cp .env.example .env
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run Laravel Pint (Code Style)
+        run: ./vendor/bin/pint --test
+
+      - name: Check dependencies
+        run: |
+          echo "🔍 Checking required dependencies..."
+          if ! composer show blade-ui-kit/blade-heroicons >/dev/null 2>&1; then
+            echo "❌ blade-heroicons not found - required for icon components"
+            exit 1
+          fi
+          echo "✅ Dependencies verified"
+
+      - name: Run TypeScript type checking
+        run: |
+          cd packages/keys-ui
+          echo "🔍 Running TypeScript type checking..."
+          npm run typecheck
+          echo "✅ TypeScript validation passed"
+
+      - name: Run Pest tests
+        run: |
+          echo "🧪 Running test suite..."
+          php artisan test
+          echo "✅ All tests passed"
+
+      - name: Build Keys UI assets
+        run: |
+          cd packages/keys-ui
+          echo "🏗️  Building Keys UI assets..."
+          npm run ci
+          echo "✅ Build completed successfully"
+
+      - name: Test Keys UI build command
+        run: php artisan keys:build --dev
+
+      - name: Verify published assets
+        run: |
+          if [ ! -f public/vendor/keys-ui/keys-ui.min.js ]; then
+            echo "Published JavaScript not found"
+            exit 1
+          fi
+          echo "✅ Published assets verified"

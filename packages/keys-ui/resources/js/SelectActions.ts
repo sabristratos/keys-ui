@@ -7,7 +7,6 @@
  * - Single and multiple selection
  * - Chip creation and removal
  * - Click outside to close
- *
  */
 
 import { BaseActionClass } from './utils/BaseActionClass';
@@ -32,10 +31,146 @@ interface SelectState {
     focusedIndex: number;
     filteredOptions: SelectOption[];
     floating?: FloatingInstance;
+    searchTimeout?: number;
+    livewireComponent?: any;
+    livewireProperty?: string;
+    entangledProperty?: any;
+}
+
+/**
+ * LivewireIntegration - Handles Livewire-specific functionality for Select components
+ */
+class LivewireIntegration {
+
+    /**
+     * Check if Livewire is available globally
+     */
+    static isLivewireAvailable(): boolean {
+        return typeof window !== 'undefined' && 'Livewire' in window;
+    }
+
+    /**
+     * Detect if a select element is Livewire-enabled
+     */
+    static isLivewireEnabled(select: HTMLElement): boolean {
+        return select.dataset.livewireEnabled === 'true' ||
+               select.dataset.livewireMode === 'true' ||
+               !!select.dataset.wireModel;
+    }
+
+    /**
+     * Get the Livewire component for a select element
+     */
+    static getLivewireComponent(select: HTMLElement): any {
+        if (!this.isLivewireAvailable()) return null;
+
+        const livewireElement = select.closest('[wire\\:id]');
+        if (!livewireElement) return null;
+
+        return (window as any).Livewire.find(livewireElement.getAttribute('wire:id'));
+    }
+
+    /**
+     * Get the wire:model property name
+     */
+    static getWireModelProperty(select: HTMLElement): string | null {
+        return select.dataset.wireModel || select.dataset.livewireProperty || null;
+    }
+
+
+    /**
+     * Update Livewire property value
+     */
+    static updateLivewireProperty(select: HTMLElement, value: any): void {
+        const component = this.getLivewireComponent(select);
+        const property = this.getWireModelProperty(select);
+
+        if (!component || !property) return;
+
+        try {
+            component.set(property, value);
+        } catch (error) {
+            console.warn('Failed to update Livewire property:', property, error);
+        }
+    }
+
+    /**
+     * Get current value from Livewire property
+     */
+    static getLivewirePropertyValue(select: HTMLElement): any {
+        const component = this.getLivewireComponent(select);
+        const property = this.getWireModelProperty(select);
+
+        if (!component || !property) return null;
+
+        try {
+            return component.get(property);
+        } catch (error) {
+            console.warn('Failed to get Livewire property value:', property, error);
+            return null;
+        }
+    }
+
+    /**
+     * Setup Livewire event listeners
+     */
+    static setupEventListeners(select: HTMLElement, callback: (data: any) => void): void {
+        if (!this.isLivewireAvailable()) return;
+
+        const livewireElement = select.closest('[wire\\:id]');
+        if (!livewireElement) return;
+
+        document.addEventListener('livewire:update', (event: any) => {
+            if (event.detail.component.id === livewireElement.getAttribute('wire:id')) {
+                callback({
+                    type: 'livewire:update',
+                    component: event.detail.component,
+                    element: select
+                });
+            }
+        });
+
+        document.addEventListener('livewire:morph.updated', () => {
+            callback({
+                type: 'livewire:morph.updated',
+                element: select
+            });
+        });
+    }
+
+    /**
+     * Format value for Livewire (arrays vs strings)
+     */
+    static formatValueForLivewire(value: string[], isMultiple: boolean): any {
+        if (isMultiple) {
+            return Array.isArray(value) ? value : [];
+        } else {
+            return Array.isArray(value) ? (value[0] || '') : (value || '');
+        }
+    }
+
+    /**
+     * Parse value from Livewire property
+     */
+    static parseValueFromLivewire(value: any, isMultiple: boolean): string[] {
+        if (isMultiple) {
+            if (Array.isArray(value)) return value.map(v => String(v));
+            if (typeof value === 'string') {
+                try {
+                    const parsed = JSON.parse(value);
+                    return Array.isArray(parsed) ? parsed.map(v => String(v)) : [];
+                } catch {
+                    return [];
+                }
+            }
+            return [];
+        } else {
+            return value ? [String(value)] : [];
+        }
+    }
 }
 
 export class SelectActions extends BaseActionClass<SelectState> {
-
 
     /**
      * Initialize select elements - required by BaseActionClass
@@ -51,16 +186,14 @@ export class SelectActions extends BaseActionClass<SelectState> {
      */
     private initializeSelect(selectElement: HTMLElement): void {
         const isMultiple = selectElement.dataset.multiple === 'true';
-        const initialValue = selectElement.dataset.value;
+        const isLivewireEnabled = LivewireIntegration.isLivewireEnabled(selectElement);
 
         let selectedValues: string[] = [];
 
-        if (initialValue) {
-            try {
-                selectedValues = isMultiple ? JSON.parse(initialValue) : [initialValue];
-            } catch {
-                selectedValues = isMultiple ? [] : [initialValue];
-            }
+        if (isLivewireEnabled) {
+            selectedValues = this.readLivewireInitialValues(selectElement, isMultiple);
+        } else {
+            selectedValues = this.readInitialValues(selectElement, isMultiple);
         }
 
         const state: SelectState = {
@@ -71,105 +204,206 @@ export class SelectActions extends BaseActionClass<SelectState> {
             filteredOptions: []
         };
 
+        if (isLivewireEnabled) {
+            this.setupLivewireIntegration(selectElement, state);
+        }
+
         this.setState(selectElement, state);
         this.updateOptions(selectElement);
         this.updateOptionsSelectedState(selectElement);
         this.updateDisplay(selectElement);
+        this.updateStableInputs(selectElement);
+    }
+
+    /**
+     * Read initial values from stable inputs
+     */
+    private readInitialValues(selectElement: HTMLElement, isMultiple: boolean): string[] {
+        if (isMultiple) {
+            const poolInputs = DOMUtils.querySelectorAll('.select-pool-input', selectElement) as unknown as NodeListOf<HTMLInputElement>;
+            const values: string[] = [];
+
+            poolInputs.forEach(input => {
+                if (input.dataset.poolActive === 'true' && input.value) {
+                    values.push(input.value);
+                }
+            });
+
+            return values;
+        } else {
+            const singleInput = DOMUtils.querySelector('.select-single-input', selectElement) as HTMLInputElement;
+            return singleInput && singleInput.value ? [singleInput.value] : [];
+        }
+    }
+
+    /**
+     * Read initial values from Livewire property
+     */
+    private readLivewireInitialValues(selectElement: HTMLElement, isMultiple: boolean): string[] {
+        const livewireValue = LivewireIntegration.getLivewirePropertyValue(selectElement);
+        return LivewireIntegration.parseValueFromLivewire(livewireValue, isMultiple);
+    }
+
+    /**
+     * Setup Livewire integration for a select element
+     */
+    private setupLivewireIntegration(selectElement: HTMLElement, state: SelectState): void {
+        const propertyName = LivewireIntegration.getWireModelProperty(selectElement);
+        if (!propertyName) return;
+
+        state.livewireComponent = LivewireIntegration.getLivewireComponent(selectElement);
+        state.livewireProperty = propertyName;
+
+        LivewireIntegration.setupEventListeners(selectElement, (data) => {
+            this.handleLivewireEvent(selectElement, data);
+        });
+
+        // Skip entanglement - wire:model handles data binding directly
+    }
+
+    /**
+     * Handle Livewire events (update, morph, etc.)
+     */
+    private handleLivewireEvent(selectElement: HTMLElement, data: any): void {
+        const state = this.getState(selectElement);
+        if (!state) return;
+
+        switch (data.type) {
+            case 'livewire:update':
+                this.syncFromLivewire(selectElement);
+                break;
+            case 'livewire:morph.updated':
+                this.reinitializeAfterMorph(selectElement);
+                break;
+        }
+    }
+
+    /**
+     * Synchronize state from Livewire to JavaScript
+     */
+    private syncFromLivewire(selectElement: HTMLElement): void {
+        const state = this.getState(selectElement);
+        if (!state || !state.livewireProperty) return;
+
+        const isMultiple = selectElement.dataset.multiple === 'true';
+        const livewireValue = LivewireIntegration.getLivewirePropertyValue(selectElement);
+        const newSelectedValues = LivewireIntegration.parseValueFromLivewire(livewireValue, isMultiple);
+
+        if (JSON.stringify(state.selectedValues) !== JSON.stringify(newSelectedValues)) {
+            state.selectedValues = newSelectedValues;
+            this.setState(selectElement, state);
+            this.updateDisplay(selectElement);
+            this.updateOptionsSelectedState(selectElement);
+            this.updateStableInputs(selectElement);
+        }
+    }
+
+    /**
+     * Synchronize state from JavaScript to Livewire
+     */
+    private syncToLivewire(selectElement: HTMLElement): void {
+        const state = this.getState(selectElement);
+        if (!state || !LivewireIntegration.isLivewireEnabled(selectElement)) return;
+
+        const isMultiple = selectElement.dataset.multiple === 'true';
+        const formattedValue = LivewireIntegration.formatValueForLivewire(state.selectedValues, isMultiple);
+
+        LivewireIntegration.updateLivewireProperty(selectElement, formattedValue);
+    }
+
+    /**
+     * Reinitialize select after DOM morphing
+     */
+    private reinitializeAfterMorph(selectElement: HTMLElement): void {
+        if (DOMUtils.findByDataAttribute('select', 'true').includes(selectElement)) {
+            if (!this.hasState(selectElement)) {
+                this.initializeSelect(selectElement);
+            }
+        }
     }
 
     /**
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Handle all click events with a single delegated listener
-        EventUtils.handleDelegatedClick('[data-remove-chip], [data-select-clear], [data-select-option], [data-select-trigger]', (element, event) => {
-            if (element.matches('[data-remove-chip]')) {
-                event.preventDefault();
-                event.stopPropagation();
-                event.stopImmediatePropagation();
-                const chipValue = element.dataset.removeChip;
-                const select = DOMUtils.findClosest(element, '[data-select="true"]');
-                if (select && chipValue) {
-                    this.removeChip(select, chipValue);
-                }
-                return;
-            }
-
-            if (element.matches('[data-select-clear]')) {
-                event.preventDefault();
-                event.stopPropagation();
-                const select = DOMUtils.findClosest(element, '[data-select="true"]');
-                if (select) {
-                    this.clearSelection(select);
-                }
-                return;
-            }
-
-            if (element.matches('[data-select-option]')) {
-                event.preventDefault();
-                event.stopPropagation();
-                const select = DOMUtils.findClosest(element, '[data-select="true"]');
-                if (select) {
-                    this.selectOption(select, element);
-                }
-                return;
-            }
-
-            if (element.matches('[data-select-trigger]')) {
-                event.preventDefault();
-                event.stopPropagation();
-                const select = DOMUtils.findClosest(element, '[data-select="true"]');
-                if (select && !this.isDisabled(select)) {
-                    this.toggleDropdown(select);
-                }
-                return;
+        EventUtils.handleDelegatedClick('[data-chip-remove]', (element, event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            const chipValue = element.dataset.chipValue;
+            const select = DOMUtils.findClosest(element, '[data-select="true"]');
+            if (select && chipValue) {
+                this.removeChip(select, chipValue);
             }
         });
 
-        // Handle click outside to close dropdowns
+        EventUtils.handleDelegatedClick('[data-select-clear] button', (element, event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const select = DOMUtils.findClosest(element, '[data-select="true"]');
+            if (select) {
+                this.clearSelection(select);
+            }
+        });
+
+        EventUtils.handleDelegatedClick('[data-select-option]', (element, event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const select = DOMUtils.findClosest(element, '[data-select="true"]');
+            if (select) {
+                this.selectOption(select, element);
+            }
+        });
+
+        EventUtils.handleDelegatedClick('[data-select-trigger]', (element, event) => {
+            // Check if the click originated from the clear button area
+            const target = event.target as Element;
+            const isClearButtonClick = target.closest('[data-select-clear]');
+
+            if (isClearButtonClick) {
+                return; // Don't toggle dropdown if clicking clear button
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            const select = DOMUtils.findClosest(element, '[data-select="true"]');
+            if (select && !this.isDisabled(select)) {
+                this.toggleDropdown(select);
+            }
+        });
+
         EventUtils.addEventListener(document, 'click', (event) => {
             const target = event.target as Node;
 
-            // Check if the click was inside any select element
             if (target && target instanceof Element) {
-                // Check if click is within any select dropdown or related elements
-                const withinSelectElement = target.closest('[data-select="true"], [data-select-dropdown], [data-select-search], [data-remove-chip], [data-select-clear], [data-select-option], [data-select-trigger]');
-
-                // Also check if clicking on input elements within search areas
+                const withinSelectElement = target.closest('[data-select="true"], [data-select-dropdown], [data-select-search], [data-chip-remove], [data-select-clear], [data-select-option], [data-select-trigger]');
                 const isInputElement = target.matches('input, button') && target.closest('[data-select="true"]');
 
-                // If click is inside select component or dropdown area, don't close
                 if (withinSelectElement || isInputElement) {
                     return;
                 }
 
-                // Otherwise, close all dropdowns (outside click)
                 this.closeAllDropdowns();
             }
         });
 
-        // Handle search input - target actual input elements within select dropdowns
         EventUtils.handleDelegatedInput('input[type="text"]', (searchInput, event) => {
-            // Only handle inputs within select components that have search functionality
             const select = DOMUtils.findClosest(searchInput, '[data-select="true"]');
             const isSearchable = select && select.dataset.searchable === 'true';
             const isInDropdown = searchInput.closest('[data-select-dropdown]');
 
             if (select && isSearchable && isInDropdown) {
-                this.handleSearch(select, searchInput.value);
+                this.handleDebouncedSearch(select, searchInput.value);
             }
         });
 
-
-        // Handle keyboard navigation
         EventUtils.handleDelegatedKeydown('[data-select="true"]', (select, event) => {
             this.handleKeydown(select, event);
         });
 
-        // Handle focus events
         EventUtils.handleDelegatedFocus('[data-select="true"]', (select, event) => {
             if (!this.isOpen(select)) {
-                // Handle focus logic if needed
+                //
             }
         });
     }
@@ -183,14 +417,12 @@ export class SelectActions extends BaseActionClass<SelectState> {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as HTMLElement;
 
-                    // Check if the added node is a select
                     if (DOMUtils.hasDataAttribute(element, 'select', 'true')) {
                         if (!this.hasState(element)) {
                             this.initializeSelect(element);
                         }
                     }
 
-                    // Check for selects within the added node
                     const selects = DOMUtils.findByDataAttribute('select', 'true', element);
                     selects.forEach(select => {
                         if (!this.hasState(select)) {
@@ -228,19 +460,15 @@ export class SelectActions extends BaseActionClass<SelectState> {
         state.isOpen = true;
         this.setState(select, state);
 
+        select.setAttribute('data-dropdown-state', 'open');
+
         const dropdown = DOMUtils.querySelector('[data-select-dropdown]', select) as HTMLElement;
         const trigger = DOMUtils.querySelector('[data-select-trigger]', select) as HTMLElement;
         const searchInput = DOMUtils.querySelector('[data-select-search]', select) as HTMLInputElement;
 
         if (dropdown) {
             dropdown.classList.remove('hidden');
-
-            // Handle floating or regular positioning
-            if (this.isFloatingEnabled(select)) {
-                this.setupFloating(select, dropdown);
-            } else {
-                this.positionDropdown(select);
-            }
+            this.setupFloating(select, dropdown);
         }
 
         if (trigger) {
@@ -256,7 +484,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
         }
 
         this.updateFilteredOptions(select);
-
         this.dispatchSelectEvent(select, 'select:open');
     }
 
@@ -269,13 +496,14 @@ export class SelectActions extends BaseActionClass<SelectState> {
             return;
         }
 
-        // Clean up floating
         this.cleanupFloating(select);
 
         state.isOpen = false;
         state.searchTerm = '';
         state.focusedIndex = -1;
         this.setState(select, state);
+
+        select.setAttribute('data-dropdown-state', 'closed');
 
         const dropdown = DOMUtils.querySelector('[data-select-dropdown]', select) as HTMLElement;
         const trigger = DOMUtils.querySelector('[data-select-trigger]', select) as HTMLElement;
@@ -298,7 +526,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
         }
 
         this.handleSearch(select, '');
-
         this.dispatchSelectEvent(select, 'select:close');
     }
 
@@ -340,8 +567,12 @@ export class SelectActions extends BaseActionClass<SelectState> {
 
         this.setState(select, state);
         this.updateDisplay(select);
-        this.updateHiddenInputs(select);
+        this.updateStableInputs(select);
         this.updateOptionsSelectedState(select);
+
+        if (LivewireIntegration.isLivewireEnabled(select)) {
+            this.syncToLivewire(select);
+        }
 
         this.dispatchSelectEvent(select, 'select:change', {
             value: isMultiple ? state.selectedValues : optionValue,
@@ -360,9 +591,27 @@ export class SelectActions extends BaseActionClass<SelectState> {
         if (index > -1) {
             state.selectedValues.splice(index, 1);
             this.setState(select, state);
+
+            const chipElement = DOMUtils.querySelector(`[data-chip-value="${value}"]`, select);
+            if (chipElement) {
+                (chipElement as HTMLElement).style.transition = 'all 200ms ease-out';
+                (chipElement as HTMLElement).style.opacity = '0';
+                (chipElement as HTMLElement).style.transform = 'scale(0.8)';
+
+                setTimeout(() => {
+                    if (chipElement.parentNode) {
+                        chipElement.remove();
+                    }
+                }, 200);
+            }
+
             this.updateDisplay(select);
-            this.updateHiddenInputs(select);
+            this.updateStableInputs(select);
             this.updateOptionsSelectedState(select);
+
+            if (LivewireIntegration.isLivewireEnabled(select)) {
+                this.syncToLivewire(select);
+            }
 
             this.dispatchSelectEvent(select, 'select:change', {
                 value: state.selectedValues,
@@ -370,7 +619,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
             });
         }
     }
-
 
     /**
      * Clear all selections
@@ -382,13 +630,35 @@ export class SelectActions extends BaseActionClass<SelectState> {
         state.selectedValues = [];
         this.setState(select, state);
         this.updateDisplay(select);
-        this.updateHiddenInputs(select);
+        this.updateStableInputs(select);
         this.updateOptionsSelectedState(select);
+
+        if (LivewireIntegration.isLivewireEnabled(select)) {
+            this.syncToLivewire(select);
+        }
 
         this.dispatchSelectEvent(select, 'select:change', {
             value: select.dataset.multiple === 'true' ? [] : '',
             selectedValues: []
         });
+    }
+
+    /**
+     * Handle debounced search functionality
+     */
+    private handleDebouncedSearch(select: HTMLElement, searchTerm: string): void {
+        const state = this.getState(select);
+        if (!state) return;
+
+        if (state.searchTimeout) {
+            clearTimeout(state.searchTimeout);
+        }
+
+        state.searchTimeout = window.setTimeout(() => {
+            this.handleSearch(select, searchTerm);
+        }, 150) as number;
+
+        this.setState(select, state);
     }
 
     /**
@@ -400,6 +670,9 @@ export class SelectActions extends BaseActionClass<SelectState> {
 
         state.searchTerm = searchTerm.toLowerCase();
         this.setState(select, state);
+
+        select.setAttribute('data-search-active', state.searchTerm ? 'true' : 'false');
+        select.setAttribute('data-search-term', state.searchTerm);
 
         this.updateFilteredOptions(select);
         this.updateOptionsVisibility(select);
@@ -457,6 +730,10 @@ export class SelectActions extends BaseActionClass<SelectState> {
                 noResultsElement.classList.add('hidden');
             }
         }
+
+        select.setAttribute('data-visible-options', visibleCount.toString());
+        select.setAttribute('data-has-results', visibleCount > 0 ? 'true' : 'false');
+        select.setAttribute('data-show-no-results', (visibleCount === 0 && state.searchTerm) ? 'true' : 'false');
     }
 
     /**
@@ -573,10 +850,35 @@ export class SelectActions extends BaseActionClass<SelectState> {
         } else {
             this.updateSingleValueDisplay(select);
         }
+
+        this.updateClearButtonVisibility(select);
     }
 
     /**
-     * Update chips display for multiple selection using Badge components
+     * Update clear button visibility based on selection state
+     */
+    private updateClearButtonVisibility(select: HTMLElement): void {
+        const state = this.getState(select);
+        if (!state) return;
+
+        const clearButtonWrapper = DOMUtils.querySelector('[data-select-clear]', select) as HTMLElement;
+        if (!clearButtonWrapper) return;
+
+        const hasSelections = state.selectedValues.length > 0;
+        const isDisabled = select.dataset.disabled === 'true';
+        const isClearable = select.dataset.clearable === 'true';
+
+        if (hasSelections && !isDisabled && isClearable) {
+            clearButtonWrapper.classList.remove('opacity-0', 'pointer-events-none');
+            clearButtonWrapper.classList.add('opacity-100', 'pointer-events-auto');
+        } else {
+            clearButtonWrapper.classList.remove('opacity-100', 'pointer-events-auto');
+            clearButtonWrapper.classList.add('opacity-0', 'pointer-events-none');
+        }
+    }
+
+    /**
+     * Update chips display for multiple selection - creates/removes chips dynamically
      */
     private updateChipsDisplay(select: HTMLElement): void {
         const state = this.getState(select);
@@ -585,62 +887,85 @@ export class SelectActions extends BaseActionClass<SelectState> {
         const chipsContainer = DOMUtils.querySelector('[data-select-chips]', select) as HTMLElement;
         if (!chipsContainer) return;
 
-        chipsContainer.innerHTML = '';
+        const existingChips = DOMUtils.querySelectorAll('[data-select-chip="true"]', chipsContainer);
+        const placeholder = DOMUtils.querySelector('[data-select-placeholder]', chipsContainer);
 
         if (state.selectedValues.length === 0) {
-            const placeholderText = select.dataset.placeholder || 'Select options...';
-            chipsContainer.innerHTML = `<span class="text-neutral-500 select-placeholder">${placeholderText}</span>`;
+            existingChips.forEach(chip => chip.remove());
+
+            if (placeholder) {
+                (placeholder as HTMLElement).style.display = 'inline';
+            } else {
+                const placeholderText = select.dataset.placeholder || 'Select options...';
+                const placeholderElement = document.createElement('span');
+                placeholderElement.className = 'text-neutral-500 select-placeholder';
+                placeholderElement.setAttribute('data-select-placeholder', 'true');
+                placeholderElement.textContent = placeholderText;
+                chipsContainer.appendChild(placeholderElement);
+            }
         } else {
-            state.selectedValues.forEach(value => {
-                const option = this.findOptionByValue(select, value);
-                const label = option ? option.displayLabel : value;
-                const isClearable = select.dataset.clearable === 'true' && !this.isDisabled(select);
-                const chipId = `select-chip-${this.generateChipId(value)}`;
+            if (placeholder) {
+                (placeholder as HTMLElement).style.display = 'none';
+            }
 
-                const chip = document.createElement('button');
-                chip.type = 'button';
-                chip.className = 'inline-flex items-center gap-1 font-medium cursor-pointer transition-colors px-1.5 py-0.5 text-xs rounded-sm';
-                chip.style.cssText = `
-                    background-color: var(--color-brand-50);
-                    color: var(--color-brand-700);
-                    border: 1px solid var(--color-brand-200);
-                `;
-                chip.setAttribute('data-chip-value', value);
-                chip.setAttribute('data-remove-chip', value);
-                chip.setAttribute('data-dismiss-target', `#${chipId}`);
-                chip.setAttribute('aria-label', 'Remove badge');
-                chip.id = chipId;
+            const currentChipValues = Array.from(existingChips).map(chip =>
+                (chip as HTMLElement).dataset.chipValue
+            ).filter(value => value);
 
-                chip.addEventListener('mouseenter', () => {
-                    chip.style.backgroundColor = 'var(--color-brand-100)';
-                });
-                chip.addEventListener('mouseleave', () => {
-                    chip.style.backgroundColor = 'var(--color-brand-50)';
-                });
-
-                const chipContent = document.createElement('span');
-                chipContent.textContent = label;
-                chip.appendChild(chipContent);
-
-                if (isClearable) {
-                    const dismissText = document.createElement('span');
-                    dismissText.className = 'text-brand-600 hover:text-brand-700 ml-1 flex-shrink-0 font-bold leading-none';
-                    dismissText.textContent = '×';
-                    dismissText.setAttribute('aria-hidden', 'true');
-
-                    chip.appendChild(dismissText);
-
-                    const srText = document.createElement('span');
-                    srText.className = 'sr-only';
-                    srText.textContent = 'Remove badge';
-                    chip.appendChild(srText);
+            existingChips.forEach(chip => {
+                const chipValue = (chip as HTMLElement).dataset.chipValue;
+                if (chipValue && !state.selectedValues.includes(chipValue)) {
+                    chip.remove();
                 }
+            });
 
-                chipsContainer.appendChild(chip);
+            state.selectedValues.forEach(value => {
+                if (!currentChipValues.includes(value)) {
+                    this.createChipElement(select, chipsContainer, value);
+                }
             });
         }
     }
 
+    /**
+     * Create a new chip element for a selected value
+     */
+    private createChipElement(select: HTMLElement, container: HTMLElement, value: string): void {
+        const selectId = select.dataset.name || select.id || 'select';
+        const option = this.findOptionByValue(select, value);
+        const displayLabel = option ? option.displayLabel : value;
+        const clearable = select.dataset.clearable === 'true';
+        const disabled = select.dataset.disabled === 'true';
+        const dismissible = clearable && !disabled;
+
+        // Create non-clickable chip container
+        const chip = document.createElement('span');
+        chip.className = 'inline-flex items-center font-medium px-2 py-0.5 text-xs rounded-sm bg-brand text-white';
+
+        chip.setAttribute('data-select-chip', 'true');
+        chip.setAttribute('data-chip-value', value);
+        chip.setAttribute('data-variant', 'chip');
+        chip.setAttribute('data-color', 'brand');
+        chip.setAttribute('data-size', 'xs');
+        chip.setAttribute('data-badge-id', `chip-${selectId}-${value}`);
+        chip.id = `chip-${selectId}-${value}`;
+
+        if (dismissible) {
+            chip.innerHTML = `
+                <span class="chip-label">${displayLabel}</span>
+                <button type="button" class="ml-1.5 p-0.5 rounded hover:bg-white/20 transition-colors focus:outline-none focus:ring-1 focus:ring-white/30" data-chip-remove data-chip-value="${value}">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    <span class="sr-only">Remove ${displayLabel}</span>
+                </button>
+            `;
+        } else {
+            chip.innerHTML = `<span class="chip-label">${displayLabel}</span>`;
+        }
+
+        container.appendChild(chip);
+    }
 
     /**
      * Update single value display
@@ -664,35 +989,63 @@ export class SelectActions extends BaseActionClass<SelectState> {
     }
 
     /**
-     * Update hidden form inputs
+     * Update stable inputs - with Livewire integration support
      */
-    private updateHiddenInputs(select: HTMLElement): void {
-        const state = this.getState(select);
-        if (!state) return;
+    private updateStableInputs(select: HTMLElement, state?: SelectState, isMultiple?: boolean): void {
+        const currentState = state || this.getState(select);
+        if (!currentState) return;
 
-        const isMultiple = select.dataset.multiple === 'true';
-        const name = select.dataset.name;
-        if (!name) return;
+        const multiple = isMultiple ?? (select.dataset.multiple === 'true');
+        const isLivewireEnabled = LivewireIntegration.isLivewireEnabled(select);
 
-        const existingInputs = DOMUtils.querySelectorAll('.select-hidden-input', select);
-        existingInputs.forEach(input => input.remove());
-
-        if (isMultiple) {
-            state.selectedValues.forEach(value => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = `${name}[]`;
-                input.value = value;
-                input.className = 'select-hidden-input';
-                select.appendChild(input);
-            });
+        if (isLivewireEnabled) {
+            // For Livewire: Let wire:model handle the data binding
+            // Only sync to Livewire component for bidirectional updates
+            this.syncToLivewire(select);
         } else {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = name;
-            input.value = state.selectedValues[0] || '';
-            input.className = 'select-hidden-input';
-            select.appendChild(input);
+            if (multiple) {
+                this.updateMultipleInputPool(select, currentState.selectedValues);
+            } else {
+                this.updateSingleInput(select, currentState.selectedValues[0] || '');
+            }
+        }
+    }
+
+
+    /**
+     * Update single input value (for single select)
+     */
+    private updateSingleInput(select: HTMLElement, value: string): void {
+        const singleInput = DOMUtils.querySelector('.select-single-input', select) as HTMLInputElement;
+        if (!singleInput) return;
+
+        if (singleInput.value !== value) {
+            singleInput.value = value;
+            singleInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+
+    /**
+     * Update multiple input pool (for multiple select)
+     */
+    private updateMultipleInputPool(select: HTMLElement, selectedValues: string[]): void {
+        const poolInputs = DOMUtils.querySelectorAll('.select-pool-input', select) as unknown as NodeListOf<HTMLInputElement>;
+
+        poolInputs.forEach((input, index) => {
+            const isActive = index < selectedValues.length;
+            const newValue = isActive ? selectedValues[index] : '';
+
+            if (input.value !== newValue) {
+                input.value = newValue;
+            }
+
+            input.dataset.poolActive = isActive ? 'true' : 'false';
+            input.style.display = isActive ? '' : 'none';
+        });
+
+        const firstActiveInput = poolInputs[0];
+        if (firstActiveInput) {
+            firstActiveInput.dispatchEvent(new Event('change', { bubbles: true }));
         }
     }
 
@@ -771,48 +1124,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
     }
 
     /**
-     * Position dropdown relative to trigger
-     */
-    private positionDropdown(select: HTMLElement): void {
-        const dropdown = DOMUtils.querySelector('[data-select-dropdown]', select) as HTMLElement;
-        const trigger = DOMUtils.querySelector('[data-select-trigger]', select) as HTMLElement;
-
-        if (!dropdown || !trigger) return;
-
-        const rect = trigger.getBoundingClientRect();
-        const dropdownRect = dropdown.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const viewportWidth = window.innerWidth;
-
-        const spaceBelow = viewportHeight - rect.bottom;
-        const spaceAbove = rect.top;
-        const dropdownHeight = dropdownRect.height || 240;
-
-        if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
-            dropdown.style.bottom = '100%';
-            dropdown.style.top = 'auto';
-            dropdown.style.marginBottom = '4px';
-            dropdown.style.marginTop = '0';
-        } else {
-            dropdown.style.top = '100%';
-            dropdown.style.bottom = 'auto';
-            dropdown.style.marginTop = '4px';
-            dropdown.style.marginBottom = '0';
-        }
-    }
-
-    /**
-     * Reposition all open dropdowns
-     */
-    private repositionDropdowns(): void {
-        this.getAllStates().forEach((state, select) => {
-            if (state.isOpen) {
-                this.positionDropdown(select);
-            }
-        });
-    }
-
-    /**
      * Check if select is disabled
      */
     private isDisabled(select: HTMLElement): boolean {
@@ -826,14 +1137,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
         const state = this.getState(select);
         return state ? state.isOpen : false;
     }
-
-    /**
-     * Generate unique chip ID for a value
-     */
-    private generateChipId(value: string): string {
-        return btoa(value).replace(/[^a-zA-Z0-9]/g, '').substring(0, 8) + Date.now().toString(36);
-    }
-
 
     /**
      * Dispatch custom select event
@@ -866,7 +1169,7 @@ export class SelectActions extends BaseActionClass<SelectState> {
 
         this.setState(select, state);
         this.updateDisplay(select);
-        this.updateHiddenInputs(select);
+        this.updateStableInputs(select);
         this.updateOptionsSelectedState(select);
 
         this.dispatchSelectEvent(select, 'select:change', {
@@ -876,11 +1179,22 @@ export class SelectActions extends BaseActionClass<SelectState> {
     }
 
     /**
-     * Check if floating is enabled for select (always true now)
+     * Set select value programmatically (external API)
      */
-    private isFloatingEnabled(select: HTMLElement): boolean {
-        // Always use Floating UI
-        return true;
+    public setSelectValue(select: HTMLElement, value: string | string[]): void {
+        const values = Array.isArray(value) ? value : [value];
+        this.setSelectedValues(select, values);
+    }
+
+    /**
+     * Get current select value (external API)
+     */
+    public getSelectValue(select: HTMLElement): string | string[] | null {
+        const state = this.getState(select);
+        if (!state) return null;
+
+        const isMultiple = select.dataset.multiple === 'true';
+        return isMultiple ? state.selectedValues : (state.selectedValues[0] || null);
     }
 
     /**
@@ -890,17 +1204,14 @@ export class SelectActions extends BaseActionClass<SelectState> {
         const state = this.getState(select);
         if (!state) return;
 
-        // Clean up existing floating first
         this.cleanupFloating(select);
 
         const trigger = DOMUtils.querySelector('[data-select-trigger]', select) as HTMLElement;
         if (!trigger) return;
 
-        // Parse configuration from data attributes
         const placement = select.dataset.floatingPlacement || 'bottom-start';
         const offset = parseInt(select.dataset.floatingOffset || '4', 10);
 
-        // Create floating element with enhanced Floating UI features
         const floating = FloatingManager.getInstance().createFloating(trigger, dropdown, {
             placement: placement as any,
             offset,
@@ -914,7 +1225,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
             },
             size: {
                 apply: ({ availableHeight }) => {
-                    // Limit dropdown height based on available space
                     const optionsContainer = DOMUtils.querySelector('[data-select-options]', dropdown);
                     if (optionsContainer) {
                         Object.assign(optionsContainer.style, {
@@ -946,7 +1256,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
         const state = this.getState(select);
         if (!state) return;
 
-        // Clean up floating
         if (state.floating) {
             state.floating.cleanup();
             state.floating = undefined;
@@ -959,9 +1268,12 @@ export class SelectActions extends BaseActionClass<SelectState> {
      * Clean up SelectActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // Clean up floating instances
         this.getAllStates().forEach((state, select) => {
             this.cleanupFloating(select);
+
+            if (state.searchTimeout) {
+                clearTimeout(state.searchTimeout);
+            }
         });
     }
 }

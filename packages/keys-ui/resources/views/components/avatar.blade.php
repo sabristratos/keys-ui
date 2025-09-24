@@ -1,4 +1,4 @@
-<div {{ $attributes->merge(['class' => $avatarClasses()]) }}>
+<div {{ $attributes->merge(['class' => $avatarClasses()])->merge($dataAttributes) }}>
     @if($hasImage())
         <img
             src="{{ $src }}"

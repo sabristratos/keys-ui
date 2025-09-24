@@ -102,5 +102,5 @@
 
 {{-- Error display --}}
 @if($showErrors && $hasError())
-    <x-keys::error :errors="$errors" />
+    <x-keys::error :messages="$errors" />
 @endif

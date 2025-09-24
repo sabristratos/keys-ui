@@ -7,20 +7,20 @@
 @layer components {
   /* Base Quill Editor Container */
   .quill-editor {
-    @apply focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2 transition-all duration-200;
+    @apply focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2 transition-all duration-200 overflow-hidden;
   }
 
   /* Editor Container Base */
   .quill-container {
-    @apply border border-border bg-surface overflow-hidden;
+    @apply border border-border bg-surface;
   }
 
-  /* Size-based border radius variants */
-  .quill-container-xs { @apply rounded-sm; }
-  .quill-container-sm { @apply rounded-md; }
-  .quill-container-md { @apply rounded-md; }
-  .quill-container-lg { @apply rounded-lg; }
-  .quill-container-xl { @apply rounded-lg; }
+  /* Size-based border radius variants for outer wrapper */
+  .quill-editor-xs { @apply rounded-sm; }
+  .quill-editor-sm { @apply rounded-md; }
+  .quill-editor-md { @apply rounded-md; }
+  .quill-editor-lg { @apply rounded-lg; }
+  .quill-editor-xl { @apply rounded-lg; }
 
   /* Disabled state */
   .quill-editor-disabled {
@@ -63,9 +63,10 @@
 
   /* Loading overlay */
   .quill-editor-loading::after {
-    @apply absolute inset-0 bg-surface/50 backdrop-blur-sm rounded-md flex items-center justify-center;
+    @apply absolute inset-0 bg-surface/50 backdrop-blur-sm flex items-center justify-center;
     content: '';
     z-index: 10;
+    border-radius: inherit;
   }
 
   /* Loading spinner container */
@@ -161,13 +162,12 @@
   }
 
   /* Toolbar Button Base Styling - Aligned with Button Component */
-  .quill-editor .ql-toolbar button {
-    @apply inline-flex items-center justify-center rounded-sm text-foreground transition-all duration-200;
-    @apply hover:bg-surface active:bg-border;
+  .ql-toolbar.ql-snow button {
+    @apply inline-flex items-center justify-center rounded-sm bg-transparent text-foreground transition-all duration-200;
+    @apply hover:bg-neutral-100 active:bg-neutral-200;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1;
     padding: 0;
     border: none;
-    background: transparent;
     margin: 0;
   }
 
@@ -194,18 +194,57 @@
     }
   }
 
-  /* Toolbar Button States */
-  .quill-editor .ql-toolbar button:hover {
-    @apply bg-surface;
+  /* Toolbar Button States - Override Quill defaults with higher specificity */
+  .ql-toolbar.ql-snow button:hover {
+    @apply bg-neutral-100 text-foreground;
   }
 
-  .quill-editor .ql-toolbar button.ql-active {
+  .ql-toolbar.ql-snow button.ql-active {
     @apply bg-brand text-foreground-brand;
   }
 
-  /* Toolbar Button Icons */
-  .quill-editor .ql-toolbar button svg {
-    @apply fill-current;
+  /* Toolbar Button Icons - Override Quill's hardcoded colors */
+  .ql-snow .ql-stroke {
+    stroke: var(--color-foreground);
+  }
+
+  .ql-snow .ql-fill {
+    fill: var(--color-foreground);
+  }
+
+  .ql-snow .ql-stroke.ql-fill {
+    fill: var(--color-foreground);
+  }
+
+  /* Override Quill's hover/active icon colors */
+  .ql-toolbar.ql-snow button:hover .ql-stroke,
+  .ql-snow .ql-toolbar button:hover .ql-stroke {
+    stroke: var(--color-foreground);
+  }
+
+  .ql-toolbar.ql-snow button:hover .ql-fill,
+  .ql-snow .ql-toolbar button:hover .ql-fill {
+    fill: var(--color-foreground);
+  }
+
+  .ql-toolbar.ql-snow button:hover .ql-stroke.ql-fill,
+  .ql-snow .ql-toolbar button:hover .ql-stroke.ql-fill {
+    fill: var(--color-foreground);
+  }
+
+  .ql-toolbar.ql-snow button.ql-active .ql-stroke,
+  .ql-snow .ql-toolbar button.ql-active .ql-stroke {
+    stroke: var(--color-foreground-brand);
+  }
+
+  .ql-toolbar.ql-snow button.ql-active .ql-fill,
+  .ql-snow .ql-toolbar button.ql-active .ql-fill {
+    fill: var(--color-foreground-brand);
+  }
+
+  .ql-toolbar.ql-snow button.ql-active .ql-stroke.ql-fill,
+  .ql-snow .ql-toolbar button.ql-active .ql-stroke.ql-fill {
+    fill: var(--color-foreground-brand);
   }
 
   /* Icon Size Variants */
@@ -264,12 +303,12 @@
     .quill-editor-xl .ql-toolbar .ql-formats { @apply mr-3; }
   }
 
-  /* Dropdown Picker Styling */
-  .quill-editor .ql-toolbar .ql-picker {
+  /* Dropdown Picker Styling - Override Quill defaults */
+  .ql-snow .ql-picker {
     @apply text-foreground;
   }
 
-  .quill-editor .ql-toolbar .ql-picker-label {
+  .ql-snow .ql-picker-label {
     @apply text-foreground border-none;
     height: inherit;
     line-height: inherit;
@@ -282,17 +321,21 @@
   .quill-editor-lg .ql-toolbar .ql-picker-label { @apply px-2 text-base; }
   .quill-editor-xl .ql-toolbar .ql-picker-label { @apply px-2 text-lg; }
 
-  /* Dropdown Options */
-  .quill-editor .ql-toolbar .ql-picker-options {
-    @apply bg-surface border border-border rounded-md shadow-md;
+  /* Dropdown Options - Override Quill defaults */
+  .ql-snow .ql-picker-options {
+    @apply bg-surface border border-border rounded-md shadow-md text-foreground;
     z-index: 1000;
   }
 
-  .quill-editor .ql-toolbar .ql-picker-item {
-    @apply hover:bg-surface;
+  .ql-snow .ql-picker-item {
+    @apply text-foreground;
   }
 
-  .quill-editor .ql-toolbar .ql-picker-item.ql-selected {
+  .ql-snow .ql-picker-item:hover {
+    @apply bg-neutral-100;
+  }
+
+  .ql-snow .ql-picker-item.ql-selected {
     @apply bg-brand text-foreground-brand;
   }
 
@@ -450,62 +493,39 @@
   }
 
   /* Comprehensive Dark Mode Support */
-  /* SVG Icon Color Fixes */
-  .quill-editor .ql-snow .ql-stroke {
-    stroke: currentColor;
-  }
-
-  .quill-editor .ql-snow .ql-fill {
-    fill: currentColor;
-  }
-
-  .quill-editor .ql-snow .ql-stroke.ql-thin {
-    stroke: currentColor;
+  /* Additional Quill Icon Support */
+  .ql-snow .ql-stroke.ql-thin {
+    stroke: var(--color-foreground);
     opacity: 0.7;
   }
 
   /* Quill Tooltip Dark Mode Support */
-  .quill-editor .ql-tooltip {
+  .ql-snow .ql-tooltip {
     @apply bg-surface border border-border text-foreground shadow-lg;
   }
 
-  .quill-editor .ql-tooltip::before {
+  .ql-snow .ql-tooltip::before {
     @apply border-b-surface;
   }
 
-  .quill-editor .ql-tooltip input[type=text] {
+  .ql-snow .ql-tooltip input[type=text] {
     @apply bg-input text-foreground border border-border;
   }
 
-  .quill-editor .ql-tooltip input[type=text]:focus {
+  .ql-snow .ql-tooltip input[type=text]:focus {
     @apply border-brand ring-1 ring-brand;
   }
 
-  .quill-editor .ql-tooltip a.ql-preview {
+  .ql-snow .ql-tooltip a.ql-preview {
     @apply text-brand;
   }
 
-  .quill-editor .ql-tooltip a.ql-action::after,
-  .quill-editor .ql-tooltip a.ql-remove::before {
+  .ql-snow .ql-tooltip a.ql-action::after,
+  .ql-snow .ql-tooltip a.ql-remove::before {
     @apply text-foreground;
   }
 
-  /* Picker Dropdown Dark Mode */
-  .quill-editor .ql-picker.ql-expanded .ql-picker-options {
-    @apply bg-surface border border-border shadow-lg;
-  }
-
-  .quill-editor .ql-picker-options .ql-picker-item {
-    @apply text-foreground;
-  }
-
-  .quill-editor .ql-picker-options .ql-picker-item:hover {
-    @apply bg-border;
-  }
-
-  .quill-editor .ql-picker-options .ql-picker-item.ql-selected {
-    @apply bg-brand text-foreground-brand;
-  }
+  /* Additional Picker Support - Already covered by main picker selectors above */
 
   /* Selection and Link Preview */
   .quill-editor .ql-editor ::selection {
