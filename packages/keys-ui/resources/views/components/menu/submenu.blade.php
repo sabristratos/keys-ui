@@ -1,23 +1,46 @@
 
-<div class="relative" {{ $attributes->merge($computedDataAttributes) }}>
-    
-    <div class="{{ $computedTriggerClasses }}" {{ $attributes->only([])->merge($computedTriggerDataAttributes) }}>
-        <div class="flex items-center flex-1 min-w-0">
+<div class="w-full" {{ $attributes->merge($computedDataAttributes) }}>
+<x-keys::popover
+    :id="$id"
+    :placement="$computedPlacement"
+    :fullWidth="true"
+>
+    <x-slot:trigger>
+        <button
+            type="button"
+            class="{{ $computedButtonClasses }}"
+            data-popover-trigger="{{ $id }}"
+            popovertarget="{{ $id }}"
+            {{ $attributes->only([])->merge($computedTriggerDataAttributes) }}
+        >
+            {{-- Icon --}}
             @if($hasIcon())
-                <x-keys::icon :name="$icon" :size="$computedIconSize" class="{{ $computedIconClasses }}" />
+                <x-keys::icon
+                    :name="$icon"
+                    size="{{ $computedIconSize }}"
+                    class="{{ $computedIconClasses }}"
+                />
             @endif
 
+            {{-- Content --}}
             @if($hasHeading())
-                <span class="truncate">{{ $heading }}</span>
+                <div class="flex-1 min-w-0">
+                    <span class="truncate">{{ $heading }}</span>
+                </div>
             @endif
-        </div>
 
-        
-        <x-keys::icon name="heroicon-o-chevron-right" class="w-4 h-4 text-muted flex-shrink-0 transition-transform duration-200" />
-    </div>
+            {{-- Chevron Arrow --}}
+            <x-keys::icon
+                name="heroicon-o-chevron-right"
+                size="sm"
+                class="text-muted flex-shrink-0 transition-transform duration-200"
+            />
+        </button>
+    </x-slot:trigger>
 
-    
+    {{-- Submenu panel content --}}
     <div class="{{ $computedPanelClasses }}" {{ $attributes->only([])->merge($computedPanelDataAttributes) }}>
         {{ $slot }}
     </div>
+</x-keys::popover>
 </div>

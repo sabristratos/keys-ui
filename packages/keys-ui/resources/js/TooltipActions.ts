@@ -12,7 +12,6 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
-import { AnimationUtils } from './utils/AnimationUtils';
 import { FloatingManager, FloatingInstance } from './utils/FloatingManager';
 
 interface TooltipState {
@@ -205,7 +204,7 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
 
         this.cancelHide(tooltip);
 
-        state.showTimer = AnimationUtils.createTimer(() => {
+        state.showTimer = window.setTimeout(() => {
             this.showTooltip(tooltip);
         }, state.delay);
     }
@@ -219,7 +218,7 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
 
         this.cancelShow(tooltip);
 
-        state.hideTimer = AnimationUtils.createTimer(() => {
+        state.hideTimer = window.setTimeout(() => {
             this.hideTooltip(tooltip);
         }, 100); // Short delay for better UX
     }
@@ -230,7 +229,7 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
     private cancelShow(tooltip: HTMLElement): void {
         const state = this.getState(tooltip);
         if (state?.showTimer) {
-            AnimationUtils.clearTimer(state.showTimer);
+            clearTimeout(state.showTimer);
             delete state.showTimer;
         }
     }
@@ -241,7 +240,7 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
     private cancelHide(tooltip: HTMLElement): void {
         const state = this.getState(tooltip);
         if (state?.hideTimer) {
-            AnimationUtils.clearTimer(state.hideTimer);
+            clearTimeout(state.hideTimer);
             delete state.hideTimer;
         }
     }
@@ -257,15 +256,10 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
             this.positionTooltip(state.trigger, tooltip);
         }
 
-        // Use AnimationUtils for fade in animation
-        AnimationUtils.fadeIn(tooltip, {
-            duration: 200,
-            onComplete: () => {
-                tooltip.setAttribute('data-show', 'true');
-                state.isVisible = true;
-                this.dispatchTooltipEvent(tooltip, 'tooltip:show', { trigger: state.trigger });
-            }
-        });
+        // Show tooltip with CSS animation
+        tooltip.setAttribute('data-show', 'true');
+        state.isVisible = true;
+        this.dispatchTooltipEvent(tooltip, 'tooltip:show', { trigger: state.trigger });
     }
 
     /**
@@ -281,15 +275,10 @@ export class TooltipActions extends BaseActionClass<TooltipState> {
             state.floating = undefined;
         }
 
-        // Use AnimationUtils for fade out animation
-        AnimationUtils.fadeOut(tooltip, {
-            duration: 150,
-            onComplete: () => {
-                tooltip.setAttribute('data-show', 'false');
-                state.isVisible = false;
-                this.dispatchTooltipEvent(tooltip, 'tooltip:hide', { trigger: state.trigger });
-            }
-        });
+        // Hide tooltip with CSS animation
+        tooltip.setAttribute('data-show', 'false');
+        state.isVisible = false;
+        this.dispatchTooltipEvent(tooltip, 'tooltip:hide', { trigger: state.trigger });
     }
 
     /**

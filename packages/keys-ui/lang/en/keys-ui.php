@@ -34,6 +34,19 @@ return [
         'copy_failed' => 'Copy failed',
     ],
 
+    'file_upload' => [
+        'drag_drop_files' => 'Drag and drop files here',
+        'or_click_to_browse' => 'or click to browse',
+        'click_to_select_files' => 'Click to select files',
+        'drop_files_here' => 'Drop files here',
+        'remove_file' => 'Remove file',
+        'clear_all' => 'Clear all',
+        'supported_formats' => 'Supported formats',
+        'max_file_size' => 'Max file size',
+        'max_files' => 'Max files',
+        'processing_files' => 'Processing files...',
+    ],
+
     'aria' => [
         'required_field' => 'Required',
         'show_password' => 'Show password',

@@ -10,7 +10,6 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
-import { AnimationUtils } from './utils/AnimationUtils';
 
 interface BadgeActionEvent {
     badge: HTMLElement;
@@ -80,7 +79,7 @@ export class BadgeActions extends BaseActionClass {
         badge.style.opacity = '0';
 
         // Remove from DOM after animation
-        AnimationUtils.createTimer(() => {
+        setTimeout(() => {
             if (badge.parentNode) {
                 badge.parentNode.removeChild(badge);
             }

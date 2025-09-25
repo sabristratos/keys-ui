@@ -10,7 +10,6 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
-import { AnimationUtils } from './utils/AnimationUtils';
 
 interface AlertActionEvent {
     alert: HTMLElement;

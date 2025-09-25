@@ -21,29 +21,29 @@
     {{ $optionAttributes }}
 >
     @if($hasIcon())
-        <div class="{{ $computedIconClasses }}">
+        <div class="flex-shrink-0 mr-2">
             <x-keys::icon name="{{ $icon }}" size="sm" />
         </div>
     @endif
 
-    <div class="{{ $computedContentClasses }}">
+    <div class="flex-1 min-w-0">
         @if($slot->isNotEmpty())
             {{ $slot }}
         @else
             @if($hasContent())
-                <div class="{{ $computedLabelClasses }}">
+                <div class="block font-medium truncate">
                     {{ $label }}
                 </div>
             @endif
             @if($hasDescription())
-                <div class="{{ $computedDescriptionClasses }}">
+                <div class="block text-xs text-muted mt-0.5 truncate">
                     {{ $description }}
                 </div>
             @endif
         @endif
     </div>
 
-    <div class="{{ $computedCheckmarkClasses }}">
+    <div class="flex-shrink-0 ml-2 transition-opacity duration-150 {{ $selected ? 'opacity-100' : 'opacity-0' }}">
         <x-keys::icon name="heroicon-o-check" size="sm" class="text-brand" />
     </div>
 </div>

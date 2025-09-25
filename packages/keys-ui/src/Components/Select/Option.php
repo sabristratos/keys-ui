@@ -36,46 +36,6 @@ class Option extends Component
         return $base . ' text-foreground';
     }
 
-    /**
-     * Generate CSS classes for icon container
-     */
-    public function iconClasses(): string
-    {
-        return 'flex-shrink-0 mr-2';
-    }
-
-    /**
-     * Generate CSS classes for content container
-     */
-    public function contentClasses(): string
-    {
-        return 'flex-1 min-w-0';
-    }
-
-    /**
-     * Generate CSS classes for label text
-     */
-    public function labelClasses(): string
-    {
-        return 'block font-medium truncate';
-    }
-
-    /**
-     * Generate CSS classes for description text
-     */
-    public function descriptionClasses(): string
-    {
-        return 'block text-xs text-muted mt-0.5 truncate';
-    }
-
-    /**
-     * Generate CSS classes for checkmark icon
-     */
-    public function checkmarkClasses(): string
-    {
-        $base = 'flex-shrink-0 ml-2 transition-opacity duration-150';
-        return $base . ($this->selected ? ' opacity-100' : ' opacity-0');
-    }
 
     /**
      * Check if option has label content
@@ -128,11 +88,6 @@ class Option extends Component
     {
         return view('keys::components.select.option', [
             'computedOptionClasses' => $this->optionClasses(),
-            'computedIconClasses' => $this->iconClasses(),
-            'computedContentClasses' => $this->contentClasses(),
-            'computedLabelClasses' => $this->labelClasses(),
-            'computedDescriptionClasses' => $this->descriptionClasses(),
-            'computedCheckmarkClasses' => $this->checkmarkClasses(),
             'searchableText' => $this->getSearchableText(),
             'displayLabel' => $this->getDisplayLabel(),
         ]);

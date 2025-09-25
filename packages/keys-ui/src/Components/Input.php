@@ -74,127 +74,31 @@ class Input extends Component
             return $this->errors->isNotEmpty();
         }
 
+        // Handle Laravel MessageBag
+        if (is_object($this->errors) && method_exists($this->errors, 'any')) {
+            return $this->errors->any();
+        }
+
+        // Handle ViewErrorBag
+        if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
+            try {
+                $bag = $this->errors->getBag('default');
+                return $bag && $bag->any();
+            } catch (\Exception $e) {
+                // If getBag fails, treat as no errors
+                return false;
+            }
+        }
+
         return false;
     }
 
-    public function baseClasses(): string
-    {
-        return 'block w-full rounded-md border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
-    }
-
-    public function sizeClasses(): string
-    {
-        return match ($this->size) {
-            'xs' => 'px-2.5 py-1 text-xs',
-            'sm' => 'px-3 py-1.5 text-sm',
-            'md' => 'px-3 py-2 text-sm',
-            'lg' => 'px-4 py-2.5 text-base',
-            'xl' => 'px-4 py-3 text-base',
-            default => 'px-3 py-2 text-sm'
-        };
-    }
-
-    public function stateClasses(): string
-    {
-        if ($this->disabled) {
-            return 'bg-surface border-border text-muted cursor-not-allowed opacity-50';
-        }
-
-        if ($this->hasError()) {
-            return 'bg-input border-danger text-foreground focus:border-danger focus:ring-danger';
-        }
-
-        return 'bg-input border-border text-foreground focus:border-brand focus:ring-brand hover:border-neutral';
-    }
-
-    public function iconSize(): string
-    {
-        return match ($this->size) {
-            'xs' => 'xs',
-            'sm' => 'xs',
-            'md' => 'sm',
-            'lg' => 'md',
-            'xl' => 'md',
-            default => 'sm'
-        };
-    }
-
-    public function iconPadding(): string
-    {
-        $leftPadding = '';
-        $rightPadding = '';
-
-        if ($this->iconLeft) {
-            $leftPadding = match ($this->size) {
-                'xs' => 'pl-7',
-                'sm' => 'pl-8',
-                'md' => 'pl-10',
-                'lg' => 'pl-12',
-                'xl' => 'pl-12',
-                default => 'pl-10'
-            };
-        }
-
-        if ($this->iconRight || $this->hasActions()) {
-            $padding = $this->hasActions() ? $this->actionPadding() : match ($this->size) {
-                'xs' => 'pr-7',
-                'sm' => 'pr-8',
-                'md' => 'pr-10',
-                'lg' => 'pr-12',
-                'xl' => 'pr-12',
-                default => 'pr-10'
-            };
-            $rightPadding = $padding;
-        }
-
-        return trim($leftPadding . ' ' . $rightPadding);
-    }
-
-    public function iconPosition(): string
-    {
-        return 'top-1/2 transform -translate-y-1/2';
-    }
-
-    public function iconOffset(): array
-    {
-        // Use logical positioning (start/end) for RTL support
-        return match ($this->size) {
-            'xs' => ['left' => 'start-2', 'right' => 'end-2'],
-            'sm' => ['left' => 'start-2.5', 'right' => 'end-2.5'],
-            'md' => ['left' => 'start-3', 'right' => 'end-3'],
-            'lg' => ['left' => 'start-3.5', 'right' => 'end-3.5'],
-            'xl' => ['left' => 'start-3.5', 'right' => 'end-3.5'],
-            default => ['left' => 'start-3', 'right' => 'end-3']
-        };
-    }
 
     public function hasActions(): bool
     {
-        return ! empty($this->getAllActions());
+        return ! empty($this->configuredActions());
     }
 
-    public function getAllActions(): array
-    {
-        return $this->configuredActions();
-    }
-
-    public function actionPadding(): string
-    {
-        if (! $this->hasActions()) {
-            return '';
-        }
-
-        $actionsCount = count($this->getAllActions());
-        $actionWidth = match ($this->actionSize) {
-            'xs' => 24,
-            'sm' => 32,
-            'md' => 40,
-            default => 24
-        };
-
-        $totalWidth = ($actionsCount * $actionWidth) + (($actionsCount - 1) * 4) + 8;
-        return 'pr-' . ceil($totalWidth / 4);
-    }
 
 
     public function configuredActions(): array
@@ -241,36 +145,22 @@ class Input extends Component
         return array_merge($autoActions, $this->actions);
     }
 
-    public function getComputedIconSize(): string
-    {
-        return $this->iconSize();
-    }
-
-    public function getComputedActionSize(): string
-    {
-        return $this->getActionSize();
-    }
 
     public function getComputedActionData(): array
     {
         $actions = [];
 
-        foreach ($this->getAllActions() as $action) {
+        foreach ($this->configuredActions() as $action) {
             // Handle both 'type' and 'action' keys for action type
             $actionType = $action['type'] ?? $action['action'] ?? 'custom';
 
-            // Handle label - use provided label or generate default
-            $label = $action['label'] ?? $action['tooltip'] ?? 'Action';
-
             $computedAction = [
-                'type' => $actionType,
-                'icon' => $action['icon'] ?? 'heroicon-o-cursor-arrow-rays',
-                'label' => $label,
-                'is_multi_state' => isset($action['icon_toggle']) || isset($action['icon_success']),
                 'data_action' => $actionType,
                 'data_icon_default' => $action['icon'] ?? 'heroicon-o-cursor-arrow-rays',
+                'icon' => $action['icon'] ?? 'heroicon-o-cursor-arrow-rays',
                 'icon_toggle' => $action['icon_toggle'] ?? null,
                 'icon_success' => $action['icon_success'] ?? null,
+                'label' => $action['label'] ?? $action['tooltip'] ?? 'Action',
                 'label_toggle' => $action['label_toggle'] ?? null,
                 'label_success' => $action['label_success'] ?? null,
                 'data_url' => $action['url'] ?? null,
@@ -286,25 +176,6 @@ class Input extends Component
         return $actions;
     }
 
-    public function getComputedIconOffsets(): array
-    {
-        return $this->iconOffset();
-    }
-
-    public function getComputedIconPosition(): string
-    {
-        return $this->iconPosition();
-    }
-
-    public function getActionSize(): string
-    {
-        return match ($this->actionSize) {
-            'xs' => 'xs',
-            'sm' => 'sm',
-            'md' => 'md',
-            default => 'xs'
-        };
-    }
 
     public function getDataAttributes(): array
     {
@@ -349,7 +220,7 @@ class Input extends Component
         // Action attributes
         if ($this->hasActions()) {
             $attributes['data-has-actions'] = 'true';
-            $attributes['data-actions-count'] = count($this->getAllActions());
+            $attributes['data-actions-count'] = count($this->configuredActions());
         }
 
         // Feature flags
@@ -380,11 +251,7 @@ class Input extends Component
     public function render()
     {
         return view('keys::components.input', [
-            'computedIconSize' => $this->getComputedIconSize(),
-            'computedActionSize' => $this->getComputedActionSize(),
             'computedActionData' => $this->getComputedActionData(),
-            'computedIconOffsets' => $this->getComputedIconOffsets(),
-            'computedIconPosition' => $this->getComputedIconPosition(),
             'dataAttributes' => $this->getDataAttributes(),
         ]);
     }

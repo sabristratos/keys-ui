@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./quill-editor.css";
+@import "./components.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -11,6 +12,27 @@
     --radius-xl: calc(var(--radius-base) * 1.5);
     --radius-2xl: calc(var(--radius-base) * 2);
     --radius-3xl: calc(var(--radius-base) * 3);
+
+    /* Icon positioning scale - component-specific positioning */
+    --icon-offset-sm: 0.625rem;  /* 10px - small inputs */
+    --icon-offset-md: 0.75rem;   /* 12px - medium inputs */
+    --icon-offset-lg: 0.875rem;  /* 14px - large inputs */
+
+    /* Scale values for transforms */
+    --scale-down: 0.95;      /* hover/focus scale down */
+    --scale-up-sm: 1.02;     /* drag hover effect */
+    --scale-up-md: 1.05;     /* thumbnail hover */
+
+    /* Z-index scale - systematic layering */
+    --z-dropdown: 50;        /* dropdown/popover layer */
+    --z-overlay: 1000;       /* modal/overlay layer */
+    --z-tooltip: 9999;       /* tooltip layer */
+    --z-file-input: 10;      /* file input overlay */
+
+    /* Progress and dimension values */
+    --height-progress-thin: 6px;    /* thin progress bars */
+    --width-scrollbar-thin: 4px;    /* thin scrollbars */
+    --width-scrollbar: 6px;         /* standard scrollbars */
 
     /* Subtler shadow system */
     --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
@@ -101,8 +123,8 @@
     /* Core Layout Colors - Modern light-dark() approach */
     --surface: light-dark(white, var(--color-neutral-900));
     --body: light-dark(var(--color-neutral-50), var(--color-neutral-950));
-    --foreground: light-dark(var(--color-neutral-900), var(--color-neutral-100));
-    --border: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+    --foreground: light-dark(var(--color-neutral-800), var(--color-neutral-200));
+    --border: light-dark(var(--color-neutral-200), var(--color-neutral-900));
     --input: light-dark(var(--color-neutral-50), var(--color-neutral-950));
     --muted: light-dark(var(--color-neutral-600), var(--color-neutral-400));
 
@@ -138,7 +160,7 @@
     --foreground-info: white;
 
     --neutral: light-dark(var(--color-neutral-500), var(--color-neutral-400));
-    --neutral-hover: light-dark(var(--color-neutral-600), var(--color-neutral-300));
+    --neutral-hover: light-dark(var(--color-neutral-600), var(--color-neutral-700));
     --neutral-active: light-dark(var(--color-neutral-700), var(--color-neutral-200));
     --neutral-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
     --foreground-neutral: white;
@@ -200,105 +222,5 @@
     --color-muted: var(--muted);
 }
 
-/* Custom Scrollbar Implementation */
-/* Modern browsers with cross-browser compatibility */
 
-/* Base scrollbar styling - applies to all scrollable elements */
-* {
-    /* Firefox */
-    scrollbar-width: thin;
-    scrollbar-color: light-dark(var(--color-neutral-300), var(--color-neutral-600)) transparent;
-}
 
-/* Webkit browsers (Chrome, Safari, Edge) */
-*::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-*::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 3px;
-}
-
-*::-webkit-scrollbar-thumb {
-    background: light-dark(var(--color-neutral-300), var(--color-neutral-600));
-    border-radius: 3px;
-    transition: background-color 0.2s ease;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-    background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
-}
-
-*::-webkit-scrollbar-thumb:active {
-    background: light-dark(var(--color-neutral-500), var(--color-neutral-400));
-}
-
-*::-webkit-scrollbar-corner {
-    background: transparent;
-}
-
-/* Thin scrollbar variant for Select components and small containers */
-.scrollbar-thin,
-[data-select-options] {
-    /* Firefox */
-    scrollbar-width: thin;
-    scrollbar-color: light-dark(var(--color-neutral-400), var(--color-neutral-500)) transparent;
-}
-
-.scrollbar-thin::-webkit-scrollbar,
-[data-select-options]::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb,
-[data-select-options]::-webkit-scrollbar-thumb {
-    background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
-    border-radius: 2px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb:hover,
-[data-select-options]::-webkit-scrollbar-thumb:hover {
-    background: light-dark(var(--color-neutral-500), var(--color-neutral-400));
-}
-
-/* Hide scrollbar variant */
-.scrollbar-hide {
-    /* Firefox */
-    scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
-}
-
-/* Thick scrollbar variant for large content areas */
-.scrollbar-thick {
-    /* Firefox */
-    scrollbar-width: auto;
-    scrollbar-color: light-dark(var(--color-neutral-300), var(--color-neutral-600)) light-dark(var(--color-neutral-100), var(--color-neutral-800));
-}
-
-.scrollbar-thick::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-}
-
-.scrollbar-thick::-webkit-scrollbar-track {
-    background: light-dark(var(--color-neutral-100), var(--color-neutral-800));
-    border-radius: 6px;
-}
-
-.scrollbar-thick::-webkit-scrollbar-thumb {
-    background: light-dark(var(--color-neutral-300), var(--color-neutral-600));
-    border-radius: 6px;
-    border: 2px solid light-dark(var(--color-neutral-100), var(--color-neutral-800));
-}
-
-.scrollbar-thick::-webkit-scrollbar-thumb:hover {
-    background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
-}
-
-/* Gallery styles moved to component-level inline CSS for better encapsulation */

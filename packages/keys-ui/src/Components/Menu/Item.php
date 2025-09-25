@@ -41,10 +41,10 @@ class Item extends Component
 
     public function itemClasses(): string
     {
-        $base = 'flex items-center w-full px-3 py-2 text-sm text-left transition-colors duration-150 rounded-md group relative';
+        $base = 'flex items-center w-full px-2 py-2 text-sm text-left transition-colors duration-150 rounded-md group relative';
 
         if ($this->disabled) {
-            return $base . ' text-neutral-400 cursor-not-allowed bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-500';
+            return $base . ' text-neutral-400 cursor-not-allowed bg-neutral-disabled dark:text-neutral-500';
         }
 
         $variantClasses = match ($this->variant) {
@@ -53,7 +53,7 @@ class Item extends Component
             'warning' => 'text-warning-600 hover:bg-warning-50 hover:text-warning-700 dark:text-warning-400 dark:hover:bg-warning-900/20',
             'brand' => 'text-brand-600 hover:bg-brand-50 hover:text-brand-700 dark:text-brand-400 dark:hover:bg-brand-900/20',
             'info' => 'text-info-600 hover:bg-info-50 hover:text-info-700 dark:text-info-400 dark:hover:bg-info-900/20',
-            default => 'text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800'
+            default => 'text-foreground hover:bg-neutral-hover'
         };
 
         return $base . ' ' . $variantClasses . ' cursor-pointer';

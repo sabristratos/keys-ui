@@ -31,13 +31,13 @@ class Checkbox extends Component
 
     public function itemClasses(): string
     {
-        $base = 'flex items-center w-full px-3 py-2 text-sm transition-colors duration-150 rounded-md cursor-pointer';
+        $base = 'flex items-center w-full px-2 py-2 text-sm transition-colors duration-150 rounded-md cursor-pointer';
 
         if ($this->disabled) {
-            return $base . ' text-neutral-400 cursor-not-allowed bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-500';
+            return $base . ' text-neutral-400 cursor-not-allowed bg-neutral-disabled dark:text-neutral-500';
         }
 
-        return $base . ' text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 has-[:checked]:bg-' . $this->color . '-50 has-[:checked]:text-' . $this->color . '-700 dark:has-[:checked]:bg-' . $this->color . '-900/20 dark:has-[:checked]:text-' . $this->color . '-300';
+        return $base . ' text-foreground hover:bg-neutral-hover has-[:checked]:bg-' . $this->color . '-50 has-[:checked]:text-' . $this->color . '-700 dark:has-[:checked]:bg-' . $this->color . '-900/20 dark:has-[:checked]:text-' . $this->color . '-300';
     }
 
     public function checkboxClasses(): string

@@ -1,25 +1,22 @@
 /**
- * AccordionActions - Enhanced animations for Accordion components using WAAPI
+ * AccordionActions - Enhanced functionality for Accordion components
  *
  * Provides functionality for:
- * - Smooth height animations using Web Animations API
+ * - State management and event handling
  * - Progressive enhancement (works without JavaScript)
  * - Multiple accordion instance management
- * - Accessibility support with prefers-reduced-motion
+ * - Accessibility support
  * - Custom event dispatching for framework integration
  *
- * Based on: https://css-tricks.com/how-to-animate-the-details-element-using-waapi/
+ * Note: Animations are now handled by pure CSS transitions
  */
 
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
-import { AnimationUtils } from './utils/AnimationUtils';
 
 interface AccordionState {
-    isAnimating: boolean;
-    animation: Animation | null;
-    isExpanding: boolean;
+    isOpen: boolean;
 }
 
 interface AccordionEventDetail {
@@ -47,9 +44,7 @@ export class AccordionActions extends BaseActionClass<AccordionState> {
         }
 
         const state: AccordionState = {
-            isAnimating: false,
-            animation: null,
-            isExpanding: false
+            isOpen: accordion.open
         };
 
         this.setState(accordion, state);
@@ -100,127 +95,31 @@ export class AccordionActions extends BaseActionClass<AccordionState> {
     }
 
     /**
-     * Handle summary click with animation
+     * Handle summary click - now just updates state and dispatches events
      */
     private handleSummaryClick(accordion: HTMLDetailsElement, event: Event): void {
         const state = this.getState(accordion);
         if (!state) return;
 
-        // If we're already animating, prevent default and return
-        if (state.isAnimating) {
-            event.preventDefault();
-            return;
-        }
+        // Update state to track open/close
+        state.isOpen = !accordion.open;
+        this.setState(accordion, state);
 
-        // Check for reduced motion preference
-        if (AnimationUtils.prefersReducedMotion()) {
-            return; // Let default behavior handle it
-        }
-
-        event.preventDefault();
-
-        // Determine if we're opening or closing
-        const isExpanding = !accordion.open;
-        state.isExpanding = isExpanding;
-
-        if (isExpanding) {
-            this.expand(accordion);
-        } else {
-            this.shrink(accordion);
-        }
+        // Dispatch events for framework integration
+        this.dispatchAccordionEvent(accordion, state.isOpen ? 'accordion:expanding' : 'accordion:collapsing');
     }
 
     /**
      * Handle toggle events (for keyboard navigation)
      */
     private handleToggle(accordion: HTMLDetailsElement): void {
+        const state = this.getState(accordion);
+        if (state) {
+            state.isOpen = accordion.open;
+            this.setState(accordion, state);
+        }
+
         this.dispatchAccordionEvent(accordion, 'accordion:toggle', {
-            isExpanded: accordion.open
-        });
-    }
-
-    /**
-     * Expand accordion with animation
-     */
-    private expand(accordion: HTMLDetailsElement): void {
-        const state = this.getState(accordion);
-        if (!state) return;
-
-        state.isAnimating = true;
-        accordion.setAttribute('animating', '');
-
-        // Open the details element to measure content height
-        accordion.open = true;
-
-        // Get the summary height (what's always visible)
-        const summary = DOMUtils.querySelector('summary', accordion);
-        const summaryHeight = summary ? summary.offsetHeight : 0;
-
-        // Get full height (summary + content)
-        const fullHeight = accordion.offsetHeight;
-
-        // Use AnimationUtils for the expand animation
-        state.animation = AnimationUtils.expandHeight(accordion, {
-            fromHeight: summaryHeight,
-            toHeight: fullHeight,
-            duration: 300,
-            easing: 'ease-out',
-            onComplete: () => {
-                this.onAnimationFinish(accordion);
-            }
-        });
-
-        this.dispatchAccordionEvent(accordion, 'accordion:expanding');
-    }
-
-    /**
-     * Shrink accordion with animation
-     */
-    private shrink(accordion: HTMLDetailsElement): void {
-        const state = this.getState(accordion);
-        if (!state) return;
-
-        state.isAnimating = true;
-        accordion.setAttribute('animating', '');
-
-        // Get summary height (target height)
-        const summary = DOMUtils.querySelector('summary', accordion);
-        const summaryHeight = summary ? summary.offsetHeight : 0;
-
-        // Use AnimationUtils for the collapse animation
-        state.animation = AnimationUtils.collapseHeight(accordion, {
-            toHeight: summaryHeight,
-            duration: 300,
-            easing: 'ease-out',
-            onComplete: () => {
-                // Close the details element after animation
-                accordion.open = false;
-                this.onAnimationFinish(accordion);
-            }
-        });
-
-        this.dispatchAccordionEvent(accordion, 'accordion:collapsing');
-    }
-
-    /**
-     * Clean up after animation finishes
-     */
-    private onAnimationFinish(accordion: HTMLDetailsElement): void {
-        const state = this.getState(accordion);
-        if (!state) return;
-
-        // Remove animation attributes and styles
-        accordion.removeAttribute('animating');
-        accordion.style.height = '';
-        accordion.style.overflow = '';
-
-        // Clear animation reference
-        state.animation = null;
-        state.isAnimating = false;
-
-        this.setState(accordion, state);
-
-        this.dispatchAccordionEvent(accordion, 'accordion:animated', {
             isExpanded: accordion.open
         });
     }
@@ -239,18 +138,18 @@ export class AccordionActions extends BaseActionClass<AccordionState> {
             return true; // Already open
         }
 
+        accordion.open = true;
+
         const state = this.getState(accordion);
-        if (state && state.isAnimating) {
-            return false; // Currently animating
+        if (state) {
+            state.isOpen = true;
+            this.setState(accordion, state);
         }
 
-        // Check for reduced motion
-        if (AnimationUtils.prefersReducedMotion()) {
-            accordion.open = true;
-            return true;
-        }
+        this.dispatchAccordionEvent(accordion, 'accordion:opened', {
+            isExpanded: true
+        });
 
-        this.expand(accordion);
         return true;
     }
 
@@ -268,18 +167,18 @@ export class AccordionActions extends BaseActionClass<AccordionState> {
             return true; // Already closed
         }
 
+        accordion.open = false;
+
         const state = this.getState(accordion);
-        if (state && state.isAnimating) {
-            return false; // Currently animating
+        if (state) {
+            state.isOpen = false;
+            this.setState(accordion, state);
         }
 
-        // Check for reduced motion
-        if (AnimationUtils.prefersReducedMotion()) {
-            accordion.open = false;
-            return true;
-        }
+        this.dispatchAccordionEvent(accordion, 'accordion:closed', {
+            isExpanded: false
+        });
 
-        this.shrink(accordion);
         return true;
     }
 
@@ -309,14 +208,11 @@ export class AccordionActions extends BaseActionClass<AccordionState> {
     }
 
     /**
-     * Check if accordion is animating
+     * Check if accordion is animating (deprecated - CSS animations don't need tracking)
      */
     public isAccordionAnimating(accordionId: string): boolean {
-        const accordion = DOMUtils.getElementById(accordionId) as HTMLDetailsElement;
-        if (!accordion) return false;
-
-        const state = this.getState(accordion);
-        return state ? state.isAnimating : false;
+        // Always return false since CSS animations don't need JavaScript tracking
+        return false;
     }
 
     /**
@@ -344,13 +240,7 @@ export class AccordionActions extends BaseActionClass<AccordionState> {
      * Clean up AccordionActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // Cancel any running animations
-        this.getAllStates().forEach((state, accordion) => {
-            AnimationUtils.cancelAnimation(state.animation);
-            accordion.removeAttribute('animating');
-            accordion.style.height = '';
-            accordion.style.overflow = '';
-        });
+        // No cleanup needed since animations are handled by CSS
     }
 }
 

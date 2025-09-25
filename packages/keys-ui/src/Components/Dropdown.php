@@ -20,7 +20,9 @@ class Dropdown extends Component
         $this->id = $this->id ?? 'dropdown-' . uniqid();
 
 
-        if (!in_array($this->position, ['top', 'bottom', 'left', 'right'])) {
+        // Validate position using base placements (top, bottom, left, right)
+        $basePlacements = ['top', 'bottom', 'left', 'right'];
+        if (!in_array($this->position, $basePlacements)) {
             $this->position = 'bottom';
         }
 
@@ -37,51 +39,51 @@ class Dropdown extends Component
 
     public function dropdownClasses(): string
     {
-        $base = 'relative inline-block';
-
-        if ($this->disabled) {
-            $base .= ' opacity-50 pointer-events-none';
-        }
-
-        return $base;
+        // No wrapper classes needed - Popover component handles the container
+        return '';
     }
 
     public function panelClasses(): string
     {
-        $base = 'absolute z-50 min-w-48 bg-surface border border-border rounded-lg shadow-lg hidden';
+        // Simplified classes for dropdown panel - positioning is handled by Popover component
+        $base = 'bg-surface border border-border rounded-lg shadow-lg space-y-1 max-w-[90vw] w-max';
 
         $sizeClasses = match ($this->size) {
-            'sm' => 'min-w-40 p-1',
-            'md' => 'min-w-48 p-2',
-            'lg' => 'min-w-56 p-2',
-            default => 'min-w-48 p-2'
+            'sm' => 'min-w-40 sm:min-w-40 p-1',
+            'md' => 'min-w-48 sm:min-w-48 p-1',
+            'lg' => 'min-w-56 sm:min-w-56 p-1',
+            default => 'min-w-48 sm:min-w-48 p-1'
         };
 
-        $positionClasses = match ($this->position) {
-            'top' => 'bottom-full mb-' . ($this->offset / 4),
-            'bottom' => 'top-full mt-' . ($this->offset / 4),
-            'left' => 'right-full mr-' . ($this->offset / 4),
-            'right' => 'left-full ml-' . ($this->offset / 4),
-            default => 'top-full mt-2'
-        };
+        return trim($base . ' ' . $sizeClasses);
+    }
 
-        $alignClasses = match ($this->align) {
-            'start' => match ($this->position) {
-                'left', 'right' => 'top-0',
-                default => 'left-0'
+    public function getComputedPlacement(): string
+    {
+        // Map position + align to popover placement format
+        return match ($this->position) {
+            'top' => match ($this->align) {
+                'start' => 'top-start',
+                'end' => 'top-end',
+                default => 'top'
             },
-            'center' => match ($this->position) {
-                'left', 'right' => 'top-1/2 -translate-y-1/2',
-                default => 'left-1/2 -translate-x-1/2'
+            'bottom' => match ($this->align) {
+                'start' => 'bottom-start',
+                'end' => 'bottom-end',
+                default => 'bottom'
             },
-            'end' => match ($this->position) {
-                'left', 'right' => 'bottom-0',
-                default => 'right-0'
+            'left' => match ($this->align) {
+                'start' => 'left-start',
+                'end' => 'left-end',
+                default => 'left'
             },
-            default => 'left-0'
+            'right' => match ($this->align) {
+                'start' => 'right-start',
+                'end' => 'right-end',
+                default => 'right'
+            },
+            default => 'bottom-start'
         };
-
-        return trim($base . ' ' . $sizeClasses . ' ' . $positionClasses . ' ' . $alignClasses);
     }
 
     public function getDataAttributes(): array
@@ -93,13 +95,15 @@ class Dropdown extends Component
             'data-align' => $this->align,
             'data-offset' => $this->offset,
             'data-disabled' => $this->disabled ? 'true' : 'false',
-            'data-modal' => $this->modal ? 'true' : 'false'
+            'data-modal' => $this->modal ? 'true' : 'false',
+            'class' => $this->panelClasses() // Add panel classes to the popover
         ];
     }
 
     public function triggerClasses(): string
     {
-        return 'cursor-pointer';
+        // Minimal trigger classes - let the trigger content handle its own styling
+        return '';
     }
 
     public function isDisabled(): bool
@@ -114,6 +118,7 @@ class Dropdown extends Component
             'computedPanelClasses' => $this->panelClasses(),
             'computedTriggerClasses' => $this->triggerClasses(),
             'computedDataAttributes' => $this->getDataAttributes(),
+            'computedPlacement' => $this->getComputedPlacement(),
         ]);
     }
 }

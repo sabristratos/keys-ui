@@ -85,18 +85,44 @@ npm run build:all && npm run keys:build
 
 ## Component Development Patterns
 
-### Blade Component Structure
-Components follow Laravel patterns with PHP classes in `src/Components/` that precompute all template data to avoid Blade directive parsing issues in component attributes:
+### Modern Component Architecture
+Components follow a simplified Laravel pattern where PHP classes handle complex business logic only, while Tailwind utilities are placed directly in Blade templates:
+
+**PHP Classes - Handle Complex Logic Only:**
+- Constructor validation and property setup
+- Business logic methods (error checking, state management)
+- Complex data processing and action configuration
+- Data attributes generation for JavaScript integration
+
+**Blade Templates - Direct Tailwind Utilities:**
+- All styling uses inline Tailwind utilities with match statements
+- Conditional classes based on component state
+- No separate CSS files or utility getter methods
+- Direct styling approach for better maintainability
 
 ```php
-// Always precompute values to avoid @if() in templates
-public function getComputedActionData(): array {
-    return [
-        'icon_toggle' => $action['icon_toggle'] ?? null,
-        'data_url' => $action['url'] ?? null,
-        // Always set all possible values (null if not present)
-    ];
+// PHP class handles ONLY complex logic
+public function hasActions(): bool {
+    return !empty($this->configuredActions());
 }
+
+public function configuredActions(): array {
+    // Complex business logic for building action arrays
+    return array_merge($autoActions, $this->actions);
+}
+```
+
+```blade
+{{-- Blade template uses direct Tailwind utilities --}}
+@php
+    $baseClasses = 'block w-full rounded-md border transition-colors duration-200';
+    $sizeClasses = match ($size) {
+        'xs' => 'px-2.5 py-1 text-xs',
+        'sm' => 'px-3 py-1.5 text-sm',
+        'md' => 'px-3 py-2 text-sm',
+        default => 'px-3 py-2 text-sm'
+    };
+@endphp
 ```
 
 ### Multi-State Button Pattern
@@ -107,9 +133,9 @@ The Button component natively supports icon state changes:
 - **Auto Icon-Only**: Detects when slot content is empty (no `icon-only` prop needed)
 
 ### JavaScript Integration
-- **Event Delegation**: Uses `.input-action` class for dynamic element handling
-- **CSS Toggles**: Icon state changes via opacity classes, not DOM manipulation
-- **Data Attributes**: Button component sets `data-icon-default`, `data-icon-toggle`, etc.
+- **Direct Component Styling**: Actions use existing Button component styling instead of separate CSS
+- **Tailwind Pseudo-classes**: Use `focus-within:`, `hover:`, `data-[state]:` utilities instead of custom CSS
+- **Data Attributes**: For JavaScript functionality only, not styling selectors
 - **Progressive Enhancement**: All functionality degrades gracefully
 
 ## Testing Strategy
@@ -139,16 +165,24 @@ Components should have comprehensive browser tests covering:
 
 ## Important Development Notes
 
-### Blade Template Rules
-- **Never use Blade directives inside component attributes** (causes parsing issues)
-- **Precompute all conditional values** in PHP component classes
-- **Use `{{ }}` syntax only** in component templates, not `:attribute="value"`
+### Modern Component Guidelines
 
-### Multi-State Component Guidelines
-- Button handles icon rendering internally (no slot content for icons)
-- Input actions pass multi-state props directly to Button
-- JavaScript works with Button's data attributes, not wrapper elements
-- CSS opacity toggles provide smooth animations
+**PHP Class Structure:**
+- **No utility getter methods** - eliminate `baseClasses()`, `sizeClasses()`, etc.
+- **Only complex business logic** - error handling, validation, action configuration
+- **Avoid redundant wrapper methods** - call core methods directly
+- **Simplified data passing** - only pass what templates actually need
+
+**Blade Template Structure:**
+- **Direct Tailwind utilities** - use match statements and conditional logic inline
+- **Leverage existing components** - use Button component for actions instead of custom CSS
+- **Tailwind pseudo-classes** - `focus-within:`, `hover:`, `data-[state]:` over custom selectors
+- **Eliminate separate CSS files** - move all styling to inline utilities and existing components
+
+**Component Integration:**
+- **Never use Blade directives inside component attributes** (causes parsing issues)
+- **Use existing component styling** - Button component handles action styling
+- **Direct styling over data attributes** - apply classes directly instead of CSS selectors
 
 ### Asset Management
 - Keys UI assets auto-inject via `<keys:scripts />` component
@@ -765,25 +799,90 @@ Blade::component('keys::toggle', Toggle::class);
 
 ## Keys UI Component Development Guidelines
 
-### Component Styling
-- **Use inline styles in component templates**, NOT the main CSS theme file
-- **Keep component-specific styles contained** within component templates using `<style>` tags
-- **Avoid adding to main theme file** - this keeps styles modular and component-specific
+### Component Styling - Modern Approach
+- **Use direct Tailwind utilities** in Blade templates, NOT separate CSS files
+- **Leverage existing components** - use Button, Icon, etc. instead of creating custom styles
+- **Tailwind pseudo-classes** - `focus-within:`, `hover:`, `data-[attribute]:` for dynamic states
+- **Eliminate component CSS files** - move all styling to inline utilities
+- **Only use CSS for complex cases** - semantic tokens with `var(--color-*)` when Tailwind can't handle it
 
 ### Component Testing
 - **Add component tests to the welcome page**, NOT separate test pages
 - **Keep testing consolidated** in one place for easier maintenance and review
 
-### Example Inline Styling Pattern:
-```blade
-<div {{ $attributes }}>
-    <!-- Component content -->
+## Component Refactoring Patterns
 
-    {{-- Inline styles for component enhancements --}}
-    <style>
-        [data-component-name] selector {
-            /* Component-specific styles */
-        }
-    </style>
+### Modern Component Development Principles
+
+**1. Separation of Concerns:**
+```php
+// ❌ OLD: PHP class with utility methods
+public function baseClasses(): string {
+    return 'block w-full rounded-md border';
+}
+
+// ✅ NEW: PHP class with business logic only
+public function hasActions(): bool {
+    return !empty($this->configuredActions());
+}
+```
+
+```blade
+{{-- ✅ NEW: Direct Tailwind utilities in template --}}
+@php
+    $baseClasses = 'block w-full rounded-md border transition-colors duration-200';
+    $sizeClasses = match ($size) {
+        'xs' => 'px-2.5 py-1 text-xs',
+        'md' => 'px-3 py-2 text-sm',
+        default => 'px-3 py-2 text-sm'
+    };
+@endphp
+```
+
+**2. Eliminate Redundant Methods:**
+```php
+// ❌ OLD: Wrapper methods
+public function getAllActions(): array {
+    return $this->configuredActions();
+}
+
+// ✅ NEW: Call core methods directly
+// Remove getAllActions(), call configuredActions() directly
+```
+
+**3. Leverage Existing Components:**
+```blade
+{{-- ❌ OLD: Custom CSS for actions --}}
+<div class="input-action" data-action="clear">
+    {{-- Custom styling via CSS file --}}
+</div>
+
+{{-- ✅ NEW: Use existing Button component --}}
+<x-keys::button
+    variant="ghost"
+    size="xs"
+    class="text-neutral-400 hover:text-danger"
+>
+```
+
+**4. Use Tailwind Pseudo-classes:**
+```css
+/* ❌ OLD: Custom CSS selectors */
+.relative:focus-within [data-icon-left] {
+    color: var(--color-brand);
+}
+```
+
+```blade
+{{-- ✅ NEW: Tailwind pseudo-classes --}}
+<div class="relative focus-within:[&_[data-icon]]:text-brand">
+    <div data-icon>{{-- Icon content --}}</div>
 </div>
 ```
+
+### Benefits of Modern Approach
+- **Better maintainability** - styling visible in templates
+- **Reduced complexity** - fewer PHP methods to maintain
+- **Improved performance** - no method call overhead for utilities
+- **Consistent patterns** - all components follow same structure
+- **Easier debugging** - all styling logic in one place

@@ -1,12 +1,13 @@
 
-<div class="{{ $computedDropdownClasses }}" {{ $attributes->merge($computedDataAttributes) }}>
-    
-    <div class="{{ $computedTriggerClasses }}" data-dropdown-trigger>
+<x-keys::popover
+    :id="$id"
+    :placement="$computedPlacement"
+    {{ $attributes->merge($computedDataAttributes) }}
+>
+    <x-slot:trigger>
         {{ $trigger }}
-    </div>
+    </x-slot:trigger>
 
-    
-    <div class="{{ $computedPanelClasses }}" data-dropdown-panel>
-        {{ $slot }}
-    </div>
-</div>
+    {{-- Dropdown content goes directly in the Popover slot --}}
+    {{ $slot }}
+</x-keys::popover>

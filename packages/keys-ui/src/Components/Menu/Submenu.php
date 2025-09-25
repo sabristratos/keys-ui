@@ -17,8 +17,10 @@ class Submenu extends Component
         public string $position = 'right',
         public string $align = 'start',
         public int $offset = 4,
+        public ?string $id = null,
+        public string $size = 'md',
     ) {
-        //
+        $this->id = $this->id ?? 'submenu-' . uniqid();
     }
 
     /**
@@ -27,10 +29,10 @@ class Submenu extends Component
     public function getComputedTriggerClasses(): string
     {
         $baseClasses = [
-            'flex items-center justify-between w-full px-3 py-2 text-sm text-left',
+            'flex items-center justify-between w-full px-2 py-2 text-sm text-left',
             'transition-colors duration-150 rounded-md group relative',
-            'text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800',
-            'focus:outline-none focus:bg-neutral-100 dark:focus:bg-neutral-800',
+            'text-foreground hover:bg-neutral-hover',
+            'focus:outline-none focus:bg-neutral-hover',
             'cursor-pointer',
         ];
 
@@ -42,16 +44,65 @@ class Submenu extends Component
     }
 
     /**
-     * Get computed classes for the submenu panel
+     * Get computed classes for the submenu panel (now handled by popover)
      */
     public function getComputedPanelClasses(): string
     {
-        return implode(' ', [
-            'absolute hidden z-50 min-w-48 p-2',
-            'bg-surface border border-border',
-            'rounded-lg shadow-lg',
-            'focus:outline-none',
-        ]);
+        $base = 'focus:outline-none space-y-1 max-w-[85vw] w-max';
+
+        $sizeClasses = match ($this->size) {
+            'sm' => 'min-w-40 sm:min-w-40 p-1',
+            'md' => 'min-w-48 sm:min-w-48 p-1',
+            'lg' => 'min-w-56 sm:min-w-56 p-1',
+            default => 'min-w-48 sm:min-w-48 p-1'
+        };
+
+        return trim($base . ' ' . $sizeClasses);
+    }
+
+    /**
+     * Get computed placement for popover positioning
+     * Mobile-responsive: bottom on small screens, right on larger screens
+     */
+    public function getComputedPlacement(): string
+    {
+        // Map position + align to popover placement format
+        return match ($this->position) {
+            'right' => match ($this->align) {
+                'start' => 'right-start',
+                'end' => 'right-end',
+                default => 'right'
+            },
+            'left' => match ($this->align) {
+                'start' => 'left-start',
+                'end' => 'left-end',
+                default => 'left'
+            },
+            'top' => match ($this->align) {
+                'start' => 'top-start',
+                'end' => 'top-end',
+                default => 'top'
+            },
+            'bottom' => match ($this->align) {
+                'start' => 'bottom-start',
+                'end' => 'bottom-end',
+                default => 'bottom'
+            },
+            default => 'right-start'
+        };
+    }
+
+    /**
+     * Get mobile-responsive placement (for CSS media queries)
+     */
+    public function getMobilePlacement(): string
+    {
+        // On mobile, prefer bottom opening for accordion-style behavior
+        return match ($this->align) {
+            'end' => 'bottom-end',
+            'center' => 'bottom',
+            default => 'bottom-start'
+        };
     }
 
     /**
@@ -128,6 +179,31 @@ class Submenu extends Component
     }
 
     /**
+     * Get button classes for submenu trigger (consistent with MenuItem)
+     */
+    public function getComputedButtonClasses(): string
+    {
+        $baseClasses = [
+            'flex items-center w-full px-2 py-2 text-sm text-left',
+            'transition-colors duration-150 rounded-md group relative',
+            'text-foreground hover:bg-neutral-hover',
+            'focus:outline-none focus:bg-neutral-hover',
+            'cursor-pointer',
+        ];
+
+        if ($this->disabled) {
+            $baseClasses = [
+                'flex items-center w-full px-2 py-2 text-sm text-left',
+                'transition-colors duration-150 rounded-md group relative',
+                'text-neutral-400 cursor-not-allowed',
+                'bg-neutral-disabled dark:text-neutral-500',
+            ];
+        }
+
+        return implode(' ', $baseClasses);
+    }
+
+    /**
      * Render the component.
      */
     public function render()
@@ -135,11 +211,15 @@ class Submenu extends Component
         return view('keys::components.menu.submenu', [
             'computedTriggerClasses' => $this->getComputedTriggerClasses(),
             'computedPanelClasses' => $this->getComputedPanelClasses(),
+            'computedPlacement' => $this->getComputedPlacement(),
+            'computedMobilePlacement' => $this->getMobilePlacement(),
             'computedDataAttributes' => $this->getComputedDataAttributes(),
             'computedTriggerDataAttributes' => $this->getComputedTriggerDataAttributes(),
             'computedPanelDataAttributes' => $this->getComputedPanelDataAttributes(),
             'computedIconSize' => $this->getIconSize(),
             'computedIconClasses' => $this->getIconClasses(),
+            'computedButtonClasses' => $this->getComputedButtonClasses(),
+            'id' => $this->id,
         ]);
     }
 }

@@ -2,12 +2,13 @@
  * ModalActions - Optional enhancements for Modal components
  *
  * Provides functionality for:
- * - Enhanced animations beyond CSS
  * - Custom event dispatching
  * - Programmatic modal control
  * - Focus restoration enhancements
+ * - Livewire integration
  *
  * Note: Core modal functionality works without JavaScript using native dialog features
+ * Animations are now handled by pure CSS transitions
  */
 
 import { BaseActionClass } from './utils/BaseActionClass';
@@ -16,7 +17,6 @@ import { DOMUtils } from './utils/DOMUtils';
 
 interface ModalState {
     lastFocusedElement: HTMLElement | null;
-    isAnimating: boolean;
 }
 
 interface ModalEventDetail {
@@ -46,8 +46,7 @@ export class ModalActions extends BaseActionClass<ModalState> {
         }
 
         const state: ModalState = {
-            lastFocusedElement: null,
-            isAnimating: false
+            lastFocusedElement: null
         };
 
         this.setState(modal, state);
@@ -315,7 +314,6 @@ export class ModalActions extends BaseActionClass<ModalState> {
         }
 
         state.lastFocusedElement = null;
-        state.isAnimating = false;
         this.setState(modal, state);
 
         this.dispatchModalEvent(modal, 'modal:close');

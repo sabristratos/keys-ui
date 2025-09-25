@@ -1,76 +1,25 @@
 /* ============================================
-   Select Component Styles
+   Select Component Styles - Essential only
    ============================================ */
 
-/* Select dropdown container */
-[data-select="true"] [data-select-dropdown] {
-    z-index: 50;
-    background-color: light-dark(var(--color-white), var(--color-neutral-900));
-    border-color: light-dark(var(--color-neutral-200), var(--color-neutral-700));
-}
-
-/* Select option base styles */
-[data-select="true"] [data-select-option] {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-}
-
-/* Hover states for options - Enhanced visibility and specificity */
+/* Hover states for options - Cannot be handled by Tailwind due to complex selectors */
 [data-select="true"] [data-select-option]:hover:not([aria-disabled="true"]):not([aria-selected="true"]) {
     background-color: light-dark(var(--color-neutral-100), var(--color-neutral-800)) !important;
     color: light-dark(var(--color-neutral-900), var(--color-neutral-100)) !important;
 }
 
-/* Selected option styles */
-[data-select="true"] [data-select-option][aria-selected="true"] {
-    background-color: light-dark(var(--color-brand-50), rgba(var(--color-brand-900), 0.2));
-    color: light-dark(var(--color-brand-700), var(--color-brand-300));
+/* Focus states for options - Cannot be handled by Tailwind due to complex selectors */
+[data-select="true"] [data-select-option]:focus:not([aria-disabled="true"]):not([aria-selected="true"]) {
+    background-color: light-dark(var(--color-neutral-100), var(--color-neutral-800)) !important;
+    color: light-dark(var(--color-neutral-900), var(--color-neutral-100)) !important;
+    outline: none !important;
 }
 
-/* Disabled option styles */
-[data-select="true"] [data-select-option][aria-disabled="true"] {
-    background-color: light-dark(var(--color-neutral-50), var(--color-neutral-800));
-    color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
-    cursor: not-allowed;
-}
-
-/* Chip animation for multiselect */
+/* Chip animation for multiselect - Custom keyframe animation */
 [data-select="true"] [data-chip-value] {
     animation: chipIn 200ms ease-out;
 }
 
-/* Arrow transition */
-[data-select="true"] .select-arrow {
-    transition-property: transform;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 200ms;
-}
-
-/* Dropdown animation */
-[data-select="true"] [data-select-dropdown]:not(.hidden) {
-    animation: dropdownSlideIn 200ms ease-out;
-}
-
-/* Focus styles for trigger */
-[data-select="true"] [data-select-trigger]:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--color-brand), 0 0 0 4px rgba(var(--color-brand), 0.1);
-}
-
-/* Chip remove button hover */
-[data-select="true"] [data-remove-chip]:hover svg {
-    transform: scale(1.1);
-}
-
-/* No results message */
-[data-select="true"] [data-select-no-results] {
-    font-style: italic;
-    color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
-}
-
-/* Keyframe animations */
 @keyframes chipIn {
     from {
         opacity: 0;
@@ -80,6 +29,11 @@
         opacity: 1;
         transform: scale(1);
     }
+}
+
+/* Dropdown slide animation - Custom keyframe animation */
+[data-select="true"] [data-select-dropdown]:not(.hidden) {
+    animation: dropdownSlideIn 200ms ease-out;
 }
 
 @keyframes dropdownSlideIn {
@@ -93,33 +47,7 @@
     }
 }
 
-/* Mobile responsive styles */
-@media (max-width: 640px) {
-    [data-select="true"] [data-select-dropdown] {
-        max-height: 50vh;
-    }
-
-    [data-select="true"] [data-select-option] {
-        padding-left: 1rem;
-        padding-right: 1rem;
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-    }
-}
-
-/* Additional hover effect for focus state */
-[data-select="true"] [data-select-option]:focus:not([aria-disabled="true"]):not([aria-selected="true"]) {
-    background-color: light-dark(var(--color-neutral-100), var(--color-neutral-800)) !important;
-    color: light-dark(var(--color-neutral-900), var(--color-neutral-100)) !important;
-    outline: none !important;
-}
-
-/* Ensure proper z-index stacking */
-[data-select="true"] {
-    position: relative;
-}
-
-[data-select="true"] [data-select-dropdown] {
-    position: absolute;
-    z-index: 50;
+/* Chip remove button hover - Nested element styling */
+[data-select="true"] [data-remove-chip]:hover svg {
+    transform: scale(1.1);
 }

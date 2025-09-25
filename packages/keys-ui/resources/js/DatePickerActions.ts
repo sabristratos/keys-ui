@@ -13,7 +13,6 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
-import { AnimationUtils } from './utils/AnimationUtils';
 import { DateUtils } from './utils/DateUtils';
 import { FloatingManager, FloatingInstance } from './utils/FloatingManager';
 
@@ -163,7 +162,7 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
                         // Let tab key move focus into calendar
                         const calendar = DOMUtils.querySelector('[data-calendar="true"]', datePicker);
                         if (calendar) {
-                            AnimationUtils.createTimer(() => {
+                            setTimeout(() => {
                                 const firstButton = calendar.querySelector('button:not(:disabled)') as HTMLElement;
                                 if (firstButton) {
                                     firstButton.focus();
@@ -282,7 +281,7 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
         dropdown.classList.add('open');
 
         // Focus on calendar after opening
-        AnimationUtils.createTimer(() => {
+        setTimeout(() => {
             dropdown.classList.remove('animating-in');
 
             // Focus first focusable element in calendar
@@ -424,7 +423,7 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
 
         // Close dropdown if configured (only for single date mode, range mode handles closing in handleRangeSelected)
         if (state.closeOnSelect && !state.isInline && !state.isRange) {
-            AnimationUtils.createTimer(() => {
+            setTimeout(() => {
                 this.closeDropdown(datePicker);
             }, 150);
         }
@@ -465,7 +464,7 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
 
         // Close dropdown if configured and range is complete
         if (state.closeOnSelect && startDate && endDate && !state.isInline) {
-            AnimationUtils.createTimer(() => {
+            setTimeout(() => {
                 this.closeDropdown(datePicker);
             }, 150);
         }

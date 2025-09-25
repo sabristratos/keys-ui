@@ -13,759 +13,450 @@
         <keys:scripts />
     </head>
     <body class="bg-body text-foreground font-sans">
-        <script>
-            // Prevent FOUC and handle initial theme detection
-            (function() {
-                const theme = localStorage.getItem('theme');
-                const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-                if (theme === 'dark' || (!theme && systemDark)) {
-                    document.documentElement.classList.add('dark');
-                    document.documentElement.style.colorScheme = 'dark';
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    document.documentElement.style.colorScheme = 'light';
-                }
-            })();
-        </script>
-        <div class="min-h-screen p-8">
-            <div class="max-w-4xl mx-auto">
-                <header class="text-center mb-8">
-                    <h1 class="text-3xl font-bold mb-3">Keys UI Components Testing</h1>
-                    <p class="text-foreground/60 mb-4">
-                        Testing Image and Calendar components after refactoring
+        <div class="container mx-auto px-8 py-12">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center">
+                    <h1 class="text-4xl font-bold text-foreground mb-4">Keys UI Component Library</h1>
+                    <p class="text-xl text-muted-foreground mb-8">
+                        Modern Blade components for Laravel applications
                     </p>
-                    <div class="flex justify-center gap-2 p-1 bg-surface rounded-lg border border-border">
-                        <button
-                            onclick="setTheme('light')"
-                            class="theme-btn px-3 py-1.5 text-sm font-medium rounded transition-colors"
-                            data-theme="light"
-                        >
-                            Light
-                        </button>
-                        <button
-                            onclick="setTheme('dark')"
-                            class="theme-btn px-3 py-1.5 text-sm font-medium rounded transition-colors"
-                            data-theme="dark"
-                        >
-                            Dark
-                        </button>
-                        <button
-                            onclick="setTheme('system')"
-                            class="theme-btn px-3 py-1.5 text-sm font-medium rounded transition-colors"
-                            data-theme="system"
-                        >
-                            System
-                        </button>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-8 max-w-2xl mx-auto mb-12">
+                        <x-keys::icon name="heroicon-o-check-circle" size="lg" class="text-green-600 mx-auto mb-4" />
+                        <h2 class="text-xl font-semibold text-green-900 mb-3">Modern Popover Component</h2>
+                        <p class="text-green-800 mb-4">
+                            Keys UI now features a modern Popover component built with the native HTML Popover API and CSS Anchor Positioning for maximum performance and accessibility.
+                        </p>
+                        <p class="text-sm text-green-700">
+                            The component works without JavaScript for basic functionality, with progressive enhancement using Floating UI for advanced positioning in older browsers.
+                        </p>
                     </div>
 
-                    <script>
-                        function setTheme(theme) {
-                            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    <!-- Popover Component Examples -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                        <!-- Basic Popover -->
+                        <div class="rounded-lg border border-border p-6">
+                            <h3 class="text-lg font-semibold mb-4">Basic Popover</h3>
+                            <p class="text-muted-foreground mb-4">Click the button to show a popover with basic content.</p>
 
-                            if (theme === 'system') {
-                                localStorage.removeItem('theme');
-                                document.documentElement.classList.toggle('dark', systemDark);
-                                document.documentElement.style.colorScheme = systemDark ? 'dark' : 'light';
-                            } else {
-                                localStorage.setItem('theme', theme);
-                                document.documentElement.classList.toggle('dark', theme === 'dark');
-                                document.documentElement.style.colorScheme = theme;
-                            }
-
-                            updateThemeButtons();
-                        }
-
-                        function updateThemeButtons() {
-                            const currentTheme = localStorage.getItem('theme') || 'system';
-
-                            document.querySelectorAll('.theme-btn').forEach(btn => {
-                                if (btn.dataset.theme === currentTheme) {
-                                    btn.classList.add('bg-brand', 'text-foreground-brand');
-                                    btn.classList.remove('hover:bg-surface');
-                                } else {
-                                    btn.classList.remove('bg-brand', 'text-foreground-brand');
-                                    btn.classList.add('hover:bg-surface');
-                                }
-                            });
-                        }
-
-                        // Initialize theme buttons
-                        updateThemeButtons();
-
-                        // Listen for system theme changes
-                        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                            if (!localStorage.getItem('theme')) {
-                                document.documentElement.classList.toggle('dark', e.matches);
-                                document.documentElement.style.colorScheme = e.matches ? 'dark' : 'light';
-                            }
-                        });
-                    </script>
-                </header>
-
-                <div class="space-y-12">
-
-                    <!-- Select Component -->
-                    <section class="space-y-6">
-                        <div>
-                            <h2 class="text-2xl font-bold mb-4">Select Component</h2>
-                            <p class="text-foreground/70 mb-6">Advanced dropdown with search, multi-select, and rich option content</p>
-                        </div>
-
-                        <!-- Basic Select -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Basic Select</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <x-keys::select
-                                    name="basic_select"
-                                    placeholder="Choose an option"
-                                >
-                                    <x-keys::select.option value="option1" label="Option 1" />
-                                    <x-keys::select.option value="option2" label="Option 2" />
-                                    <x-keys::select.option value="option3" label="Option 3" />
-                                </x-keys::select>
-
-                                <x-keys::select
-                                    name="with_label"
-                                    label="Category"
-                                    placeholder="Select category"
-                                >
-                                    <x-keys::select.option value="tech" label="Technology" />
-                                    <x-keys::select.option value="business" label="Business" />
-                                    <x-keys::select.option value="design" label="Design" />
-                                    <x-keys::select.option value="marketing" label="Marketing" />
-                                </x-keys::select>
-                            </div>
-                        </div>
-
-                        <!-- With Icons and Descriptions -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">With Icons and Descriptions</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <x-keys::select
-                                    name="status_select"
-                                    label="Status"
-                                    placeholder="Choose status"
-                                >
-                                    <x-keys::select.option
-                                        value="active"
-                                        label="Active"
-                                        icon="heroicon-o-check-circle"
-                                        description="Item is currently active"
-                                    />
-                                    <x-keys::select.option
-                                        value="pending"
-                                        label="Pending"
-                                        icon="heroicon-o-clock"
-                                        description="Waiting for approval"
-                                    />
-                                    <x-keys::select.option
-                                        value="archived"
-                                        label="Archived"
-                                        icon="heroicon-o-archive-box"
-                                        description="Moved to archive"
-                                    />
-                                    <x-keys::select.option
-                                        value="deleted"
-                                        label="Deleted"
-                                        icon="heroicon-o-trash"
-                                        description="Marked for deletion"
-                                        :disabled="true"
-                                    />
-                                </x-keys::select>
-
-                                <x-keys::select
-                                    name="priority"
-                                    label="Priority"
-                                    placeholder="Select priority"
-                                    value="medium"
-                                >
-                                    <x-keys::select.option
-                                        value="critical"
-                                        label="Critical"
-                                        icon="heroicon-o-exclamation-circle"
-                                    />
-                                    <x-keys::select.option
-                                        value="high"
-                                        label="High"
-                                        icon="heroicon-o-arrow-up"
-                                    />
-                                    <x-keys::select.option
-                                        value="medium"
-                                        label="Medium"
-                                        icon="heroicon-o-minus"
-                                    />
-                                    <x-keys::select.option
-                                        value="low"
-                                        label="Low"
-                                        icon="heroicon-o-arrow-down"
-                                    />
-                                </x-keys::select>
-                            </div>
-                        </div>
-
-                        <!-- Searchable Select -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Searchable Select</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <x-keys::select
-                                    name="country"
-                                    label="Country"
-                                    placeholder="Search countries..."
-                                    :searchable="true"
-                                    :clearable="true"
-                                >
-                                    <x-keys::select.option value="us" label="United States" icon="heroicon-o-flag" />
-                                    <x-keys::select.option value="uk" label="United Kingdom" icon="heroicon-o-flag" />
-                                    <x-keys::select.option value="ca" label="Canada" icon="heroicon-o-flag" />
-                                    <x-keys::select.option value="au" label="Australia" icon="heroicon-o-flag" />
-                                    <x-keys::select.option value="de" label="Germany" icon="heroicon-o-flag" />
-                                    <x-keys::select.option value="fr" label="France" icon="heroicon-o-flag" />
-                                    <x-keys::select.option value="jp" label="Japan" icon="heroicon-o-flag" />
-                                    <x-keys::select.option value="cn" label="China" icon="heroicon-o-flag" />
-                                </x-keys::select>
-
-                                <x-keys::select
-                                    name="timezone"
-                                    label="Time Zone"
-                                    placeholder="Search time zones..."
-                                    :searchable="true"
-                                >
-                                    <x-keys::select.option value="utc" label="UTC" description="Coordinated Universal Time" />
-                                    <x-keys::select.option value="est" label="EST" description="Eastern Standard Time (UTC-5)" />
-                                    <x-keys::select.option value="cst" label="CST" description="Central Standard Time (UTC-6)" />
-                                    <x-keys::select.option value="mst" label="MST" description="Mountain Standard Time (UTC-7)" />
-                                    <x-keys::select.option value="pst" label="PST" description="Pacific Standard Time (UTC-8)" />
-                                    <x-keys::select.option value="gmt" label="GMT" description="Greenwich Mean Time (UTC+0)" />
-                                    <x-keys::select.option value="cet" label="CET" description="Central European Time (UTC+1)" />
-                                    <x-keys::select.option value="jst" label="JST" description="Japan Standard Time (UTC+9)" />
-                                </x-keys::select>
-                            </div>
-                        </div>
-
-                        <!-- Multi-Select -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Multi-Select</h3>
-                            <div class="space-y-4">
-                                <x-keys::select
-                                    name="skills[]"
-                                    label="Skills"
-                                    placeholder="Select your skills..."
-                                    :multiple="true"
-                                    :searchable="true"
-                                    :clearable="true"
-                                >
-                                    <x-keys::select.option value="php" label="PHP" icon="heroicon-o-code-bracket" />
-                                    <x-keys::select.option value="javascript" label="JavaScript" icon="heroicon-o-code-bracket" />
-                                    <x-keys::select.option value="python" label="Python" icon="heroicon-o-code-bracket" />
-                                    <x-keys::select.option value="react" label="React" icon="heroicon-o-bolt" />
-                                    <x-keys::select.option value="vue" label="Vue.js" icon="heroicon-o-bolt" />
-                                    <x-keys::select.option value="laravel" label="Laravel" icon="heroicon-o-server-stack" />
-                                    <x-keys::select.option value="tailwind" label="Tailwind CSS" icon="heroicon-o-paint-brush" />
-                                    <x-keys::select.option value="docker" label="Docker" icon="heroicon-o-cube" />
-                                </x-keys::select>
-
-                                <x-keys::select
-                                    name="tags[]"
-                                    label="Tags"
-                                    placeholder="Add tags..."
-                                    :multiple="true"
-                                    :value="['important', 'urgent']"
-                                >
-                                    <x-keys::select.option value="important" label="Important" />
-                                    <x-keys::select.option value="urgent" label="Urgent" />
-                                    <x-keys::select.option value="review" label="Review" />
-                                    <x-keys::select.option value="in-progress" label="In Progress" />
-                                    <x-keys::select.option value="completed" label="Completed" />
-                                    <x-keys::select.option value="on-hold" label="On Hold" />
-                                </x-keys::select>
-                            </div>
-                        </div>
-
-                        <!-- Portal Select Testing -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Floating Select (Overflow Test)</h3>
-                            <div class="p-4 border border-border rounded-lg">
-                                <div style="height: 200px; overflow: hidden; border: 2px solid #ccc; padding: 16px;">
-                                    <p class="text-sm text-muted mb-4">This container has overflow:hidden to test floating behavior</p>
-
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <!-- Regular Select (will be clipped) -->
-                                        <x-keys::select
-                                            name="regular_select"
-                                            label="Regular Select (Clipped)"
-                                            placeholder="Will be clipped..."
-                                            :searchable="true"
-                                        >
-                                            <x-keys::select.option value="1" label="Option 1" />
-                                            <x-keys::select.option value="2" label="Option 2" />
-                                            <x-keys::select.option value="3" label="Option 3" />
-                                            <x-keys::select.option value="4" label="Option 4" />
-                                            <x-keys::select.option value="5" label="Option 5" />
-                                            <x-keys::select.option value="6" label="Option 6" />
-                                            <x-keys::select.option value="7" label="Option 7" />
-                                            <x-keys::select.option value="8" label="Option 8" />
-                                        </x-keys::select>
-
-                                        <!-- Floating Select (will escape) -->
-                                        <x-keys::select
-                                            name="floating_select"
-                                            label="Floating Select (Escapes)"
-                                            placeholder="Will escape overflow..."
-                                            :searchable="true"
-                                            :floating="true"
-                                        >
-                                            <x-keys::select.option value="1" label="Floating Option 1" />
-                                            <x-keys::select.option value="2" label="Floating Option 2" />
-                                            <x-keys::select.option value="3" label="Floating Option 3" />
-                                            <x-keys::select.option value="4" label="Floating Option 4" />
-                                            <x-keys::select.option value="5" label="Floating Option 5" />
-                                            <x-keys::select.option value="6" label="Floating Option 6" />
-                                            <x-keys::select.option value="7" label="Floating Option 7" />
-                                            <x-keys::select.option value="8" label="Floating Option 8" />
-                                        </x-keys::select>
-                                    </div>
+                            <x-keys::popover id="basic-popover" placement="top">
+                                <x-slot:trigger>
+                                    <x-keys::button variant="brand">Show Popover</x-keys::button>
+                                </x-slot:trigger>
+                                <div class="text-center">
+                                    <p class="font-semibold mb-2">Welcome!</p>
+                                    <p class="text-sm text-muted-foreground">This is a basic popover using the native HTML Popover API.</p>
                                 </div>
-                            </div>
+                            </x-keys::popover>
                         </div>
 
-                        <!-- Custom Content Options -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Custom Content Options</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <x-keys::select
-                                    name="plan"
-                                    label="Subscription Plan"
-                                    placeholder="Choose a plan"
-                                >
-                                    <x-keys::select.option value="free">
-                                        <div class="flex items-center justify-between w-full">
-                                            <div>
-                                                <div class="font-semibold">Free Plan</div>
-                                                <div class="text-xs text-muted">Basic features</div>
-                                            </div>
-                                            <div class="text-sm font-bold text-success">$0/mo</div>
-                                        </div>
-                                    </x-keys::select.option>
-                                    <x-keys::select.option value="pro">
-                                        <div class="flex items-center justify-between w-full">
-                                            <div>
-                                                <div class="font-semibold">Pro Plan</div>
-                                                <div class="text-xs text-muted">Advanced features</div>
-                                            </div>
-                                            <div class="text-sm font-bold text-brand">$29/mo</div>
-                                        </div>
-                                    </x-keys::select.option>
-                                    <x-keys::select.option value="enterprise">
-                                        <div class="flex items-center justify-between w-full">
-                                            <div>
-                                                <div class="font-semibold">Enterprise</div>
-                                                <div class="text-xs text-muted">All features + support</div>
-                                            </div>
-                                            <div class="text-sm font-bold text-purple">$99/mo</div>
-                                        </div>
-                                    </x-keys::select.option>
-                                </x-keys::select>
+                        <!-- Tooltip Style -->
+                        <div class="rounded-lg border border-border p-6">
+                            <h3 class="text-lg font-semibold mb-4">Tooltip Style</h3>
+                            <p class="text-muted-foreground mb-4">Hover over the button to show a tooltip-style popover.</p>
 
-                                <x-keys::select
-                                    name="user"
-                                    label="Assign to User"
-                                    placeholder="Select user"
-                                >
-                                    <x-keys::select.option value="john">
-                                        <div class="flex items-center gap-3 w-full">
-                                            <div class="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-sm font-semibold text-brand">
-                                                JD
-                                            </div>
-                                            <div class="flex-1">
-                                                <div class="font-medium">John Doe</div>
-                                                <div class="text-xs text-muted">john@example.com</div>
-                                            </div>
-                                        </div>
-                                    </x-keys::select.option>
-                                    <x-keys::select.option value="jane">
-                                        <div class="flex items-center gap-3 w-full">
-                                            <div class="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center text-sm font-semibold text-success">
-                                                JS
-                                            </div>
-                                            <div class="flex-1">
-                                                <div class="font-medium">Jane Smith</div>
-                                                <div class="text-xs text-muted">jane@example.com</div>
-                                            </div>
-                                        </div>
-                                    </x-keys::select.option>
-                                    <x-keys::select.option value="bob">
-                                        <div class="flex items-center gap-3 w-full">
-                                            <div class="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center text-sm font-semibold text-warning">
-                                                BW
-                                            </div>
-                                            <div class="flex-1">
-                                                <div class="font-medium">Bob Wilson</div>
-                                                <div class="text-xs text-muted">bob@example.com</div>
-                                            </div>
-                                        </div>
-                                    </x-keys::select.option>
-                                </x-keys::select>
+                            <x-keys::popover id="tooltip-popover" placement="bottom" variant="tooltip" trigger="hover" delay="300">
+                                <x-slot:trigger>
+                                    <x-keys::button variant="outline" icon="heroicon-o-information-circle">Hover Me</x-keys::button>
+                                </x-slot:trigger>
+                                <span class="text-white text-sm">This is helpful information!</span>
+                            </x-keys::popover>
+                        </div>
+
+                        <!-- Menu Style -->
+                        <div class="rounded-lg border border-border p-6">
+                            <h3 class="text-lg font-semibold mb-4">Menu Style</h3>
+                            <p class="text-muted-foreground mb-4">Click to show a menu-style popover with actions.</p>
+
+                            <x-keys::popover id="menu-popover" placement="bottom-start" variant="menu">
+                                <x-slot:trigger>
+                                    <x-keys::button variant="outline" icon="heroicon-o-ellipsis-horizontal">Actions</x-keys::button>
+                                </x-slot:trigger>
+                                <div class="py-1">
+                                    <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 rounded">
+                                        <x-keys::icon name="heroicon-o-pencil" size="sm" />
+                                        Edit
+                                    </a>
+                                    <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 rounded">
+                                        <x-keys::icon name="heroicon-o-share" size="sm" />
+                                        Share
+                                    </a>
+                                    <hr class="my-1">
+                                    <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded">
+                                        <x-keys::icon name="heroicon-o-trash" size="sm" />
+                                        Delete
+                                    </a>
+                                </div>
+                            </x-keys::popover>
+                        </div>
+
+                        <!-- Different Placements -->
+                        <div class="rounded-lg border border-border p-6">
+                            <h3 class="text-lg font-semibold mb-4">Placement Options</h3>
+                            <p class="text-muted-foreground mb-4">Popovers can be positioned in different directions.</p>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <x-keys::popover id="top-popover" placement="top" size="sm">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="outline" size="sm">Top</x-keys::button>
+                                    </x-slot:trigger>
+                                    <p class="text-sm">Positioned at the top</p>
+                                </x-keys::popover>
+
+                                <x-keys::popover id="right-popover" placement="right" size="sm">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="outline" size="sm">Right</x-keys::button>
+                                    </x-slot:trigger>
+                                    <p class="text-sm">Positioned to the right</p>
+                                </x-keys::popover>
+
+                                <x-keys::popover id="bottom-popover" placement="bottom" size="sm">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="outline" size="sm">Bottom</x-keys::button>
+                                    </x-slot:trigger>
+                                    <p class="text-sm">Positioned at the bottom</p>
+                                </x-keys::popover>
+
+                                <x-keys::popover id="left-popover" placement="left" size="sm">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="outline" size="sm">Left</x-keys::button>
+                                    </x-slot:trigger>
+                                    <p class="text-sm">Positioned to the left</p>
+                                </x-keys::popover>
                             </div>
                         </div>
 
                         <!-- Size Variants -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Size Variants</h3>
-                            <div class="space-y-4">
-                                <x-keys::select
-                                    name="size_sm"
-                                    size="sm"
-                                    placeholder="Small select"
-                                >
-                                    <x-keys::select.option value="1" label="Option 1" />
-                                    <x-keys::select.option value="2" label="Option 2" />
-                                </x-keys::select>
+                        <div class="rounded-lg border border-border p-6">
+                            <h3 class="text-lg font-semibold mb-4">Size Variants</h3>
+                            <p class="text-muted-foreground mb-4">Popovers come in different sizes.</p>
 
-                                <x-keys::select
-                                    name="size_md"
-                                    size="md"
-                                    placeholder="Medium select (default)"
-                                >
-                                    <x-keys::select.option value="1" label="Option 1" />
-                                    <x-keys::select.option value="2" label="Option 2" />
-                                </x-keys::select>
+                            <div class="flex flex-wrap gap-2">
+                                <x-keys::popover id="small-popover" placement="top" size="sm">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="outline" size="sm">Small</x-keys::button>
+                                    </x-slot:trigger>
+                                    <p class="text-xs">Small popover content</p>
+                                </x-keys::popover>
 
-                                <x-keys::select
-                                    name="size_lg"
-                                    size="lg"
-                                    placeholder="Large select"
-                                >
-                                    <x-keys::select.option value="1" label="Option 1" />
-                                    <x-keys::select.option value="2" label="Option 2" />
-                                </x-keys::select>
+                                <x-keys::popover id="medium-popover" placement="top" size="md">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="outline">Medium</x-keys::button>
+                                    </x-slot:trigger>
+                                    <p class="text-sm">Medium popover content with more text</p>
+                                </x-keys::popover>
+
+                                <x-keys::popover id="large-popover" placement="top" size="lg">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="outline">Large</x-keys::button>
+                                    </x-slot:trigger>
+                                    <div>
+                                        <p class="text-base font-semibold mb-2">Large Popover</p>
+                                        <p class="text-sm text-muted-foreground">This is a larger popover with more content and better spacing for complex information.</p>
+                                    </div>
+                                </x-keys::popover>
                             </div>
                         </div>
 
-                        <!-- States -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">States</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <x-keys::select
-                                    name="disabled_select"
-                                    label="Disabled Select"
-                                    placeholder="This is disabled"
-                                    :disabled="true"
-                                >
-                                    <x-keys::select.option value="1" label="Option 1" />
-                                </x-keys::select>
+                        <!-- Focus Trigger -->
+                        <div class="rounded-lg border border-border p-6">
+                            <h3 class="text-lg font-semibold mb-4">Focus Trigger</h3>
+                            <p class="text-muted-foreground mb-4">Tab to or click on the input to show help text.</p>
 
-                                <x-keys::select
-                                    name="required_select"
-                                    label="Required Select"
-                                    placeholder="This is required"
-                                    :required="true"
-                                >
-                                    <x-keys::select.option value="1" label="Option 1" />
-                                    <x-keys::select.option value="2" label="Option 2" />
-                                </x-keys::select>
+                            <x-keys::popover id="focus-popover" placement="right" trigger="focus" variant="tooltip">
+                                <x-slot:trigger>
+                                    <x-keys::input placeholder="Enter your username" />
+                                </x-slot:trigger>
+                                <span class="text-white text-sm">Username must be 3-20 characters long</span>
+                            </x-keys::popover>
+                        </div>
+                    </div>
 
-                                <x-keys::select
-                                    name="optional_select"
-                                    label="Optional Select"
-                                    placeholder="This is optional"
-                                    :optional="true"
-                                >
-                                    <x-keys::select.option value="1" label="Option 1" />
-                                    <x-keys::select.option value="2" label="Option 2" />
-                                </x-keys::select>
+                    <!-- Dropdown Component Demos -->
+                    <div class="mt-16">
+                        <h2 class="text-2xl font-bold text-center mb-8">Dropdown Components</h2>
+                        <p class="text-center text-muted-foreground mb-8">Modern dropdown components using CSS anchor positioning with comprehensive menu items</p>
 
-                                <x-keys::select
-                                    name="error_select"
-                                    label="Select with Error"
-                                    placeholder="Select an option"
-                                    :errors="['Please select a valid option']"
-                                >
-                                    <x-keys::select.option value="1" label="Option 1" />
-                                    <x-keys::select.option value="2" label="Option 2" />
-                                </x-keys::select>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <!-- Basic Dropdown -->
+                            <div class="rounded-lg border border-border p-6">
+                                <h3 class="text-lg font-semibold mb-4">Basic Dropdown</h3>
+                                <p class="text-muted-foreground mb-4">Simple dropdown with menu items and different variants.</p>
+
+                                <x-keys::dropdown id="basic-dropdown" position="bottom" align="start">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="outline" icon="heroicon-o-chevron-down">
+                                            Options
+                                        </x-keys::button>
+                                    </x-slot:trigger>
+
+                                    <x-keys::menu.item icon="heroicon-o-eye" href="#">
+                                        View Details
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item icon="heroicon-o-pencil" href="#" variant="brand">
+                                        Edit Item
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item icon="heroicon-o-share" href="#">
+                                        Share
+                                    </x-keys::menu.item>
+                                    <hr class="my-1">
+                                    <x-keys::menu.item icon="heroicon-o-trash" href="#" variant="danger">
+                                        Delete
+                                    </x-keys::menu.item>
+                                </x-keys::dropdown>
+                            </div>
+
+                            <!-- Dropdown with Keyboard Shortcuts -->
+                            <div class="rounded-lg border border-border p-6">
+                                <h3 class="text-lg font-semibold mb-4">With Shortcuts</h3>
+                                <p class="text-muted-foreground mb-4">Dropdown showing keyboard shortcuts and different states.</p>
+
+                                <x-keys::dropdown id="shortcuts-dropdown" position="bottom" align="center">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="brand" icon="heroicon-o-cog-6-tooth">
+                                            Actions
+                                        </x-keys::button>
+                                    </x-slot:trigger>
+
+                                    <x-keys::menu.item icon="heroicon-o-document-duplicate" kbd="⌘C">
+                                        Copy
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item icon="heroicon-o-scissors" kbd="⌘X">
+                                        Cut
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item icon="heroicon-o-clipboard" kbd="⌘V">
+                                        Paste
+                                    </x-keys::menu.item>
+                                    <hr class="my-1">
+                                    <x-keys::menu.item icon="heroicon-o-arrow-uturn-left" kbd="⌘Z">
+                                        Undo
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item icon="heroicon-o-arrow-uturn-right" kbd="⌘⇧Z">
+                                        Redo
+                                    </x-keys::menu.item>
+                                    <hr class="my-1">
+                                    <x-keys::menu.item icon="heroicon-o-cog-6-tooth" kbd="⌘,">
+                                        Settings
+                                    </x-keys::menu.item>
+                                </x-keys::dropdown>
+                            </div>
+
+                            <!-- Dropdown with Multi-State Items -->
+                            <div class="rounded-lg border border-border p-6">
+                                <h3 class="text-lg font-semibold mb-4">Multi-State Items</h3>
+                                <p class="text-muted-foreground mb-4">Interactive items with toggle states and success feedback.</p>
+
+                                <x-keys::dropdown id="multistate-dropdown" position="bottom" align="end">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="outline" icon="heroicon-o-ellipsis-vertical">
+                                            More
+                                        </x-keys::button>
+                                    </x-slot:trigger>
+
+                                    <x-keys::menu.item
+                                        icon="heroicon-o-eye"
+                                        icon-toggle="heroicon-o-eye-slash"
+                                        label-toggle="Hide Item"
+                                        :keep-open="true"
+                                    >
+                                        Show Item
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item
+                                        icon="heroicon-o-heart"
+                                        icon-toggle="heroicon-s-heart"
+                                        icon-success="heroicon-s-check-circle"
+                                        label-success="Liked!"
+                                        variant="danger"
+                                        :keep-open="true"
+                                    >
+                                        Like
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item
+                                        icon="heroicon-o-bookmark"
+                                        icon-toggle="heroicon-s-bookmark"
+                                        label-toggle="Bookmarked"
+                                        variant="success"
+                                        :keep-open="true"
+                                    >
+                                        Bookmark
+                                    </x-keys::menu.item>
+                                    <hr class="my-1">
+                                    <x-keys::menu.item icon="heroicon-o-information-circle" disabled>
+                                        Disabled Item
+                                    </x-keys::menu.item>
+                                </x-keys::dropdown>
+                            </div>
+
+                            <!-- Dropdown with Submenu -->
+                            <div class="rounded-lg border border-border p-6">
+                                <h3 class="text-lg font-semibold mb-4">With Submenus</h3>
+                                <p class="text-muted-foreground mb-4">Nested dropdown menus with submenus for complex navigation.</p>
+
+                                <x-keys::dropdown id="submenu-dropdown" position="bottom" align="start">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="ghost" icon="heroicon-o-squares-plus">
+                                            Create
+                                        </x-keys::button>
+                                    </x-slot:trigger>
+
+                                    <x-keys::menu.item icon="heroicon-o-document-text">
+                                        New Document
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item icon="heroicon-o-folder-plus">
+                                        New Folder
+                                    </x-keys::menu.item>
+
+                                    <x-keys::menu.submenu icon="heroicon-o-photo" heading="Import">
+                                        <x-keys::menu.item icon="heroicon-o-cloud-arrow-up">
+                                            From Cloud
+                                        </x-keys::menu.item>
+                                        <x-keys::menu.item icon="heroicon-o-computer-desktop">
+                                            From Computer
+                                        </x-keys::menu.item>
+                                        <x-keys::menu.item icon="heroicon-o-link">
+                                            From URL
+                                        </x-keys::menu.item>
+                                        <hr class="my-1">
+                                        <x-keys::menu.item icon="heroicon-o-arrow-down-tray" variant="brand">
+                                            Bulk Import
+                                        </x-keys::menu.item>
+                                    </x-keys::menu.submenu>
+
+                                    <x-keys::menu.submenu icon="heroicon-o-share" heading="Export">
+                                        <x-keys::menu.item icon="heroicon-o-document-arrow-down">
+                                            Export as PDF
+                                        </x-keys::menu.item>
+                                        <x-keys::menu.item icon="heroicon-o-table-cells">
+                                            Export as CSV
+                                        </x-keys::menu.item>
+                                        <x-keys::menu.item icon="heroicon-o-code-bracket">
+                                            Export as JSON
+                                        </x-keys::menu.item>
+                                    </x-keys::menu.submenu>
+
+                                    <hr class="my-1">
+                                    <x-keys::menu.item icon="heroicon-o-cog-6-tooth">
+                                        Templates
+                                    </x-keys::menu.item>
+                                </x-keys::dropdown>
+                            </div>
+
+                            <!-- Different Positions -->
+                            <div class="rounded-lg border border-border p-6">
+                                <h3 class="text-lg font-semibold mb-4">Position Variants</h3>
+                                <p class="text-muted-foreground mb-4">Dropdowns can be positioned in different directions.</p>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <x-keys::dropdown id="top-dropdown" position="top" align="center">
+                                        <x-slot:trigger>
+                                            <x-keys::button variant="outline" size="sm">Top</x-keys::button>
+                                        </x-slot:trigger>
+                                        <x-keys::menu.item icon="heroicon-o-arrow-up">Up Arrow</x-keys::menu.item>
+                                        <x-keys::menu.item>Top Menu Item</x-keys::menu.item>
+                                    </x-keys::dropdown>
+
+                                    <x-keys::dropdown id="right-dropdown" position="right" align="start">
+                                        <x-slot:trigger>
+                                            <x-keys::button variant="outline" size="sm">Right</x-keys::button>
+                                        </x-slot:trigger>
+                                        <x-keys::menu.item icon="heroicon-o-arrow-right">Right Arrow</x-keys::menu.item>
+                                        <x-keys::menu.item>Right Menu Item</x-keys::menu.item>
+                                    </x-keys::dropdown>
+
+                                    <x-keys::dropdown id="left-dropdown" position="left" align="start">
+                                        <x-slot:trigger>
+                                            <x-keys::button variant="outline" size="sm">Left</x-keys::button>
+                                        </x-slot:trigger>
+                                        <x-keys::menu.item icon="heroicon-o-arrow-left">Left Arrow</x-keys::menu.item>
+                                        <x-keys::menu.item>Left Menu Item</x-keys::menu.item>
+                                    </x-keys::dropdown>
+
+                                    <x-keys::dropdown id="bottom-end-dropdown" position="bottom" align="end">
+                                        <x-slot:trigger>
+                                            <x-keys::button variant="outline" size="sm">Bottom End</x-keys::button>
+                                        </x-slot:trigger>
+                                        <x-keys::menu.item icon="heroicon-o-arrow-down">Down Arrow</x-keys::menu.item>
+                                        <x-keys::menu.item>Bottom End Item</x-keys::menu.item>
+                                    </x-keys::dropdown>
+                                </div>
+                            </div>
+
+                            <!-- Large Dropdown -->
+                            <div class="rounded-lg border border-border p-6">
+                                <h3 class="text-lg font-semibold mb-4">Large Dropdown</h3>
+                                <p class="text-muted-foreground mb-4">Large dropdown with comprehensive menu structure.</p>
+
+                                <x-keys::dropdown id="large-dropdown" size="lg" position="bottom" align="start">
+                                    <x-slot:trigger>
+                                        <x-keys::button variant="brand" size="lg" icon="heroicon-o-squares-2x2">
+                                            Dashboard
+                                        </x-keys::button>
+                                    </x-slot:trigger>
+
+                                    <div class="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border">
+                                        Analytics
+                                    </div>
+                                    <x-keys::menu.item icon="heroicon-o-chart-bar" href="#" kbd="⌘A">
+                                        Overview
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item icon="heroicon-o-users" href="#" variant="brand">
+                                        Users
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item icon="heroicon-o-banknotes" href="#" variant="success">
+                                        Revenue
+                                    </x-keys::menu.item>
+
+                                    <div class="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border">
+                                        Management
+                                    </div>
+                                    <x-keys::menu.item icon="heroicon-o-cog-6-tooth" href="#">
+                                        Settings
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item icon="heroicon-o-user-group" href="#">
+                                        Team
+                                    </x-keys::menu.item>
+
+                                    <x-keys::menu.submenu icon="heroicon-o-wrench-screwdriver" heading="Tools">
+                                        <x-keys::menu.item icon="heroicon-o-bug-ant">
+                                            Debug Console
+                                        </x-keys::menu.item>
+                                        <x-keys::menu.item icon="heroicon-o-cpu-chip">
+                                            System Monitor
+                                        </x-keys::menu.item>
+                                        <x-keys::menu.item icon="heroicon-o-clipboard-document-list">
+                                            Logs
+                                        </x-keys::menu.item>
+                                    </x-keys::menu.submenu>
+
+                                    <hr class="my-1">
+                                    <x-keys::menu.item icon="heroicon-o-arrow-right-on-rectangle" href="#" variant="danger">
+                                        Sign Out
+                                    </x-keys::menu.item>
+                                </x-keys::dropdown>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Width Control Examples -->
-                        <div class="space-y-6">
-                            <h3 class="text-lg font-semibold">Width Control</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">Auto Width</label>
-                                    <x-keys::select
-                                        name="width_auto"
-                                        width="auto"
-                                        placeholder="Auto width"
-                                    >
-                                        <x-keys::select.option value="1" label="Short" />
-                                        <x-keys::select.option value="2" label="Medium length option" />
-                                    </x-keys::select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">Extra Small (xs)</label>
-                                    <x-keys::select
-                                        name="width_xs"
-                                        width="xs"
-                                        placeholder="XS"
-                                    >
-                                        <x-keys::select.option value="1" label="Option 1" />
-                                        <x-keys::select.option value="2" label="Option 2" />
-                                    </x-keys::select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">Small (sm)</label>
-                                    <x-keys::select
-                                        name="width_sm"
-                                        width="sm"
-                                        placeholder="Small width"
-                                    >
-                                        <x-keys::select.option value="1" label="Option 1" />
-                                        <x-keys::select.option value="2" label="Option 2" />
-                                    </x-keys::select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">Medium (md)</label>
-                                    <x-keys::select
-                                        name="width_md"
-                                        width="md"
-                                        placeholder="Medium width"
-                                    >
-                                        <x-keys::select.option value="1" label="Option 1" />
-                                        <x-keys::select.option value="2" label="Option 2" />
-                                    </x-keys::select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">Large (lg)</label>
-                                    <x-keys::select
-                                        name="width_lg"
-                                        width="lg"
-                                        placeholder="Large width"
-                                    >
-                                        <x-keys::select.option value="1" label="Option 1" />
-                                        <x-keys::select.option value="2" label="Option 2" />
-                                    </x-keys::select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">Extra Large (xl)</label>
-                                    <x-keys::select
-                                        name="width_xl"
-                                        width="xl"
-                                        placeholder="Extra large width"
-                                    >
-                                        <x-keys::select.option value="1" label="Option 1" />
-                                        <x-keys::select.option value="2" label="Option 2" />
-                                    </x-keys::select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">2X Large (2xl)</label>
-                                    <x-keys::select
-                                        name="width_2xl"
-                                        width="2xl"
-                                        placeholder="2X Large width"
-                                    >
-                                        <x-keys::select.option value="1" label="Option 1" />
-                                        <x-keys::select.option value="2" label="Option 2" />
-                                    </x-keys::select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">Fit Content</label>
-                                    <x-keys::select
-                                        name="width_fit"
-                                        width="fit"
-                                        placeholder="Fit"
-                                    >
-                                        <x-keys::select.option value="1" label="Short" />
-                                        <x-keys::select.option value="2" label="Longer option text" />
-                                    </x-keys::select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">Full Width (default)</label>
-                                    <x-keys::select
-                                        name="width_full"
-                                        width="full"
-                                        placeholder="Full width (default)"
-                                    >
-                                        <x-keys::select.option value="1" label="Option 1" />
-                                        <x-keys::select.option value="2" label="Option 2" />
-                                    </x-keys::select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Testing Info -->
-                        <div class="bg-surface border border-border rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-3">Input & Select Features to Test</h3>
-                            <div class="text-sm text-foreground/70 space-y-2">
-                                <p><strong>🔤 Input Features:</strong></p>
-                                <ul class="list-disc list-inside space-y-1 ml-4">
-                                    <li>Password toggle: Click eye icon to show/hide password</li>
-                                    <li>Copy action: Click clipboard icon to copy input value</li>
-                                    <li>Clear action: Click X icon to clear input</li>
-                                    <li>Generate password: Click sparkles icon for random password</li>
-                                    <li>Multi-state icons: Watch icons change on interaction</li>
-                                    <li>Size variants: xs, sm, md, lg, xl sizes</li>
-                                    <li>Validation states: Error messages and styling</li>
+                    <!-- CSS Anchor Positioning Notice -->
+                    <div class="mt-16 bg-blue-50 border border-blue-200 rounded-lg p-8 max-w-4xl mx-auto">
+                        <div class="flex items-start">
+                            <x-keys::icon name="heroicon-o-information-circle" size="lg" class="text-blue-600 mt-1 mr-4 flex-shrink-0" />
+                            <div>
+                                <h3 class="text-lg font-semibold text-blue-900 mb-2">Modern CSS Anchor Positioning</h3>
+                                <p class="text-blue-800 mb-3">
+                                    All positioning components (Popover, Dropdown, Tooltip) now use CSS Anchor Positioning with the OddBird polyfill for maximum performance and compatibility.
+                                </p>
+                                <ul class="text-sm text-blue-700 space-y-1">
+                                    <li>• <strong>Native Performance:</strong> CSS handles positioning without JavaScript overhead</li>
+                                    <li>• <strong>Modern Standards:</strong> Uses cutting-edge web technologies with polyfill fallback</li>
+                                    <li>• <strong>Consistent API:</strong> All overlay components share the same positioning system</li>
+                                    <li>• <strong>Future-Proof:</strong> Ready for native browser support as it becomes available</li>
                                 </ul>
-                                <p class="mt-3"><strong>📋 Select Features:</strong></p>
-                                <ul class="list-disc list-inside space-y-1 ml-4">
-                                    <li>Click to open dropdown menu</li>
-                                    <li>Search: Type to filter options in searchable selects</li>
-                                    <li>Multi-select: Choose multiple options, see chips</li>
-                                    <li>Clear button: Reset selection (when clearable)</li>
-                                    <li>Keyboard navigation: Arrow keys, Enter, Escape</li>
-                                    <li>Rich content: Custom layouts in options</li>
-                                    <li>Width control: auto, xs, sm, md, lg, xl, 2xl, fit, full</li>
-                                    <li>Disabled options: Some options cannot be selected</li>
-                                </ul>
-                                <p class="mt-3"><strong>⌨️ Keyboard Support:</strong></p>
-                                <ul class="list-disc list-inside space-y-1 ml-4">
-                                    <li>Tab: Navigate between form elements</li>
-                                    <li>Space/Enter: Open select dropdown</li>
-                                    <li>Arrow keys: Navigate options</li>
-                                    <li>Escape: Close dropdown</li>
-                                    <li>Type to search: In searchable selects</li>
-                                    <li>Backspace: Remove chips in multi-select</li>
-                                </ul>
                             </div>
                         </div>
-                    </section>
-
-                    <!-- Badge Components -->
-                    <section class="space-y-6">
-                        <div>
-                            <h2 class="text-2xl font-bold mb-4">Badge Components</h2>
-                            <p class="text-foreground/70 mb-6">Status indicators and tags with multiple variants including the new subtle style</p>
-                        </div>
-
-                        <!-- Badge Variants -->
-                        <div>
-                            <h3 class="text-lg font-semibold mb-3">Badge Variants</h3>
-                            <div class="space-y-6">
-                                <!-- Simple Badges -->
-                                <div>
-                                    <h4 class="text-sm font-medium mb-2">Simple Badges (Default)</h4>
-                                    <div class="flex flex-wrap gap-2">
-                                        <x-keys::badge color="brand">Brand</x-keys::badge>
-                                        <x-keys::badge color="success">Success</x-keys::badge>
-                                        <x-keys::badge color="warning">Warning</x-keys::badge>
-                                        <x-keys::badge color="danger">Danger</x-keys::badge>
-                                        <x-keys::badge color="neutral">Neutral</x-keys::badge>
-                                        <x-keys::badge color="blue">Blue</x-keys::badge>
-                                        <x-keys::badge color="purple">Purple</x-keys::badge>
-                                        <x-keys::badge color="green">Green</x-keys::badge>
-                                    </div>
-                                </div>
-
-                                <!-- Subtle Badges (NEW) -->
-                                <div>
-                                    <h4 class="text-sm font-medium mb-2">Subtle Badges with Status Dots (NEW)</h4>
-                                    <div class="flex flex-wrap gap-4">
-                                        <x-keys::badge variant="subtle" color="success">Online</x-keys::badge>
-                                        <x-keys::badge variant="subtle" color="warning">Away</x-keys::badge>
-                                        <x-keys::badge variant="subtle" color="danger">Busy</x-keys::badge>
-                                        <x-keys::badge variant="subtle" color="neutral">Offline</x-keys::badge>
-                                        <x-keys::badge variant="subtle" color="brand">Active</x-keys::badge>
-                                        <x-keys::badge variant="subtle" color="blue">Available</x-keys::badge>
-                                        <x-keys::badge variant="subtle" color="purple">Premium</x-keys::badge>
-                                        <x-keys::badge variant="subtle" color="green">Verified</x-keys::badge>
-                                    </div>
-                                </div>
-
-                                <!-- Chip Badges -->
-                                <div>
-                                    <h4 class="text-sm font-medium mb-2">Chip Badges (Dismissible)</h4>
-                                    <div class="flex flex-wrap gap-2">
-                                        <x-keys::badge variant="chip" color="blue" dismissible>React</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="green" dismissible>Vue.js</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="purple" dismissible>Laravel</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="yellow" dismissible>JavaScript</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="red" dismissible>PHP</x-keys::badge>
-                                    </div>
-                                </div>
-
-                                <!-- Icon Badges -->
-                                <div>
-                                    <h4 class="text-sm font-medium mb-2">Icon Badges</h4>
-                                    <div class="space-y-3">
-                                        <div>
-                                            <p class="text-xs text-foreground/60 mb-2">Simple with Icons:</p>
-                                            <div class="flex flex-wrap gap-2">
-                                                <x-keys::badge icon="heroicon-o-check-circle" color="success">Verified</x-keys::badge>
-                                                <x-keys::badge icon="heroicon-o-star" color="yellow">Featured</x-keys::badge>
-                                                <x-keys::badge icon="heroicon-o-shield-check" color="brand">Secure</x-keys::badge>
-                                                <x-keys::badge icon="heroicon-o-bolt" color="purple">Fast</x-keys::badge>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-foreground/60 mb-2">Subtle with Icons:</p>
-                                            <div class="flex flex-wrap gap-3">
-                                                <x-keys::badge variant="subtle" icon="heroicon-o-check-circle" color="success">Verified</x-keys::badge>
-                                                <x-keys::badge variant="subtle" icon="heroicon-o-star" color="yellow">Featured</x-keys::badge>
-                                                <x-keys::badge variant="subtle" icon="heroicon-o-shield-check" color="brand">Secure</x-keys::badge>
-                                                <x-keys::badge variant="subtle" icon="heroicon-o-bolt" color="purple">Fast</x-keys::badge>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-foreground/60 mb-2">Icon-Only (Auto-detected):</p>
-                                            <div class="flex flex-wrap gap-2">
-                                                <x-keys::badge icon="heroicon-o-check" color="success" />
-                                                <x-keys::badge icon="heroicon-o-x-mark" color="danger" />
-                                                <x-keys::badge icon="heroicon-o-exclamation-triangle" color="warning" />
-                                                <x-keys::badge variant="subtle" icon="heroicon-o-star" color="yellow" />
-                                                <x-keys::badge variant="subtle" icon="heroicon-o-heart" color="red" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Size Variants -->
-                                <div>
-                                    <h4 class="text-sm font-medium mb-2">Size Variants</h4>
-                                    <div class="space-y-3">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs text-foreground/60 w-16">XS:</span>
-                                            <x-keys::badge size="xs" color="brand">Extra Small</x-keys::badge>
-                                            <x-keys::badge variant="subtle" size="xs" color="success">Subtle XS</x-keys::badge>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs text-foreground/60 w-16">SM:</span>
-                                            <x-keys::badge size="sm" color="brand">Small</x-keys::badge>
-                                            <x-keys::badge variant="subtle" size="sm" color="success">Subtle SM</x-keys::badge>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs text-foreground/60 w-16">MD:</span>
-                                            <x-keys::badge size="md" color="brand">Medium</x-keys::badge>
-                                            <x-keys::badge variant="subtle" size="md" color="success">Subtle MD</x-keys::badge>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-6 p-4 bg-surface border border-border rounded-lg">
-                                <p class="text-sm"><strong>🎯 Try:</strong></p>
-                                <ul class="list-disc list-inside space-y-1 ml-4 text-sm">
-                                    <li>Click dismiss buttons on chip badges to remove them</li>
-                                    <li>Notice the subtle variant's status dot with ring effect</li>
-                                    <li>Compare visual weight between variants</li>
-                                    <li>Test icon-only auto-detection (no slot content = icon-only)</li>
-                                </ul>
-                                <p class="mt-3 text-info"><strong>💡 New Subtle Variant:</strong> Text-only display with status indicator dot and low-opacity ring for minimal visual impact while maintaining clear status communication.</p>
-                            </div>
-                        </div>
-                    </section>
-
+                    </div>
                 </div>
             </div>
         </div>
-
     </body>
 </html>

@@ -57,7 +57,13 @@
       "mcp__laravel-boost__list-routes",
       "Read(//c/Users/chaab/**)",
       "mcp__laravel-boost__read-log-entries",
-      "mcp__laravel-boost__get-config"
+      "mcp__laravel-boost__get-config",
+      "WebFetch(domain:uploadcare.com)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:www.uinkits.com)",
+      "WebFetch(domain:nikitahl.com)",
+      "Bash(del \"C:\\Work\\keys\\packages\\keys-ui\\src\\Components\\CssPopover.php\")",
+      "WebFetch(domain:flowbite.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

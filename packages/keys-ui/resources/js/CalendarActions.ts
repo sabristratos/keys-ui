@@ -12,7 +12,6 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
-import { AnimationUtils } from './utils/AnimationUtils';
 import { DateUtils } from './utils/DateUtils';
 
 type ViewMode = 'calendar' | 'month' | 'year';

@@ -22,7 +22,7 @@ class Tooltip extends Component
         $this->id = $this->id ?? 'tooltip-' . uniqid();
 
         // Validate placement
-        if (!in_array($this->placement, ['top', 'bottom', 'left', 'right'])) {
+        if (!in_array($this->placement, ComponentConstants::POPOVER_PLACEMENTS)) {
             $this->placement = 'top';
         }
 
@@ -37,15 +37,16 @@ class Tooltip extends Component
         }
 
         // Validate trigger
-        if (!in_array($this->trigger, ['hover', 'click', 'focus'])) {
+        if (!in_array($this->trigger, ComponentConstants::TOOLTIP_TRIGGERS)) {
             $this->trigger = 'hover';
         }
     }
 
-    public function getTooltipClasses(): string
+    public function getContentClasses(): string
     {
         $color = $this->getColorClasses();
-        return $color;
+        $size = $this->getSizeClasses();
+        return "tooltip-content {$color} {$size}";
     }
 
     protected function getSizeClasses(): string
@@ -67,14 +68,6 @@ class Tooltip extends Component
         };
     }
 
-    public function getArrowClasses(): string
-    {
-        if (!$this->arrow) {
-            return '';
-        }
-
-        return '';
-    }
 
     protected function getArrowColorClasses(): string
     {
@@ -85,11 +78,6 @@ class Tooltip extends Component
         };
     }
 
-    protected function getArrowPositionClasses(): string
-    {
-        // Let CSS handle positioning via data-placement attribute
-        return '';
-    }
 
     public function getTooltipAttributes(): array
     {
@@ -115,36 +103,34 @@ class Tooltip extends Component
         return $attributes;
     }
 
-    public function getTriggerAttributes(): array
+    public function getDataAttributes(): array
     {
-        $attributes = [];
+        $attributes = [
+            'data-tooltip' => 'true',
+            'data-tooltip-trigger' => $this->trigger,
+            'data-tooltip-delay' => $this->delay,
+            'data-color' => $this->color,
+            'data-size' => $this->size,
+        ];
 
         if ($this->target) {
-            $attributes['data-tooltip-target'] = $this->id;
-            $attributes['data-tooltip-placement'] = $this->placement;
-            $attributes['data-tooltip-trigger'] = $this->trigger;
+            $attributes['data-target'] = $this->target;
+        }
+
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
         }
 
         return $attributes;
     }
 
-    public function getComputedTooltipClasses(): string
-    {
-        return $this->getTooltipClasses();
-    }
 
-    public function getComputedArrowClasses(): string
-    {
-        return $this->getArrowClasses();
-    }
 
     public function render()
     {
         return view('keys::components.tooltip', [
-            'computedTooltipClasses' => $this->getComputedTooltipClasses(),
-            'computedArrowClasses' => $this->getComputedArrowClasses(),
-            'tooltipAttributes' => $this->getTooltipAttributes(),
-            'triggerAttributes' => $this->getTriggerAttributes(),
+            'computedDataAttributes' => $this->getDataAttributes(),
+            'computedContentClasses' => $this->getContentClasses(),
         ]);
     }
 }

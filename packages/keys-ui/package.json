@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",
+    "@oddbird/css-anchor-positioning": "^0.1.0",
     "quill": "^2.0.3"
   },
   "devDependencies": {

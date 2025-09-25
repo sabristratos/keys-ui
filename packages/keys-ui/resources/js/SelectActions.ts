@@ -12,7 +12,6 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
-import { AnimationUtils } from './utils/AnimationUtils';
 import { FloatingManager, FloatingInstance } from './utils/FloatingManager';
 
 interface SelectOption {
@@ -480,7 +479,7 @@ export class SelectActions extends BaseActionClass<SelectState> {
         }
 
         if (searchInput && select.dataset.searchable === 'true') {
-            AnimationUtils.createTimer(() => searchInput.focus(), 10);
+            setTimeout(() => searchInput.focus(), 10);
         }
 
         this.updateFilteredOptions(select);

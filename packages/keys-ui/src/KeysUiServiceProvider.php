@@ -33,7 +33,6 @@ use Keys\UI\Components\Menu\Radio as MenuRadio;
 use Keys\UI\Components\Menu\Separator as MenuSeparator;
 use Keys\UI\Components\Menu\Submenu as MenuSubmenu;
 use Keys\UI\Components\Modal;
-use Keys\UI\Components\Popover;
 use Keys\UI\Components\Radio;
 use Keys\UI\Components\Range;
 use Keys\UI\Components\Select;
@@ -60,10 +59,12 @@ use Keys\UI\Components\Table\Loading as TableLoading;
 use Keys\UI\Components\AddToCart;
 use Keys\UI\Components\Progress;
 use Keys\UI\Components\Separator;
+use Keys\UI\Components\Popover;
 use Keys\UI\Services\KeysManager;
 use Keys\UI\Services\ModalManager;
 use Keys\UI\Services\ToastManager;
 use Keys\UI\Components\Scripts;
+use Keys\UI\Components\FileUpload;
 
 class KeysUiServiceProvider extends ServiceProvider
 {
@@ -147,7 +148,6 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::breadcrumbs', Breadcrumbs::class);
         Blade::component('keys::breadcrumbs.item', Item::class);
         Blade::component('keys::modal', Modal::class);
-        Blade::component('keys::popover', Popover::class);
         Blade::component('keys::toast', Toast::class);
         Blade::component('keys::dropdown', Dropdown::class);
         Blade::component('keys::editor', Editor::class);
@@ -173,7 +173,9 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::add-to-cart', AddToCart::class);
         Blade::component('keys::progress', Progress::class);
         Blade::component('keys::separator', Separator::class);
+        Blade::component('keys::popover', Popover::class);
         Blade::component('keys::scripts', Scripts::class);
+        Blade::component('keys::file-upload', FileUpload::class);
 
         $this->app->alias(KeysManager::class, 'keys');
     }

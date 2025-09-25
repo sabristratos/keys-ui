@@ -6,7 +6,6 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
-import { AnimationUtils } from './utils/AnimationUtils';
 
 interface ToastState {
     toasts: Map<string, HTMLElement>;
@@ -185,14 +184,8 @@ export class ToastActions extends BaseActionClass<ToastState> {
 
         container.appendChild(toast);
 
-        // Use AnimationUtils for fade in animation
-        AnimationUtils.fadeIn(toast, {
-            scale: true,
-            duration: 300,
-            onComplete: () => {
-                toast.setAttribute('data-toast-visible', 'true');
-            }
-        });
+        // Show toast without animation
+        toast.setAttribute('data-toast-visible', 'true');
 
         const duration = data.duration || 5000;
         const persistent = data.persistent === true;
@@ -318,17 +311,11 @@ export class ToastActions extends BaseActionClass<ToastState> {
         toast.setAttribute('data-toast-visible', 'false');
         toast.setAttribute('data-toast-exiting', 'true');
 
-        // Use AnimationUtils for fade out animation
-        AnimationUtils.fadeOut(toast, {
-            scale: true,
-            duration: 300,
-            onComplete: () => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-                globalState.toasts.delete(id);
-            }
-        });
+        // Remove toast without animation
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
+        globalState.toasts.delete(id);
 
         this.dispatchToastEvent('toast:dismiss', id);
 
@@ -438,7 +425,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
             toast.setAttribute('data-toast-start-time', String(Date.now()));
         }
 
-        const timer = AnimationUtils.createTimer(() => {
+        const timer = setTimeout(() => {
             this.dismiss(id);
         }, duration);
 
@@ -454,7 +441,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
 
         const timer = globalState.timers.get(id);
         if (timer) {
-            AnimationUtils.clearTimer(timer);
+            clearTimeout(timer);
             globalState.timers.delete(id);
         }
     }
@@ -470,7 +457,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
         const toast = globalState.toasts.get(id);
 
         if (timer && toast) {
-            AnimationUtils.pauseTimer(timer);
+            // Timer pausing not supported with setTimeout - will remove timer
             const duration = parseInt(toast.getAttribute('data-toast-duration') || '5000');
             const startTime = parseInt(toast.getAttribute('data-toast-start-time') || '0');
             const elapsed = Date.now() - startTime;
@@ -498,7 +485,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
             const persistent = toast.getAttribute('data-toast-persistent') === 'true';
 
             if (!persistent) {
-                AnimationUtils.resumeTimer(timer);
+                // Resume not supported - create new timer with remaining time
                 globalState.pausedTimers.delete(id);
             }
         } else if (toast && pausedInfo) {
@@ -565,7 +552,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
         const globalState = this.getGlobalState();
         if (!globalState) return;
 
-        globalState.timers.forEach(timer => AnimationUtils.clearTimer(timer));
+        globalState.timers.forEach(timer => clearTimeout(timer));
         globalState.timers.clear();
 
         globalState.pausedTimers.clear();

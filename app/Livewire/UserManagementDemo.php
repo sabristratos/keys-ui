@@ -26,6 +26,9 @@ class UserManagementDemo extends Component
     #[Validate('nullable|image|max:2048')]
     public $avatar;
 
+    #[Validate('nullable|array|max:5')]
+    public $attachments = [];
+
     #[Validate('required|string')]
     public $department = '';
 
@@ -66,6 +69,7 @@ class UserManagementDemo extends Component
     public $showDeleteConfirm = false;
     public $userToDelete = null;
 
+
     public function mount()
     {
         $this->loadUsers();
@@ -89,53 +93,124 @@ class UserManagementDemo extends Component
         $this->users = DemoUser::latest()->get();
     }
 
+    public $errorMessage = '';
+    public $successMessage = '';
+
     public function save()
     {
-        $this->validate();
+        try {
+            // Clear previous messages
+            $this->errorMessage = '';
+            $this->successMessage = '';
 
-        $userData = [
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'email' => $this->email,
-            'birth_date' => $this->birth_date,
-            'department' => $this->department,
-            'role' => $this->role,
-            'salary_range' => $this->salary_range,
-            'skills' => $this->skills,
-            'preferences' => $this->preferences,
-            'status' => $this->status,
-            'bio' => $this->bio,
-            'is_remote' => $this->is_remote,
-            'notifications_enabled' => $this->notifications_enabled,
-            'priority_level' => $this->priority_level,
-            'start_date' => $this->start_date,
-            'contract_type' => $this->contract_type,
-            'experience_level' => $this->experience_level,
-        ];
+            // Validate all fields
+            $this->validate();
 
-        if ($this->avatar) {
-            $avatarPath = $this->avatar->store('avatars', 'public');
-            $userData['avatar_path'] = $avatarPath;
+            $isEditing = $this->editingUser !== null;
+
+            $userData = [
+                'first_name' => $this->first_name,
+                'last_name' => $this->last_name,
+                'email' => $this->email,
+                'birth_date' => $this->birth_date,
+                'department' => $this->department,
+                'role' => $this->role,
+                'salary_range' => $this->salary_range,
+                'skills' => $this->skills,
+                'preferences' => $this->preferences,
+                'status' => $this->status,
+                'bio' => $this->bio,
+                'is_remote' => $this->is_remote,
+                'notifications_enabled' => $this->notifications_enabled,
+                'priority_level' => $this->priority_level,
+                'start_date' => $this->start_date,
+                'contract_type' => $this->contract_type,
+                'experience_level' => $this->experience_level,
+            ];
+
+            // Handle avatar upload
+            if ($this->avatar) {
+                try {
+                    $avatarPath = $this->avatar->store('avatars', 'public');
+                    $userData['avatar_path'] = $avatarPath;
+                } catch (\Exception $e) {
+                    $this->errorMessage = 'Failed to upload avatar: ' . $e->getMessage();
+                    return;
+                }
+            }
+
+            // Handle multiple attachments
+            if (!empty($this->attachments)) {
+                try {
+                    $attachmentPaths = [];
+                    foreach ($this->attachments as $attachment) {
+                        $attachmentPaths[] = $attachment->store('attachments', 'public');
+                    }
+                    $userData['attachments'] = $attachmentPaths;
+                } catch (\Exception $e) {
+                    $this->errorMessage = 'Failed to upload attachments: ' . $e->getMessage();
+                    return;
+                }
+            }
+
+            // Save or update user
+            if ($isEditing) {
+                $this->editingUser->update($userData);
+                $this->editingUser = null;
+                $this->successMessage = 'User updated successfully!';
+            } else {
+                $user = DemoUser::create($userData);
+                if (!$user) {
+                    $this->errorMessage = 'Failed to create user. Please try again.';
+                    return;
+                }
+                $this->successMessage = 'User created successfully!';
+            }
+
+            // Reset form fields
+            $this->reset([
+                'first_name', 'last_name', 'email', 'birth_date', 'avatar', 'attachments',
+                'department', 'role', 'salary_range', 'skills', 'preferences',
+                'status', 'bio', 'is_remote', 'notifications_enabled',
+                'priority_level', 'start_date', 'contract_type', 'experience_level'
+            ]);
+
+            $this->setDefaultValues();
+            $this->loadUsers();
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Validation errors are automatically handled by Livewire
+            $this->errorMessage = 'Please fix the validation errors below.';
+
+            // Log validation details
+            logger('Validation failed during user creation:', [
+                'validation_errors' => $e->errors(),
+                'form_data' => collect($userData ?? [])->except(['avatar_path', 'attachments'])->toArray(),
+                'user' => auth()->user()?->email ?? 'guest',
+                'timestamp' => now()->toISOString()
+            ]);
+            throw $e;
+        } catch (\Exception $e) {
+            $this->errorMessage = 'An unexpected error occurred: ' . $e->getMessage();
+
+            // Comprehensive error logging
+            logger('User creation error:', [
+                'error' => $e->getMessage(),
+                'exception_class' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'form_data' => collect($userData ?? [])->except(['avatar_path', 'attachments'])->toArray(),
+                'user' => auth()->user()?->email ?? 'guest',
+                'timestamp' => now()->toISOString(),
+                'memory_usage' => memory_get_usage(true),
+                'component_state' => [
+                    'editing_user' => $this->editingUser?->id,
+                    'has_avatar' => !empty($this->avatar),
+                    'has_attachments' => !empty($this->attachments)
+                ]
+            ]);
         }
-
-        if ($this->editingUser) {
-            $this->editingUser->update($userData);
-            $this->editingUser = null;
-        } else {
-            DemoUser::create($userData);
-        }
-
-        $this->reset([
-            'first_name', 'last_name', 'email', 'birth_date', 'avatar',
-            'department', 'role', 'salary_range', 'skills', 'preferences',
-            'status', 'bio', 'is_remote', 'notifications_enabled',
-            'priority_level', 'start_date', 'contract_type', 'experience_level'
-        ]);
-
-        $this->setDefaultValues();
-        $this->loadUsers();
-
-        session()->flash('message', $this->editingUser ? 'User updated successfully!' : 'User created successfully!');
     }
 
     public function editUser($userId)
@@ -153,6 +228,7 @@ class UserManagementDemo extends Component
             $this->salary_range = $user->salary_range;
             $this->skills = $user->skills ?? [];
             $this->preferences = $user->preferences ?? [];
+            $this->attachments = []; // Reset attachments for editing
             $this->status = $user->status;
             $this->bio = $user->bio;
             $this->is_remote = $user->is_remote;
@@ -168,7 +244,7 @@ class UserManagementDemo extends Component
     {
         $this->editingUser = null;
         $this->reset([
-            'first_name', 'last_name', 'email', 'birth_date', 'avatar',
+            'first_name', 'last_name', 'email', 'birth_date', 'avatar', 'attachments',
             'department', 'role', 'salary_range', 'skills', 'preferences',
             'status', 'bio', 'is_remote', 'notifications_enabled',
             'priority_level', 'start_date', 'contract_type', 'experience_level'
@@ -187,8 +263,14 @@ class UserManagementDemo extends Component
         if ($this->userToDelete) {
             $user = DemoUser::find($this->userToDelete);
             if ($user) {
+                // Clean up uploaded files
                 if ($user->avatar_path) {
                     \Storage::disk('public')->delete($user->avatar_path);
+                }
+                if ($user->attachments) {
+                    foreach ($user->attachments as $attachment) {
+                        \Storage::disk('public')->delete($attachment);
+                    }
                 }
                 $user->delete();
                 $this->loadUsers();

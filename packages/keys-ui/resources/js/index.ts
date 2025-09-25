@@ -26,6 +26,7 @@ import { DatePickerActions } from './DatePickerActions';
 import { AddToCartActions } from './AddToCartActions';
 import { GalleryActions } from './GalleryActions';
 import { PopoverActions } from './PopoverActions';
+import './FileUploadActions';
 
 // Import Quill to expose globally for EditorActions
 import Quill from 'quill';
@@ -37,6 +38,9 @@ import { EventUtils } from './utils/EventUtils';
 import { RTLUtils } from './utils/RTLUtils';
 import FloatingManager from './utils/FloatingManager';
 
+// Import and initialize CSS anchor positioning polyfill
+import polyfill from '@oddbird/css-anchor-positioning/fn';
+
 export { FormActions, AlertActions, BadgeActions, CalendarActions, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, AccordionActions, EditorActions, DatePickerActions, AddToCartActions, GalleryActions, PopoverActions };
 
 // Export utility classes for external consumption
@@ -47,6 +51,11 @@ export { BaseActionClass, DOMUtils, EventUtils, RTLUtils, FloatingManager };
  * Call this function to automatically set up all interactive functionality
  */
 export function initializeKeysUI(): void {
+    // Initialize CSS anchor positioning polyfill if needed
+    if (!("anchorName" in document.documentElement.style)) {
+        polyfill();
+    }
+
     // Initialize RTL support first
     RTLUtils.initialize();
 
@@ -91,7 +100,10 @@ export function initializeKeysUI(): void {
 
     GalleryActions.getInstance().init();
 
-    PopoverActions.getInstance().init();
+    // PopoverActions initializes automatically
+    new PopoverActions();
+
+    // FileUploadActions initializes itself on DOM ready
 
 }
 
@@ -119,7 +131,7 @@ const KeysUI = {
     DatePickerActions: DatePickerActions.getInstance(),
     AddToCartActions: AddToCartActions.getInstance(),
     GalleryActions: GalleryActions.getInstance(),
-    PopoverActions: PopoverActions.getInstance(),
+    PopoverActions: new PopoverActions(),
     // Expose Quill for EditorActions to use
     Quill: Quill,
     init: initializeKeysUI,

@@ -6,12 +6,12 @@
             'class' => $computedDialogClasses,
             'closedby' => $closedby,
             'data-modal' => true,
+            'data-backdrop' => $backdrop,
+            'data-scrollable' => $scrollable ? 'true' : 'false',
         ])
         ->merge($livewireAttributes);
 
-    if ($animate) {
-        $dialogAttributes = $dialogAttributes->merge(['data-modal-animate' => true]);
-    }
+    // All modals now use CSS animations by default
 
     $dialogAttributes = $dialogAttributes->merge($eventAttributes)->merge($dataAttributes);
 @endphp
@@ -40,108 +40,6 @@
         </div>
     </div>
 
-    
-    <style>
-        dialog[data-modal] {
-            color: var(--color-foreground);
-        }
-
-        dialog[data-modal]::backdrop {
-            background: rgba(0, 0, 0, 0.5);
-            @if($backdrop === 'blur')
-            backdrop-filter: blur(4px);
-            @endif
-        }
-
-        /* Animation support for modal */
-        @if($animate)
-        dialog[data-modal-animate] {
-            opacity: 0;
-            transform: scale(0.95);
-            transition: opacity 200ms ease-out, transform 200ms ease-out;
-        }
-
-        dialog[data-modal-animate][open] {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        dialog[data-modal-animate]::backdrop {
-            opacity: 0;
-            transition: opacity 150ms ease-out;
-        }
-
-        dialog[data-modal-animate][open]::backdrop {
-            opacity: 1;
-        }
-
-        /* Ensure backdrop is completely removed when modal is closed */
-        dialog[data-modal-animate]:not([open])::backdrop {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Starting style for entry animation */
-        @starting-style {
-            dialog[data-modal-animate][open] {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-
-            dialog[data-modal-animate][open]::backdrop {
-                opacity: 0;
-            }
-        }
-        @endif
-
-        /* Scrollable modal styles */
-        @if($scrollable)
-        dialog[data-modal] .modal-body {
-            max-height: calc(80vh - 8rem);
-            overflow-y: auto;
-        }
-        @endif
-
-        /* Focus management */
-        dialog[data-modal]:focus {
-            outline: none;
-        }
-
-        dialog[data-modal] [data-modal-close]:focus-visible {
-            outline: 2px solid var(--color-brand);
-            outline-offset: 2px;
-            border-radius: var(--radius-sm);
-        }
-
-        /* Livewire integration styles */
-        dialog[data-modal-livewire] {
-            /* Enhanced styles for Livewire modals */
-        }
-
-        dialog[data-modal-lazy] {
-            /* Lazy loading placeholder styles */
-        }
-
-        dialog[data-modal-lazy]:not([open]) .modal-content {
-            display: none;
-        }
-
-        /* Loading state for lazy modals */
-        dialog[data-modal-lazy][data-loading] .modal-content::before {
-            content: 'Loading...';
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--color-surface);
-            z-index: 1;
-        }
-
-    </style>
 
     
     @if($isLivewireEnabled())

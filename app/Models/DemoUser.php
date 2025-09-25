@@ -26,6 +26,7 @@ class DemoUser extends Model
         'start_date',
         'contract_type',
         'experience_level',
+        'attachments',
     ];
 
     protected $casts = [
@@ -33,6 +34,7 @@ class DemoUser extends Model
         'start_date' => 'date',
         'skills' => 'array',
         'preferences' => 'array',
+        'attachments' => 'array',
         'is_remote' => 'boolean',
         'notifications_enabled' => 'boolean',
         'experience_level' => 'integer',

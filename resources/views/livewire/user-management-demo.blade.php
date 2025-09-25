@@ -6,6 +6,20 @@
         </x-keys::alert>
     @endif
 
+    {{-- Error Messages --}}
+    @if (!empty($errorMessage))
+        <x-keys::alert variant="danger" dismissible>
+            {{ $errorMessage }}
+        </x-keys::alert>
+    @endif
+
+    {{-- Success Messages --}}
+    @if (!empty($successMessage))
+        <x-keys::alert variant="success" dismissible>
+            {{ $successMessage }}
+        </x-keys::alert>
+    @endif
+
     {{-- User Form --}}
     <x-keys::card>
         <x-slot:header>
@@ -56,18 +70,23 @@
                     required
                 />
 
-                <x-keys::input
+                <x-keys::date-picker
                     wire:model="birth_date"
-                    type="date"
                     label="Birth Date"
+                    placeholder="Select birth date"
+                    format="Y-m-d"
+                    displayFormat="M j, Y"
                     required
                 />
 
-                <x-keys::input
+                {{-- Profile Avatar --}}
+                <x-keys::file-upload
                     wire:model="avatar"
-                    type="file"
+                    name="avatar"
                     label="Profile Avatar"
                     accept="image/*"
+                    maxSize="2MB"
+                    :errors="$errors->get('avatar')"
                     optional
                 />
             </div>
@@ -104,10 +123,12 @@
                     </x-keys::select>
                 </div>
 
-                <x-keys::input
+                <x-keys::date-picker
                     wire:model="start_date"
-                    type="date"
                     label="Start Date"
+                    placeholder="Select start date"
+                    format="Y-m-d"
+                    displayFormat="M j, Y"
                     required
                 />
 
@@ -202,6 +223,23 @@
                     </div>
                 </div>
 
+                {{-- Supporting Documents Note --}}
+                <div class="p-4 bg-surface border border-border rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <x-keys::icon name="heroicon-o-information-circle" size="sm" class="text-brand mt-0.5" />
+                        <div>
+                            <p class="text-sm font-medium text-foreground mb-1">Supporting Documents</p>
+                            <p class="text-sm text-muted">
+                                The file upload component currently supports single file uploads.
+                                Multiple file upload functionality will be added in a future update.
+                            </p>
+                            <p class="text-xs text-muted mt-2">
+                                For now, you can use the current avatar upload field to test file upload functionality.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <x-keys::textarea
                     wire:model="bio"
                     label="Bio"
@@ -258,7 +296,15 @@
                                         <div>
                                             <div class="font-medium text-foreground">{{ $user->full_name }}</div>
                                             <div class="text-sm text-muted">{{ $user->email }}</div>
-                                            <div class="text-xs text-muted">{{ $user->role }} • {{ $user->contract_type }}</div>
+                                            <div class="text-xs text-muted flex items-center gap-2">
+                                                {{ $user->role }} • {{ $user->contract_type }}
+                                                @if($user->attachments && count($user->attachments) > 0)
+                                                    <span class="inline-flex items-center gap-1 text-brand">
+                                                        <x-keys::icon name="heroicon-s-paper-clip" size="xs" />
+                                                        {{ count($user->attachments) }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

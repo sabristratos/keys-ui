@@ -121,6 +121,21 @@ class ComponentConstants
     public const AVATAR_STATUS = ['online', 'offline', 'away', 'busy'];
 
     /**
+     * Popover/Tooltip/Dropdown placement options
+     */
+    public const POPOVER_PLACEMENTS = [
+        'top', 'top-start', 'top-end',
+        'bottom', 'bottom-start', 'bottom-end',
+        'left', 'left-start', 'left-end',
+        'right', 'right-start', 'right-end'
+    ];
+
+    /**
+     * Tooltip trigger types
+     */
+    public const TOOLTIP_TRIGGERS = ['hover', 'click', 'focus'];
+
+    /**
      * Component-specific size arrays
      */
     public const MODAL_SIZES = ['xs', 'sm', 'md', 'lg', 'xl', 'full'];

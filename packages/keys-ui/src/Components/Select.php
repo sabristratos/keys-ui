@@ -66,6 +66,22 @@ class Select extends Component
             return $this->errors->isNotEmpty();
         }
 
+        // Handle Laravel MessageBag
+        if (is_object($this->errors) && method_exists($this->errors, 'any')) {
+            return $this->errors->any();
+        }
+
+        // Handle ViewErrorBag
+        if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
+            try {
+                $bag = $this->errors->getBag('default');
+                return $bag && $bag->any();
+            } catch (\Exception $e) {
+                // If getBag fails, treat as no errors
+                return false;
+            }
+        }
+
         return false;
     }
 
@@ -138,6 +154,7 @@ class Select extends Component
         $width = $this->width === 'auto' || $this->width === 'fit' ? 'w-auto min-w-full' : 'w-full';
         return "absolute z-50 mt-1 {$width} rounded-md bg-surface border border-border shadow-lg";
     }
+
 
     /**
      * Get icon size based on component size

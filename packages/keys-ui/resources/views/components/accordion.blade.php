@@ -72,44 +72,4 @@
         {{ $slot }}
     </div>
 
-    <style>
-        /* Remove default summary styling */
-        [data-accordion] summary {
-            list-style: none;
-        }
-
-        [data-accordion] summary::-webkit-details-marker {
-            display: none;
-        }
-
-        /* Ensure content doesn't overflow during animation */
-        [data-accordion][animating] {
-            overflow: hidden;
-        }
-
-        /* Handle focus styles for summary */
-        [data-accordion] summary:focus {
-            outline: 2px solid transparent;
-            outline-offset: 2px;
-        }
-
-        [data-accordion] summary:focus-visible {
-            @apply ring-2 ring-offset-2 ring-brand/50;
-        }
-
-        /* Disabled state */
-        [data-accordion][disabled] summary {
-            pointer-events: none;
-        }
-
-
-        /* Reduce motion for accessibility */
-        @media (prefers-reduced-motion: reduce) {
-            [data-accordion] * {
-                transition-duration: 0.01ms !important;
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-            }
-        }
-    </style>
 </details>

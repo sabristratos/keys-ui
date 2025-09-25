@@ -12,7 +12,6 @@ import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
 import { RTLUtils } from './utils/RTLUtils';
-import { FloatingManager, FloatingInstance } from './utils/FloatingManager';
 
 interface DropdownState {
     isOpen: boolean;
@@ -20,7 +19,6 @@ interface DropdownState {
     menuItems: HTMLElement[];
     parent?: HTMLElement;
     children: HTMLElement[];
-    floating?: FloatingInstance;
 }
 
 export class DropdownActions extends BaseActionClass<DropdownState> {
@@ -32,6 +30,11 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
     protected initializeElements(): void {
         DOMUtils.findByDataAttribute('dropdown', 'true').forEach(dropdown => {
             this.initializeDropdown(dropdown);
+        });
+
+        // Initialize submenus alongside dropdowns
+        DOMUtils.findByDataAttribute('submenu', 'true').forEach(submenu => {
+            this.initializeDropdown(submenu);
         });
     }
 
@@ -145,32 +148,34 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
             }
         });
 
-        // Handle submenu hover events
+        // Handle submenu hover events - simulate click for auto popovers
         EventUtils.addEventListener(document, 'mouseenter', (event) => {
             const submenuTrigger = DOMUtils.findClosest(event.target as Element, '[data-submenu-trigger]') as HTMLElement;
             if (submenuTrigger && !this.isMobile()) {
-                const submenu = DOMUtils.findClosest(submenuTrigger, '[data-submenu="true"]');
-                if (submenu && !this.isDisabled(submenu)) {
-                    this.closeSiblingSubmenus(submenu);
+                // Find the associated popover trigger element (div with data-popover-trigger)
+                const popoverTrigger = DOMUtils.findClosest(submenuTrigger, '[data-popover-trigger]') as HTMLElement;
+                if (popoverTrigger) {
+                    // Close any sibling submenus by finding other popover triggers in the same dropdown
+                    const dropdown = DOMUtils.findClosest(submenuTrigger, '[data-keys-dropdown]') as HTMLElement;
+                    if (dropdown) {
+                        const siblingTriggers = DOMUtils.querySelectorAll('[data-popover-trigger]', dropdown);
+                        siblingTriggers.forEach(trigger => {
+                            const popoverId = trigger.getAttribute('data-popover-trigger');
+                            if (popoverId && popoverId !== popoverTrigger.getAttribute('data-popover-trigger')) {
+                                const popover = document.getElementById(popoverId);
+                                if (popover && popover.matches(':popover-open')) {
+                                    (popover as any).hidePopover?.();
+                                }
+                            }
+                        });
+                    }
+
+                    // Open this submenu by simulating click on trigger after a short delay
                     setTimeout(() => {
                         if (submenuTrigger.matches(':hover')) {
-                            this.openSubmenu(submenu);
+                            submenuTrigger.click();
                         }
                     }, 100);
-                }
-            }
-        }, { capture: true });
-
-        EventUtils.addEventListener(document, 'mouseleave', (event) => {
-            const submenu = DOMUtils.findClosest(event.target as Element, '[data-submenu="true"]') as HTMLElement;
-            if (submenu && !this.isMobile()) {
-                const state = this.getState(submenu);
-                if (state?.isOpen) {
-                    setTimeout(() => {
-                        if (!submenu.matches(':hover')) {
-                            this.closeSubmenu(submenu);
-                        }
-                    }, 150);
                 }
             }
         }, { capture: true });
@@ -197,11 +202,26 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
                         }
                     }
 
+                    // Check if the added node is a submenu
+                    if (DOMUtils.hasDataAttribute(element, 'submenu', 'true')) {
+                        if (!this.hasState(element)) {
+                            this.initializeDropdown(element);
+                        }
+                    }
+
                     // Check for dropdowns within the added node
                     const dropdowns = DOMUtils.findByDataAttribute('dropdown', 'true', element);
                     dropdowns.forEach(dropdown => {
                         if (!this.hasState(dropdown)) {
                             this.initializeDropdown(dropdown);
+                        }
+                    });
+
+                    // Check for submenus within the added node
+                    const submenus = DOMUtils.findByDataAttribute('submenu', 'true', element);
+                    submenus.forEach(submenu => {
+                        if (!this.hasState(submenu)) {
+                            this.initializeDropdown(submenu);
                         }
                     });
                 }
@@ -236,12 +256,13 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         state.focusedIndex = -1;
         this.setState(dropdown, state);
 
-        const panel = DOMUtils.querySelector('[data-dropdown-panel]', dropdown) as HTMLElement;
+        // Find popover element (now the dropdown uses Popover component)
+        const popover = DOMUtils.querySelector('[data-keys-popover]', dropdown) as HTMLElement;
         const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
 
-        if (panel) {
-            panel.classList.remove('hidden');
-            this.positionDropdown(dropdown);
+        if (popover) {
+            // Use HTML Popover API instead of CSS classes
+            (popover as any).showPopover?.();
         }
 
         if (trigger) {
@@ -254,22 +275,30 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
     }
 
     /**
-     * Open submenu
+     * Open submenu using HTML Popover API
      */
     private openSubmenu(submenu: HTMLElement): void {
         const state = this.getState(submenu);
-        if (!state || this.isDisabled(submenu)) return;
+        if (!state || this.isDisabled(submenu)) {
+            return;
+        }
 
         state.isOpen = true;
         state.focusedIndex = -1;
+        this.closeSiblingSubmenus(submenu);
         this.setState(submenu, state);
 
-        const panel = DOMUtils.querySelector('[data-submenu-panel]', submenu) as HTMLElement;
+        // Find the popover element within the submenu
+        const popover = DOMUtils.querySelector('[data-keys-popover]', submenu) as HTMLElement;
         const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
 
-        if (panel) {
-            panel.classList.remove('hidden');
-            this.positionSubmenu(submenu);
+        if (popover) {
+            // Use HTML Popover API
+            try {
+                (popover as any).showPopover?.();
+            } catch (error) {
+                // Silently handle popover API errors
+            }
         }
 
         if (trigger) {
@@ -290,21 +319,19 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
 
         this.closeChildSubmenus(dropdown);
 
-        // Clean up floating instance
-        if (state.floating) {
-            state.floating.cleanup();
-            state.floating = undefined;
-        }
+        // No longer need FloatingManager cleanup - CSS anchor positioning handles this
 
         state.isOpen = false;
         state.focusedIndex = -1;
         this.setState(dropdown, state);
 
-        const panel = DOMUtils.querySelector('[data-dropdown-panel]', dropdown) as HTMLElement;
+        // Find popover element (now the dropdown uses Popover component)
+        const popover = DOMUtils.querySelector('[data-keys-popover]', dropdown) as HTMLElement;
         const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
 
-        if (panel) {
-            panel.classList.add('hidden');
+        if (popover) {
+            // Use HTML Popover API instead of CSS classes
+            (popover as any).hidePopover?.();
         }
 
         if (trigger) {
@@ -315,7 +342,7 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
     }
 
     /**
-     * Close submenu
+     * Close submenu using HTML Popover API
      */
     private closeSubmenu(submenu: HTMLElement): void {
         const state = this.getState(submenu);
@@ -323,21 +350,17 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
 
         this.closeChildSubmenus(submenu);
 
-        // Clean up floating instance
-        if (state.floating) {
-            state.floating.cleanup();
-            state.floating = undefined;
-        }
-
         state.isOpen = false;
         state.focusedIndex = -1;
         this.setState(submenu, state);
 
-        const panel = DOMUtils.querySelector('[data-submenu-panel]', submenu) as HTMLElement;
+        // Find the popover element within the submenu
+        const popover = DOMUtils.querySelector('[data-keys-popover]', submenu) as HTMLElement;
         const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
 
-        if (panel) {
-            panel.classList.add('hidden');
+        if (popover) {
+            // Use HTML Popover API
+            (popover as any).hidePopover?.();
         }
 
         if (trigger) {
@@ -411,7 +434,9 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
      */
     private toggleSubmenu(submenu: HTMLElement): void {
         const state = this.getState(submenu);
-        if (!state) return;
+        if (!state) {
+            return;
+        }
 
         if (state.isOpen) {
             this.closeSubmenu(submenu);
@@ -595,109 +620,9 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         this.setState(dropdown, state);
     }
 
-    /**
-     * Setup floating for submenu using Floating UI
-     */
-    private setupSubmenuFloating(submenu: HTMLElement, trigger: HTMLElement, panel: HTMLElement): void {
-        const state = this.getState(submenu);
-        if (!state) return;
 
-        // Clean up existing floating instance
-        if (state.floating) {
-            state.floating.cleanup();
-        }
 
-        // Parse configuration from submenu attributes
-        const position = submenu.dataset.position || 'right';
-        const align = submenu.dataset.align || 'start';
-        const offset = parseInt(submenu.dataset.offset || '4');
 
-        // Get RTL-aware positioning for submenus
-        const rtlPosition = RTLUtils.getDropdownPosition(
-            position as 'left' | 'right' | 'top' | 'bottom',
-            align as 'start' | 'center' | 'end'
-        );
-
-        // Convert position and align to Floating UI placement
-        let placement: any = rtlPosition.position;
-        if (rtlPosition.position === 'right' || rtlPosition.position === 'left') {
-            if (rtlPosition.align === 'start') placement = `${rtlPosition.position}-start`;
-            else if (rtlPosition.align === 'end') placement = `${rtlPosition.position}-end`;
-        } else if (rtlPosition.position === 'top' || rtlPosition.position === 'bottom') {
-            if (rtlPosition.align === 'start') placement = `${rtlPosition.position}-start`;
-            else if (rtlPosition.align === 'end') placement = `${rtlPosition.position}-end`;
-        }
-
-        // Create floating element with enhanced Floating UI features for submenu
-        const floating = FloatingManager.getInstance().createFloating(trigger, panel, {
-            placement,
-            offset,
-            flip: {
-                fallbackStrategy: 'bestFit',
-                padding: 8
-            },
-            shift: {
-                padding: 8,
-                crossAxis: true
-            },
-            hide: {
-                strategy: 'escaped'
-            },
-            autoUpdate: {
-                ancestorScroll: true,
-                ancestorResize: true,
-                elementResize: true,
-                layoutShift: true
-            }
-        });
-
-        state.floating = floating;
-        this.setState(submenu, state);
-    }
-
-    /**
-     * Position dropdown relative to trigger using Floating UI
-     */
-    private positionDropdown(dropdown: HTMLElement): void {
-        const panel = DOMUtils.querySelector('[data-dropdown-panel]', dropdown) as HTMLElement;
-        const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
-
-        if (!panel || !trigger) return;
-
-        const state = this.getState(dropdown);
-        if (!state) return;
-
-        // Setup floating element with Floating UI
-        this.setupFloating(dropdown, trigger, panel);
-    }
-
-    /**
-     * Position submenu relative to trigger using Floating UI
-     */
-    private positionSubmenu(submenu: HTMLElement): void {
-        const panel = DOMUtils.querySelector('[data-submenu-panel]', submenu) as HTMLElement;
-        const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
-
-        if (!panel || !trigger) return;
-
-        // Setup floating element with Floating UI for submenu
-        this.setupSubmenuFloating(submenu, trigger, panel);
-    }
-
-    /**
-     * Reposition all open dropdowns and submenus
-     */
-    private repositionDropdowns(): void {
-        this.getAllStates().forEach((state, dropdown) => {
-            if (state.isOpen) {
-                if (dropdown.hasAttribute('data-submenu')) {
-                    this.positionSubmenu(dropdown);
-                } else {
-                    this.positionDropdown(dropdown);
-                }
-            }
-        });
-    }
 
     /**
      * Check if dropdown is disabled
@@ -722,12 +647,7 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
      * Clean up DropdownActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // Clean up all floating instances
-        this.getAllStates().forEach((state, dropdown) => {
-            if (state.floating) {
-                state.floating.cleanup();
-            }
-        });
+        // No FloatingManager cleanup needed - CSS anchor positioning handles this
     }
 }
 

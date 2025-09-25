@@ -94,6 +94,22 @@ class Range extends Component
             return $this->errors->isNotEmpty();
         }
 
+        // Handle Laravel MessageBag
+        if (is_object($this->errors) && method_exists($this->errors, 'any')) {
+            return $this->errors->any();
+        }
+
+        // Handle ViewErrorBag
+        if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
+            try {
+                $bag = $this->errors->getBag('default');
+                return $bag && $bag->any();
+            } catch (\Exception $e) {
+                // If getBag fails, treat as no errors
+                return false;
+            }
+        }
+
         return false;
     }
 
