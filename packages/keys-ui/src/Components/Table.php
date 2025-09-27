@@ -21,66 +21,16 @@ class Table extends Component
         public bool $loading = false,
         public string $loadingText = 'Loading...',
         public string $loadingAnimation = 'spinner'
-    ) {
-    }
-
-    public function getTableClasses(): string
-    {
-        $base = 'min-w-full divide-y divide-border';
-        $size = $this->getSizeClasses();
-        $variants = $this->getVariantClasses();
-
-        return trim($base . ' ' . $size . ' ' . $variants);
-    }
-
-    public function getContainerClasses(): string
-    {
-        $base = '';
-
-        if ($this->responsive) {
-            $base .= 'overflow-x-auto ';
-        }
-
-        if ($this->bordered) {
-            $base .= 'border border-border rounded-md overflow-hidden ';
-        }
-
-        return trim($base);
-    }
-
-    protected function getSizeClasses(): string
-    {
-        return match ($this->size) {
-            'sm' => 'text-sm',
-            'md' => 'text-sm',
-            'lg' => 'text-base',
-            default => 'text-sm'
-        };
-    }
-
-    protected function getVariantClasses(): string
-    {
-        $classes = '';
-
-        if ($this->striped) {
-            $classes .= '[&_tbody_tr:nth-child(odd)]:bg-body ';
-        }
-
-        if ($this->hover) {
-            $classes .= '[&_tbody_tr]:hover:bg-body ';
-        }
-
-        return trim($classes);
-    }
+    ) {}
 
     public function hasPagination(): bool
     {
-        return !is_null($this->paginate);
+        return ! is_null($this->paginate);
     }
 
     public function getPaginationInfo(): ?string
     {
-        if (!$this->hasPagination()) {
+        if (! $this->hasPagination()) {
             return null;
         }
 
@@ -95,32 +45,49 @@ class Table extends Component
         return "Showing {$from} to {$to} of {$total} results";
     }
 
-    public function getComputedTableClasses(): string
-    {
-        return $this->getTableClasses();
-    }
-
-    public function getComputedContainerClasses(): string
-    {
-        return $this->getContainerClasses();
-    }
-
     public function isRowSelected(string $rowId): bool
     {
         return in_array($rowId, $this->selectedIds);
     }
 
-    public function getSelectionDataAttributes(): array
+    public function getDataAttributes(): array
     {
-        $attributes = [];
+        $attributes = [
+            'data-keys-table' => 'true',
+            'data-size' => $this->size,
+        ];
 
         if ($this->selectable) {
-            $attributes['data-table'] = 'true';
             $attributes['data-selectable'] = 'true';
+            $attributes['data-selection-name'] = $this->selectionName;
 
             if ($this->livewireSelectionMethod) {
                 $attributes['data-selection-method'] = $this->livewireSelectionMethod;
             }
+        }
+
+        if ($this->striped) {
+            $attributes['data-striped'] = 'true';
+        }
+
+        if ($this->hover) {
+            $attributes['data-hover'] = 'true';
+        }
+
+        if ($this->bordered) {
+            $attributes['data-bordered'] = 'true';
+        }
+
+        if ($this->responsive) {
+            $attributes['data-responsive'] = 'true';
+        }
+
+        if ($this->loading) {
+            $attributes['data-loading'] = 'true';
+        }
+
+        if ($this->hasPagination()) {
+            $attributes['data-has-pagination'] = 'true';
         }
 
         return $attributes;
@@ -129,9 +96,7 @@ class Table extends Component
     public function render()
     {
         return view('keys::components.table', [
-            'computedTableClasses' => $this->getComputedTableClasses(),
-            'computedContainerClasses' => $this->getComputedContainerClasses(),
-            'selectionDataAttributes' => $this->getSelectionDataAttributes(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

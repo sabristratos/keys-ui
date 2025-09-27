@@ -8,27 +8,20 @@ class Body extends Component
 {
     public function __construct(
         public string $variant = 'default'
-    ) {
-    }
+    ) {}
 
-    public function getBodyClasses(): string
+    public function getDataAttributes(): array
     {
-        return match ($this->variant) {
-            'divided' => 'divide-y divide-border bg-surface',
-            'bordered' => 'divide-y divide-border bg-surface border-t border-border',
-            default => 'divide-y divide-border bg-surface'
-        };
-    }
-
-    public function getComputedBodyClasses(): string
-    {
-        return $this->getBodyClasses();
+        return [
+            'data-keys-table-body' => 'true',
+            'data-variant' => $this->variant,
+        ];
     }
 
     public function render()
     {
         return view('keys::components.table.body', [
-            'computedBodyClasses' => $this->getComputedBodyClasses(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

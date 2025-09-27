@@ -30,7 +30,7 @@ export class TabsActions extends BaseActionClass<TabState> {
      * Initialize tabs elements - required by BaseActionClass
      */
     protected initializeElements(): void {
-        DOMUtils.findByDataAttribute('tabs', 'true').forEach(tabs => {
+        DOMUtils.findByDataAttribute('keys-tabs', 'true').forEach(tabs => {
             this.initializeTabsElement(tabs);
         });
     }
@@ -76,14 +76,14 @@ export class TabsActions extends BaseActionClass<TabState> {
         EventUtils.handleDelegatedClick('[data-tabs-trigger="true"]', (tab, event) => {
             event.preventDefault();
 
-            const tabsElement = DOMUtils.findClosest(tab, '[data-tabs="true"]');
+            const tabsElement = DOMUtils.findClosest(tab, '[data-keys-tabs="true"]');
             if (tabsElement && tab.getAttribute('aria-disabled') !== 'true') {
                 this.activateTab(tabsElement, tab.dataset.value || '');
             }
         });
 
         EventUtils.handleDelegatedKeydown('[data-tabs-trigger="true"]', (tab, event) => {
-            const tabsElement = DOMUtils.findClosest(tab, '[data-tabs="true"]');
+            const tabsElement = DOMUtils.findClosest(tab, '[data-keys-tabs="true"]');
             if (tabsElement) {
                 this.handleKeydown(tabsElement, event);
             }
@@ -104,14 +104,14 @@ export class TabsActions extends BaseActionClass<TabState> {
                     const element = node as HTMLElement;
 
                     // Check if the added node is a tabs element
-                    if (DOMUtils.hasDataAttribute(element, 'tabs', 'true')) {
+                    if (DOMUtils.hasDataAttribute(element, 'keys-tabs', 'true')) {
                         if (!this.hasState(element)) {
                             this.initializeTabsElement(element);
                         }
                     }
 
                     // Check for tabs within the added node
-                    const tabs = DOMUtils.findByDataAttribute('tabs', 'true', element);
+                    const tabs = DOMUtils.findByDataAttribute('keys-tabs', 'true', element);
                     tabs.forEach(tabsEl => {
                         if (!this.hasState(tabsEl)) {
                             this.initializeTabsElement(tabsEl);
@@ -321,7 +321,7 @@ export class TabsActions extends BaseActionClass<TabState> {
 
         const activeTab = state.tabs.find(tab => tab.dataset.value === state.activeTab);
         if (activeTab) {
-            AnimationUtils.createTimer(() => {
+            setTimeout(() => {
                 this.repositionMarker(tabsElement, activeTab);
             }, 10);
         }

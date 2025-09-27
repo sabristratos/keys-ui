@@ -1,16 +1,158 @@
+@once
+<style>
+/* Accordion - Custom CSS that can't be expressed as Tailwind utilities */
+
+/* Remove webkit details marker (pseudo-element can't be styled with Tailwind) */
+details[data-keys-accordion] summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Reduced motion accessibility - Complex media query with !important overrides */
+@media (prefers-reduced-motion: reduce) {
+    details[data-keys-accordion] .accordion-content-wrapper {
+        transition-duration: 0.01ms !important;
+    }
+    details[data-keys-accordion] * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+</style>
+@endonce
+
 @php
     $attributes = $attributes->except(['title', 'icon', 'collapsed', 'disabled', 'color', 'size', 'actions', 'actionVariant', 'actionSize', 'animated']);
+
+    // Base classes for details element
+    $baseClasses = 'group overflow-hidden transition-all duration-200';
+
+    // Variant classes for container styling
+    $variantClasses = match ($variant) {
+        'default' => 'bg-surface border border-border',
+        'flush' => 'bg-transparent border-0',
+        'spaced' => 'bg-surface border border-border mb-3',
+        'outlined' => 'bg-transparent border border-border',
+        'elevated' => 'bg-surface border border-border shadow-md',
+        default => 'bg-surface border border-border'
+    };
+
+    // Rounded classes
+    $roundedClasses = match ($rounded) {
+        'none' => '',
+        'xs' => 'rounded-sm',
+        'sm' => 'rounded',
+        'md' => 'rounded-md',
+        'lg' => 'rounded-lg',
+        'xl' => 'rounded-xl',
+        '2xl' => 'rounded-2xl',
+        '3xl' => 'rounded-3xl',
+        default => 'rounded-lg'
+    };
+
+    // Size classes for padding/text
+    $sizeClasses = match ($size) {
+        'xs' => 'px-3 py-2 text-sm',
+        'sm' => 'px-4 py-3 text-sm',
+        'md' => 'px-4 py-3 text-base',
+        'lg' => 'px-6 py-4 text-lg',
+        default => 'px-4 py-3 text-base'
+    };
+
+    // Summary color classes
+    $summaryColorClasses = $variant === 'flush'
+        ? match ($color) {
+            'brand' => 'hover:bg-brand/5 text-brand',
+            'success' => 'hover:bg-success/5 text-success',
+            'warning' => 'hover:bg-warning/5 text-warning',
+            'danger' => 'hover:bg-danger/5 text-danger',
+            default => 'hover:bg-neutral/5 text-foreground'
+        }
+        : match ($color) {
+            'brand' => 'bg-brand/5 hover:bg-brand/10 text-brand',
+            'success' => 'bg-success/5 hover:bg-success/10 text-success',
+            'warning' => 'bg-warning/5 hover:bg-warning/10 text-warning',
+            'danger' => 'bg-danger/5 hover:bg-danger/10 text-danger',
+            default => 'bg-surface hover:bg-neutral/5 text-foreground'
+        };
+
+    // Content wrapper classes with CSS Grid animation using Tailwind
+    $contentWrapperClasses = 'grid grid-rows-[0fr] opacity-0 transition-all duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-open:grid-rows-[1fr] group-open:opacity-100';
+
+    // Content inner classes
+    $contentInnerClasses = 'overflow-hidden';
+
+    // Content color classes
+    $contentColorClasses = $variant === 'flush'
+        ? match ($color) {
+            'brand' => 'text-brand',
+            'success' => 'text-success',
+            'warning' => 'text-warning',
+            'danger' => 'text-danger',
+            default => 'text-muted'
+        }
+        : match ($color) {
+            'brand' => 'bg-brand/5 text-brand',
+            'success' => 'bg-success/5 text-success',
+            'warning' => 'bg-warning/5 text-warning',
+            'danger' => 'bg-danger/5 text-danger',
+            default => 'bg-surface text-muted'
+        };
+
+    // Content size classes
+    $contentSizeClasses = match ($size) {
+        'xs' => 'px-3 py-2',
+        'sm' => 'px-4 py-3',
+        'md' => 'px-4 py-3',
+        'lg' => 'px-6 py-4',
+        default => 'px-4 py-3'
+    };
+
+    // Icon size
+    $iconSize = match ($size) {
+        'xs' => 'xs',
+        'sm' => 'sm',
+        'md' => 'sm',
+        'lg' => 'md',
+        default => 'sm'
+    };
+
+    // Disabled classes
+    $disabledClasses = $disabled ? 'opacity-50 cursor-not-allowed' : '';
+    $summaryDisabledClasses = $disabled ? 'cursor-not-allowed' : 'cursor-pointer';
+
+    // Border for content (not for flush variant)
+    $contentBorderClass = $variant === 'flush' ? '' : 'border-t border-border';
+
+    // Prepare action data to avoid Blade directives inside component attributes
+    $preparedActionData = [];
+    foreach ($computedActionData as $action) {
+        $preparedActionData[] = [
+            'variant' => $actionVariant,
+            'size' => $computedActionSize,
+            'icon' => $action['icon'],
+            'icon_toggle' => $action['icon_toggle'],
+            'icon_success' => $action['icon_success'],
+            'data_action' => $action['data_action'],
+            'data_url' => $action['data_url'] ?? null,
+            'label' => $action['label']
+        ];
+    }
+
+    // Combine all classes
+    $detailsClasses = trim("{$baseClasses} {$variantClasses} {$roundedClasses} {$disabledClasses}");
+    $summaryClasses = trim("list-none flex items-center justify-between w-full select-none transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 disabled:pointer-events-none {$sizeClasses} {$summaryColorClasses} {$summaryDisabledClasses}");
+    $contentClasses = trim("{$contentBorderClass} {$contentSizeClasses} {$contentColorClasses}");
 @endphp
 
 <details
     id="{{ $id }}"
-    class="{{ $detailsClasses() }}"
+    class="{{ $detailsClasses }}"
     {{ $collapsed ? '' : 'open' }}
     {{ $disabled ? 'disabled' : '' }}
-    @if($animated) data-accordion="true" @endif
-    {{ $attributes }}
+    {{ $attributes->merge($dataAttributes) }}
 >
-    <summary class="{{ $summaryClasses() }}" @if($disabled) tabindex="-1" @endif>
+    <summary class="{{ $summaryClasses }}" tabindex="{{ $disabled ? '-1' : '0' }}">
         <div class="flex items-center gap-3 flex-1 min-w-0">
             @if($title)
                 <span class="font-medium truncate">{{ $title }}</span>
@@ -20,56 +162,47 @@
         <div class="flex items-center gap-2 ml-auto">
             @if($hasActions())
                 <div class="flex items-center gap-1">
-                    @foreach($computedActionData as $action)
-                        <div class="input-action"
-                             data-action="{{ $action['data_action'] }}"
-                             @if($action['data_url']) data-url="{{ $action['data_url'] }}" @endif
-                             @if($action['data_icon_toggle']) data-icon-toggle="{{ $action['data_icon_toggle'] }}" @endif
-                             @if($action['data_icon_success']) data-icon-success="{{ $action['data_icon_success'] }}" @endif
-                             @if($action['data_label_toggle']) data-label-toggle="{{ $action['data_label_toggle'] }}" @endif
-                             @if($action['data_label_success']) data-label-success="{{ $action['data_label_success'] }}" @endif>
+                    @foreach($preparedActionData as $actionData)
+                        @if($actionData['data_url'])
                             <x-keys::button
-                                :variant="$actionVariant"
-                                :size="$computedActionSize"
-                                :icon="$action['icon']"
-                                :data-icon-default="$action['data_icon_default']"
-                                :data-icon-toggle="$action['data_icon_toggle']"
-                                :data-icon-success="$action['data_icon_success']"
-                                :data-label-toggle="$action['data_label_toggle']"
-                                :data-label-success="$action['data_label_success']"
+                                variant="{{ $actionData['variant'] }}"
+                                size="{{ $actionData['size'] }}"
+                                icon="{{ $actionData['icon'] }}"
+                                icon-toggle="{{ $actionData['icon_toggle'] }}"
+                                icon-success="{{ $actionData['icon_success'] }}"
+                                data-action="{{ $actionData['data_action'] }}"
+                                data-url="{{ $actionData['data_url'] }}"
                                 onclick="event.stopPropagation();">
-                                <span class="sr-only">{{ $action['label'] }}</span>
-                                @if($action['is_multi_state'])
-                                    <span class="button-icon-default {{ $action['icon'] === $action['data_icon_default'] ? 'opacity-100' : 'opacity-0' }} transition-opacity duration-200">
-                                        <x-keys::icon :name="$action['data_icon_default']" :size="$computedActionSize" />
-                                    </span>
-                                    @if($action['data_icon_toggle'])
-                                        <span class="button-icon-toggle {{ $action['icon'] === $action['data_icon_toggle'] ? 'opacity-100' : 'opacity-0' }} absolute inset-0 flex items-center justify-center transition-all duration-200">
-                                            <x-keys::icon :name="$action['data_icon_toggle']" :size="$computedActionSize" />
-                                        </span>
-                                    @endif
-                                    @if($action['data_icon_success'])
-                                        <span class="button-icon-success opacity-0 absolute inset-0 flex items-center justify-center transition-all duration-200">
-                                            <x-keys::icon :name="$action['data_icon_success']" :size="$computedActionSize" />
-                                        </span>
-                                    @endif
-                                @endif
+                                <span class="sr-only">{{ $actionData['label'] }}</span>
                             </x-keys::button>
-                        </div>
+                        @else
+                            <x-keys::button
+                                variant="{{ $actionData['variant'] }}"
+                                size="{{ $actionData['size'] }}"
+                                icon="{{ $actionData['icon'] }}"
+                                icon-toggle="{{ $actionData['icon_toggle'] }}"
+                                icon-success="{{ $actionData['icon_success'] }}"
+                                data-action="{{ $actionData['data_action'] }}"
+                                onclick="event.stopPropagation();">
+                                <span class="sr-only">{{ $actionData['label'] }}</span>
+                            </x-keys::button>
+                        @endif
                     @endforeach
                 </div>
             @endif
 
             @if($icon)
-                <div class="{{ $iconClasses() }}">
-                    <x-keys::icon :name="$icon" :size="$iconSize()" />
+                <div class="transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-open:rotate-180 {{ $disabled ? 'opacity-50' : '' }}">
+                    <x-keys::icon :name="$icon" :size="$iconSize" />
                 </div>
             @endif
         </div>
     </summary>
 
-    <div class="{{ $contentClasses() }}">
-        {{ $slot }}
+    <div class="{{ $contentWrapperClasses }}">
+        <div class="{{ $contentInnerClasses }} {{ $contentClasses }}">
+            {{ $slot }}
+        </div>
     </div>
 
 </details>

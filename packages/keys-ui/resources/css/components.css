@@ -4,6 +4,7 @@
  * This allows utilities to override component styles while maintaining organization
  */
 
+
 @layer components {
   /* ===== TOOLTIP COMPONENT ===== */
   /* Tooltip core styling - uses semantic design tokens */
@@ -18,6 +19,73 @@
   [data-tooltip-target]:hover,
   [data-tooltip-trigger]:hover {
     cursor: help;
+  }
+
+  /* Tooltip arrow styling with placement-aware borders */
+  .tooltip-arrow {
+    border: 1px solid transparent;
+  }
+
+  /* Arrow borders based on tooltip placement */
+  [data-tooltip-placement="top"] .tooltip-arrow,
+  [data-tooltip-placement="top-start"] .tooltip-arrow,
+  [data-tooltip-placement="top-end"] .tooltip-arrow {
+    border-bottom-color: var(--color-neutral-700);
+    border-right-color: var(--color-neutral-700);
+  }
+
+  [data-tooltip-placement="bottom"] .tooltip-arrow,
+  [data-tooltip-placement="bottom-start"] .tooltip-arrow,
+  [data-tooltip-placement="bottom-end"] .tooltip-arrow {
+    border-top-color: var(--color-neutral-700);
+    border-left-color: var(--color-neutral-700);
+  }
+
+  [data-tooltip-placement="left"] .tooltip-arrow,
+  [data-tooltip-placement="left-start"] .tooltip-arrow,
+  [data-tooltip-placement="left-end"] .tooltip-arrow {
+    border-top-color: var(--color-neutral-700);
+    border-right-color: var(--color-neutral-700);
+  }
+
+  [data-tooltip-placement="right"] .tooltip-arrow,
+  [data-tooltip-placement="right-start"] .tooltip-arrow,
+  [data-tooltip-placement="right-end"] .tooltip-arrow {
+    border-bottom-color: var(--color-neutral-700);
+    border-left-color: var(--color-neutral-700);
+  }
+
+  /* Light color variant arrows */
+  [data-tooltip-color="light"] .tooltip-arrow {
+    border-color: transparent;
+  }
+
+  [data-tooltip-color="light"][data-tooltip-placement="top"] .tooltip-arrow,
+  [data-tooltip-color="light"][data-tooltip-placement="top-start"] .tooltip-arrow,
+  [data-tooltip-color="light"][data-tooltip-placement="top-end"] .tooltip-arrow {
+    border-bottom-color: var(--color-border);
+    border-right-color: var(--color-border);
+  }
+
+  [data-tooltip-color="light"][data-tooltip-placement="bottom"] .tooltip-arrow,
+  [data-tooltip-color="light"][data-tooltip-placement="bottom-start"] .tooltip-arrow,
+  [data-tooltip-color="light"][data-tooltip-placement="bottom-end"] .tooltip-arrow {
+    border-top-color: var(--color-border);
+    border-left-color: var(--color-border);
+  }
+
+  [data-tooltip-color="light"][data-tooltip-placement="left"] .tooltip-arrow,
+  [data-tooltip-color="light"][data-tooltip-placement="left-start"] .tooltip-arrow,
+  [data-tooltip-color="light"][data-tooltip-placement="left-end"] .tooltip-arrow {
+    border-top-color: var(--color-border);
+    border-right-color: var(--color-border);
+  }
+
+  [data-tooltip-color="light"][data-tooltip-placement="right"] .tooltip-arrow,
+  [data-tooltip-color="light"][data-tooltip-placement="right-start"] .tooltip-arrow,
+  [data-tooltip-color="light"][data-tooltip-placement="right-end"] .tooltip-arrow {
+    border-bottom-color: var(--color-border);
+    border-left-color: var(--color-border);
   }
 
   /* Mobile responsiveness */
@@ -87,7 +155,7 @@
   }
 
   /* Focus management */
-  dialog[data-modal]:focus {
+  dialog[data-modal]:focus-visible {
     outline: none;
   }
 
@@ -126,187 +194,6 @@
     z-index: 1;
   }
 
-  /* ===== DATE PICKER COMPONENT ===== */
-  [data-date-picker="true"] {
-    position: relative;
-  }
-
-  /* Date picker input */
-  [data-date-picker="true"] .date-picker-input {
-    cursor: pointer;
-  }
-
-  [data-date-picker="true"] .date-picker-input:read-only {
-    cursor: pointer;
-    background-color: var(--color-input);
-  }
-
-  /* Calendar dropdown */
-  [data-date-picker="true"] .date-picker-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin-top: var(--spacing-md);
-    z-index: var(--z-dropdown);
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-var(--spacing-md)) scale(var(--scale-down));
-    transform-origin: top;
-    pointer-events: none;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  /* Dropdown open state */
-  [data-date-picker="true"] .date-picker-dropdown.open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
-  }
-
-  /* Inline mode */
-  [data-date-picker="true"][data-inline="true"] .date-picker-dropdown {
-    position: static;
-    margin-top: var(--spacing-md);
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    pointer-events: auto;
-    box-shadow: none;
-  }
-
-  /* Quick selectors */
-  [data-date-picker="true"] .quick-selectors {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-    padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--color-border);
-    background-color: var(--color-surface-50);
-  }
-
-  [data-date-picker="true"]:where(.dark, .dark *) .quick-selectors {
-    background-color: var(--color-surface-900);
-  }
-
-  [data-date-picker="true"] .quick-selector-btn {
-    padding: var(--spacing-xs) var(--spacing-lg);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--color-foreground);
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-  }
-
-  [data-date-picker="true"] .quick-selector-btn:hover {
-    background-color: var(--color-brand-50);
-    border-color: var(--color-brand);
-    color: var(--color-brand);
-  }
-
-  [data-date-picker="true"]:where(.dark, .dark *) .quick-selector-btn:hover {
-    background-color: var(--color-brand-950);
-  }
-
-  [data-date-picker="true"] .quick-selector-btn:active {
-    transform: scale(var(--scale-down));
-  }
-
-  /* Left icon positioning */
-  [data-date-picker="true"] .icon-left {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: var(--color-muted);
-  }
-
-  /* Icon positions based on size */
-  [data-date-picker="true"][data-size="sm"] .icon-left { left: var(--icon-offset-sm); }
-  [data-date-picker="true"][data-size="md"] .icon-left { left: var(--icon-offset-md); }
-  [data-date-picker="true"][data-size="lg"] .icon-left { left: var(--icon-offset-lg); }
-
-  /* Error state */
-  [data-date-picker="true"].has-error .date-picker-input {
-    border-color: var(--color-danger);
-  }
-
-  [data-date-picker="true"].has-error .date-picker-input:focus {
-    ring-color: var(--color-danger);
-  }
-
-  /* Disabled state */
-  [data-date-picker="true"][data-disabled="true"] .date-picker-input {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  [data-date-picker="true"][data-disabled="true"] .date-picker-trigger,
-  [data-date-picker="true"][data-disabled="true"] .date-picker-clear {
-    pointer-events: none;
-    opacity: 0.6;
-  }
-
-  /* Custom trigger button styles */
-  [data-date-picker="true"] .custom-trigger {
-    cursor: pointer;
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 640px) {
-    [data-date-picker="true"] .date-picker-dropdown {
-      width: 90%;
-      max-width: 360px;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    [data-date-picker="true"][data-inline="true"] .date-picker-dropdown {
-      position: static;
-      transform: none;
-      width: 100%;
-      max-width: none;
-    }
-  }
-
-  /* Animation keyframes */
-  @keyframes datePickerSlideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-var(--spacing-md)) scale(var(--scale-down));
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  @keyframes datePickerSlideUp {
-    from {
-      opacity: 0;
-      transform: translateY(var(--spacing-md)) scale(var(--scale-down));
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  [data-date-picker="true"] .date-picker-dropdown.animating-in {
-    animation: datePickerSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  [data-date-picker="true"] .date-picker-dropdown.top.animating-in {
-    animation: datePickerSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
 
   /* ===== FILE UPLOAD COMPONENT ===== */
   /* Drag state styling - Complex state changes that require CSS */
@@ -354,44 +241,6 @@
     background-color: var(--color-body);
   }
 
-  /* ===== ACCORDION COMPONENT ===== */
-  /* Remove default summary styling */
-  [data-accordion] summary {
-    list-style: none;
-  }
-
-  [data-accordion] summary::-webkit-details-marker {
-    display: none;
-  }
-
-  /* Ensure content doesn't overflow during animation */
-  [data-accordion][animating] {
-    overflow: hidden;
-  }
-
-  /* Handle focus styles for summary */
-  [data-accordion] summary:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-  }
-
-  [data-accordion] summary:focus-visible {
-    box-shadow: 0 0 0 2px rgb(from var(--color-brand) r g b / 0.5), 0 0 0 4px rgb(from var(--color-brand) r g b / 0.1);
-  }
-
-  /* Disabled state */
-  [data-accordion][disabled] summary {
-    pointer-events: none;
-  }
-
-  /* Reduce motion for accessibility */
-  @media (prefers-reduced-motion: reduce) {
-    [data-accordion] * {
-      transition-duration: 0.01ms !important;
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-    }
-  }
 
   /* ===== FILE PREVIEW ITEM COMPONENT ===== */
   /* Hover scale effect for thumbnails */
@@ -428,39 +277,60 @@
   /* ===== SCROLLBAR COMPONENTS ===== */
   /* Custom Scrollbar Implementation - Modern browsers with cross-browser compatibility */
 
-  /* Base scrollbar styling - applies to all scrollable elements */
-  * {
+  /* Base scrollbar styling - scoped to avoid global conflicts */
+  .scrollable,
+  [data-scrollable="true"],
+  [data-keys-component],
+  [data-select-options] {
     /* Firefox */
     scrollbar-width: thin;
     scrollbar-color: light-dark(var(--color-neutral-300), var(--color-neutral-600)) transparent;
   }
 
   /* Webkit browsers (Chrome, Safari, Edge) */
-  *::-webkit-scrollbar {
+  .scrollable::-webkit-scrollbar,
+  [data-scrollable="true"]::-webkit-scrollbar,
+  [data-keys-component]::-webkit-scrollbar,
+  [data-select-options]::-webkit-scrollbar {
     width: var(--width-scrollbar);
     height: var(--width-scrollbar);
   }
 
-  *::-webkit-scrollbar-track {
+  .scrollable::-webkit-scrollbar-track,
+  [data-scrollable="true"]::-webkit-scrollbar-track,
+  [data-keys-component]::-webkit-scrollbar-track,
+  [data-select-options]::-webkit-scrollbar-track {
     background: transparent;
     border-radius: 3px;
   }
 
-  *::-webkit-scrollbar-thumb {
+  .scrollable::-webkit-scrollbar-thumb,
+  [data-scrollable="true"]::-webkit-scrollbar-thumb,
+  [data-keys-component]::-webkit-scrollbar-thumb,
+  [data-select-options]::-webkit-scrollbar-thumb {
     background: light-dark(var(--color-neutral-300), var(--color-neutral-600));
     border-radius: 3px;
     transition: background-color 0.2s ease;
   }
 
-  *::-webkit-scrollbar-thumb:hover {
+  .scrollable::-webkit-scrollbar-thumb:hover,
+  [data-scrollable="true"]::-webkit-scrollbar-thumb:hover,
+  [data-keys-component]::-webkit-scrollbar-thumb:hover,
+  [data-select-options]::-webkit-scrollbar-thumb:hover {
     background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
   }
 
-  *::-webkit-scrollbar-thumb:active {
+  .scrollable::-webkit-scrollbar-thumb:active,
+  [data-scrollable="true"]::-webkit-scrollbar-thumb:active,
+  [data-keys-component]::-webkit-scrollbar-thumb:active,
+  [data-select-options]::-webkit-scrollbar-thumb:active {
     background: light-dark(var(--color-neutral-500), var(--color-neutral-400));
   }
 
-  *::-webkit-scrollbar-corner {
+  .scrollable::-webkit-scrollbar-corner,
+  [data-scrollable="true"]::-webkit-scrollbar-corner,
+  [data-keys-component]::-webkit-scrollbar-corner,
+  [data-select-options]::-webkit-scrollbar-corner {
     background: transparent;
   }
 

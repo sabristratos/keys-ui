@@ -47,7 +47,7 @@ class Range extends Component
         }
 
         // Auto-enable showTicks if ticks are provided
-        if (!empty($this->ticks)) {
+        if (! empty($this->ticks)) {
             $this->showTicks = true;
         }
 
@@ -61,14 +61,15 @@ class Range extends Component
             $this->step = 1;
         }
 
-        if (!$this->hasError && $this->hasErrors()) {
+
+        if (! $this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
     }
 
     public function isShorthand(): bool
     {
-        return !is_null($this->label);
+        return ! is_null($this->label);
     }
 
     public function hasError(): bool
@@ -83,11 +84,11 @@ class Range extends Component
         }
 
         if (is_string($this->errors)) {
-            return !empty(trim($this->errors));
+            return ! empty(trim($this->errors));
         }
 
         if (is_array($this->errors)) {
-            return !empty($this->errors);
+            return ! empty($this->errors);
         }
 
         if ($this->errors instanceof Collection) {
@@ -103,6 +104,7 @@ class Range extends Component
         if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
             try {
                 $bag = $this->errors->getBag('default');
+
                 return $bag && $bag->any();
             } catch (\Exception $e) {
                 // If getBag fails, treat as no errors
@@ -113,67 +115,6 @@ class Range extends Component
         return false;
     }
 
-    public function trackClasses(): string
-    {
-        $base = 'relative h-2 rounded-full transition-colors duration-200';
-        $state = $this->disabled
-            ? 'bg-neutral-200 dark:bg-neutral-700'
-            : 'bg-neutral-200 dark:bg-neutral-700';
-
-        return trim($base . ' ' . $state);
-    }
-
-    public function handleClasses(): string
-    {
-        $base = 'absolute w-5 h-5 rounded-full border-2 transition-all duration-200 transform -translate-y-1/2 cursor-pointer';
-
-        if ($this->disabled) {
-            $state = 'bg-neutral-100 border-neutral-300 cursor-not-allowed';
-        } elseif ($this->hasError()) {
-            $state = 'bg-white border-danger shadow-sm hover:shadow-md focus:shadow-md focus:ring-2 focus:ring-danger focus:ring-offset-2';
-        } else {
-            $state = 'bg-white border-brand shadow-sm hover:shadow-md focus:shadow-md focus:ring-2 focus:ring-brand focus:ring-offset-2';
-        }
-
-        return trim($base . ' ' . $state);
-    }
-
-    public function fillClasses(): string
-    {
-        $base = 'absolute h-full rounded-full transition-all duration-200';
-        $state = $this->hasError()
-            ? 'bg-danger'
-            : 'bg-brand';
-
-        return trim($base . ' ' . $state);
-    }
-
-    public function sizeClasses(): string
-    {
-        return match ($this->size) {
-            'xs' => 'h-0.5',
-            'sm' => 'h-1',
-            'md' => 'h-2',
-            'lg' => 'h-3',
-            'xl' => 'h-4',
-            default => 'h-2'
-        };
-    }
-
-    public function containerClasses(): string
-    {
-        $base = 'relative';
-        $spacing = match ($this->size) {
-            'xs' => 'px-1 py-2',
-            'sm' => 'px-2 py-3',
-            'md' => 'px-3 py-4',
-            'lg' => 'px-4 py-5',
-            'xl' => 'px-5 py-6',
-            default => 'px-3 py-4'
-        };
-
-        return trim($base . ' ' . $spacing);
-    }
 
     public function getComputedValue(): mixed
     {
@@ -191,6 +132,7 @@ class Range extends Component
         if ($this->dual) {
             $minPercent = (($this->minValue - $this->min) / $range) * 100;
             $maxPercent = (($this->maxValue - $this->min) / $range) * 100;
+
             return [$minPercent, $maxPercent];
         }
 
@@ -228,29 +170,10 @@ class Range extends Component
         return $computedTicks;
     }
 
-    public function getComputedTrackClasses(): string
-    {
-        return $this->trackClasses();
-    }
-
-    public function getComputedHandleClasses(): string
-    {
-        return $this->handleClasses();
-    }
-
-    public function getComputedFillClasses(): string
-    {
-        return $this->fillClasses();
-    }
-
-    public function getComputedContainerClasses(): string
-    {
-        return $this->containerClasses();
-    }
 
     public function getUniqueId(): string
     {
-        return $this->id ?? 'range-' . uniqid();
+        return $this->id ?? 'range-'.uniqid();
     }
 
     public function getDataAttributes(): array
@@ -261,7 +184,7 @@ class Range extends Component
             'data-min' => $this->min,
             'data-max' => $this->max,
             'data-step' => $this->step,
-            'data-value' => $this->value,
+            'data-value' => $this->dual ? json_encode([$this->minValue, $this->maxValue]) : $this->value,
         ];
 
         // State attributes
@@ -282,7 +205,7 @@ class Range extends Component
             $attributes['data-show-values'] = 'true';
         }
 
-        if (!empty($this->ticks)) {
+        if (! empty($this->ticks)) {
             $attributes['data-show-ticks'] = 'true';
             $attributes['data-ticks-count'] = count($this->ticks);
         }
@@ -296,10 +219,6 @@ class Range extends Component
             'computedValue' => $this->getComputedValue(),
             'computedPercentage' => $this->getComputedPercentage(),
             'computedTicks' => $this->getComputedTicks(),
-            'computedTrackClasses' => $this->getComputedTrackClasses(),
-            'computedHandleClasses' => $this->getComputedHandleClasses(),
-            'computedFillClasses' => $this->getComputedFillClasses(),
-            'computedContainerClasses' => $this->getComputedContainerClasses(),
             'uniqueId' => $this->getUniqueId(),
             'dataAttributes' => $this->getDataAttributes(),
         ]);

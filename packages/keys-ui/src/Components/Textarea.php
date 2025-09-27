@@ -5,8 +5,47 @@ namespace Keys\UI\Components;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
 
+/**
+ * Textarea Component
+ *
+ * A comprehensive textarea component with icon support, actions, validation, and advanced features.
+ * Supports auto-resize, character counting, resize modes, and auto-generated actions.
+ */
 class Textarea extends Component
 {
+    /**
+     * Create a new Textarea component instance.
+     *
+     * @param  string|null  $name  Form field name
+     * @param  string|null  $id  Textarea ID (auto-generated if not provided)
+     * @param  string|null  $value  Textarea value
+     * @param  string|null  $placeholder  Placeholder text
+     * @param  string  $size  Size variant (xs, sm, md, lg)
+     * @param  bool  $disabled  Whether the textarea is disabled
+     * @param  bool  $readonly  Whether the textarea is readonly
+     * @param  bool  $required  Whether the textarea is required
+     * @param  int  $rows  Number of visible text lines
+     * @param  int|null  $cols  Number of visible character widths
+     * @param  string  $resize  Resize behavior (none, both, horizontal, vertical)
+     * @param  bool  $autoResize  Enable automatic height adjustment
+     * @param  string|null  $label  Label text for shorthand mode
+     * @param  bool  $optional  Whether to show optional indicator
+     * @param  string|array|Collection|null  $errors  Validation errors
+     * @param  bool  $showErrors  Whether to display validation errors
+     * @param  string|null  $icon  Alias for iconLeft
+     * @param  string|null  $iconLeft  Left icon name
+     * @param  string|null  $iconRight  Right icon name
+     * @param  string|null  $hint  Hint text below textarea
+     * @param  array  $actions  Custom actions array
+     * @param  bool  $clearable  Enable clear action
+     * @param  bool  $copyable  Enable copy action
+     * @param  string|null  $externalUrl  Enable external link action
+     * @param  string  $actionVariant  Action button variant
+     * @param  string  $actionSize  Action button size
+     * @param  bool  $hasError  Force error state
+     * @param  bool  $showCharacterCount  Show character count
+     * @param  int|null  $maxLength  Maximum character length
+     */
     public function __construct(
         public ?string $name = null,
         public ?string $id = null,
@@ -24,10 +63,10 @@ class Textarea extends Component
         public bool $optional = false,
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
-        public ?string $icon = null,  // Alias for iconLeft
+        public ?string $icon = null,
         public ?string $iconLeft = null,
         public ?string $iconRight = null,
-        public ?string $hint = null,  // Add support for hint text
+        public ?string $hint = null,
         public array $actions = [],
         public bool $clearable = false,
         public bool $copyable = false,
@@ -38,28 +77,37 @@ class Textarea extends Component
         public bool $showCharacterCount = false,
         public ?int $maxLength = null
     ) {
-        // Handle icon alias for iconLeft
-        if ($this->icon && !$this->iconLeft) {
+        if ($this->icon && ! $this->iconLeft) {
             $this->iconLeft = $this->icon;
         }
 
-        $this->id = $this->id ?? $this->name;
+        $this->id = $this->id ?? $this->name ?? 'textarea-'.uniqid();
 
-        if (!$this->hasError && $this->hasErrors()) {
+        if (! $this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
     }
 
+    /**
+     * Check if the component is using shorthand mode (with label).
+     */
     public function isShorthand(): bool
     {
         return ! is_null($this->label);
     }
 
+    /**
+     * Check if the textarea has an error state.
+     */
     public function hasError(): bool
     {
         return $this->hasError || $this->hasErrors();
     }
 
+    /**
+     * Check if validation errors exist.
+     * Handles multiple error formats: string, array, Collection, MessageBag, ViewErrorBag.
+     */
     public function hasErrors(): bool
     {
         if (is_null($this->errors)) {
@@ -78,18 +126,16 @@ class Textarea extends Component
             return $this->errors->isNotEmpty();
         }
 
-        // Handle Laravel MessageBag
         if (is_object($this->errors) && method_exists($this->errors, 'any')) {
             return $this->errors->any();
         }
 
-        // Handle ViewErrorBag
         if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
             try {
                 $bag = $this->errors->getBag('default');
+
                 return $bag && $bag->any();
             } catch (\Exception $e) {
-                // If getBag fails, treat as no errors
                 return false;
             }
         }
@@ -97,185 +143,70 @@ class Textarea extends Component
         return false;
     }
 
-    public function baseClasses(): string
-    {
-        return 'block w-full rounded-md border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
-    }
-
-    public function sizeClasses(): string
-    {
-        return match ($this->size) {
-            'xs' => 'px-2.5 py-1 text-xs',
-            'sm' => 'px-3 py-1.5 text-sm',
-            'md' => 'px-3 py-2 text-sm',
-            'lg' => 'px-4 py-2.5 text-base',
-            'xl' => 'px-4 py-3 text-base',
-            default => 'px-3 py-2 text-sm'
-        };
-    }
-
-    public function resizeClasses(): string
-    {
-        return match ($this->resize) {
-            'none' => 'resize-none',
-            'both' => 'resize',
-            'horizontal' => 'resize-x',
-            'vertical' => 'resize-y',
-            default => 'resize-y'
-        };
-    }
-
-    public function stateClasses(): string
-    {
-        if ($this->disabled) {
-            return 'bg-neutral-100 border-neutral-300 text-neutral-500 cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400';
-        }
-
-        if ($this->hasError()) {
-            return 'bg-input border-danger text-foreground focus:border-danger focus:ring-danger';
-        }
-
-        return 'bg-input border-border text-foreground focus:border-brand focus:ring-brand hover:border-neutral-300 dark:hover:border-neutral-600';
-    }
-
-    public function iconSize(): string
-    {
-        return match ($this->size) {
-            'sm' => 'xs',
-            'md' => 'sm',
-            'lg' => 'md',
-            default => 'sm'
-        };
-    }
-
-    public function iconPadding(): string
-    {
-        $leftPadding = '';
-        $rightPadding = '';
-
-        if ($this->iconLeft) {
-            $leftPadding = match ($this->size) {
-                'sm' => 'pl-8',
-                'md' => 'pl-10',
-                'lg' => 'pl-12',
-                default => 'pl-10'
-            };
-        }
-
-        if ($this->iconRight || $this->hasActions()) {
-            $padding = $this->hasActions() ? $this->actionPadding() : match ($this->size) {
-                'sm' => 'pr-8',
-                'md' => 'pr-10',
-                'lg' => 'pr-12',
-                default => 'pr-10'
-            };
-            $rightPadding = $padding;
-        }
-
-        return trim($leftPadding . ' ' . $rightPadding);
-    }
-
-    public function iconPosition(): string
-    {
-        return 'top-3';
-    }
-
-    public function iconOffset(): array
-    {
-        return match ($this->size) {
-            'sm' => ['left' => 'left-2.5', 'right' => 'right-2.5'],
-            'md' => ['left' => 'left-3', 'right' => 'right-3'],
-            'lg' => ['left' => 'left-3.5', 'right' => 'right-3.5'],
-            default => ['left' => 'left-3', 'right' => 'right-3']
-        };
-    }
-
+    /**
+     * Check if the textarea has any configured actions.
+     */
     public function hasActions(): bool
     {
-        return ! empty($this->getAllActions());
+        return ! empty($this->configuredActions());
     }
 
-    public function getAllActions(): array
-    {
-        return $this->configuredActions();
-    }
-
-    public function actionPadding(): string
-    {
-        if (! $this->hasActions()) {
-            return '';
-        }
-
-        $actionsCount = count($this->getAllActions());
-        $actionWidth = match ($this->actionSize) {
-            'xs' => 24,
-            'sm' => 32,
-            'md' => 40,
-            default => 24
-        };
-
-        $totalWidth = ($actionsCount * $actionWidth) + (($actionsCount - 1) * 4) + 8;
-        return 'pr-' . ceil($totalWidth / 4);
-    }
-
+    /**
+     * Get all configured actions including auto-generated and custom actions.
+     * Auto-generates actions for clear, copy, and external URL features.
+     */
     public function configuredActions(): array
     {
         $autoActions = [];
 
         if ($this->clearable) {
             $autoActions[] = [
-                'type' => 'clear',
+                'action' => 'clear',
                 'icon' => 'heroicon-o-x-mark',
-                'label' => __('keys-ui::keys-ui.actions.clear_textarea')
+                'label' => __('keys-ui::keys-ui.actions.clear_textarea'),
             ];
         }
 
         if ($this->copyable) {
             $autoActions[] = [
-                'type' => 'copy',
+                'action' => 'copy',
                 'icon' => 'heroicon-o-clipboard',
                 'label' => __('keys-ui::keys-ui.actions.copy_clipboard'),
                 'icon_success' => 'heroicon-o-check',
-                'label_success' => __('keys-ui::keys-ui.actions.copied')
+                'label_success' => __('keys-ui::keys-ui.actions.copied'),
             ];
         }
 
         if ($this->externalUrl) {
             $autoActions[] = [
-                'type' => 'external',
+                'action' => 'external',
                 'icon' => 'heroicon-o-arrow-top-right-on-square',
                 'label' => __('keys-ui::keys-ui.actions.open_new_tab'),
-                'url' => $this->externalUrl
+                'url' => $this->externalUrl,
             ];
         }
 
         return array_merge($autoActions, $this->actions);
     }
 
-    public function getComputedIconSize(): string
-    {
-        return $this->iconSize();
-    }
-
-    public function getComputedActionSize(): string
-    {
-        return $this->getActionSize();
-    }
-
+    /**
+     * Process configured actions into computed data for Button components.
+     * Transforms action arrays into format expected by Button component with multi-state support.
+     */
     public function getComputedActionData(): array
     {
         $actions = [];
 
-        foreach ($this->getAllActions() as $action) {
+        foreach ($this->configuredActions() as $action) {
+            $actionType = $action['type'] ?? $action['action'] ?? 'custom';
+
             $computedAction = [
-                'type' => $action['type'],
-                'icon' => $action['icon'],
-                'label' => $action['label'],
-                'is_multi_state' => isset($action['icon_toggle']) || isset($action['icon_success']),
-                'data_action' => $action['type'],
-                'data_icon_default' => $action['icon'],
+                'data_action' => $actionType,
+                'data_icon_default' => $action['icon'] ?? 'heroicon-o-cursor-arrow-rays',
+                'icon' => $action['icon'] ?? 'heroicon-o-cursor-arrow-rays',
                 'icon_toggle' => $action['icon_toggle'] ?? null,
                 'icon_success' => $action['icon_success'] ?? null,
+                'label' => $action['label'] ?? $action['tooltip'] ?? 'Action',
                 'label_toggle' => $action['label_toggle'] ?? null,
                 'label_success' => $action['label_success'] ?? null,
                 'data_url' => $action['url'] ?? null,
@@ -291,26 +222,10 @@ class Textarea extends Component
         return $actions;
     }
 
-    public function getComputedIconOffsets(): array
-    {
-        return $this->iconOffset();
-    }
-
-    public function getComputedIconPosition(): string
-    {
-        return $this->iconPosition();
-    }
-
-    public function getActionSize(): string
-    {
-        return match ($this->actionSize) {
-            'xs' => 'xs',
-            'sm' => 'sm',
-            'md' => 'md',
-            default => 'xs'
-        };
-    }
-
+    /**
+     * Generate comprehensive data attributes for CSS targeting and JavaScript functionality.
+     * Includes component identification, state, features, icons, actions, and character counting.
+     */
     public function getDataAttributes(): array
     {
         $attributes = [
@@ -318,7 +233,6 @@ class Textarea extends Component
             'data-size' => $this->size,
         ];
 
-        // State attributes
         if ($this->disabled) {
             $attributes['data-disabled'] = 'true';
         }
@@ -335,7 +249,6 @@ class Textarea extends Component
             $attributes['data-invalid'] = 'true';
         }
 
-        // Feature attributes
         if ($this->autoResize) {
             $attributes['data-auto-resize'] = 'true';
         }
@@ -348,7 +261,6 @@ class Textarea extends Component
             $attributes['data-max-length'] = $this->maxLength;
         }
 
-        // Icon attributes
         if ($this->iconLeft) {
             $attributes['data-has-icon-left'] = 'true';
             $attributes['data-icon-left'] = $this->iconLeft;
@@ -363,28 +275,37 @@ class Textarea extends Component
             $attributes['data-has-icon'] = 'true';
         }
 
-        // Actions
         if ($this->hasActions()) {
             $attributes['data-has-actions'] = 'true';
-            $attributes['data-actions-count'] = count($this->getAllActions());
+            $attributes['data-actions-count'] = count($this->configuredActions());
         }
 
-        // Value state
-        if (!empty($this->value)) {
+        if ($this->clearable) {
+            $attributes['data-clearable'] = 'true';
+        }
+
+        if ($this->copyable) {
+            $attributes['data-copyable'] = 'true';
+        }
+
+        if ($this->externalUrl) {
+            $attributes['data-external-url'] = $this->externalUrl;
+        }
+
+        if (! empty($this->value)) {
             $attributes['data-has-value'] = 'true';
         }
 
         return $attributes;
     }
 
+    /**
+     * Render the textarea component view.
+     */
     public function render()
     {
         return view('keys::components.textarea', [
-            'computedIconSize' => $this->getComputedIconSize(),
-            'computedActionSize' => $this->getComputedActionSize(),
             'computedActionData' => $this->getComputedActionData(),
-            'computedIconOffsets' => $this->getComputedIconOffsets(),
-            'computedIconPosition' => $this->getComputedIconPosition(),
             'dataAttributes' => $this->getDataAttributes(),
         ]);
     }

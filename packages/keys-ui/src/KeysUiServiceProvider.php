@@ -5,6 +5,7 @@ namespace Keys\UI;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Keys\UI\Components\Accordion;
+use Keys\UI\Components\AddToCart;
 use Keys\UI\Components\Alert;
 use Keys\UI\Components\Avatar;
 use Keys\UI\Components\Avatar\Stack;
@@ -14,15 +15,19 @@ use Keys\UI\Components\Breadcrumbs\Item;
 use Keys\UI\Components\Button;
 use Keys\UI\Components\Button\Group;
 use Keys\UI\Components\Calendar;
-use Keys\UI\Components\DatePicker;
 use Keys\UI\Components\Card;
 use Keys\UI\Components\Checkbox;
 use Keys\UI\Components\ChoiceGroup;
+use Keys\UI\Components\DatePicker;
 use Keys\UI\Components\Dropdown;
 use Keys\UI\Components\Editor;
 use Keys\UI\Components\Error;
 use Keys\UI\Components\Field;
+use Keys\UI\Components\FileUpload;
+use Keys\UI\Components\Gallery;
+use Keys\UI\Components\HeadingDecorator;
 use Keys\UI\Components\Icon;
+use Keys\UI\Components\Image;
 use Keys\UI\Components\Input;
 use Keys\UI\Components\Label;
 use Keys\UI\Components\Loading;
@@ -33,38 +38,34 @@ use Keys\UI\Components\Menu\Radio as MenuRadio;
 use Keys\UI\Components\Menu\Separator as MenuSeparator;
 use Keys\UI\Components\Menu\Submenu as MenuSubmenu;
 use Keys\UI\Components\Modal;
+use Keys\UI\Components\Popover;
+use Keys\UI\Components\Progress;
 use Keys\UI\Components\Radio;
 use Keys\UI\Components\Range;
+use Keys\UI\Components\Scripts;
 use Keys\UI\Components\Select;
+use Keys\UI\Components\Select\Chip;
 use Keys\UI\Components\Select\Option;
+use Keys\UI\Components\Separator;
+use Keys\UI\Components\Table;
+use Keys\UI\Components\Table\Body;
+use Keys\UI\Components\Table\Cell;
+use Keys\UI\Components\Table\EmptyState as TableEmpty;
+use Keys\UI\Components\Table\Head;
+use Keys\UI\Components\Table\Header;
+use Keys\UI\Components\Table\Loading as TableLoading;
+use Keys\UI\Components\Table\Row;
 use Keys\UI\Components\Tabs;
-use Keys\UI\Components\Tabs\Tab;
 use Keys\UI\Components\Tabs\Panel;
+use Keys\UI\Components\Tabs\Tab;
 use Keys\UI\Components\Textarea;
+use Keys\UI\Components\TimePicker;
 use Keys\UI\Components\Toast;
 use Keys\UI\Components\Toggle;
 use Keys\UI\Components\Tooltip;
-use Keys\UI\Components\HeadingDecorator;
-use Keys\UI\Components\Gallery;
-use Keys\UI\Components\Image;
-use Keys\UI\Components\TimePicker;
-use Keys\UI\Components\Table;
-use Keys\UI\Components\Table\Head;
-use Keys\UI\Components\Table\Body;
-use Keys\UI\Components\Table\Row;
-use Keys\UI\Components\Table\Cell;
-use Keys\UI\Components\Table\Header;
-use Keys\UI\Components\Table\EmptyState as TableEmpty;
-use Keys\UI\Components\Table\Loading as TableLoading;
-use Keys\UI\Components\AddToCart;
-use Keys\UI\Components\Progress;
-use Keys\UI\Components\Separator;
-use Keys\UI\Components\Popover;
 use Keys\UI\Services\KeysManager;
 use Keys\UI\Services\ModalManager;
 use Keys\UI\Services\ToastManager;
-use Keys\UI\Components\Scripts;
-use Keys\UI\Components\FileUpload;
 
 class KeysUiServiceProvider extends ServiceProvider
 {
@@ -78,17 +79,16 @@ class KeysUiServiceProvider extends ServiceProvider
             'keys-ui'
         );
 
-
         $this->app->singleton(ModalManager::class, function ($app) {
-            return new ModalManager();
+            return new ModalManager;
         });
 
         $this->app->singleton(ToastManager::class, function ($app) {
-            return new ToastManager();
+            return new ToastManager;
         });
 
         $this->app->singleton(KeysManager::class, function ($app) {
-            return new KeysManager();
+            return new KeysManager;
         });
     }
 
@@ -107,7 +107,6 @@ class KeysUiServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/views' => resource_path('views/vendor/keys'),
         ], 'keys-ui-views');
-
 
         $this->publishes([
             __DIR__.'/Components' => app_path('View/Components/Keys'),
@@ -138,6 +137,7 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::alert', Alert::class);
         Blade::component('keys::select', Select::class);
         Blade::component('keys::select.option', Option::class);
+        Blade::component('keys::select.chip', Chip::class);
         Blade::component('keys::tabs', Tabs::class);
         Blade::component('keys::tabs.tab', Tab::class);
         Blade::component('keys::tabs.panel', Panel::class);
@@ -179,5 +179,4 @@ class KeysUiServiceProvider extends ServiceProvider
 
         $this->app->alias(KeysManager::class, 'keys');
     }
-
 }

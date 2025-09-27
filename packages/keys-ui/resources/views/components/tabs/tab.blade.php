@@ -1,11 +1,23 @@
+@php
+    // Base tab classes
+    $baseClasses = 'tab-trigger inline-flex items-center justify-center px-3 py-2 font-medium text-sm transition-colors duration-200 relative z-10';
+
+    // State-based classes
+    $stateClasses = $disabled
+        ? 'cursor-not-allowed opacity-50 text-muted'
+        : 'cursor-pointer text-muted hover:text-foreground';
+
+    // Icon classes
+    $iconClasses = 'flex-shrink-0 mr-2';
+
+    // Final classes
+    $tabClasses = trim("$baseClasses $stateClasses");
+@endphp
+
 @if ($isLink())
-    <a {{ $attributes->merge(array_merge(
-        ['class' => $computedTabClasses],
-        $ariaAttributes,
-        $linkAttributes
-    )) }}>
+    <a {{ $attributes->merge(['class' => $tabClasses])->merge($dataAttributes)->merge($linkAttributes) }}>
         @if ($hasIcon())
-            <x-keys::icon :name="$icon" class="{{ $computedIconClasses }}" />
+            <x-keys::icon :name="$icon" class="{{ $iconClasses }}" />
         @endif
 
         @if ($hasLabel())
@@ -15,12 +27,9 @@
         {{ $slot }}
     </a>
 @else
-    <button {{ $attributes->merge(array_merge(
-        ['class' => $computedTabClasses, 'type' => 'button'],
-        $ariaAttributes
-    )) }}>
+    <button {{ $attributes->merge(['class' => $tabClasses, 'type' => 'button'])->merge($dataAttributes) }}>
         @if ($hasIcon())
-            <x-keys::icon :name="$icon" class="{{ $computedIconClasses }}" />
+            <x-keys::icon :name="$icon" class="{{ $iconClasses }}" />
         @endif
 
         @if ($hasLabel())

@@ -2,8 +2,8 @@
 
 namespace Keys\UI\Components\Menu;
 
-use Illuminate\View\Component;
 use Illuminate\Support\Collection;
+use Illuminate\View\Component;
 
 class Radio extends Component
 {
@@ -19,68 +19,51 @@ class Radio extends Component
         public string|array|Collection|null $errors = null,
         public bool $keepOpen = true
     ) {
+        $this->id = $this->id ?? ($this->name ? $this->name.'-'.$this->value.'-'.uniqid() : 'menu-radio-'.uniqid());
 
-        $this->id = $this->id ?? ($this->name ? $this->name . '-' . $this->value . '-' . uniqid() : 'menu-radio-' . uniqid());
-
-
-        if (!in_array($this->color, ['brand', 'success', 'warning', 'danger', 'neutral'])) {
+        if (! in_array($this->color, ['brand', 'success', 'warning', 'danger', 'neutral'])) {
             $this->color = 'brand';
         }
     }
 
-    public function itemClasses(): string
+    public function hasIcon(): bool
     {
-        $base = 'flex items-center w-full px-2 py-2 text-sm transition-colors duration-150 rounded-md cursor-pointer';
+        return ! empty($this->icon);
+    }
 
-        if ($this->disabled) {
-            return $base . ' text-neutral-400 cursor-not-allowed bg-neutral-disabled dark:text-neutral-500';
+    public function hasError(): bool
+    {
+        if (is_null($this->errors)) {
+            return false;
         }
 
-        return $base . ' text-foreground hover:bg-neutral-hover has-[:checked]:bg-' . $this->color . '-50 has-[:checked]:text-' . $this->color . '-700 dark:has-[:checked]:bg-' . $this->color . '-900/20 dark:has-[:checked]:text-' . $this->color . '-300';
-    }
-
-    public function radioClasses(): string
-    {
-        $base = 'h-4 w-4 border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-full';
-
-        if ($this->disabled) {
-            return $base . ' bg-neutral-100 border-neutral-300 text-neutral-400 cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-700';
+        if (is_string($this->errors)) {
+            return ! empty(trim($this->errors));
         }
 
-        $colorClasses = match ($this->color) {
-            'brand' => 'text-brand focus:ring-brand border-border hover:border-brand',
-            'success' => 'text-success focus:ring-success border-border hover:border-success',
-            'warning' => 'text-warning focus:ring-warning border-border hover:border-warning',
-            'danger' => 'text-danger focus:ring-danger border-border hover:border-danger',
-            'neutral' => 'text-neutral-600 focus:ring-neutral-500 border-border hover:border-neutral-400',
-            default => 'text-brand focus:ring-brand border-border hover:border-brand'
-        };
+        if (is_array($this->errors)) {
+            return ! empty($this->errors);
+        }
 
-        return $base . ' bg-input ' . $colorClasses;
-    }
+        if ($this->errors instanceof Collection) {
+            return $this->errors->isNotEmpty();
+        }
 
-    public function iconClasses(): string
-    {
-        return 'flex-shrink-0 mr-3';
-    }
-
-    public function contentClasses(): string
-    {
-        return 'flex-1 min-w-0 ml-3';
-    }
-
-    public function labelClasses(): string
-    {
-        return 'block text-sm font-medium text-foreground';
+        return false;
     }
 
     public function getDataAttributes(): array
     {
         return [
-            'data-menu-radio' => 'true',
+            'data-keys-menu-radio' => 'true',
             'data-keep-open' => $this->keepOpen ? 'true' : 'false',
             'data-color' => $this->color,
-            'data-name' => $this->name
+            'data-name' => $this->name,
+            'data-value' => $this->value,
+            'data-disabled' => $this->disabled ? 'true' : 'false',
+            'data-checked' => $this->checked ? 'true' : 'false',
+            'data-has-icon' => $this->hasIcon() ? 'true' : 'false',
+            'data-has-error' => $this->hasError() ? 'true' : 'false'
         ];
     }
 
@@ -92,7 +75,6 @@ class Radio extends Component
             'value' => $this->value,
             'checked' => $this->checked,
             'disabled' => $this->disabled,
-            'class' => $this->radioClasses()
         ];
 
         if ($this->name) {
@@ -110,51 +92,15 @@ class Radio extends Component
     {
         return [
             'for' => $this->id,
-            'class' => $this->itemClasses()
         ];
-    }
-
-    public function hasIcon(): bool
-    {
-        return !empty($this->icon);
-    }
-
-    public function hasError(): bool
-    {
-        if (is_null($this->errors)) {
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            return !empty(trim($this->errors));
-        }
-
-        if (is_array($this->errors)) {
-            return !empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        return false;
-    }
-
-    public function iconSize(): string
-    {
-        return 'sm';
     }
 
     public function render()
     {
         return view('keys::components.menu.radio', [
-            'computedItemClasses' => $this->itemClasses(),
-            'computedIconClasses' => $this->iconClasses(),
-            'computedContentClasses' => $this->contentClasses(),
-            'computedLabelClasses' => $this->labelClasses(),
-            'computedDataAttributes' => $this->getDataAttributes(),
-            'computedRadioAttributes' => $this->getRadioAttributes(),
-            'computedLabelAttributes' => $this->getLabelAttributes(),
+            'dataAttributes' => $this->getDataAttributes(),
+            'radioAttributes' => $this->getRadioAttributes(),
+            'labelAttributes' => $this->getLabelAttributes(),
         ]);
     }
 }

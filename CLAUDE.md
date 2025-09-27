@@ -165,24 +165,73 @@ Components should have comprehensive browser tests covering:
 
 ## Important Development Notes
 
-### Modern Component Guidelines
+### Modern Component Architecture (Post-Refactoring Standards)
 
 **PHP Class Structure:**
-- **No utility getter methods** - eliminate `baseClasses()`, `sizeClasses()`, etc.
-- **Only complex business logic** - error handling, validation, action configuration
-- **Avoid redundant wrapper methods** - call core methods directly
-- **Simplified data passing** - only pass what templates actually need
+- **No utility getter methods** - eliminate `baseClasses()`, `sizeClasses()`, `stateClasses()`, etc.
+- **Only complex business logic** - error handling, validation, action configuration, data processing
+- **Avoid redundant wrapper methods** - call core methods like `configuredActions()` directly
+- **Auto-generate IDs when missing** - use pattern `$this->id = $this->id ?? $this->name ?? 'component-' . uniqid();`
+- **Simplified render() method** - only pass computed data and data attributes to template
+- **Data attributes generation** - provide comprehensive `getDataAttributes()` for CSS/JS targeting
+
+**Example Modern PHP Class:**
+```php
+public function __construct(/* props */) {
+    $this->id = $this->id ?? $this->name ?? 'textarea-' . uniqid();
+    // Handle business logic only
+}
+
+public function configuredActions(): array {
+    // Complex business logic for building action arrays
+    return array_merge($autoActions, $this->actions);
+}
+
+public function getDataAttributes(): array {
+    // Comprehensive data attributes for targeting
+    return ['data-keys-component' => 'true', ...];
+}
+
+public function render() {
+    return view('keys::components.component', [
+        'computedActionData' => $this->getComputedActionData(),
+        'dataAttributes' => $this->getDataAttributes(),
+    ]);
+}
+```
 
 **Blade Template Structure:**
-- **Direct Tailwind utilities** - use match statements and conditional logic inline
+- **Direct Tailwind utilities** - use match statements and conditional logic inline in @php blocks
+- **No partial templates** - inline all content into main component template for better maintainability
 - **Leverage existing components** - use Button component for actions instead of custom CSS
-- **Tailwind pseudo-classes** - `focus-within:`, `hover:`, `data-[state]:` over custom selectors
-- **Eliminate separate CSS files** - move all styling to inline utilities and existing components
+- **Focus-within enhancement** - add `focus-within:[&_[data-icon]]:text-brand` for interactive icon coloring
+- **Proper data attributes** - ensure textarea/input elements have required data attributes for JavaScript
+
+**Example Modern Template Pattern:**
+```blade
+@php
+    // All styling logic directly in template
+    $baseClasses = 'block w-full rounded-md border transition-colors duration-200';
+    $sizeClasses = match ($size) {
+        'sm' => 'px-3 py-1.5 text-sm',
+        'md' => 'px-3 py-2 text-sm',
+        default => 'px-3 py-2 text-sm'
+    };
+    $stateClasses = $disabled ? 'bg-surface opacity-50' : 'bg-input border-border';
+@endphp
+
+<div class="relative focus-within:[&_[data-icon]]:text-brand">
+    <input {{ $attributes->merge(['class' => "$baseClasses $sizeClasses $stateClasses"]) }}
+           data-keys-input="true"
+           @if($showFeature) data-show-feature="true" @endif />
+</div>
+```
 
 **Component Integration:**
 - **Never use Blade directives inside component attributes** (causes parsing issues)
-- **Use existing component styling** - Button component handles action styling
-- **Direct styling over data attributes** - apply classes directly instead of CSS selectors
+- **Use existing component styling** - Button component handles all action styling
+- **Consistent data attributes** - all components need proper data attributes for JavaScript targeting
+- **ID generation** - all form components must auto-generate IDs when missing for proper functionality
 
 ### Asset Management
 - Keys UI assets auto-inject via `<keys:scripts />` component

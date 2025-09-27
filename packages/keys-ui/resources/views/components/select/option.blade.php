@@ -1,25 +1,31 @@
 @php
+    // Base classes for all option states
+    $baseClasses = 'flex items-center w-full px-3 py-2 mx-0.5 my-0.5 text-sm text-left cursor-pointer transition-colors duration-150 rounded-md';
+
+    // State-based classes using match statement
+    // Note: Selected state styling is handled by CSS based on aria-selected attribute
+    $stateClasses = match (true) {
+        $disabled => 'text-neutral-400 cursor-not-allowed bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-500',
+        default => 'text-foreground hover:bg-neutral-hover'
+    };
+
+    // Standard option attributes with inline styling
     $optionAttributes = $attributes
         ->except(['class'])
         ->merge([
             'role' => 'option',
-            'data-value' => $value,
-            'data-display-label' => $displayLabel,
-            'data-searchable-text' => $searchableText,
             'aria-selected' => $selected ? 'true' : 'false',
             'tabindex' => $disabled ? null : '0',
-        ]);
+            'class' => trim("$baseClasses $stateClasses"),
+        ])
+        ->merge($dataAttributes);
 
     if ($disabled) {
         $optionAttributes = $optionAttributes->merge(['aria-disabled' => 'true']);
     }
 @endphp
 
-<div
-    class="{{ $computedOptionClasses }}"
-    data-select-option
-    {{ $optionAttributes }}
->
+<div {{ $optionAttributes }}>
     @if($hasIcon())
         <div class="flex-shrink-0 mr-2">
             <x-keys::icon name="{{ $icon }}" size="sm" />

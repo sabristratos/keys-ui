@@ -28,7 +28,8 @@ class Calendar extends Component
         public bool $isRange = false,
         public mixed $startDate = null,
         public mixed $endDate = null,
-        public int $monthsToShow = 1
+        public int $monthsToShow = 1,
+        public bool|array $quickSelectors = false
     ) {
         $this->initializeBasicProperties();
         $this->initializeDateValues();
@@ -42,7 +43,7 @@ class Calendar extends Component
      */
     private function initializeBasicProperties(): void
     {
-        $this->id = $this->id ?? $this->name ?? 'calendar-' . uniqid();
+        $this->id = $this->id ?? $this->name ?? 'calendar-'.uniqid();
         $this->currentMonth = $this->currentMonth ?? Carbon::now()->startOfMonth();
 
         // Validate monthsToShow
@@ -101,13 +102,13 @@ class Calendar extends Component
      * - Invalid date strings return null instead of throwing exceptions
      * - This ensures the calendar remains functional even with bad input data
      *
-     * @param mixed $date The date value to parse (string, Carbon, or other)
+     * @param  mixed  $date  The date value to parse (string, Carbon, or other)
      * @return Carbon|null Parsed Carbon instance or null if parsing fails
      */
     private function parseDate(mixed $date): ?Carbon
     {
         // Handle null or falsy values
-        if (!$date) {
+        if (! $date) {
             return null;
         }
 
@@ -117,7 +118,7 @@ class Calendar extends Component
         }
 
         // Attempt to parse string values
-        if (is_string($date) && !empty(trim($date))) {
+        if (is_string($date) && ! empty(trim($date))) {
             try {
                 return Carbon::parse($date);
             } catch (\Exception $e) {
@@ -154,7 +155,7 @@ class Calendar extends Component
     private function validateProperties(): void
     {
         // Validate size
-        if (!in_array($this->size, ComponentConstants::CALENDAR_SIZES)) {
+        if (! in_array($this->size, ComponentConstants::CALENDAR_SIZES)) {
             $this->size = ComponentConstants::getDefaultSize();
         }
     }
@@ -164,14 +165,14 @@ class Calendar extends Component
      */
     private function initializeErrorState(): void
     {
-        if (!$this->hasError && $this->hasErrors()) {
+        if (! $this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
     }
 
     public function isShorthand(): bool
     {
-        return !is_null($this->label);
+        return ! is_null($this->label);
     }
 
     public function hasError(): bool
@@ -186,11 +187,11 @@ class Calendar extends Component
         }
 
         if (is_string($this->errors)) {
-            return !empty(trim($this->errors));
+            return ! empty(trim($this->errors));
         }
 
         if (is_array($this->errors)) {
-            return !empty($this->errors);
+            return ! empty($this->errors);
         }
 
         if ($this->errors instanceof Collection) {
@@ -198,59 +199,6 @@ class Calendar extends Component
         }
 
         return false;
-    }
-
-    public function getCalendarClasses(): string
-    {
-        $baseWidth = $this->monthsToShow > 1 ? 'min-w-[560px] w-full' : 'min-w-[280px] w-full max-w-[320px]';
-        $base = 'calendar-component ' . $baseWidth . ' text-foreground';
-        $size = $this->getSizeClasses();
-        $state = $this->getStateClasses();
-
-        return trim($base . ' ' . $size . ' ' . $state);
-    }
-
-    public function getSizeClasses(): string
-    {
-        return match ($this->size) {
-            'sm' => 'text-sm',
-            'md' => 'text-sm',
-            'lg' => 'text-base',
-            default => 'text-sm'
-        };
-    }
-
-    public function getStateClasses(): string
-    {
-        if ($this->disabled) {
-            return 'opacity-50 cursor-not-allowed border-neutral-300 dark:border-neutral-700';
-        }
-
-        if ($this->hasError()) {
-            return 'border-danger';
-        }
-
-        return 'border-border hover:border-neutral-300 dark:hover:border-neutral-600';
-    }
-
-    public function getHeaderClasses(): string
-    {
-        return match ($this->size) {
-            'sm' => 'px-3 py-2 text-sm font-medium',
-            'md' => 'px-4 py-3 text-sm font-semibold',
-            'lg' => 'px-5 py-4 text-base font-semibold',
-            default => 'px-4 py-3 text-sm font-semibold'
-        };
-    }
-
-    public function getCellClasses(): string
-    {
-        return match ($this->size) {
-            'sm' => 'w-8 h-8 text-xs',
-            'md' => 'w-10 h-10 text-sm',
-            'lg' => 'w-12 h-12 text-base',
-            default => 'w-10 h-10 text-sm'
-        };
     }
 
     public function getWeekdays(): array
@@ -273,8 +221,8 @@ class Calendar extends Component
             'weekdays' => $this->getWeekdays(),
             'monthNames' => [
                 'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ]
+                'July', 'August', 'September', 'October', 'November', 'December',
+            ],
         ];
     }
 
@@ -286,7 +234,7 @@ class Calendar extends Component
      * 2. Min/max date constraints
      * 3. Explicitly disabled dates array
      *
-     * @param Carbon $date The date to check
+     * @param  Carbon  $date  The date to check
      * @return bool True if the date should be disabled
      */
     public function isDateDisabled(Carbon $date): bool
@@ -359,10 +307,10 @@ class Calendar extends Component
 
             if ($start && $end) {
                 // Complete range selection
-                return $start . ',' . $end;
+                return $start.','.$end;
             } elseif ($start) {
                 // Partial range selection (only start date)
-                return $start . ',';
+                return $start.',';
             } else {
                 // No dates selected
                 return null;
@@ -398,10 +346,10 @@ class Calendar extends Component
 
             if ($startMonth->year === $endMonth->year) {
                 // Same year - show "January - March 2024"
-                return $startMonth->format('F') . ' - ' . $endMonth->format('F Y');
+                return $startMonth->format('F').' - '.$endMonth->format('F Y');
             } else {
                 // Different years - show "December 2023 - February 2024"
-                return $startMonth->format('F Y') . ' - ' . $endMonth->format('F Y');
+                return $startMonth->format('F Y').' - '.$endMonth->format('F Y');
             }
         }
 
@@ -419,30 +367,150 @@ class Calendar extends Component
         return $this->id;
     }
 
-    // Computed methods for consistent pattern with other Keys UI components
-    public function getComputedCalendarClasses(): string
+    /**
+     * Get comprehensive data attributes following Keys UI patterns
+     *
+     * @return array Data attributes array
+     */
+    public function getDataAttributes(): array
     {
-        return $this->getCalendarClasses();
+        $attributes = [
+            // Component identification (Keys UI standard)
+            'data-keys-calendar' => 'true',
+            'data-keys-component' => 'true',
+
+            // Core configuration
+            'data-variant' => $this->isRange ? 'range' : 'single',
+            'data-size' => $this->size,
+            'data-months-to-show' => (string) $this->monthsToShow,
+            'id' => $this->id,
+        ];
+
+        // State attributes
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
+        }
+
+        if ($this->hasError()) {
+            $attributes['data-invalid'] = 'true';
+        }
+
+        if ($this->required) {
+            $attributes['data-required'] = 'true';
+        }
+
+        // Range-specific attributes
+        if ($this->isRange) {
+            $attributes['data-is-range'] = 'true';
+
+            if ($this->startDate instanceof Carbon) {
+                $attributes['data-has-start-date'] = 'true';
+            }
+            if ($this->endDate instanceof Carbon) {
+                $attributes['data-has-end-date'] = 'true';
+            }
+            if ($this->startDate instanceof Carbon && $this->endDate instanceof Carbon) {
+                $attributes['data-has-complete-range'] = 'true';
+                $attributes['data-selection-state'] = 'complete';
+            } elseif ($this->startDate instanceof Carbon) {
+                $attributes['data-selection-state'] = 'partial';
+            } else {
+                $attributes['data-selection-state'] = 'empty';
+            }
+        } else {
+            $attributes['data-is-range'] = 'false';
+            if ($this->value instanceof Carbon) {
+                $attributes['data-has-selection'] = 'true';
+                $attributes['data-selection-state'] = 'selected';
+            } else {
+                $attributes['data-selection-state'] = 'empty';
+            }
+        }
+
+        // Constraint attributes
+        if ($this->minDate instanceof Carbon) {
+            $attributes['data-has-min-date'] = 'true';
+        }
+
+        if ($this->maxDate instanceof Carbon) {
+            $attributes['data-has-max-date'] = 'true';
+        }
+
+        if (! empty($this->disabledDates)) {
+            $attributes['data-has-disabled-dates'] = 'true';
+        }
+
+        // Feature flags
+        if (! empty($this->quickSelectors) && $this->quickSelectors !== false) {
+            $attributes['data-has-quick-selectors'] = 'true';
+        }
+
+        if ($this->monthsToShow > 1) {
+            $attributes['data-multi-month'] = 'true';
+        }
+
+        return $attributes;
     }
 
-    public function getComputedHeaderClasses(): string
+    /**
+     * Get default quick selector options
+     *
+     * Returns the default set of quick date selector options with improved
+     * labeling and better mode compatibility.
+     *
+     * @return array Array of quick selector options
+     */
+    public function getDefaultQuickSelectors(): array
     {
-        return $this->getHeaderClasses();
+        return [
+            ['label' => 'Today', 'value' => 'today', 'description' => 'Select today\'s date'],
+            ['label' => 'Yesterday', 'value' => 'yesterday', 'description' => 'Select yesterday\'s date'],
+            ['label' => 'Last 7 Days', 'value' => 'last7days', 'range' => true, 'description' => 'Select past week range'],
+            ['label' => 'Last 30 Days', 'value' => 'last30days', 'range' => true, 'description' => 'Select past month range'],
+            ['label' => 'This Month', 'value' => 'thismonth', 'range' => true, 'description' => 'Select current month range'],
+            ['label' => 'Last Month', 'value' => 'lastmonth', 'range' => true, 'description' => 'Select previous month range'],
+            ['label' => 'This Year', 'value' => 'thisyear', 'range' => true, 'description' => 'Select current year range'],
+        ];
     }
 
-    public function getComputedCellClasses(): string
+    /**
+     * Filter quick selectors based on range mode
+     *
+     * Intelligently filters quick selectors based on calendar mode.
+     * Single date selectors work in both modes, range selectors only in range mode.
+     *
+     * @return array Filtered array of quick selector options
+     */
+    public function getFilteredQuickSelectors(): array
     {
-        return $this->getCellClasses();
-    }
+        // If quickSelectors is false, return empty array
+        if ($this->quickSelectors === false) {
+            return [];
+        }
 
-    public function getComputedInitialData(): array
-    {
-        return $this->getInitialCalendarData();
-    }
+        // If quickSelectors is true, use default selectors
+        $selectors = is_array($this->quickSelectors) ? $this->quickSelectors : $this->getDefaultQuickSelectors();
 
-    public function getComputedWeekdays(): array
-    {
-        return $this->getWeekdays();
+        if (! $this->isRange) {
+            // In single date mode, filter out range-only selectors
+            // but keep selectors that can work in both modes
+            $selectors = array_filter($selectors, function ($selector) {
+                // Keep if no range flag (single date selectors)
+                if (! isset($selector['range'])) {
+                    return true;
+                }
+
+                // Keep if explicitly marked as compatible with single mode
+                if (isset($selector['singleCompatible']) && $selector['singleCompatible']) {
+                    return true;
+                }
+
+                // Filter out range-only selectors
+                return ! $selector['range'];
+            });
+        }
+
+        return array_values($selectors);
     }
 
     /**
@@ -453,16 +521,13 @@ class Calendar extends Component
     public function render()
     {
         return view('keys::components.calendar', [
-            'computedCalendarClasses' => $this->getComputedCalendarClasses(),
-            'computedHeaderClasses' => $this->getComputedHeaderClasses(),
-            'computedCellClasses' => $this->getComputedCellClasses(),
-            'computedInitialData' => $this->getComputedInitialData(),
-            'computedWeekdays' => $this->getComputedWeekdays(),
+            'computedInitialData' => $this->getInitialCalendarData(),
+            'computedWeekdays' => $this->getWeekdays(),
             'uniqueId' => $this->getCalendarId(),
             'monthYearDisplay' => $this->getMonthYearDisplay(),
             'formattedValue' => $this->getFormattedValue(),
-            'isRange' => $this->isRange,
-            'monthsToShow' => $this->monthsToShow,
+            'dataAttributes' => $this->getDataAttributes(),
+            'quickSelectors' => $this->getFilteredQuickSelectors(),
         ]);
     }
 }

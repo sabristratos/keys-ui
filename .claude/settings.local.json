@@ -63,7 +63,10 @@
       "WebFetch(domain:www.uinkits.com)",
       "WebFetch(domain:nikitahl.com)",
       "Bash(del \"C:\\Work\\keys\\packages\\keys-ui\\src\\Components\\CssPopover.php\")",
-      "WebFetch(domain:flowbite.com)"
+      "WebFetch(domain:flowbite.com)",
+      "WebFetch(domain:localhost)",
+      "Bash(del:*)",
+      "Bash(curl:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

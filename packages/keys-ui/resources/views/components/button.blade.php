@@ -3,7 +3,7 @@
     $isIconOnly = $isIconOnly($slotContent);
 
     // Base classes for all buttons
-    $baseClasses = 'inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+    $baseClasses = 'flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
     // Variant classes
     $variantClasses = match ($variant) {
@@ -41,7 +41,7 @@
     $disabledClasses = ($disabled || $loading) ? 'cursor-not-allowed opacity-50' : '';
 
     // Multi-state positioning
-    $positionClasses = $isMultiState() ? 'relative' : '';
+    $positionClasses = $isMultiState ? 'relative' : '';
 
     // Icon size for child components
     $iconSize = match ($size) {
@@ -57,47 +57,49 @@
         'class' => trim("$baseClasses $variantClasses $sizeClasses $disabledClasses $positionClasses")
     ]);
 
-    if ($elementType() === 'button') {
+    if ($elementType === 'button') {
         $elementAttributes = $elementAttributes->merge([
-            'type' => $buttonType(),
+            'type' => $buttonType,
             'disabled' => $disabled || $loading
         ]);
-    } elseif ($elementType() === 'a') {
+    } elseif ($elementType === 'a') {
         $elementAttributes = $elementAttributes->merge([
             'href' => $href
         ]);
     }
 
     // Merge data attributes with slot-dependent attributes
-    $elementAttributes = $elementAttributes->merge($getDataAttributes())->merge($getDataAttributesForSlot($slotContent));
+    $elementAttributes = $elementAttributes->merge($dataAttributes)->merge($getDataAttributesForSlot($slotContent));
 @endphp
 
-<{{ $elementType() }} {{ $elementAttributes }}>
+<{{ $elementType }} {{ $elementAttributes }}>
     @if($loading)
         <x-keys::loading :animation="$loadingAnimation" :size="$iconSize" class="mr-2" />
     @elseif($iconLeft && !$loading)
-        @if($isMultiState())
-            <x-keys::icon
-                :name="$iconLeft"
-                :size="$iconSize"
-                class="button-icon-default {{ $isIconOnly ? '' : 'mr-2' }} transition-all duration-200"
-            />
-
-            @if($iconToggle)
+        @if($isMultiState)
+            <div class="relative {{ $isIconOnly ? '' : 'mr-2' }} flex-shrink-0">
                 <x-keys::icon
-                    :name="$iconToggle"
+                    :name="$iconLeft"
                     :size="$iconSize"
-                    class="button-icon-toggle absolute inset-0 m-auto opacity-0 transition-all duration-200"
+                    class="button-icon-default transition-all duration-200"
                 />
-            @endif
 
-            @if($iconSuccess)
-                <x-keys::icon
-                    :name="$iconSuccess"
-                    :size="$iconSize"
-                    class="button-icon-success absolute inset-0 m-auto opacity-0 transition-all duration-200 text-success"
-                />
-            @endif
+                @if($iconToggle)
+                    <x-keys::icon
+                        :name="$iconToggle"
+                        :size="$iconSize"
+                        class="button-icon-toggle absolute inset-0 opacity-0 transition-all duration-200"
+                    />
+                @endif
+
+                @if($iconSuccess)
+                    <x-keys::icon
+                        :name="$iconSuccess"
+                        :size="$iconSize"
+                        class="button-icon-success absolute inset-0 opacity-0 transition-all duration-200 text-success"
+                    />
+                @endif
+            </div>
         @else
             <x-keys::icon :name="$iconLeft" :size="$iconSize" class="{{ $isIconOnly ? '' : 'mr-2' }}" />
         @endif
@@ -110,4 +112,4 @@
     @if($iconRight && !$loading && !$isIconOnly)
         <x-keys::icon :name="$iconRight" :size="$iconSize" class="ml-2" />
     @endif
-</{{ $elementType() }}>
+</{{ $elementType }}>

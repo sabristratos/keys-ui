@@ -1,14 +1,46 @@
-<div {{ $attributes->merge(['class' => $computedContainerClasses]) }}
-     data-tabs="true"
-     data-orientation="{{ $orientation }}"
-     data-variant="{{ $variant }}"
-     data-size="{{ $size }}"
-     data-value="{{ $value }}"
-     data-disabled="{{ $disabled ? 'true' : 'false' }}"
-     id="{{ $uniqueId }}">
+@php
+    // Container classes based on orientation
+    $containerClasses = match ($orientation) {
+        'vertical' => 'flex gap-6',
+        'horizontal' => 'flex flex-col space-y-4',
+        default => 'flex flex-col space-y-4'
+    };
 
-    
-    <div class="{{ $computedTabListClasses }}" role="tablist" aria-label="Tabs" data-tabs-list="true">
+    // Size classes
+    $sizeClasses = match ($size) {
+        'sm' => 'text-sm',
+        'md' => 'text-sm',
+        'lg' => 'text-base',
+        default => 'text-sm'
+    };
+
+    // Tab list classes
+    $tabListBaseClasses = 'tabs-list flex relative';
+    $tabListOrientationClasses = match ($orientation) {
+        'vertical' => 'flex-col space-y-1 min-w-0',
+        'horizontal' => $stretch ? 'w-full gap-1' : 'space-x-1',
+        default => $stretch ? 'w-full gap-1' : 'space-x-1'
+    };
+    $tabListVariantClasses = match ($variant) {
+        'pills' => 'bg-body p-1 rounded-lg',
+        'underline' => 'border-b border-border',
+        'default' => 'border-b border-border',
+        default => 'border-b border-border'
+    };
+    $tabListClasses = "$tabListBaseClasses $tabListOrientationClasses $tabListVariantClasses";
+
+    // Panels container classes
+    $panelsContainerClasses = match ($orientation) {
+        'vertical' => 'flex-1 min-w-0',
+        'horizontal' => 'mt-4',
+        default => 'mt-4'
+    };
+
+    $finalContainerClasses = trim("tabs-container $containerClasses $sizeClasses");
+@endphp
+
+<div {{ $attributes->merge(['class' => $finalContainerClasses])->merge($dataAttributes) }}>
+    <div class="{{ $tabListClasses }}" role="tablist" aria-label="Tabs" data-tabs-list="true">
         {{ $slot }}
 
         {{-- Animated marker element --}}
@@ -16,7 +48,7 @@
     </div>
 
     {{-- Panels container --}}
-    <div class="{{ $computedPanelsContainerClasses }}" data-tabs-panels="true">
+    <div class="{{ $panelsContainerClasses }}" data-tabs-panels="true">
         {{ $panels ?? '' }}
     </div>
 </div>
@@ -108,5 +140,10 @@
 /* Horizontal tabs - keep center alignment */
 [data-orientation="horizontal"] [data-tabs-trigger="true"] {
     justify-content: center;
+}
+
+/* Stretched tabs - make tabs grow to fill available space */
+[data-stretch="true"] [data-tabs-trigger="true"] {
+    flex: 1;
 }
 </style>

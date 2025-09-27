@@ -45,7 +45,7 @@
                 value="{{ $quantity }}"
                 min="1"
                 max="{{ $maxQuantity }}"
-                class="qty-input w-16 px-2 py-2 text-center text-sm border-0 bg-surface focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                class="qty-input w-16 px-2 py-2 text-center text-sm border-0 bg-surface focus-visible:ring-0 focus-visible:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 data-max="{{ $maxQuantity }}"
                 {{ $disabled ? 'disabled' : '' }}
             />

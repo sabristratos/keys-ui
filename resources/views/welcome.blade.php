@@ -15,445 +15,477 @@
     <body class="bg-body text-foreground font-sans">
         <div class="container mx-auto px-8 py-12">
             <div class="max-w-7xl mx-auto">
-                <div class="text-center">
+                <!-- Header -->
+                <div class="text-center mb-16">
                     <h1 class="text-4xl font-bold text-foreground mb-4">Keys UI Component Library</h1>
                     <p class="text-xl text-muted-foreground mb-8">
                         Modern Blade components for Laravel applications
                     </p>
 
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-8 max-w-2xl mx-auto mb-12">
-                        <x-keys::icon name="heroicon-o-check-circle" size="lg" class="text-green-600 mx-auto mb-4" />
-                        <h2 class="text-xl font-semibold text-green-900 mb-3">Modern Popover Component</h2>
-                        <p class="text-green-800 mb-4">
-                            Keys UI now features a modern Popover component built with the native HTML Popover API and CSS Anchor Positioning for maximum performance and accessibility.
-                        </p>
-                        <p class="text-sm text-green-700">
-                            The component works without JavaScript for basic functionality, with progressive enhancement using Floating UI for advanced positioning in older browsers.
+                    <div class="flex flex-wrap justify-center gap-2 mb-8">
+                        <x-keys::badge color="brand" icon="heroicon-o-code-bracket">Modern Components</x-keys::badge>
+                        <x-keys::badge color="success" icon="heroicon-o-check-circle">Laravel Ready</x-keys::badge>
+                        <x-keys::badge color="info" icon="heroicon-o-sparkles">Tailwind v4</x-keys::badge>
+                        <x-keys::badge color="purple" icon="heroicon-o-cpu-chip">Performance</x-keys::badge>
+                    </div>
+                </div>
+
+
+
+                <!-- DatePicker Test Section -->
+                <section class="mb-20">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-bold text-foreground mb-4">DatePicker Test</h2>
+                        <p class="text-lg text-muted-foreground">
+                            Testing DatePicker with various configurations and feature sets
                         </p>
                     </div>
 
-                    <!-- Popover Component Examples -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                        <!-- Basic Popover -->
-                        <div class="rounded-lg border border-border p-6">
-                            <h3 class="text-lg font-semibold mb-4">Basic Popover</h3>
-                            <p class="text-muted-foreground mb-4">Click the button to show a popover with basic content.</p>
+                    <div class="max-w-4xl mx-auto space-y-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Basic DatePickers -->
+                            <div class="space-y-6">
+                                <h3 class="text-xl font-semibold mb-4">Basic DatePickers</h3>
 
-                            <x-keys::popover id="basic-popover" placement="top">
-                                <x-slot:trigger>
-                                    <x-keys::button variant="brand">Show Popover</x-keys::button>
-                                </x-slot:trigger>
-                                <div class="text-center">
-                                    <p class="font-semibold mb-2">Welcome!</p>
-                                    <p class="text-sm text-muted-foreground">This is a basic popover using the native HTML Popover API.</p>
+                                <x-keys::date-picker
+                                    name="basic_date"
+                                    label="Basic DatePicker"
+                                    placeholder="Select a date"
+                                    value="2024-03-15"
+                                />
+
+                                <x-keys::date-picker
+                                    name="clearable_date"
+                                    label="Clearable DatePicker"
+                                    placeholder="Select a date"
+                                    clearable
+                                    value="2024-04-20"
+                                />
+
+                                <x-keys::date-picker
+                                    name="with_icon_date"
+                                    label="With Left Icon"
+                                    placeholder="Select a date"
+                                    icon-left="heroicon-o-user"
+                                    clearable
+                                />
+                            </div>
+
+                            <!-- Advanced DatePickers -->
+                            <div class="space-y-6">
+                                <h3 class="text-xl font-semibold mb-4">Advanced Features</h3>
+
+                                <x-keys::date-picker
+                                    name="range_date"
+                                    label="Date Range Picker"
+                                    placeholder="Select date range"
+                                    :is-range="true"
+                                    :quick-selectors="true"
+                                    clearable
+                                />
+
+                                <x-keys::date-picker
+                                    name="quick_date"
+                                    label="With Quick Selectors"
+                                    placeholder="Select a date"
+                                    :quick-selectors="true"
+                                    clearable
+                                />
+
+                                <x-keys::date-picker
+                                    name="custom_format_date"
+                                    label="Custom Format (F j, Y)"
+                                    placeholder="Select a date"
+                                    format="Y-m-d"
+                                    display-format="F j, Y"
+                                    clearable
+                                    value="2024-12-25"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Inline Calendar -->
+                        <div class="border border-border rounded-lg p-6">
+                            <h3 class="text-xl font-semibold mb-4">Inline Calendar</h3>
+                            <x-keys::date-picker
+                                name="inline_date"
+                                label="Always Visible Calendar"
+                                :inline="true"
+                                value="2024-06-15"
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Calendar Component Testing Section -->
+                <section class="mb-20">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-bold text-foreground mb-4">Calendar Component Testing</h2>
+                        <p class="text-lg text-muted-foreground">
+                            Testing standalone Calendar component with various quick selector configurations
+                        </p>
+                    </div>
+
+                    <div class="max-w-4xl mx-auto space-y-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Basic Calendar with Quick Selectors -->
+                            <div class="space-y-6">
+                                <h3 class="text-xl font-semibold mb-4">Calendar with Quick Selectors</h3>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Calendar with Default Quick Selectors</label>
+                                        <x-keys::calendar
+                                            name="calendar_basic"
+                                            :quickSelectors="[
+                                                ['label' => 'Today', 'value' => 'today'],
+                                                ['label' => 'Yesterday', 'value' => 'yesterday'],
+                                                ['label' => 'Last 7 Days', 'value' => 'last7days', 'range' => true],
+                                                ['label' => 'Last 30 Days', 'value' => 'last30days', 'range' => true],
+                                            ]"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Calendar with Range Quick Selectors</label>
+                                        <x-keys::calendar
+                                            name="calendar_range"
+                                            :isRange="true"
+                                            :quickSelectors="[
+                                                ['label' => 'Last 7 Days', 'value' => 'last7days', 'range' => true],
+                                                ['label' => 'Last 30 Days', 'value' => 'last30days', 'range' => true],
+                                                ['label' => 'This Month', 'value' => 'thismonth', 'range' => true],
+                                                ['label' => 'Last Month', 'value' => 'lastmonth', 'range' => true],
+                                            ]"
+                                        />
+                                    </div>
                                 </div>
-                            </x-keys::popover>
-                        </div>
+                            </div>
 
-                        <!-- Tooltip Style -->
-                        <div class="rounded-lg border border-border p-6">
-                            <h3 class="text-lg font-semibold mb-4">Tooltip Style</h3>
-                            <p class="text-muted-foreground mb-4">Hover over the button to show a tooltip-style popover.</p>
+                            <!-- Calendar without Quick Selectors (Control) -->
+                            <div class="space-y-6">
+                                <h3 class="text-xl font-semibold mb-4">Control Tests</h3>
 
-                            <x-keys::popover id="tooltip-popover" placement="bottom" variant="tooltip" trigger="hover" delay="300">
-                                <x-slot:trigger>
-                                    <x-keys::button variant="outline" icon="heroicon-o-information-circle">Hover Me</x-keys::button>
-                                </x-slot:trigger>
-                                <span class="text-white text-sm">This is helpful information!</span>
-                            </x-keys::popover>
-                        </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Calendar without Quick Selectors</label>
+                                        <x-keys::calendar
+                                            name="calendar_no_selectors"
+                                        />
+                                    </div>
 
-                        <!-- Menu Style -->
-                        <div class="rounded-lg border border-border p-6">
-                            <h3 class="text-lg font-semibold mb-4">Menu Style</h3>
-                            <p class="text-muted-foreground mb-4">Click to show a menu-style popover with actions.</p>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Calendar with Empty Quick Selectors</label>
+                                        <x-keys::calendar
+                                            name="calendar_empty_selectors"
+                                            :quickSelectors="[]"
+                                        />
+                                    </div>
 
-                            <x-keys::popover id="menu-popover" placement="bottom-start" variant="menu">
-                                <x-slot:trigger>
-                                    <x-keys::button variant="outline" icon="heroicon-o-ellipsis-horizontal">Actions</x-keys::button>
-                                </x-slot:trigger>
-                                <div class="py-1">
-                                    <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 rounded">
-                                        <x-keys::icon name="heroicon-o-pencil" size="sm" />
-                                        Edit
-                                    </a>
-                                    <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 rounded">
-                                        <x-keys::icon name="heroicon-o-share" size="sm" />
-                                        Share
-                                    </a>
-                                    <hr class="my-1">
-                                    <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded">
-                                        <x-keys::icon name="heroicon-o-trash" size="sm" />
-                                        Delete
-                                    </a>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Calendar with Boolean True</label>
+                                        <x-keys::calendar
+                                            name="calendar_bool_selectors"
+                                            :quickSelectors="true"
+                                        />
+                                    </div>
                                 </div>
-                            </x-keys::popover>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+
+                <!-- Badge Components -->
+                <section class="mb-20">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-bold text-foreground mb-4">Badge Components</h2>
+                        <p class="text-lg text-muted-foreground">
+                            Flexible status indicators with auto icon-only detection and comprehensive variants
+                        </p>
+                    </div>
+
+                    <div class="max-w-6xl mx-auto space-y-12">
+                        <!-- Basic Badges -->
+                        <div class="space-y-8">
+                            <h3 class="text-xl font-semibold mb-6">Basic Badge Variants</h3>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <!-- Simple Badges -->
+                                <div class="space-y-6">
+                                    <h4 class="text-lg font-medium mb-4">Simple Badges</h4>
+                                    <div class="flex flex-wrap gap-3">
+                                        <x-keys::badge color="brand">Brand</x-keys::badge>
+                                        <x-keys::badge color="success">Success</x-keys::badge>
+                                        <x-keys::badge color="warning">Warning</x-keys::badge>
+                                        <x-keys::badge color="danger">Danger</x-keys::badge>
+                                        <x-keys::badge color="neutral">Neutral</x-keys::badge>
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-3">
+                                        <x-keys::badge color="blue">Blue</x-keys::badge>
+                                        <x-keys::badge color="green">Green</x-keys::badge>
+                                        <x-keys::badge color="purple">Purple</x-keys::badge>
+                                        <x-keys::badge color="pink">Pink</x-keys::badge>
+                                        <x-keys::badge color="indigo">Indigo</x-keys::badge>
+                                    </div>
+                                </div>
+
+                                <!-- Chip Badges -->
+                                <div class="space-y-6">
+                                    <h4 class="text-lg font-medium mb-4">Chip Badges</h4>
+                                    <div class="flex flex-wrap gap-3">
+                                        <x-keys::badge variant="chip" color="brand">React</x-keys::badge>
+                                        <x-keys::badge variant="chip" color="success">Vue.js</x-keys::badge>
+                                        <x-keys::badge variant="chip" color="blue">TypeScript</x-keys::badge>
+                                        <x-keys::badge variant="chip" color="purple">Laravel</x-keys::badge>
+                                        <x-keys::badge variant="chip" color="yellow">Tailwind</x-keys::badge>
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-3">
+                                        <x-keys::badge variant="chip" color="green" dismissible>PHP 8.3</x-keys::badge>
+                                        <x-keys::badge variant="chip" color="blue" dismissible>JavaScript</x-keys::badge>
+                                        <x-keys::badge variant="chip" color="red" dismissible>CSS3</x-keys::badge>
+                                        <x-keys::badge variant="chip" color="yellow" dismissible>HTML5</x-keys::badge>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Different Placements -->
-                        <div class="rounded-lg border border-border p-6">
-                            <h3 class="text-lg font-semibold mb-4">Placement Options</h3>
-                            <p class="text-muted-foreground mb-4">Popovers can be positioned in different directions.</p>
+                        <!-- Badge with Icons -->
+                        <div class="space-y-8">
+                            <h3 class="text-xl font-semibold mb-6">Badges with Icons</h3>
 
-                            <div class="grid grid-cols-2 gap-2">
-                                <x-keys::popover id="top-popover" placement="top" size="sm">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="outline" size="sm">Top</x-keys::button>
-                                    </x-slot:trigger>
-                                    <p class="text-sm">Positioned at the top</p>
-                                </x-keys::popover>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <!-- Icons with Text -->
+                                <div class="space-y-6">
+                                    <h4 class="text-lg font-medium mb-4">Icons with Text</h4>
+                                    <div class="flex flex-wrap gap-3">
+                                        <x-keys::badge color="success" icon="heroicon-o-check-circle">Verified</x-keys::badge>
+                                        <x-keys::badge color="brand" icon="heroicon-o-star">Featured</x-keys::badge>
+                                        <x-keys::badge color="warning" icon="heroicon-o-exclamation-triangle">Warning</x-keys::badge>
+                                        <x-keys::badge color="danger" icon="heroicon-o-x-circle">Error</x-keys::badge>
+                                        <x-keys::badge color="blue" icon="heroicon-o-information-circle">Info</x-keys::badge>
+                                    </div>
 
-                                <x-keys::popover id="right-popover" placement="right" size="sm">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="outline" size="sm">Right</x-keys::button>
-                                    </x-slot:trigger>
-                                    <p class="text-sm">Positioned to the right</p>
-                                </x-keys::popover>
+                                    <div class="flex flex-wrap gap-3">
+                                        <x-keys::badge color="purple" icon="heroicon-o-cpu-chip">Performance</x-keys::badge>
+                                        <x-keys::badge color="green" icon="heroicon-o-shield-check">Secure</x-keys::badge>
+                                        <x-keys::badge color="indigo" icon="heroicon-o-sparkles">Premium</x-keys::badge>
+                                        <x-keys::badge color="pink" icon="heroicon-o-heart">Favorite</x-keys::badge>
+                                    </div>
+                                </div>
 
-                                <x-keys::popover id="bottom-popover" placement="bottom" size="sm">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="outline" size="sm">Bottom</x-keys::button>
-                                    </x-slot:trigger>
-                                    <p class="text-sm">Positioned at the bottom</p>
-                                </x-keys::popover>
+                                <!-- Auto Icon-Only (No text = icon-only) -->
+                                <div class="space-y-6">
+                                    <h4 class="text-lg font-medium mb-4">Auto Icon-Only Detection</h4>
+                                    <div class="flex flex-wrap gap-3">
+                                        <x-keys::badge color="success" icon="heroicon-o-check" />
+                                        <x-keys::badge color="danger" icon="heroicon-o-x-mark" />
+                                        <x-keys::badge color="warning" icon="heroicon-o-exclamation-triangle" />
+                                        <x-keys::badge color="blue" icon="heroicon-o-information-circle" />
+                                        <x-keys::badge color="brand" icon="heroicon-o-star" />
+                                    </div>
 
-                                <x-keys::popover id="left-popover" placement="left" size="sm">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="outline" size="sm">Left</x-keys::button>
-                                    </x-slot:trigger>
-                                    <p class="text-sm">Positioned to the left</p>
-                                </x-keys::popover>
+                                    <div class="flex flex-wrap gap-3">
+                                        <x-keys::badge color="purple" icon="heroicon-o-heart" />
+                                        <x-keys::badge color="green" icon="heroicon-o-bolt" />
+                                        <x-keys::badge color="indigo" icon="heroicon-o-fire" />
+                                        <x-keys::badge color="pink" icon="heroicon-o-sparkles" />
+                                        <x-keys::badge color="yellow" icon="heroicon-o-sun" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Size Variants -->
-                        <div class="rounded-lg border border-border p-6">
-                            <h3 class="text-lg font-semibold mb-4">Size Variants</h3>
-                            <p class="text-muted-foreground mb-4">Popovers come in different sizes.</p>
+                        <div class="space-y-8">
+                            <h3 class="text-xl font-semibold mb-6">Size Variants</h3>
 
-                            <div class="flex flex-wrap gap-2">
-                                <x-keys::popover id="small-popover" placement="top" size="sm">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="outline" size="sm">Small</x-keys::button>
-                                    </x-slot:trigger>
-                                    <p class="text-xs">Small popover content</p>
-                                </x-keys::popover>
-
-                                <x-keys::popover id="medium-popover" placement="top" size="md">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="outline">Medium</x-keys::button>
-                                    </x-slot:trigger>
-                                    <p class="text-sm">Medium popover content with more text</p>
-                                </x-keys::popover>
-
-                                <x-keys::popover id="large-popover" placement="top" size="lg">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="outline">Large</x-keys::button>
-                                    </x-slot:trigger>
-                                    <div>
-                                        <p class="text-base font-semibold mb-2">Large Popover</p>
-                                        <p class="text-sm text-muted-foreground">This is a larger popover with more content and better spacing for complex information.</p>
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <!-- Extra Small -->
+                                <div class="space-y-4">
+                                    <h4 class="text-lg font-medium mb-4">Extra Small (xs)</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        <x-keys::badge size="xs" color="brand">Brand</x-keys::badge>
+                                        <x-keys::badge size="xs" color="success" icon="heroicon-o-check">Success</x-keys::badge>
+                                        <x-keys::badge size="xs" color="blue" icon="heroicon-o-star" />
+                                        <x-keys::badge size="xs" variant="chip" color="purple" dismissible>Chip</x-keys::badge>
                                     </div>
-                                </x-keys::popover>
-                            </div>
-                        </div>
+                                </div>
 
-                        <!-- Focus Trigger -->
-                        <div class="rounded-lg border border-border p-6">
-                            <h3 class="text-lg font-semibold mb-4">Focus Trigger</h3>
-                            <p class="text-muted-foreground mb-4">Tab to or click on the input to show help text.</p>
+                                <!-- Small (Default) -->
+                                <div class="space-y-4">
+                                    <h4 class="text-lg font-medium mb-4">Small - Default (sm)</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        <x-keys::badge size="sm" color="brand">Brand</x-keys::badge>
+                                        <x-keys::badge size="sm" color="success" icon="heroicon-o-check">Success</x-keys::badge>
+                                        <x-keys::badge size="sm" color="blue" icon="heroicon-o-star" />
+                                        <x-keys::badge size="sm" variant="chip" color="purple" dismissible>Chip</x-keys::badge>
+                                    </div>
+                                </div>
 
-                            <x-keys::popover id="focus-popover" placement="right" trigger="focus" variant="tooltip">
-                                <x-slot:trigger>
-                                    <x-keys::input placeholder="Enter your username" />
-                                </x-slot:trigger>
-                                <span class="text-white text-sm">Username must be 3-20 characters long</span>
-                            </x-keys::popover>
-                        </div>
-                    </div>
-
-                    <!-- Dropdown Component Demos -->
-                    <div class="mt-16">
-                        <h2 class="text-2xl font-bold text-center mb-8">Dropdown Components</h2>
-                        <p class="text-center text-muted-foreground mb-8">Modern dropdown components using CSS anchor positioning with comprehensive menu items</p>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <!-- Basic Dropdown -->
-                            <div class="rounded-lg border border-border p-6">
-                                <h3 class="text-lg font-semibold mb-4">Basic Dropdown</h3>
-                                <p class="text-muted-foreground mb-4">Simple dropdown with menu items and different variants.</p>
-
-                                <x-keys::dropdown id="basic-dropdown" position="bottom" align="start">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="outline" icon="heroicon-o-chevron-down">
-                                            Options
-                                        </x-keys::button>
-                                    </x-slot:trigger>
-
-                                    <x-keys::menu.item icon="heroicon-o-eye" href="#">
-                                        View Details
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item icon="heroicon-o-pencil" href="#" variant="brand">
-                                        Edit Item
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item icon="heroicon-o-share" href="#">
-                                        Share
-                                    </x-keys::menu.item>
-                                    <hr class="my-1">
-                                    <x-keys::menu.item icon="heroicon-o-trash" href="#" variant="danger">
-                                        Delete
-                                    </x-keys::menu.item>
-                                </x-keys::dropdown>
-                            </div>
-
-                            <!-- Dropdown with Keyboard Shortcuts -->
-                            <div class="rounded-lg border border-border p-6">
-                                <h3 class="text-lg font-semibold mb-4">With Shortcuts</h3>
-                                <p class="text-muted-foreground mb-4">Dropdown showing keyboard shortcuts and different states.</p>
-
-                                <x-keys::dropdown id="shortcuts-dropdown" position="bottom" align="center">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="brand" icon="heroicon-o-cog-6-tooth">
-                                            Actions
-                                        </x-keys::button>
-                                    </x-slot:trigger>
-
-                                    <x-keys::menu.item icon="heroicon-o-document-duplicate" kbd="⌘C">
-                                        Copy
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item icon="heroicon-o-scissors" kbd="⌘X">
-                                        Cut
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item icon="heroicon-o-clipboard" kbd="⌘V">
-                                        Paste
-                                    </x-keys::menu.item>
-                                    <hr class="my-1">
-                                    <x-keys::menu.item icon="heroicon-o-arrow-uturn-left" kbd="⌘Z">
-                                        Undo
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item icon="heroicon-o-arrow-uturn-right" kbd="⌘⇧Z">
-                                        Redo
-                                    </x-keys::menu.item>
-                                    <hr class="my-1">
-                                    <x-keys::menu.item icon="heroicon-o-cog-6-tooth" kbd="⌘,">
-                                        Settings
-                                    </x-keys::menu.item>
-                                </x-keys::dropdown>
-                            </div>
-
-                            <!-- Dropdown with Multi-State Items -->
-                            <div class="rounded-lg border border-border p-6">
-                                <h3 class="text-lg font-semibold mb-4">Multi-State Items</h3>
-                                <p class="text-muted-foreground mb-4">Interactive items with toggle states and success feedback.</p>
-
-                                <x-keys::dropdown id="multistate-dropdown" position="bottom" align="end">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="outline" icon="heroicon-o-ellipsis-vertical">
-                                            More
-                                        </x-keys::button>
-                                    </x-slot:trigger>
-
-                                    <x-keys::menu.item
-                                        icon="heroicon-o-eye"
-                                        icon-toggle="heroicon-o-eye-slash"
-                                        label-toggle="Hide Item"
-                                        :keep-open="true"
-                                    >
-                                        Show Item
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item
-                                        icon="heroicon-o-heart"
-                                        icon-toggle="heroicon-s-heart"
-                                        icon-success="heroicon-s-check-circle"
-                                        label-success="Liked!"
-                                        variant="danger"
-                                        :keep-open="true"
-                                    >
-                                        Like
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item
-                                        icon="heroicon-o-bookmark"
-                                        icon-toggle="heroicon-s-bookmark"
-                                        label-toggle="Bookmarked"
-                                        variant="success"
-                                        :keep-open="true"
-                                    >
-                                        Bookmark
-                                    </x-keys::menu.item>
-                                    <hr class="my-1">
-                                    <x-keys::menu.item icon="heroicon-o-information-circle" disabled>
-                                        Disabled Item
-                                    </x-keys::menu.item>
-                                </x-keys::dropdown>
-                            </div>
-
-                            <!-- Dropdown with Submenu -->
-                            <div class="rounded-lg border border-border p-6">
-                                <h3 class="text-lg font-semibold mb-4">With Submenus</h3>
-                                <p class="text-muted-foreground mb-4">Nested dropdown menus with submenus for complex navigation.</p>
-
-                                <x-keys::dropdown id="submenu-dropdown" position="bottom" align="start">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="ghost" icon="heroicon-o-squares-plus">
-                                            Create
-                                        </x-keys::button>
-                                    </x-slot:trigger>
-
-                                    <x-keys::menu.item icon="heroicon-o-document-text">
-                                        New Document
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item icon="heroicon-o-folder-plus">
-                                        New Folder
-                                    </x-keys::menu.item>
-
-                                    <x-keys::menu.submenu icon="heroicon-o-photo" heading="Import">
-                                        <x-keys::menu.item icon="heroicon-o-cloud-arrow-up">
-                                            From Cloud
-                                        </x-keys::menu.item>
-                                        <x-keys::menu.item icon="heroicon-o-computer-desktop">
-                                            From Computer
-                                        </x-keys::menu.item>
-                                        <x-keys::menu.item icon="heroicon-o-link">
-                                            From URL
-                                        </x-keys::menu.item>
-                                        <hr class="my-1">
-                                        <x-keys::menu.item icon="heroicon-o-arrow-down-tray" variant="brand">
-                                            Bulk Import
-                                        </x-keys::menu.item>
-                                    </x-keys::menu.submenu>
-
-                                    <x-keys::menu.submenu icon="heroicon-o-share" heading="Export">
-                                        <x-keys::menu.item icon="heroicon-o-document-arrow-down">
-                                            Export as PDF
-                                        </x-keys::menu.item>
-                                        <x-keys::menu.item icon="heroicon-o-table-cells">
-                                            Export as CSV
-                                        </x-keys::menu.item>
-                                        <x-keys::menu.item icon="heroicon-o-code-bracket">
-                                            Export as JSON
-                                        </x-keys::menu.item>
-                                    </x-keys::menu.submenu>
-
-                                    <hr class="my-1">
-                                    <x-keys::menu.item icon="heroicon-o-cog-6-tooth">
-                                        Templates
-                                    </x-keys::menu.item>
-                                </x-keys::dropdown>
-                            </div>
-
-                            <!-- Different Positions -->
-                            <div class="rounded-lg border border-border p-6">
-                                <h3 class="text-lg font-semibold mb-4">Position Variants</h3>
-                                <p class="text-muted-foreground mb-4">Dropdowns can be positioned in different directions.</p>
-
-                                <div class="grid grid-cols-2 gap-3">
-                                    <x-keys::dropdown id="top-dropdown" position="top" align="center">
-                                        <x-slot:trigger>
-                                            <x-keys::button variant="outline" size="sm">Top</x-keys::button>
-                                        </x-slot:trigger>
-                                        <x-keys::menu.item icon="heroicon-o-arrow-up">Up Arrow</x-keys::menu.item>
-                                        <x-keys::menu.item>Top Menu Item</x-keys::menu.item>
-                                    </x-keys::dropdown>
-
-                                    <x-keys::dropdown id="right-dropdown" position="right" align="start">
-                                        <x-slot:trigger>
-                                            <x-keys::button variant="outline" size="sm">Right</x-keys::button>
-                                        </x-slot:trigger>
-                                        <x-keys::menu.item icon="heroicon-o-arrow-right">Right Arrow</x-keys::menu.item>
-                                        <x-keys::menu.item>Right Menu Item</x-keys::menu.item>
-                                    </x-keys::dropdown>
-
-                                    <x-keys::dropdown id="left-dropdown" position="left" align="start">
-                                        <x-slot:trigger>
-                                            <x-keys::button variant="outline" size="sm">Left</x-keys::button>
-                                        </x-slot:trigger>
-                                        <x-keys::menu.item icon="heroicon-o-arrow-left">Left Arrow</x-keys::menu.item>
-                                        <x-keys::menu.item>Left Menu Item</x-keys::menu.item>
-                                    </x-keys::dropdown>
-
-                                    <x-keys::dropdown id="bottom-end-dropdown" position="bottom" align="end">
-                                        <x-slot:trigger>
-                                            <x-keys::button variant="outline" size="sm">Bottom End</x-keys::button>
-                                        </x-slot:trigger>
-                                        <x-keys::menu.item icon="heroicon-o-arrow-down">Down Arrow</x-keys::menu.item>
-                                        <x-keys::menu.item>Bottom End Item</x-keys::menu.item>
-                                    </x-keys::dropdown>
+                                <!-- Medium -->
+                                <div class="space-y-4">
+                                    <h4 class="text-lg font-medium mb-4">Medium (md)</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        <x-keys::badge size="md" color="brand">Brand</x-keys::badge>
+                                        <x-keys::badge size="md" color="success" icon="heroicon-o-check">Success</x-keys::badge>
+                                        <x-keys::badge size="md" color="blue" icon="heroicon-o-star" />
+                                        <x-keys::badge size="md" variant="chip" color="purple" dismissible>Chip</x-keys::badge>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Large Dropdown -->
-                            <div class="rounded-lg border border-border p-6">
-                                <h3 class="text-lg font-semibold mb-4">Large Dropdown</h3>
-                                <p class="text-muted-foreground mb-4">Large dropdown with comprehensive menu structure.</p>
+                        <!-- Subtle Variant -->
+                        <div class="space-y-8">
+                            <h3 class="text-xl font-semibold mb-6">Subtle Variant with Status Dots</h3>
 
-                                <x-keys::dropdown id="large-dropdown" size="lg" position="bottom" align="start">
-                                    <x-slot:trigger>
-                                        <x-keys::button variant="brand" size="lg" icon="heroicon-o-squares-2x2">
-                                            Dashboard
-                                        </x-keys::button>
-                                    </x-slot:trigger>
-
-                                    <div class="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border">
-                                        Analytics
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <!-- Subtle with Text -->
+                                <div class="space-y-6">
+                                    <h4 class="text-lg font-medium mb-4">Status Indicators</h4>
+                                    <div class="space-y-3">
+                                        <div><x-keys::badge variant="subtle" color="success">Online</x-keys::badge></div>
+                                        <div><x-keys::badge variant="subtle" color="warning">Away</x-keys::badge></div>
+                                        <div><x-keys::badge variant="subtle" color="danger">Offline</x-keys::badge></div>
+                                        <div><x-keys::badge variant="subtle" color="blue">Busy</x-keys::badge></div>
+                                        <div><x-keys::badge variant="subtle" color="neutral">Idle</x-keys::badge></div>
                                     </div>
-                                    <x-keys::menu.item icon="heroicon-o-chart-bar" href="#" kbd="⌘A">
-                                        Overview
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item icon="heroicon-o-users" href="#" variant="brand">
-                                        Users
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item icon="heroicon-o-banknotes" href="#" variant="success">
-                                        Revenue
-                                    </x-keys::menu.item>
+                                </div>
 
-                                    <div class="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border">
-                                        Management
+                                <!-- Subtle with Icons -->
+                                <div class="space-y-6">
+                                    <h4 class="text-lg font-medium mb-4">With Icons</h4>
+                                    <div class="space-y-3">
+                                        <div><x-keys::badge variant="subtle" color="success" icon="heroicon-o-check-circle">Completed</x-keys::badge></div>
+                                        <div><x-keys::badge variant="subtle" color="warning" icon="heroicon-o-clock">Pending</x-keys::badge></div>
+                                        <div><x-keys::badge variant="subtle" color="danger" icon="heroicon-o-x-circle">Failed</x-keys::badge></div>
+                                        <div><x-keys::badge variant="subtle" color="blue" icon="heroicon-o-play">In Progress</x-keys::badge></div>
+                                        <div><x-keys::badge variant="subtle" color="purple" icon="heroicon-o-pause">Paused</x-keys::badge></div>
                                     </div>
-                                    <x-keys::menu.item icon="heroicon-o-cog-6-tooth" href="#">
-                                        Settings
-                                    </x-keys::menu.item>
-                                    <x-keys::menu.item icon="heroicon-o-user-group" href="#">
-                                        Team
-                                    </x-keys::menu.item>
+                                </div>
+                            </div>
+                        </div>
 
-                                    <x-keys::menu.submenu icon="heroicon-o-wrench-screwdriver" heading="Tools">
-                                        <x-keys::menu.item icon="heroicon-o-bug-ant">
-                                            Debug Console
-                                        </x-keys::menu.item>
-                                        <x-keys::menu.item icon="heroicon-o-cpu-chip">
-                                            System Monitor
-                                        </x-keys::menu.item>
-                                        <x-keys::menu.item icon="heroicon-o-clipboard-document-list">
-                                            Logs
-                                        </x-keys::menu.item>
-                                    </x-keys::menu.submenu>
+                        <!-- Real-World Examples -->
+                        <div class="space-y-8">
+                            <h3 class="text-xl font-semibold mb-6">Real-World Use Cases</h3>
 
-                                    <hr class="my-1">
-                                    <x-keys::menu.item icon="heroicon-o-arrow-right-on-rectangle" href="#" variant="danger">
-                                        Sign Out
-                                    </x-keys::menu.item>
-                                </x-keys::dropdown>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <!-- User Profile -->
+                                <div class="p-6 border border-border rounded-lg">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h4 class="text-lg font-medium">User Profile</h4>
+                                        <x-keys::badge variant="subtle" color="success">Online</x-keys::badge>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between">
+                                            <span>John Doe</span>
+                                            <x-keys::badge color="brand" icon="heroicon-o-shield-check">Verified</x-keys::badge>
+                                        </div>
+                                        <div class="flex flex-wrap gap-2">
+                                            <x-keys::badge variant="chip" color="blue" dismissible>Admin</x-keys::badge>
+                                            <x-keys::badge variant="chip" color="green" dismissible>Premium</x-keys::badge>
+                                            <x-keys::badge variant="chip" color="purple" dismissible>Pro User</x-keys::badge>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- E-commerce Product -->
+                                <div class="p-6 border border-border rounded-lg">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h4 class="text-lg font-medium">MacBook Pro 14"</h4>
+                                        <x-keys::badge color="success" icon="heroicon-o-check">In Stock</x-keys::badge>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div class="flex flex-wrap gap-2">
+                                            <x-keys::badge color="yellow" icon="heroicon-o-star">Bestseller</x-keys::badge>
+                                            <x-keys::badge color="danger">Sale</x-keys::badge>
+                                            <x-keys::badge color="blue">Free Shipping</x-keys::badge>
+                                        </div>
+                                        <div class="flex flex-wrap gap-2">
+                                            <x-keys::badge variant="chip" color="neutral" dismissible>M3 Pro</x-keys::badge>
+                                            <x-keys::badge variant="chip" color="neutral" dismissible>16GB RAM</x-keys::badge>
+                                            <x-keys::badge variant="chip" color="neutral" dismissible>1TB SSD</x-keys::badge>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Project Status -->
+                                <div class="p-6 border border-border rounded-lg">
+                                    <h4 class="text-lg font-medium mb-4">Project Dashboard</h4>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <span>Frontend Development</span>
+                                            <x-keys::badge variant="subtle" color="blue" icon="heroicon-o-play">In Progress</x-keys::badge>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span>Backend API</span>
+                                            <x-keys::badge variant="subtle" color="success" icon="heroicon-o-check-circle">Completed</x-keys::badge>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span>Testing</span>
+                                            <x-keys::badge variant="subtle" color="warning" icon="heroicon-o-clock">Pending</x-keys::badge>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span>Deployment</span>
+                                            <x-keys::badge variant="subtle" color="neutral">Not Started</x-keys::badge>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Content Management -->
+                                <div class="p-6 border border-border rounded-lg">
+                                    <h4 class="text-lg font-medium mb-4">Blog Post</h4>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <span>Status</span>
+                                            <x-keys::badge color="success" icon="heroicon-o-check-circle">Published</x-keys::badge>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="text-sm text-muted-foreground">Categories</div>
+                                            <div class="flex flex-wrap gap-2">
+                                                <x-keys::badge variant="chip" color="blue" dismissible>Web Development</x-keys::badge>
+                                                <x-keys::badge variant="chip" color="purple" dismissible>Laravel</x-keys::badge>
+                                                <x-keys::badge variant="chip" color="green" dismissible>Tutorial</x-keys::badge>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-wrap gap-2">
+                                            <x-keys::badge color="yellow" icon="heroicon-o-star">Featured</x-keys::badge>
+                                            <x-keys::badge color="pink" icon="heroicon-o-heart">Popular</x-keys::badge>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </section>
 
-                    <!-- CSS Anchor Positioning Notice -->
-                    <div class="mt-16 bg-blue-50 border border-blue-200 rounded-lg p-8 max-w-4xl mx-auto">
-                        <div class="flex items-start">
-                            <x-keys::icon name="heroicon-o-information-circle" size="lg" class="text-blue-600 mt-1 mr-4 flex-shrink-0" />
-                            <div>
-                                <h3 class="text-lg font-semibold text-blue-900 mb-2">Modern CSS Anchor Positioning</h3>
-                                <p class="text-blue-800 mb-3">
-                                    All positioning components (Popover, Dropdown, Tooltip) now use CSS Anchor Positioning with the OddBird polyfill for maximum performance and compatibility.
-                                </p>
-                                <ul class="text-sm text-blue-700 space-y-1">
-                                    <li>• <strong>Native Performance:</strong> CSS handles positioning without JavaScript overhead</li>
-                                    <li>• <strong>Modern Standards:</strong> Uses cutting-edge web technologies with polyfill fallback</li>
-                                    <li>• <strong>Consistent API:</strong> All overlay components share the same positioning system</li>
-                                    <li>• <strong>Future-Proof:</strong> Ready for native browser support as it becomes available</li>
-                                </ul>
-                            </div>
-                        </div>
+                <!-- Footer -->
+                <div class="text-center pt-12 border-t border-border">
+                    <div class="flex flex-wrap justify-center items-center gap-4 mb-6">
+                        <x-keys::badge color="brand" icon="heroicon-o-code-bracket">Modern Architecture</x-keys::badge>
+                        <x-keys::badge color="success" icon="heroicon-o-check-circle">Laravel 12 Ready</x-keys::badge>
+                        <x-keys::badge color="info" icon="heroicon-o-sparkles">Tailwind v4</x-keys::badge>
+                        <x-keys::badge color="purple" icon="heroicon-o-cpu-chip">High Performance</x-keys::badge>
+                        <x-keys::badge color="warning" icon="heroicon-o-shield-check">Accessible</x-keys::badge>
+                    </div>
+
+                    <p class="text-muted-foreground mb-4">
+                        Keys UI follows modern component development principles with direct Tailwind utilities,
+                        semantic design tokens, and progressive enhancement.
+                    </p>
+
+                    <div class="flex justify-center gap-4">
+                        <x-keys::button variant="brand" icon="heroicon-o-document-text">
+                            Documentation
+                        </x-keys::button>
+                        <x-keys::button variant="outline" icon="heroicon-o-code-bracket">
+                            View Source
+                        </x-keys::button>
                     </div>
                 </div>
             </div>

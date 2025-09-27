@@ -8,12 +8,16 @@ use Keys\UI\Constants\ComponentConstants;
 class Popover extends Component
 {
     public string $id;
+
     public string $variant;
+
     public string $size;
+
     public string $placement;
+
     public bool $arrow;
+
     public bool $manual;
-    public bool $fullWidth;
 
     public function __construct(
         ?string $id = null,
@@ -22,26 +26,24 @@ class Popover extends Component
         string $placement = 'bottom',
         bool $arrow = false,
         bool $manual = false,
-        bool $fullWidth = false,
     ) {
-        $this->id = $id ?? 'popover-' . uniqid();
+        $this->id = $id ?? 'popover-'.uniqid();
         $this->variant = $variant;
 
         // Validate size
-        if (!in_array($size, ComponentConstants::SIZES)) {
+        if (! in_array($size, ComponentConstants::SIZES)) {
             $size = ComponentConstants::getDefaultSize();
         }
         $this->size = $size;
 
         // Validate placement
-        if (!in_array($placement, ComponentConstants::POPOVER_PLACEMENTS)) {
+        if (! in_array($placement, ComponentConstants::POPOVER_PLACEMENTS)) {
             $placement = 'bottom';
         }
         $this->placement = $placement;
 
         $this->arrow = $arrow;
         $this->manual = $manual;
-        $this->fullWidth = $fullWidth;
     }
 
     public function getBaseClasses(): string
@@ -51,7 +53,7 @@ class Popover extends Component
 
     public function getContentClasses(): string
     {
-        $base = 'bg-surface border border-border space-y-1 rounded-lg shadow-lg text-foreground m-2 max-w-[90vw] w-max';
+        $base = 'bg-surface border border-border space-y-1 rounded-lg shadow-lg text-foreground my-2 max-w-[90vw] w-max';
 
         $sizeClasses = match ($this->size) {
             'sm' => 'p-1 text-xs min-w-40 sm:min-w-46 leading-5',
@@ -66,12 +68,12 @@ class Popover extends Component
             default => ''
         };
 
-        return trim($base . ' ' . $sizeClasses . ' ' . $variantClasses);
+        return trim($base.' '.$sizeClasses.' '.$variantClasses);
     }
 
     public function getArrowClasses(): string
     {
-        if (!$this->arrow) {
+        if (! $this->arrow) {
             return '';
         }
 
@@ -82,13 +84,12 @@ class Popover extends Component
             default => 'bg-surface border border-border'
         };
 
-        return trim($base . ' ' . $variantClasses);
+        return trim($base.' '.$variantClasses);
     }
 
     public function getTriggerClasses(): string
     {
-        $width = $this->fullWidth ? 'w-full' : 'w-max';
-        return "keys-popover-trigger inline-flex {$width} cursor-pointer focus:outline-2 focus:outline-brand focus:outline-offset-2";
+        return 'keys-popover-trigger cursor-pointer focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2';
     }
 
     public function render()

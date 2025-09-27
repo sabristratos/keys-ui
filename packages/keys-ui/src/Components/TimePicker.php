@@ -5,15 +5,46 @@ namespace Keys\UI\Components;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
 
+/**
+ * TimePicker Component
+ *
+ * A comprehensive time selection component with 12/24 hour format support,
+ * configurable step intervals, and modern popover-based interface.
+ * Uses the Popover component for consistent positioning and accessibility.
+ */
 class TimePicker extends Component
 {
+    /**
+     * Create a new TimePicker component instance.
+     *
+     * @param  string|null  $name  Form field name
+     * @param  string|null  $id  TimePicker ID (auto-generated if not provided)
+     * @param  string|null  $value  Time value
+     * @param  string|null  $placeholder  Placeholder text
+     * @param  string  $format  Time format ('12' or '24')
+     * @param  int  $step  Minute step intervals (1, 5, 15, 30)
+     * @param  string|null  $minTime  Minimum time allowed
+     * @param  string|null  $maxTime  Maximum time allowed
+     * @param  string  $size  Size variant (sm, md, lg)
+     * @param  bool  $disabled  Whether the timepicker is disabled
+     * @param  bool  $readonly  Whether the timepicker is readonly
+     * @param  bool  $required  Whether the timepicker is required
+     * @param  string|null  $label  Label text for shorthand mode
+     * @param  bool  $optional  Whether to show optional indicator
+     * @param  string|array|Collection|null  $errors  Validation errors
+     * @param  bool  $showErrors  Whether to display validation errors
+     * @param  bool  $hasError  Force error state
+     * @param  bool  $clearable  Enable clear functionality
+     * @param  bool  $showSeconds  Show seconds in time selection
+     * @param  string  $formatMode  Format mode ('12', '24', 'flexible')
+     */
     public function __construct(
         public ?string $name = null,
         public ?string $id = null,
         public ?string $value = null,
         public ?string $placeholder = null,
-        public string $format = '24', // '12' or '24'
-        public int $step = 1, // Minute step intervals (1, 5, 15, 30)
+        public string $format = '24',
+        public int $step = 1,
         public ?string $minTime = null,
         public ?string $maxTime = null,
         public string $size = 'md',
@@ -29,10 +60,11 @@ class TimePicker extends Component
         public bool $showSeconds = false,
         public string $formatMode = 'flexible'
     ) {
-        $this->id = $this->id ?? $this->name;
+        // Auto-generate ID when missing
+        $this->id = $this->id ?? $this->name ?? 'timepicker-'.uniqid();
 
         // Validate formatMode
-        if (!in_array($this->formatMode, ['12', '24', 'flexible'])) {
+        if (! in_array($this->formatMode, ['12', '24', 'flexible'])) {
             $this->formatMode = 'flexible';
         }
 
@@ -44,12 +76,12 @@ class TimePicker extends Component
         }
 
         // Validate format
-        if (!in_array($this->format, ['12', '24'])) {
+        if (! in_array($this->format, ['12', '24'])) {
             $this->format = '24';
         }
 
         // Validate step
-        if (!in_array($this->step, [1, 5, 15, 30])) {
+        if (! in_array($this->step, [1, 5, 15, 30])) {
             $this->step = 1;
         }
 
@@ -59,27 +91,36 @@ class TimePicker extends Component
         }
 
         // Set default placeholder based on format
-        if (!$this->placeholder) {
+        if (! $this->placeholder) {
             $this->placeholder = $this->format === '12'
                 ? ($this->showSeconds ? 'h:mm:ss AM' : 'h:mm AM')
                 : ($this->showSeconds ? 'HH:mm:ss' : 'HH:mm');
         }
 
-        if (!$this->hasError && $this->hasErrors()) {
+        if (! $this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
     }
 
+    /**
+     * Check if the component is using shorthand mode (with label).
+     */
     public function isShorthand(): bool
     {
-        return !is_null($this->label);
+        return ! is_null($this->label);
     }
 
+    /**
+     * Check if the timepicker has an error state.
+     */
     public function hasError(): bool
     {
         return $this->hasError || $this->hasErrors();
     }
 
+    /**
+     * Check if there are validation errors.
+     */
     public function hasErrors(): bool
     {
         if (is_null($this->errors)) {
@@ -87,11 +128,11 @@ class TimePicker extends Component
         }
 
         if (is_string($this->errors)) {
-            return !empty(trim($this->errors));
+            return ! empty(trim($this->errors));
         }
 
         if (is_array($this->errors)) {
-            return !empty($this->errors);
+            return ! empty($this->errors);
         }
 
         if ($this->errors instanceof Collection) {
@@ -101,83 +142,12 @@ class TimePicker extends Component
         return false;
     }
 
-    public function inputClasses(): string
-    {
-        $base = 'block w-full rounded-md border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer';
-        $size = $this->sizeClasses();
-        $state = $this->stateClasses();
-        $padding = $this->paddingClasses();
-
-        return trim($base . ' ' . $size . ' ' . $state . ' ' . $padding);
-    }
-
-    public function sizeClasses(): string
-    {
-        return match ($this->size) {
-            'sm' => 'py-1.5 text-sm',
-            'md' => 'py-2 text-sm',
-            'lg' => 'py-2.5 text-base',
-            default => 'py-2 text-sm'
-        };
-    }
-
-    public function paddingClasses(): string
-    {
-        $leftPadding = match ($this->size) {
-            'sm' => 'pl-3',
-            'md' => 'pl-3',
-            'lg' => 'pl-4',
-            default => 'pl-3'
-        };
-
-        $rightPadding = $this->clearable ? match ($this->size) {
-            'sm' => 'pr-8',
-            'md' => 'pr-10',
-            'lg' => 'pr-12',
-            default => 'pr-10'
-        } : match ($this->size) {
-            'sm' => 'pr-8',
-            'md' => 'pr-10',
-            'lg' => 'pr-12',
-            default => 'pr-10'
-        };
-
-        return trim($leftPadding . ' ' . $rightPadding);
-    }
-
-    public function stateClasses(): string
-    {
-        if ($this->disabled) {
-            return 'bg-surface border-border text-muted cursor-not-allowed opacity-50';
-        }
-
-        if ($this->hasError()) {
-            return 'bg-input border-danger text-foreground focus:border-danger focus:ring-danger';
-        }
-
-        return 'bg-input border-border text-foreground focus:border-brand focus:ring-brand hover:border-neutral-300 dark:hover:border-neutral-600';
-    }
-
-    public function dropdownClasses(): string
-    {
-        return 'absolute z-50 mt-1 w-full rounded-md bg-surface border border-border shadow-lg';
-    }
-
-    public function iconSize(): string
-    {
-        return match ($this->size) {
-            'sm' => 'xs',
-            'md' => 'sm',
-            'lg' => 'md',
-            default => 'sm'
-        };
-    }
-
     public function getHourOptions(): array
     {
         if ($this->format === '12') {
             return range(1, 12);
         }
+
         return range(0, 23);
     }
 
@@ -187,6 +157,7 @@ class TimePicker extends Component
         for ($i = 0; $i < 60; $i += $this->step) {
             $minutes[] = $i;
         }
+
         return $minutes;
     }
 
@@ -200,21 +171,24 @@ class TimePicker extends Component
         return ['AM', 'PM'];
     }
 
+    /**
+     * Format time value according to component settings.
+     */
     public function formatTimeValue(?string $time): ?string
     {
-        if (!$time) {
+        if (! $time) {
             return null;
         }
 
         try {
             $parsedTime = \DateTime::createFromFormat('H:i:s', $time);
-            if (!$parsedTime) {
+            if (! $parsedTime) {
                 $parsedTime = \DateTime::createFromFormat('H:i', $time);
             }
-            if (!$parsedTime) {
+            if (! $parsedTime) {
                 $parsedTime = \DateTime::createFromFormat('g:i A', $time);
             }
-            if (!$parsedTime) {
+            if (! $parsedTime) {
                 $parsedTime = \DateTime::createFromFormat('g:i:s A', $time);
             }
 
@@ -236,57 +210,73 @@ class TimePicker extends Component
         return $time;
     }
 
-    public function getComputedInputClasses(): string
+    /**
+     * Generate comprehensive data attributes for CSS targeting and JavaScript functionality.
+     */
+    public function getDataAttributes(): array
     {
-        return $this->inputClasses();
+        $attributes = [
+            'data-keys-timepicker' => 'true',
+            'data-format' => $this->format,
+            'data-format-mode' => $this->formatMode,
+            'data-step' => $this->step,
+            'data-size' => $this->size,
+        ];
+
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
+        }
+
+        if ($this->readonly) {
+            $attributes['data-readonly'] = 'true';
+        }
+
+        if ($this->required) {
+            $attributes['data-required'] = 'true';
+        }
+
+        if ($this->hasError()) {
+            $attributes['data-invalid'] = 'true';
+        }
+
+        if ($this->clearable) {
+            $attributes['data-clearable'] = 'true';
+        }
+
+        if ($this->showSeconds) {
+            $attributes['data-show-seconds'] = 'true';
+        }
+
+        if (! empty($this->value)) {
+            $attributes['data-has-value'] = 'true';
+        }
+
+        if ($this->minTime) {
+            $attributes['data-min-time'] = $this->minTime;
+        }
+
+        if ($this->maxTime) {
+            $attributes['data-max-time'] = $this->maxTime;
+        }
+
+        if ($this->name) {
+            $attributes['data-name'] = $this->name;
+        }
+
+        return $attributes;
     }
 
-    public function getComputedDropdownClasses(): string
-    {
-        return $this->dropdownClasses();
-    }
-
-    public function getComputedIconSize(): string
-    {
-        return $this->iconSize();
-    }
-
-    public function getComputedHourOptions(): array
-    {
-        return $this->getHourOptions();
-    }
-
-    public function getComputedMinuteOptions(): array
-    {
-        return $this->getMinuteOptions();
-    }
-
-    public function getComputedSecondOptions(): array
-    {
-        return $this->getSecondOptions();
-    }
-
-    public function getComputedPeriodOptions(): array
-    {
-        return $this->getPeriodOptions();
-    }
-
-    public function getUniqueId(): string
-    {
-        return $this->id ?? 'timepicker-' . uniqid();
-    }
-
+    /**
+     * Render the component.
+     */
     public function render()
     {
         return view('keys::components.timepicker', [
-            'computedInputClasses' => $this->getComputedInputClasses(),
-            'computedDropdownClasses' => $this->getComputedDropdownClasses(),
-            'computedIconSize' => $this->getComputedIconSize(),
-            'computedHourOptions' => $this->getComputedHourOptions(),
-            'computedMinuteOptions' => $this->getComputedMinuteOptions(),
-            'computedSecondOptions' => $this->getComputedSecondOptions(),
-            'computedPeriodOptions' => $this->getComputedPeriodOptions(),
-            'uniqueId' => $this->getUniqueId(),
+            'dataAttributes' => $this->getDataAttributes(),
+            'hourOptions' => $this->getHourOptions(),
+            'minuteOptions' => $this->getMinuteOptions(),
+            'secondOptions' => $this->getSecondOptions(),
+            'periodOptions' => $this->getPeriodOptions(),
         ]);
     }
 }

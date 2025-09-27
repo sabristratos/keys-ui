@@ -23,14 +23,14 @@ class Option extends Component
         $base = 'flex items-center w-full px-3 py-2 mx-0.5 my-0.5 text-sm text-left cursor-pointer transition-colors duration-150 rounded-md';
 
         if ($this->disabled) {
-            return $base . ' text-neutral-400 cursor-not-allowed bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-500';
+            return $base.' text-neutral-400 cursor-not-allowed bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-500';
         }
 
         if ($this->selected) {
-            return $base . ' bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-300';
+            return $base.' bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-300';
         }
 
-        return $base . ' text-foreground';
+        return $base.' text-foreground';
     }
 
     public function iconClasses(): string
@@ -56,22 +56,23 @@ class Option extends Component
     public function checkmarkClasses(): string
     {
         $base = 'flex-shrink-0 ml-2 transition-opacity duration-150';
-        return $base . ($this->selected ? ' opacity-100' : ' opacity-0');
+
+        return $base.($this->selected ? ' opacity-100' : ' opacity-0');
     }
 
     public function hasContent(): bool
     {
-        return !empty(trim($this->label ?? ''));
+        return ! empty(trim($this->label ?? ''));
     }
 
     public function hasDescription(): bool
     {
-        return !empty(trim($this->description ?? ''));
+        return ! empty(trim($this->description ?? ''));
     }
 
     public function hasIcon(): bool
     {
-        return !empty(trim($this->icon ?? ''));
+        return ! empty(trim($this->icon ?? ''));
     }
 
     public function getComputedOptionClasses(): string
@@ -108,14 +109,25 @@ class Option extends Component
     {
         $text = $this->label ?? '';
         if ($this->description) {
-            $text .= ' ' . $this->description;
+            $text .= ' '.$this->description;
         }
+
         return strtolower(trim($text));
     }
 
     public function getDisplayLabel(): string
     {
         return $this->displayLabel ?? $this->label ?? $this->value ?? '';
+    }
+
+    public function getDataAttributes(): array
+    {
+        return [
+            'data-select-option' => 'true',
+            'data-value' => $this->value ?? '',
+            'data-searchable-text' => $this->getSearchableText(),
+            'data-display-label' => $this->getDisplayLabel(),
+        ];
     }
 
     public function render()
@@ -129,6 +141,7 @@ class Option extends Component
             'computedCheckmarkClasses' => $this->getComputedCheckmarkClasses(),
             'searchableText' => $this->getSearchableText(),
             'displayLabel' => $this->getDisplayLabel(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

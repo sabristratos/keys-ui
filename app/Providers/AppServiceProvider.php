@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +12,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->enforceSecureUrls();
+    }
+
+    /**
+     * Force HTTPS in non-local environments.
+     */
+    private function enforceSecureUrls(): void
+    {
+        if (! $this->app->environment('local')) {
+            URL::forceScheme('https');
+        }
     }
 
     /**

@@ -14,46 +14,30 @@ class Panel extends Component
         //
     }
 
-    public function panelClasses(): string
+    public function getDataAttributes(): array
     {
-        $base = 'tabs-panel focus:outline-none';
-        $custom = $this->className ? ' ' . $this->className : '';
-
-        return trim($base . $custom);
-    }
-
-    public function getComputedPanelClasses(): string
-    {
-        return $this->panelClasses();
-    }
-
-    public function getAriaAttributes(): array
-    {
-        return [
-            'role' => 'tabpanel',
-            'data-value' => $this->value,
+        $attributes = [
+            'data-keys-panel' => 'true',
             'data-tabs-panel' => 'true',
+            'data-value' => $this->value,
+            'role' => 'tabpanel',
             'tabindex' => '0',
-            'aria-labelledby' => 'tab-' . $this->value,
-            'id' => 'panel-' . $this->value
+            'aria-labelledby' => 'tab-'.$this->value,
+            'id' => 'panel-'.$this->value,
         ];
-    }
 
-    public function getStyleAttributes(): array
-    {
-        if (!$this->preserveOffscreen) {
-            return ['style' => 'display: none;'];
+        // Add style attribute for non-preserveOffscreen panels
+        if (! $this->preserveOffscreen) {
+            $attributes['style'] = 'display: none;';
         }
 
-        return [];
+        return $attributes;
     }
 
     public function render()
     {
         return view('keys::components.tabs.panel', [
-            'computedPanelClasses' => $this->getComputedPanelClasses(),
-            'ariaAttributes' => $this->getAriaAttributes(),
-            'styleAttributes' => $this->getStyleAttributes(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

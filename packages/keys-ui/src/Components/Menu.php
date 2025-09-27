@@ -12,18 +12,11 @@ class Menu extends Component
         public ?string $ariaLabel = null,
         public ?string $ariaLabelledBy = null
     ) {
-
         $this->id = $this->id ?? 'menu-' . uniqid();
-
 
         if (!in_array($this->role, ['menu', 'listbox', 'group'])) {
             $this->role = 'menu';
         }
-    }
-
-    public function menuClasses(): string
-    {
-        return 'flex flex-col gap-0.5 outline-none';
     }
 
     public function getAriaAttributes(): array
@@ -47,17 +40,17 @@ class Menu extends Component
     public function getDataAttributes(): array
     {
         return [
-            'data-menu' => 'true',
-            'data-menu-id' => $this->id
+            'data-keys-menu' => 'true',
+            'data-menu-id' => $this->id,
+            'data-role' => $this->role
         ];
     }
 
     public function render()
     {
         return view('keys::components.menu', [
-            'computedMenuClasses' => $this->menuClasses(),
-            'computedAriaAttributes' => $this->getAriaAttributes(),
-            'computedDataAttributes' => $this->getDataAttributes(),
+            'ariaAttributes' => $this->getAriaAttributes(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

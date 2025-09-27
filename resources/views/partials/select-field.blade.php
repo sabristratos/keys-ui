@@ -123,15 +123,15 @@
 >
     <div class="flex items-center justify-between">
         <div class="flex items-center flex-1 min-w-0">
-            
+
             <div class="select-display flex justify-start flex-1">
                 @if($multiple)
-                    
+
                     <div class="flex flex-wrap gap-1" data-select-chips>
                         <span class="text-neutral-500 select-placeholder">{{ $placeholder ?? 'Select options...' }}</span>
                     </div>
                 @else
-                    
+
                     <span class="select-value truncate">
                         @if($value)
                             {{ $value }}
@@ -143,7 +143,7 @@
             </div>
         </div>
 
-        
+
         <div class="flex items-center gap-1 ml-2">
             @if($clearable && !empty($getSelectedValues()) && !$disabled)
                 <button type="button" class="p-1 hover:text-danger-500" data-select-clear>
@@ -160,8 +160,8 @@
 </div>
 
 
-<div class="{{ $computedDropdownClasses }} hidden p-2" data-select-dropdown>
-    
+<div class="{{ $computedDropdownClasses }} hidden" data-select-dropdown>
+
     @if($searchable)
         <div class="mb-2">
             <x-keys::input
@@ -174,12 +174,12 @@
         </div>
     @endif
 
-    
+
     <div class="max-h-48 overflow-y-auto overflow-x-hidden" data-select-options>
         {{ $slot }}
     </div>
 
-    
+
     <div class="px-3 py-2 text-sm text-neutral-500 text-left hidden" data-select-no-results>
         No options found
     </div>

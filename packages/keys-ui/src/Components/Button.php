@@ -5,8 +5,33 @@ namespace Keys\UI\Components;
 use Illuminate\View\Component;
 use Keys\UI\Constants\ComponentConstants;
 
+/**
+ * Button Component
+ *
+ * A versatile button component supporting multiple variants, sizes, icons, and states.
+ * Features auto icon-only detection, multi-state functionality, loading states,
+ * and can render as both button and link elements.
+ */
 class Button extends Component
 {
+    /**
+     * Create a new Button component instance.
+     *
+     * @param  string  $variant  Button variant (brand, ghost, outline, danger, etc.)
+     * @param  string  $size  Size variant (xs, sm, md, lg, xl)
+     * @param  string|null  $type  Button type attribute (button, submit, reset)
+     * @param  string|null  $href  URL for link buttons
+     * @param  bool  $disabled  Whether the button is disabled
+     * @param  bool  $loading  Whether the button is in loading state
+     * @param  string|null  $icon  Alias for iconLeft
+     * @param  string|null  $iconLeft  Left icon name
+     * @param  string|null  $iconRight  Right icon name
+     * @param  string  $loadingAnimation  Loading animation type (spinner, dots)
+     * @param  string|null  $iconToggle  Icon for toggle state (multi-state)
+     * @param  string|null  $iconSuccess  Icon for success state (multi-state)
+     * @param  string|null  $labelToggle  Label for toggle state (multi-state)
+     * @param  string|null  $labelSuccess  Label for success state (multi-state)
+     */
     public function __construct(
         public string $variant = 'brand',
         public string $size = 'md',
@@ -23,28 +48,35 @@ class Button extends Component
         public ?string $labelToggle = null,
         public ?string $labelSuccess = null
     ) {
-        if ($this->icon && !$this->iconLeft) {
+        if ($this->icon && ! $this->iconLeft) {
             $this->iconLeft = $this->icon;
         }
 
-        if (!in_array($this->variant, ComponentConstants::BUTTON_VARIANTS)) {
+        if (! in_array($this->variant, ComponentConstants::BUTTON_VARIANTS)) {
             $this->variant = ComponentConstants::getDefaultColor();
         }
 
-        if (!ComponentConstants::isValidSize($this->size)) {
+        if (! ComponentConstants::isValidSize($this->size)) {
             $this->size = ComponentConstants::getDefaultSize();
         }
 
-        if (!in_array($this->loadingAnimation, ComponentConstants::BUTTON_LOADING_ANIMATIONS)) {
+        if (! in_array($this->loadingAnimation, ComponentConstants::BUTTON_LOADING_ANIMATIONS)) {
             $this->loadingAnimation = 'spinner';
         }
     }
 
+    /**
+     * Check if the button should render as a link element.
+     */
     public function isLink(): bool
     {
         return ! is_null($this->href);
     }
 
+    /**
+     * Determine the HTML element type to render.
+     * Returns 'a' for links, 'span' for disabled links, 'button' for buttons.
+     */
     public function elementType(): string
     {
         if ($this->isLink()) {
@@ -54,6 +86,10 @@ class Button extends Component
         return 'button';
     }
 
+    /**
+     * Get the button type attribute value.
+     * Returns null for links, defaults to 'button' for button elements.
+     */
     public function buttonType(): ?string
     {
         if ($this->isLink()) {
@@ -63,7 +99,10 @@ class Button extends Component
         return $this->type ?? 'button';
     }
 
-
+    /**
+     * Auto-detect if the button should render as icon-only.
+     * Ignores screen reader only content when determining visibility.
+     */
     public function isIconOnly(string $slotContent = ''): bool
     {
         $contentWithoutSrOnly = preg_replace('/<[^>]*sr-only[^>]*>.*?<\/[^>]*>/s', '', $slotContent);
@@ -72,11 +111,19 @@ class Button extends Component
         return trim(strip_tags($contentWithoutSrOnly)) === '' && ($this->iconLeft || $this->iconRight);
     }
 
+    /**
+     * Check if the button has multi-state functionality.
+     * Multi-state buttons can toggle between default, toggle, and success states.
+     */
     public function isMultiState(): bool
     {
         return ! is_null($this->iconToggle) || ! is_null($this->iconSuccess);
     }
 
+    /**
+     * Generate comprehensive data attributes for CSS targeting and JavaScript functionality.
+     * Includes component identification, state, multi-state, and link attributes.
+     */
     public function getDataAttributes(): array
     {
         $attributes = [
@@ -86,7 +133,6 @@ class Button extends Component
             'data-element-type' => $this->elementType(),
         ];
 
-        // Add state attributes
         if ($this->disabled) {
             $attributes['data-disabled'] = 'true';
         }
@@ -96,7 +142,6 @@ class Button extends Component
             $attributes['data-loading-animation'] = $this->loadingAnimation;
         }
 
-        // Multi-state functionality (preserve existing behavior)
         if ($this->isMultiState()) {
             $attributes['data-multi-state'] = 'true';
             $attributes['data-icon-default'] = $this->iconLeft;
@@ -118,12 +163,10 @@ class Button extends Component
             }
         }
 
-        // Icon state
         if ($this->iconLeft || $this->iconRight) {
             $attributes['data-has-icon'] = 'true';
         }
 
-        // Link specific attributes
         if ($this->isLink()) {
             $attributes['data-href'] = $this->href;
         }
@@ -131,6 +174,10 @@ class Button extends Component
         return $attributes;
     }
 
+    /**
+     * Generate data attributes based on slot content analysis.
+     * Used by the template to determine icon-only styling.
+     */
     public function getDataAttributesForSlot(string $slotContent = ''): array
     {
         $isIconOnly = $this->isIconOnly($slotContent);
@@ -140,8 +187,17 @@ class Button extends Component
         ];
     }
 
+    /**
+     * Render the button component view.
+     */
     public function render()
     {
-        return view('keys::components.button');
+        return view('keys::components.button', [
+            'elementType' => $this->elementType(),
+            'buttonType' => $this->buttonType(),
+            'isLink' => $this->isLink(),
+            'isMultiState' => $this->isMultiState(),
+            'dataAttributes' => $this->getDataAttributes(),
+        ]);
     }
 }

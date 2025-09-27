@@ -33,27 +33,25 @@ class Checkbox extends Component
         public bool $showInput = true
     ) {
 
-        $this->id = $this->id ?? ($this->name ? $this->name . '-' . $this->value . '-' . uniqid() : 'checkbox-' . uniqid());
+        $this->id = $this->id ?? ($this->name ? $this->name.'-'.$this->value.'-'.uniqid() : 'checkbox-'.uniqid());
 
-
-        if (!$this->hasError && $this->hasErrors()) {
+        if (! $this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
 
-
-        if (!in_array($this->variant, ComponentConstants::FORM_VARIANTS)) {
+        if (! in_array($this->variant, ComponentConstants::FORM_VARIANTS)) {
             $this->variant = 'standard';
         }
 
-        if (!ComponentConstants::isValidSize($this->size)) {
+        if (! ComponentConstants::isValidSize($this->size)) {
             $this->size = ComponentConstants::getDefaultSize();
         }
 
-        if (!in_array($this->color, ComponentConstants::SEMANTIC_COLORS)) {
+        if (! in_array($this->color, ComponentConstants::SEMANTIC_COLORS)) {
             $this->color = ComponentConstants::getDefaultColor();
         }
 
-        if ($this->variant === 'card' && !$this->title && $this->label) {
+        if ($this->variant === 'card' && ! $this->title && $this->label) {
             $this->title = $this->label;
             $this->label = null;
         }
@@ -91,6 +89,7 @@ class Checkbox extends Component
         if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
             try {
                 $bag = $this->errors->getBag('default');
+
                 return $bag && $bag->any();
             } catch (\Exception $e) {
                 // If getBag fails, treat as no errors
@@ -99,125 +98,6 @@ class Checkbox extends Component
         }
 
         return false;
-    }
-
-    public function checkboxClasses(): string
-    {
-        $baseClasses = 'border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
-
-        $sizeClasses = match ($this->size) {
-            'sm' => 'h-3 w-3 text-xs',
-            'md' => 'h-3.5 w-3.5 text-sm',
-            'lg' => 'h-4 w-4 text-base',
-            default => 'h-3.5 w-3.5 text-sm'
-        };
-
-        $variantClasses = match ($this->variant) {
-            'standard', 'bordered', 'card' => 'rounded',
-            'colored' => 'rounded border-2',
-            default => 'rounded'
-        };
-
-        $stateClasses = $this->getStateClasses();
-
-        return trim($baseClasses . ' ' . $sizeClasses . ' ' . $variantClasses . ' ' . $stateClasses);
-    }
-
-    public function getStateClasses(): string
-    {
-        if ($this->disabled) {
-            return 'bg-neutral-100 border-neutral-300 text-neutral-400 cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-700';
-        }
-
-        if ($this->hasError()) {
-            return 'bg-input border-danger text-danger focus:border-danger focus:ring-danger';
-        }
-
-        $colorClasses = match ($this->color) {
-            'brand' => 'text-brand focus:ring-brand',
-            'success' => 'text-success focus:ring-success',
-            'warning' => 'text-warning focus:ring-warning',
-            'danger' => 'text-danger focus:ring-danger',
-            'neutral' => 'text-neutral-600 focus:ring-neutral-500',
-            default => 'text-brand focus:ring-brand'
-        };
-
-        if ($this->variant === 'colored') {
-            $borderColor = match ($this->color) {
-                'brand' => 'border-brand',
-                'success' => 'border-success',
-                'warning' => 'border-warning',
-                'danger' => 'border-danger',
-                'neutral' => 'border-neutral-400',
-                default => 'border-brand'
-            };
-            return "bg-input border-border hover:$borderColor $colorClasses";
-        }
-
-        return 'bg-input border-border hover:border-neutral-300 dark:hover:border-neutral-600 ' . $colorClasses;
-    }
-
-    public function combinedClasses(): string
-    {
-        $gap = ($this->variant === 'card' && !$this->showInput) ? 'gap-0' : 'gap-3';
-
-        $baseClasses = match ($this->variant) {
-            'standard' => "flex items-center {$gap} cursor-pointer",
-            'bordered' => "flex items-center {$gap} p-4 border border-border rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
-            'colored' => "flex items-center {$gap} p-4 border-2 rounded-lg transition-colors duration-200 cursor-pointer",
-            'card' => "flex items-center {$gap} p-4 border border-border rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
-            default => "flex items-center {$gap} cursor-pointer"
-        };
-
-        if ($this->variant === 'colored') {
-            $borderColor = match ($this->color) {
-                'brand' => 'border-border has-[:checked]:border-brand has-[:checked]:bg-brand/5',
-                'success' => 'border-border has-[:checked]:border-success has-[:checked]:bg-success/5',
-                'warning' => 'border-border has-[:checked]:border-warning has-[:checked]:bg-warning/5',
-                'danger' => 'border-border has-[:checked]:border-danger has-[:checked]:bg-danger/5',
-                'neutral' => 'border-border has-[:checked]:border-neutral-400 has-[:checked]:bg-neutral-100 dark:has-[:checked]:bg-neutral-800',
-                default => 'border-border has-[:checked]:border-brand has-[:checked]:bg-brand/5'
-            };
-            $baseClasses .= ' ' . $borderColor;
-        }
-
-        if ($this->variant === 'card') {
-            $bgColor = match ($this->color) {
-                'brand' => 'has-[:checked]:bg-brand/5 has-[:checked]:border-brand',
-                'success' => 'has-[:checked]:bg-success/5 has-[:checked]:border-success',
-                'warning' => 'has-[:checked]:bg-warning/5 has-[:checked]:border-warning',
-                'danger' => 'has-[:checked]:bg-danger/5 has-[:checked]:border-danger',
-                'neutral' => 'has-[:checked]:bg-neutral-100 has-[:checked]:border-neutral-400 dark:has-[:checked]:bg-neutral-800',
-                default => 'has-[:checked]:bg-brand/5 has-[:checked]:border-brand'
-            };
-            $baseClasses .= ' ' . $bgColor;
-        }
-
-        if ($this->hasError()) {
-            $baseClasses .= ' border-danger';
-        }
-
-        return $baseClasses;
-    }
-
-    public function wrapperClasses(): string
-    {
-        return $this->combinedClasses();
-    }
-
-    public function labelClasses(): string
-    {
-        $sizeClasses = match ($this->size) {
-            'sm' => 'text-sm',
-            'md' => 'text-sm',
-            'lg' => 'text-base',
-            default => 'text-sm'
-        };
-
-        $colorClasses = $this->disabled ? 'text-neutral-500 dark:text-neutral-400' : 'text-foreground';
-        $weightClasses = $this->variant === 'card' ? 'font-medium' : 'font-normal';
-
-        return trim($sizeClasses . ' ' . $colorClasses . ' ' . $weightClasses);
     }
 
     public function iconSize(): string
@@ -335,7 +215,7 @@ class Checkbox extends Component
         }
 
         // Display mode
-        if (!$this->showInput) {
+        if (! $this->showInput) {
             $attributes['data-input-hidden'] = 'true';
         }
 

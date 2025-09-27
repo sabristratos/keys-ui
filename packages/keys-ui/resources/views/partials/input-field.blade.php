@@ -45,17 +45,6 @@
 @if($hasActions())
     <div class="{{ $actionContainerClasses }}">
         @foreach($computedActionData as $action)
-            @php
-                // Apply action-specific styling directly
-                $actionClasses = match($action['data_action']) {
-                    'clear' => 'text-neutral-400 hover:text-danger',
-                    'copy' => 'text-neutral-400 hover:text-brand data-[state=success]:text-success',
-                    'password_toggle' => 'text-neutral-400 hover:text-neutral-600',
-                    'external' => 'text-neutral-400 hover:text-brand',
-                    default => 'text-neutral-400 hover:text-brand'
-                };
-            @endphp
-
             <div
                 data-action="{{ $action['data_action'] }}"
                 data-icon-default="{{ $action['data_icon_default'] }}"
@@ -76,7 +65,6 @@
                     label-success="{{ $action['label_success'] }}"
                     data-action="{{ $action['data_action'] }}"
                     data-url="{{ $action['data_url'] }}"
-                    class="{{ $actionClasses }}"
                 >
                     <span class="sr-only">{{ $action['label'] }}</span>
                 </x-keys::button>

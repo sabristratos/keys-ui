@@ -1,7 +1,36 @@
-@props(['computedTableClasses', 'computedContainerClasses', 'selectionDataAttributes'])
+@php
+    // Container classes based on responsive and bordered settings
+    $containerClasses = '';
+    if ($responsive) {
+        $containerClasses .= 'overflow-x-auto ';
+    }
+    if ($bordered) {
+        $containerClasses .= 'border border-border rounded-md overflow-hidden ';
+    }
+    $containerClasses = trim($containerClasses);
 
-<div {{ collect($selectionDataAttributes)->mapWithKeys(fn($value, $key) => [$key => $value])->merge(['class' => $computedContainerClasses]) }}>
-    <table {{ $attributes->merge(['class' => $computedTableClasses]) }}>
+    // Table classes based on size and variants
+    $tableBaseClasses = 'min-w-full divide-y divide-border';
+    $tableSizeClasses = match ($size) {
+        'sm' => 'text-sm',
+        'md' => 'text-sm',
+        'lg' => 'text-base',
+        default => 'text-sm'
+    };
+
+    $tableVariantClasses = '';
+    if ($striped) {
+        $tableVariantClasses .= '[&_tbody_tr:nth-child(odd)]:bg-body ';
+    }
+    if ($hover) {
+        $tableVariantClasses .= '[&_tbody_tr]:hover:bg-body ';
+    }
+
+    $tableClasses = trim("$tableBaseClasses $tableSizeClasses $tableVariantClasses");
+@endphp
+
+<div {{ $attributes->merge(['class' => $containerClasses])->merge($dataAttributes) }}>
+    <table class="{{ $tableClasses }}">
         {{ $slot }}
     </table>
 
@@ -17,5 +46,4 @@
             </div>
         </div>
     @endif
-
 </div>

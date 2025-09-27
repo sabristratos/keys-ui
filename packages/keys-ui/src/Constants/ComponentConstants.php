@@ -18,7 +18,7 @@ class ComponentConstants
         'warning',
         'danger',
         'neutral',
-        'info'
+        'info',
     ];
 
     /**
@@ -35,7 +35,7 @@ class ComponentConstants
         'gray',
         'teal',
         'orange',
-        'dark'
+        'dark',
     ];
 
     /**
@@ -43,7 +43,7 @@ class ComponentConstants
      */
     public const ALL_COLORS = [
         ...self::SEMANTIC_COLORS,
-        ...self::SPECIFIC_COLORS
+        ...self::SPECIFIC_COLORS,
     ];
 
     /**
@@ -66,7 +66,7 @@ class ComponentConstants
         'purple',
         'yellow',
         'teal',
-        'orange'
+        'orange',
     ];
 
     /**
@@ -83,7 +83,7 @@ class ComponentConstants
         'purple',
         'yellow',
         'teal',
-        'orange'
+        'orange',
     ];
 
     /**
@@ -97,7 +97,7 @@ class ComponentConstants
         'info',
         'neutral',
         'ghost',
-        'outline'
+        'outline',
     ];
 
     /**
@@ -127,24 +127,31 @@ class ComponentConstants
         'top', 'top-start', 'top-end',
         'bottom', 'bottom-start', 'bottom-end',
         'left', 'left-start', 'left-end',
-        'right', 'right-start', 'right-end'
+        'right', 'right-start', 'right-end',
     ];
 
     /**
      * Tooltip trigger types
      */
-    public const TOOLTIP_TRIGGERS = ['hover', 'click', 'focus'];
+    public const TOOLTIP_TRIGGERS = ['hover', 'click', 'focus', 'manual'];
 
     /**
      * Component-specific size arrays
      */
     public const MODAL_SIZES = ['xs', 'sm', 'md', 'lg', 'xl', 'full'];
+
     public const TOOLTIP_SIZES = ['sm', 'md', 'lg'];
+
     public const ALERT_SIZES = ['sm', 'md', 'lg'];
+
     public const BADGE_SIZES = ['xs', 'sm', 'md'];
+
     public const CALENDAR_SIZES = ['sm', 'md', 'lg'];
+
     public const DATEPICKER_SIZES = ['sm', 'md', 'lg'];
+
     public const DROPDOWN_SIZES = ['sm', 'md', 'lg'];
+
     public const GALLERY_THUMBNAIL_SIZES = ['xs', 'sm', 'md', 'lg'];
 
     /**

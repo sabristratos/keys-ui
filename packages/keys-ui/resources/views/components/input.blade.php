@@ -3,7 +3,7 @@
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:');
 
     // Base classes for all inputs
-    $baseClasses = 'block w-full rounded-md border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
+    $baseClasses = 'block w-full rounded-md border transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
     // Size classes
     $sizeClasses = match ($size) {
@@ -20,9 +20,9 @@
     if ($disabled) {
         $stateClasses = 'bg-surface border-border text-muted cursor-not-allowed opacity-50';
     } elseif ($hasError()) {
-        $stateClasses = 'bg-input border-danger text-foreground focus:border-danger focus:ring-danger';
+        $stateClasses = 'bg-input border-danger text-foreground focus-visible:border-danger focus-visible:ring-danger';
     } else {
-        $stateClasses = 'bg-input border-border text-foreground focus:border-brand focus:ring-brand hover:border-neutral';
+        $stateClasses = 'bg-input border-border text-foreground focus-visible:border-brand focus-visible:ring-brand hover:border-neutral';
     }
 
     // Icon padding
@@ -78,8 +78,9 @@
         'required' => $required,
     ], fn($value) => !is_null($value)));
 
-    // Merge data attributes
-    $inputAttributes = $inputAttributes->merge($dataAttributes);
+    // Extract custom data attributes and merge with component data attributes
+    $customDataAttributes = $attributes->whereStartsWith('data-')->toArray();
+    $inputAttributes = $inputAttributes->merge($dataAttributes)->merge($customDataAttributes);
 @endphp
 
 @if($isShorthand())

@@ -1,10 +1,108 @@
 @php
     $radioAttributes = $attributes->whereStartsWith('wire:model');
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:model');
+
+    // Radio input classes - direct Tailwind utilities
+    $radioBaseClasses = 'border transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 shrink-0';
+
+    $radioSizeClasses = match ($size) {
+        'sm' => 'h-3 w-3 text-xs',
+        'md' => 'h-3.5 w-3.5 text-sm',
+        'lg' => 'h-4 w-4 text-base',
+        default => 'h-3.5 w-3.5 text-sm'
+    };
+
+    $radioVariantClasses = match ($variant) {
+        'standard', 'bordered', 'card' => 'rounded-full',
+        'colored' => 'rounded-full border-2',
+        default => 'rounded-full'
+    };
+
+    // Radio state classes
+    if ($disabled) {
+        $radioStateClasses = 'bg-neutral-100 border-neutral-300 text-neutral-400 cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-700';
+    } elseif ($hasError()) {
+        $radioStateClasses = 'bg-input border-danger text-danger focus-visible:border-danger focus-visible:ring-danger';
+    } else {
+        $colorClasses = match ($color) {
+            'brand' => 'text-brand focus-visible:ring-brand',
+            'success' => 'text-success focus-visible:ring-success',
+            'warning' => 'text-warning focus-visible:ring-warning',
+            'danger' => 'text-danger focus-visible:ring-danger',
+            'neutral' => 'text-neutral-600 focus-visible:ring-neutral-500',
+            default => 'text-brand focus-visible:ring-brand'
+        };
+
+        if ($variant === 'colored') {
+            $borderColor = match ($color) {
+                'brand' => 'border-brand',
+                'success' => 'border-success',
+                'warning' => 'border-warning',
+                'danger' => 'border-danger',
+                'neutral' => 'border-neutral-400',
+                default => 'border-brand'
+            };
+            $radioStateClasses = "bg-input border-border hover:$borderColor $colorClasses";
+        } else {
+            $radioStateClasses = 'bg-input border-border hover:border-neutral-300 dark:hover:border-neutral-600 ' . $colorClasses;
+        }
+    }
+
+    $radioClasses = "$radioBaseClasses $radioSizeClasses $radioVariantClasses $radioStateClasses";
+
+    // Wrapper classes - direct Tailwind utilities
+    $gap = ($variant === 'card' && !$showInput) ? 'gap-0' : 'gap-3';
+
+    $wrapperBaseClasses = match ($variant) {
+        'standard' => "flex items-center {$gap} cursor-pointer",
+        'bordered' => "flex items-center {$gap} p-4 border border-border rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
+        'colored' => "flex items-center {$gap} p-4 border-2 rounded-lg transition-colors duration-200 cursor-pointer",
+        'card' => "flex items-center {$gap} p-4 border border-border rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
+        default => "flex items-center {$gap} cursor-pointer"
+    };
+
+    if ($variant === 'colored') {
+        $borderColor = match ($color) {
+            'brand' => 'border-border has-[:checked]:border-brand has-[:checked]:bg-brand/5',
+            'success' => 'border-border has-[:checked]:border-success has-[:checked]:bg-success/5',
+            'warning' => 'border-border has-[:checked]:border-warning has-[:checked]:bg-warning/5',
+            'danger' => 'border-border has-[:checked]:border-danger has-[:checked]:bg-danger/5',
+            'neutral' => 'border-border has-[:checked]:border-neutral-400 has-[:checked]:bg-neutral-100 dark:has-[:checked]:bg-neutral-800',
+            default => 'border-border has-[:checked]:border-brand has-[:checked]:bg-brand/5'
+        };
+        $wrapperBaseClasses .= ' ' . $borderColor;
+    }
+
+    if ($variant === 'card') {
+        $bgColor = match ($color) {
+            'brand' => 'has-[:checked]:bg-brand/5 has-[:checked]:border-brand',
+            'success' => 'has-[:checked]:bg-success/5 has-[:checked]:border-success',
+            'warning' => 'has-[:checked]:bg-warning/5 has-[:checked]:border-warning',
+            'danger' => 'has-[:checked]:bg-danger/5 has-[:checked]:border-danger',
+            'neutral' => 'has-[:checked]:bg-neutral-100 has-[:checked]:border-neutral-400 dark:has-[:checked]:bg-neutral-800',
+            default => 'has-[:checked]:bg-brand/5 has-[:checked]:border-brand'
+        };
+        $wrapperBaseClasses .= ' ' . $bgColor;
+    }
+
+    if ($hasError()) {
+        $wrapperBaseClasses .= ' border-danger';
+    }
+
+    // Label classes - direct Tailwind utilities
+    $labelSizeClasses = match ($size) {
+        'sm' => 'text-sm',
+        'md' => 'text-sm',
+        'lg' => 'text-base',
+        default => 'text-sm'
+    };
+
+    $labelColorClasses = $disabled ? 'text-neutral-500 dark:text-neutral-400' : 'text-foreground';
+    $labelWeightClasses = $variant === 'card' ? 'font-medium' : 'font-normal';
+    $labelClasses = "$labelSizeClasses $labelColorClasses $labelWeightClasses";
 @endphp
 
-
-<label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $combinedClasses()])->merge($dataAttributes) }}>
+<label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $wrapperBaseClasses])->merge($dataAttributes) }}>
     @if($showInput)
         <input
             type="radio"
@@ -14,7 +112,7 @@
             {{ $checked ? 'checked' : '' }}
             {{ $disabled ? 'disabled' : '' }}
             {{ $required ? 'required' : '' }}
-            class="{{ $radioClasses() }} shrink-0"
+            class="{{ $radioClasses }}"
             {{ $radioAttributes }}
         />
     @else
@@ -42,7 +140,7 @@
                             <div class="flex items-center gap-2 mb-1">
                                 <x-keys::icon :name="$icon" :size="$iconSize()" class="shrink-0" />
                                 @if($title)
-                                    <span class="{{ $labelClasses() }}">
+                                    <span class="{{ $labelClasses }}">
                                         {{ $title }}
                                         @if($required)
                                             <span class="text-danger ml-1">*</span>
@@ -51,7 +149,7 @@
                                 @endif
                             </div>
                         @elseif($title)
-                            <span class="{{ $labelClasses() }} block mb-1">
+                            <span class="{{ $labelClasses }} block mb-1">
                                 {{ $title }}
                                 @if($required)
                                     <span class="text-danger ml-1">*</span>
@@ -65,7 +163,7 @@
                     @else
                         
                         @if($label)
-                            <span class="{{ $labelClasses() }}">
+                            <span class="{{ $labelClasses }}">
                                 {{ $label }}
                                 @if($required)
                                     <span class="text-danger ml-1">*</span>

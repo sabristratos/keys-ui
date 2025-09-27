@@ -4,8 +4,26 @@ namespace Keys\UI\Components\Select;
 
 use Illuminate\View\Component;
 
+/**
+ * Select Option Component
+ *
+ * A flexible option component for use within the Select component. Supports icons,
+ * descriptions, custom content, and provides comprehensive search functionality.
+ * Uses dot notation component structure: x-keys::select.option
+ */
 class Option extends Component
 {
+    /**
+     * Create a new Select Option component instance.
+     *
+     * @param  string|null  $value  Option value for form submission
+     * @param  string|null  $label  Display text (falls back to value if not provided)
+     * @param  string|null  $displayLabel  Alternative display label override
+     * @param  string|null  $icon  Heroicon name for left icon
+     * @param  string|null  $description  Secondary text below label
+     * @param  bool  $disabled  Whether this option is disabled
+     * @param  bool  $selected  Whether this option is pre-selected
+     */
     public function __construct(
         public ?string $value = null,
         public ?string $label = null,
@@ -19,62 +37,84 @@ class Option extends Component
     }
 
     /**
-     * Generate CSS classes for option element
+     * Generate comprehensive data attributes for CSS targeting and JavaScript functionality.
+     * Includes component identification, value data, state, and feature flags.
      */
-    public function optionClasses(): string
+    public function getDataAttributes(): array
     {
-        $base = 'flex items-center w-full px-3 py-2 mx-0.5 my-0.5 text-sm text-left cursor-pointer transition-colors duration-150 rounded-md';
+        $attributes = [
+            'data-keys-option' => 'true',
+            'data-select-option' => 'true',
+            'data-value' => $this->value,
+            'data-display-label' => $this->getDisplayLabel(),
+            'data-searchable-text' => $this->getSearchableText(),
+        ];
 
         if ($this->disabled) {
-            return $base . ' text-neutral-400 cursor-not-allowed bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-500';
+            $attributes['data-disabled'] = 'true';
         }
 
         if ($this->selected) {
-            return $base . ' bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-300';
+            $attributes['data-selected'] = 'true';
         }
 
-        return $base . ' text-foreground';
+        if ($this->hasIcon()) {
+            $attributes['data-has-icon'] = 'true';
+            $attributes['data-icon'] = $this->icon;
+        }
+
+        if ($this->hasDescription()) {
+            $attributes['data-has-description'] = 'true';
+        }
+
+        if ($this->hasContent()) {
+            $attributes['data-has-content'] = 'true';
+        }
+
+        return $attributes;
     }
 
-
     /**
-     * Check if option has label content
+     * Check if the option has label content.
      */
     public function hasContent(): bool
     {
-        return !empty(trim($this->label ?? ''));
+        return ! empty(trim($this->label ?? ''));
     }
 
     /**
-     * Check if option has description
+     * Check if the option has a description.
      */
     public function hasDescription(): bool
     {
-        return !empty(trim($this->description ?? ''));
+        return ! empty(trim($this->description ?? ''));
     }
 
     /**
-     * Check if option has icon
+     * Check if the option has an icon.
      */
     public function hasIcon(): bool
     {
-        return !empty(trim($this->icon ?? ''));
+        return ! empty(trim($this->icon ?? ''));
     }
 
     /**
-     * Get searchable text for filtering
+     * Get searchable text for filtering functionality.
+     * Combines label and description for comprehensive search.
      */
     public function getSearchableText(): string
     {
         $text = $this->label ?? '';
         if ($this->description) {
-            $text .= ' ' . $this->description;
+            $text .= ' '.$this->description;
         }
+
         return strtolower(trim($text));
     }
 
     /**
-     * Get display label with fallback hierarchy
+     * Get display label with fallback hierarchy.
+     * Priority: displayLabel -> label -> empty string.
      */
     public function getDisplayLabel(): string
     {
@@ -82,14 +122,12 @@ class Option extends Component
     }
 
     /**
-     * Render the component view
+     * Render the select option component view.
      */
     public function render()
     {
         return view('keys::components.select.option', [
-            'computedOptionClasses' => $this->optionClasses(),
-            'searchableText' => $this->getSearchableText(),
-            'displayLabel' => $this->getDisplayLabel(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

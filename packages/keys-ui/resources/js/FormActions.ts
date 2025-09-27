@@ -59,14 +59,14 @@ export class FormActions extends BaseActionClass {
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Handle input action button clicks
-        EventUtils.handleDelegatedClick('.input-action', (button, event) => {
+        // Handle input action button clicks - target buttons inside data-action containers
+        EventUtils.handleDelegatedClick('[data-action] button', (button, event) => {
             event.preventDefault();
             this.handleActionClick(button as HTMLButtonElement);
         });
 
         // Handle input action button keyboard activation
-        EventUtils.handleDelegatedKeydown('.input-action', (button, event) => {
+        EventUtils.handleDelegatedKeydown('[data-action] button', (button, event) => {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
                 this.handleActionClick(button as HTMLButtonElement);
@@ -78,14 +78,17 @@ export class FormActions extends BaseActionClass {
      * Handle action button click
      */
     private async handleActionClick(button: HTMLButtonElement): Promise<void> {
-        const wrapper = DOMUtils.findClosest(button, '.input-action');
+        const wrapper = DOMUtils.findClosest(button, '[data-action]');
         const action = wrapper?.dataset.action;
         if (!action) return;
 
         const element = DOMUtils.findFormElementForAction(button);
         if (!element) return;
 
-        switch (action) {
+        // Normalize action names for consistency
+        const normalizedAction = action === 'password_toggle' ? 'toggle-password' : action;
+
+        switch (normalizedAction) {
             case 'clear':
                 this.clearValue(element);
                 break;
@@ -96,14 +99,14 @@ export class FormActions extends BaseActionClass {
                 await this.togglePasswordVisibility(element as HTMLInputElement, button, wrapper);
                 break;
             case 'external':
-                this.openExternalUrl(button.dataset.url);
+                this.openExternalUrl(wrapper.dataset.url);
                 break;
             default:
-                this.handleCustomAction(element, action);
+                this.handleCustomAction(element, normalizedAction);
                 break;
         }
 
-        this.dispatchActionEvent(element, action);
+        this.dispatchActionEvent(element, normalizedAction);
     }
 
 
@@ -175,7 +178,6 @@ export class FormActions extends BaseActionClass {
     private clearValue(element: HTMLInputElement | HTMLTextAreaElement): void {
         element.value = '';
         element.focus();
-
         element.dispatchEvent(new Event('input', { bubbles: true }));
         element.dispatchEvent(new Event('change', { bubbles: true }));
     }

@@ -6,9 +6,12 @@
  */
 
 import { FormActions } from './FormActions';
+import { TextareaActions } from './TextareaActions';
 import { AlertActions } from './AlertActions';
+import { AvatarActions } from './AvatarActions';
 import { BadgeActions } from './BadgeActions';
-import { CalendarActions } from './CalendarActions';
+import { ButtonActions } from './ButtonActions';
+import { CalendarCore } from './calendar/CalendarCore';
 import { RadioActions } from './RadioActions';
 import { RangeActions } from './RangeActions';
 import { SelectActions } from './SelectActions';
@@ -20,7 +23,6 @@ import { TableActions } from './TableActions';
 import { ButtonGroupActions } from './ButtonGroupActions';
 import { TooltipActions } from './TooltipActions';
 import { TimePickerActions } from './TimePickerActions';
-import { AccordionActions } from './AccordionActions';
 import { EditorActions } from './EditorActions';
 import { DatePickerActions } from './DatePickerActions';
 import { AddToCartActions } from './AddToCartActions';
@@ -41,7 +43,7 @@ import FloatingManager from './utils/FloatingManager';
 // Import and initialize CSS anchor positioning polyfill
 import polyfill from '@oddbird/css-anchor-positioning/fn';
 
-export { FormActions, AlertActions, BadgeActions, CalendarActions, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, AccordionActions, EditorActions, DatePickerActions, AddToCartActions, GalleryActions, PopoverActions };
+export { FormActions, TextareaActions, AlertActions, AvatarActions, BadgeActions, ButtonActions, CalendarCore, RadioActions, RangeActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, ButtonGroupActions, TooltipActions, TimePickerActions, EditorActions, DatePickerActions, AddToCartActions, GalleryActions, PopoverActions };
 
 // Export utility classes for external consumption
 export { BaseActionClass, DOMUtils, EventUtils, RTLUtils, FloatingManager };
@@ -61,11 +63,17 @@ export function initializeKeysUI(): void {
 
     FormActions.getInstance().init();
 
+    TextareaActions.getInstance().init();
+
     AlertActions.getInstance().init();
+
+    AvatarActions.getInstance().init();
 
     BadgeActions.getInstance().init();
 
-    CalendarActions.getInstance().init();
+    ButtonActions.getInstance().init();
+
+    CalendarCore.getInstance().init();
 
     RadioActions.getInstance().init();
 
@@ -89,7 +97,6 @@ export function initializeKeysUI(): void {
 
     TimePickerActions.getInstance().init();
 
-    AccordionActions.getInstance().init();
 
     EditorActions.getInstance().init();
 
@@ -112,9 +119,12 @@ export function initializeKeysUI(): void {
  */
 const KeysUI = {
     FormActions: FormActions.getInstance(),
+    TextareaActions: TextareaActions.getInstance(),
     AlertActions: AlertActions.getInstance(),
+    AvatarActions: AvatarActions.getInstance(),
     BadgeActions: BadgeActions.getInstance(),
-    CalendarActions: CalendarActions.getInstance(),
+    ButtonActions: ButtonActions.getInstance(),
+    CalendarCore: CalendarCore.getInstance(),
     RadioActions: RadioActions.getInstance(),
     RangeActions: RangeActions.getInstance(),
     SelectActions: SelectActions.getInstance(),
@@ -126,7 +136,6 @@ const KeysUI = {
     ButtonGroupActions: ButtonGroupActions.getInstance(),
     TooltipActions: TooltipActions.getInstance(),
     TimePickerActions: TimePickerActions.getInstance(),
-    AccordionActions: AccordionActions.getInstance(),
     EditorActions: EditorActions.getInstance(),
     DatePickerActions: DatePickerActions.getInstance(),
     AddToCartActions: AddToCartActions.getInstance(),
@@ -148,4 +157,5 @@ if (typeof window !== 'undefined') {
     (window as any).Quill = Quill;
     // Expose manual sync method for debugging
     (window as any).manualSyncEditor = () => KeysUI.EditorActions.manualSync();
+
 }

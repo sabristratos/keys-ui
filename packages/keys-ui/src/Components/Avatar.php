@@ -5,8 +5,40 @@ namespace Keys\UI\Components;
 use Illuminate\View\Component;
 use Keys\UI\Constants\ComponentConstants;
 
+/**
+ * Avatar Component
+ *
+ * Displays user profile images with intelligent fallback handling and comprehensive
+ * customization options. Features automatic initials generation, status indicators,
+ * and flexible theming with full accessibility support.
+ *
+ * Features:
+ * - Image display with lazy loading support
+ * - Smart initials fallback generation from names
+ * - Icon fallback for users without names
+ * - Multiple size variants (xs, sm, md, lg, xl)
+ * - Shape options (circle, square)
+ * - Status indicators (online, offline, away, busy)
+ * - Color theming for backgrounds and borders
+ * - Optional border styling
+ * - Auto-generated alt text for accessibility
+ * - Comprehensive data attributes for JavaScript integration
+ */
 class Avatar extends Component
 {
+    /**
+     * Create a new Avatar component instance.
+     *
+     * @param  string|null  $src  Image URL for avatar display
+     * @param  string|null  $alt  Alternative text for accessibility (auto-generated if not provided)
+     * @param  string|null  $name  User name for initials fallback and accessibility
+     * @param  string  $size  Size variant affecting avatar dimensions
+     * @param  string  $shape  Avatar shape (circle or square)
+     * @param  string|null  $status  Status indicator (online, offline, away, busy)
+     * @param  string  $color  Color theme for avatar background and styling
+     * @param  bool  $border  Whether to display border around avatar
+     * @param  bool  $lazy  Whether to enable lazy loading for images
+     */
     public function __construct(
         public ?string $src = null,
         public ?string $alt = null,
@@ -18,162 +50,99 @@ class Avatar extends Component
         public bool $border = false,
         public bool $lazy = true
     ) {
-
-        if (!$this->alt && $this->name) {
+        if (! $this->alt && $this->name) {
             $this->alt = "Avatar for {$this->name}";
         }
 
-
-        if (!ComponentConstants::isValidSize($this->size)) {
+        if (! ComponentConstants::isValidSize($this->size)) {
             $this->size = ComponentConstants::getDefaultSize();
         }
 
-
-        if (!in_array($this->shape, ComponentConstants::AVATAR_SHAPES)) {
+        if (! in_array($this->shape, ComponentConstants::AVATAR_SHAPES)) {
             $this->shape = 'circle';
         }
 
-
-        if (!ComponentConstants::isValidColorForComponent($this->color, 'avatar')) {
+        if (! ComponentConstants::isValidColorForComponent($this->color, 'avatar')) {
             $this->color = 'neutral';
         }
 
-
-        if ($this->status && !in_array($this->status, ComponentConstants::AVATAR_STATUS)) {
+        if ($this->status && ! in_array($this->status, ComponentConstants::AVATAR_STATUS)) {
             $this->status = null;
         }
     }
 
+    /**
+     * Check if avatar has an image source.
+     *
+     * @return bool True if src property contains a URL
+     */
     public function hasImage(): bool
     {
-        return !empty($this->src);
+        return ! empty($this->src);
     }
 
+    /**
+     * Check if avatar has a name for initials generation.
+     *
+     * @return bool True if name property is set
+     */
+    public function hasName(): bool
+    {
+        return ! empty($this->name);
+    }
+
+    /**
+     * Check if avatar should display initials.
+     *
+     * @return bool True if name exists and no image is provided
+     */
     public function hasInitials(): bool
     {
-        return !empty($this->name) && !$this->hasImage();
+        return ! empty($this->name) && ! $this->hasImage();
     }
 
+    /**
+     * Check if initials fallback should be available.
+     *
+     * @return bool True if name is available for fallback display
+     */
+    public function shouldShowInitialsFallback(): bool
+    {
+        return ! empty($this->name);
+    }
+
+    /**
+     * Generate initials from the user's name.
+     *
+     * Creates 1-2 character initials from the name:
+     * - Two words or more: first letter of first and second words
+     * - Single word: first two characters
+     *
+     * @return string Generated initials in uppercase
+     */
     public function getInitials(): string
     {
-        if (!$this->name) {
+        if (! $this->name) {
             return '';
         }
 
         $words = explode(' ', trim($this->name));
 
         if (count($words) >= 2) {
-            return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+            return strtoupper(substr($words[0], 0, 1).substr($words[1], 0, 1));
         }
 
         return strtoupper(substr($words[0], 0, 2));
     }
 
-    public function sizeClasses(): string
-    {
-        return match ($this->size) {
-            'xs' => 'w-6 h-6 text-xs',
-            'sm' => 'w-8 h-8 text-sm',
-            'md' => 'w-10 h-10 text-base',
-            'lg' => 'w-12 h-12 text-lg',
-            'xl' => 'w-16 h-16 text-xl',
-            default => 'w-10 h-10 text-base'
-        };
-    }
-
-    public function shapeClasses(): string
-    {
-        return match ($this->shape) {
-            'circle' => 'rounded-full',
-            'square' => 'rounded-lg',
-            default => 'rounded-full'
-        };
-    }
-
-    public function colorClasses(): string
-    {
-        if ($this->hasImage()) {
-            return '';
-        }
-
-        return match ($this->color) {
-            'brand' => 'bg-brand text-brand-foreground',
-            'success' => 'bg-success text-success-foreground',
-            'warning' => 'bg-warning text-warning-foreground',
-            'danger' => 'bg-danger text-danger-foreground',
-            'neutral' => 'bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200',
-            'red' => 'bg-red-500 text-white',
-            'green' => 'bg-green-500 text-white',
-            'blue' => 'bg-blue-500 text-white',
-            'purple' => 'bg-purple-500 text-white',
-            'yellow' => 'bg-yellow-400 text-yellow-900',
-            'teal' => 'bg-teal-500 text-white',
-            'orange' => 'bg-orange-500 text-white',
-            default => 'bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200'
-        };
-    }
-
-    public function borderClasses(): string
-    {
-        if (!$this->border) {
-            return '';
-        }
-
-        return 'ring-2 ring-white dark:ring-neutral-800';
-    }
-
-    public function statusClasses(): string
-    {
-        if (!$this->status) {
-            return '';
-        }
-
-        $baseClasses = 'absolute bottom-0 right-0 block rounded-full ring-2 ring-white dark:ring-neutral-800';
-
-        $sizeClasses = match ($this->size) {
-            'xs' => 'w-2 h-2',
-            'sm' => 'w-2.5 h-2.5',
-            'md' => 'w-3 h-3',
-            'lg' => 'w-3.5 h-3.5',
-            'xl' => 'w-4 h-4',
-            default => 'w-3 h-3'
-        };
-
-        $colorClasses = match ($this->status) {
-            'online' => 'bg-green-400',
-            'offline' => 'bg-neutral-400',
-            'away' => 'bg-yellow-400',
-            'busy' => 'bg-red-400',
-            default => 'bg-neutral-400'
-        };
-
-        return trim("{$baseClasses} {$sizeClasses} {$colorClasses}");
-    }
-
-    public function avatarClasses(): string
-    {
-        $baseClasses = 'inline-block flex-shrink-0 relative';
-        $sizeClasses = $this->sizeClasses();
-        $shapeClasses = $this->shapeClasses();
-        $colorClasses = $this->colorClasses();
-        $borderClasses = $this->borderClasses();
-
-        return trim("{$baseClasses} {$sizeClasses} {$shapeClasses} {$colorClasses} {$borderClasses}");
-    }
-
-    public function imageClasses(): string
-    {
-        $baseClasses = 'w-full h-full object-cover';
-        $shapeClasses = $this->shapeClasses();
-
-        return trim("{$baseClasses} {$shapeClasses}");
-    }
-
-    public function initialsClasses(): string
-    {
-        return 'flex items-center justify-center w-full h-full font-medium select-none';
-    }
-
+    /**
+     * Generate comprehensive data attributes for avatar functionality.
+     *
+     * Provides data attributes for JavaScript initialization, fallback handling,
+     * accessibility enhancements, and visual state management.
+     *
+     * @return array Complete set of data attributes for avatar element
+     */
     public function getDataAttributes(): array
     {
         $attributes = [
@@ -192,17 +161,33 @@ class Avatar extends Component
 
         if ($this->src) {
             $attributes['data-has-image'] = 'true';
+            $attributes['data-avatar-image-active'] = 'true';
+            $attributes['data-fallback-type'] = $this->shouldShowInitialsFallback() ? 'initials' : 'icon';
         } else {
             $attributes['data-fallback-type'] = $this->name ? 'initials' : 'icon';
+            $attributes['data-avatar-fallback-active'] = 'true';
         }
 
         if ($this->color) {
             $attributes['data-color'] = $this->color;
         }
 
+        if ($this->name) {
+            $attributes['data-avatar-name'] = $this->name;
+        }
+
+        if ($this->lazy && $this->src) {
+            $attributes['data-avatar-lazy'] = 'true';
+        }
+
         return $attributes;
     }
 
+    /**
+     * Render the avatar component.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
     public function render()
     {
         return view('keys::components.avatar', [

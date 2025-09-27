@@ -43,7 +43,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
      * Initialize timepicker elements - required by BaseActionClass
      */
     protected initializeElements(): void {
-        DOMUtils.querySelectorAll('[data-timepicker="true"]').forEach(timepicker => {
+        DOMUtils.querySelectorAll('[data-keys-timepicker]').forEach(timepicker => {
             this.initializeTimePicker(timepicker as HTMLElement);
         });
     }
@@ -52,7 +52,10 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
      * Initialize a single timepicker element
      */
     private initializeTimePicker(timePickerElement: HTMLElement): void {
+        console.log('🕒 Initializing TimePicker:', timePickerElement);
+
         if (this.hasState(timePickerElement)) {
+            console.log('🕒 TimePicker already initialized, skipping');
             return;
         }
 
@@ -62,6 +65,8 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const minTime = timePickerElement.dataset.minTime || null;
         const maxTime = timePickerElement.dataset.maxTime || null;
         const initialValue = timePickerElement.dataset.value || null;
+
+        console.log('🕒 TimePicker config:', { format, showSeconds, step, minTime, maxTime, initialValue });
 
         const currentTime = this.parseTime(initialValue) || this.getCurrentTime();
 
@@ -82,27 +87,42 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         this.setState(timePickerElement, state);
         this.updateDisplay(timePickerElement);
         this.updateSelectedStates(timePickerElement);
+        this.updateClearButtonVisibility(timePickerElement, initialValue || '');
+
+        console.log('🕒 TimePicker initialized successfully with state:', state);
     }
 
     /**
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Trigger click
+        // Trigger click - let native popover handle the opening/closing
         EventUtils.handleDelegatedClick('[data-timepicker-trigger]', (trigger, event) => {
-            event.preventDefault();
-            const timepicker = DOMUtils.findClosest(trigger, '[data-timepicker="true"]') as HTMLElement;
+            console.log('🕒 TimePicker trigger clicked:', trigger);
+            // Don't prevent default - let native popover API handle the toggle
+            const timepicker = DOMUtils.findClosest(trigger, '[data-keys-timepicker]') as HTMLElement;
             if (timepicker && !this.isDisabled(timepicker)) {
-                this.toggleDropdown(timepicker);
+                console.log('🕒 Native popover will handle toggle for:', timepicker);
+                // Update our internal state but let popover handle the UI
+                const state = this.getState(timepicker);
+                if (state) {
+                    // The popover will handle opening/closing, we just track state
+                    console.log('🕒 Current TimePicker state:', state);
+                }
+            } else {
+                console.log('🕒 TimePicker trigger ignored - disabled or not found');
+                event.preventDefault(); // Only prevent default if disabled
             }
         });
 
         // Clear button
         EventUtils.handleDelegatedClick('[data-timepicker-clear]', (clearButton, event) => {
+            console.log('🕒 TimePicker clear button clicked:', clearButton);
             event.preventDefault();
             event.stopPropagation();
-            const timepicker = DOMUtils.findClosest(clearButton, '[data-timepicker="true"]') as HTMLElement;
+            const timepicker = DOMUtils.findClosest(clearButton, '[data-keys-timepicker]') as HTMLElement;
             if (timepicker) {
+                console.log('🕒 Clearing TimePicker value for:', timepicker);
                 this.clearTime(timepicker);
             }
         });
@@ -110,7 +130,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         // Hour selection
         EventUtils.handleDelegatedClick('[data-timepicker-hour]', (hourButton, event) => {
             event.preventDefault();
-            const timepicker = DOMUtils.findClosest(hourButton, '[data-timepicker="true"]') as HTMLElement;
+            const timepicker = DOMUtils.findClosest(hourButton, '[data-keys-timepicker]') as HTMLElement;
             const hour = parseInt(hourButton.dataset.timepickerHour || '0');
             if (timepicker) {
                 this.setHour(timepicker, hour);
@@ -120,7 +140,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         // Minute selection
         EventUtils.handleDelegatedClick('[data-timepicker-minute]', (minuteButton, event) => {
             event.preventDefault();
-            const timepicker = DOMUtils.findClosest(minuteButton, '[data-timepicker="true"]') as HTMLElement;
+            const timepicker = DOMUtils.findClosest(minuteButton, '[data-keys-timepicker]') as HTMLElement;
             const minute = parseInt(minuteButton.dataset.timepickerMinute || '0');
             if (timepicker) {
                 this.setMinute(timepicker, minute);
@@ -130,7 +150,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         // Second selection
         EventUtils.handleDelegatedClick('[data-timepicker-second]', (secondButton, event) => {
             event.preventDefault();
-            const timepicker = DOMUtils.findClosest(secondButton, '[data-timepicker="true"]') as HTMLElement;
+            const timepicker = DOMUtils.findClosest(secondButton, '[data-keys-timepicker]') as HTMLElement;
             const second = parseInt(secondButton.dataset.timepickerSecond || '0');
             if (timepicker) {
                 this.setSecond(timepicker, second);
@@ -140,7 +160,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         // Period selection
         EventUtils.handleDelegatedClick('[data-timepicker-period]', (periodButton, event) => {
             event.preventDefault();
-            const timepicker = DOMUtils.findClosest(periodButton, '[data-timepicker="true"]') as HTMLElement;
+            const timepicker = DOMUtils.findClosest(periodButton, '[data-keys-timepicker]') as HTMLElement;
             const period = periodButton.dataset.timepickerPeriod as 'AM' | 'PM';
             if (timepicker) {
                 this.setPeriod(timepicker, period);
@@ -150,7 +170,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         // Format toggle
         EventUtils.handleDelegatedClick('[data-timepicker-format]', (formatButton, event) => {
             event.preventDefault();
-            const timepicker = DOMUtils.findClosest(formatButton, '[data-timepicker="true"]') as HTMLElement;
+            const timepicker = DOMUtils.findClosest(formatButton, '[data-keys-timepicker]') as HTMLElement;
             const format = formatButton.dataset.timepickerFormat as '12' | '24';
             if (timepicker) {
                 this.setFormat(timepicker, format);
@@ -160,7 +180,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         // Now button
         EventUtils.handleDelegatedClick('[data-timepicker-now]', (nowButton, event) => {
             event.preventDefault();
-            const timepicker = DOMUtils.findClosest(nowButton, '[data-timepicker="true"]') as HTMLElement;
+            const timepicker = DOMUtils.findClosest(nowButton, '[data-keys-timepicker]') as HTMLElement;
             if (timepicker) {
                 this.setToCurrentTime(timepicker);
             }
@@ -169,7 +189,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         // Apply button
         EventUtils.handleDelegatedClick('[data-timepicker-apply]', (applyButton, event) => {
             event.preventDefault();
-            const timepicker = DOMUtils.findClosest(applyButton, '[data-timepicker="true"]') as HTMLElement;
+            const timepicker = DOMUtils.findClosest(applyButton, '[data-keys-timepicker]') as HTMLElement;
             if (timepicker) {
                 this.applyTime(timepicker);
             }
@@ -178,7 +198,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         // Cancel button
         EventUtils.handleDelegatedClick('[data-timepicker-cancel]', (cancelButton, event) => {
             event.preventDefault();
-            const timepicker = DOMUtils.findClosest(cancelButton, '[data-timepicker="true"]') as HTMLElement;
+            const timepicker = DOMUtils.findClosest(cancelButton, '[data-keys-timepicker]') as HTMLElement;
             if (timepicker) {
                 this.closeDropdown(timepicker);
             }
@@ -190,7 +210,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
 
             // Check if the click was inside any timepicker element
             if (target && target instanceof Element) {
-                const closestTimePicker = target.closest('[data-timepicker="true"]');
+                const closestTimePicker = target.closest('[data-keys-timepicker]');
 
                 // If click is not inside any timepicker, close all dropdowns
                 if (!closestTimePicker) {
@@ -200,7 +220,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         });
 
         // Keyboard navigation
-        EventUtils.handleDelegatedKeydown('[data-timepicker="true"]', (timepicker, event) => {
+        EventUtils.handleDelegatedKeydown('[data-keys-timepicker]', (timepicker, event) => {
             this.handleKeydown(timepicker as HTMLElement, event);
         });
     }
@@ -215,12 +235,12 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
                     const element = node as HTMLElement;
 
                     // Check if the added node is a timepicker
-                    if (element.matches && element.matches('[data-timepicker="true"]')) {
+                    if (element.matches && element.matches('[data-keys-timepicker]')) {
                         this.initializeTimePicker(element);
                     }
 
                     // Check for timepickers within the added node
-                    DOMUtils.querySelectorAll('[data-timepicker="true"]', element).forEach(timepicker => {
+                    DOMUtils.querySelectorAll('[data-keys-timepicker]', element).forEach(timepicker => {
                         this.initializeTimePicker(timepicker as HTMLElement);
                     });
                 }
@@ -254,13 +274,9 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         state.isOpen = true;
         this.setState(timepicker, state);
 
-        const dropdown = DOMUtils.querySelector('[data-timepicker-dropdown]', timepicker) as HTMLElement;
+        // For popover-based approach, we don't manually show/hide
+        // The popover component handles this through its own mechanisms
         const trigger = DOMUtils.querySelector('[data-timepicker-trigger]', timepicker) as HTMLElement;
-
-        if (dropdown) {
-            dropdown.classList.remove('hidden');
-            this.positionDropdown(timepicker);
-        }
 
         if (trigger) {
             trigger.setAttribute('aria-expanded', 'true');
@@ -277,7 +293,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
      */
     private closeDropdown(timepicker: HTMLElement): void {
         const state = this.getState(timepicker);
-        if (!state || !state.isOpen) return;
+        if (!state) return;
 
         // Clean up floating instance
         if (state.floating) {
@@ -288,15 +304,28 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         state.isOpen = false;
         this.setState(timepicker, state);
 
-        const dropdown = DOMUtils.querySelector('[data-timepicker-dropdown]', timepicker) as HTMLElement;
+        // Actually close the popover by finding and clicking the trigger or using popover API
         const trigger = DOMUtils.querySelector('[data-timepicker-trigger]', timepicker) as HTMLElement;
-
-        if (dropdown) {
-            dropdown.classList.add('hidden');
-        }
+        const popover = DOMUtils.querySelector('[data-popover]', timepicker) as HTMLElement;
 
         if (trigger) {
             trigger.setAttribute('aria-expanded', 'false');
+        }
+
+        // Try to close using popover API if available
+        if (popover && 'hidePopover' in popover) {
+            try {
+                (popover as any).hidePopover();
+            } catch (e) {
+                // Fallback: trigger click to close popover
+                console.log('Fallback: triggering click to close popover');
+                if (trigger) {
+                    trigger.click();
+                }
+            }
+        } else if (trigger) {
+            // Fallback: trigger click to close popover
+            trigger.click();
         }
 
         this.dispatchTimePickerEvent(timepicker, 'timepicker:close');
@@ -434,6 +463,8 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             state.format = format;
             this.setState(timepicker, state);
             this.updateFormatButtons(timepicker);
+            this.updatePeriodSectionVisibility(timepicker);
+            this.updateGridLayout(timepicker);
             this.updateHourOptions(timepicker);
             this.updateSelectedStates(timepicker);
             this.updateDisplay(timepicker);
@@ -450,9 +481,11 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
 
         const currentTime = this.getCurrentTime();
 
+        // Use standardized conversion method for consistency
         if (state.format === '12') {
-            state.hour = currentTime.hour > 12 ? currentTime.hour - 12 : (currentTime.hour === 0 ? 12 : currentTime.hour);
-            state.period = currentTime.hour >= 12 ? 'PM' : 'AM';
+            const conversion = this.convertHourBetweenFormats(currentTime.hour, '24', '12');
+            state.hour = conversion.hour;
+            state.period = conversion.period!;
         } else {
             state.hour = currentTime.hour;
         }
@@ -619,11 +652,27 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         if (!state) return;
 
         const formattedTime = this.formatTimeValue(state);
-        const trigger = DOMUtils.querySelector('[data-timepicker-trigger]', timepicker) as HTMLInputElement;
+        const display = DOMUtils.querySelector('[data-timepicker-display]', timepicker) as HTMLElement;
 
-        if (trigger) {
-            trigger.value = formattedTime || '';
+        // Update display content with proper placeholder handling
+        if (display) {
+            if (formattedTime) {
+                display.innerHTML = formattedTime;
+            } else {
+                const placeholder = timepicker.dataset.placeholder || 'Select time...';
+                display.innerHTML = `<span class="text-muted timepicker-placeholder">${placeholder}</span>`;
+            }
         }
+
+        // Update data attributes for styling
+        if (formattedTime) {
+            timepicker.dataset.hasValue = 'true';
+        } else {
+            delete timepicker.dataset.hasValue;
+        }
+
+        // Update clear button visibility
+        this.updateClearButtonVisibility(timepicker, formattedTime);
     }
 
     /**
@@ -638,22 +687,61 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
      * Set value and update hidden input
      */
     private setValue(timepicker: HTMLElement, value: string): void {
-        const hiddenInput = DOMUtils.querySelector('.timepicker-hidden-input', timepicker) as HTMLInputElement;
-        const trigger = DOMUtils.querySelector('[data-timepicker-trigger]', timepicker) as HTMLInputElement;
+        const hiddenInput = DOMUtils.querySelector('[data-timepicker-hidden-input]', timepicker) as HTMLInputElement;
+        const display = DOMUtils.querySelector('[data-timepicker-display]', timepicker) as HTMLElement;
 
         if (hiddenInput) {
             hiddenInput.value = value;
         }
 
-        if (trigger) {
-            trigger.value = value;
+        // Update display content with proper placeholder handling
+        if (display) {
+            if (value) {
+                display.innerHTML = value;
+            } else {
+                const placeholder = timepicker.dataset.placeholder || 'Select time...';
+                display.innerHTML = `<span class="text-muted timepicker-placeholder">${placeholder}</span>`;
+            }
         }
+
+        // Update data attributes for styling
+        if (value) {
+            timepicker.dataset.hasValue = 'true';
+        } else {
+            delete timepicker.dataset.hasValue;
+        }
+
+        // Update clear button visibility
+        this.updateClearButtonVisibility(timepicker, value);
 
         // Update state
         const state = this.getState(timepicker);
         if (state) {
             state.value = value;
             this.setState(timepicker, state);
+        }
+    }
+
+    /**
+     * Update clear button visibility based on value
+     */
+    private updateClearButtonVisibility(timepicker: HTMLElement, value: string): void {
+        const clearButton = DOMUtils.querySelector('[data-timepicker-clear]', timepicker) as HTMLElement;
+
+        console.log('🕒 Updating clear button visibility:', { value, clearButton: !!clearButton, disabled: timepicker.dataset.disabled });
+
+        if (clearButton) {
+            if (value && !timepicker.dataset.disabled) {
+                // Show clear button
+                clearButton.classList.remove('opacity-0', 'pointer-events-none');
+                clearButton.classList.add('pointer-events-auto');
+                console.log('🕒 Clear button shown');
+            } else {
+                // Hide clear button
+                clearButton.classList.add('opacity-0', 'pointer-events-none');
+                clearButton.classList.remove('pointer-events-auto');
+                console.log('🕒 Clear button hidden');
+            }
         }
     }
 
@@ -715,7 +803,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const state = this.getState(timepicker);
         if (!state) return;
 
-        const hourContainer = DOMUtils.querySelector('[data-timepicker-dropdown] .h-24:first-child', timepicker);
+        const hourContainer = DOMUtils.querySelector('[data-timepicker-hours]', timepicker);
         if (!hourContainer) return;
 
         // Generate hour options based on format
@@ -731,7 +819,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             const button = document.createElement('button');
             button.type = 'button';
             button.dataset.timepickerHour = hour.toString();
-            button.className = 'w-full px-2 py-1 text-sm text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 focus:bg-brand focus:text-foreground-brand transition-colors';
+            button.className = 'w-full px-3 py-2 text-sm text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 focus:bg-brand focus:text-foreground-brand [&.selected]:bg-brand [&.selected]:text-foreground-brand transition-colors';
             button.textContent = hour.toString().padStart(2, '0');
             hourContainer.appendChild(button);
         });
@@ -751,6 +839,37 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             this.updateDisplay(timepicker);
             this.updatePreview(timepicker);
         }
+    }
+
+    /**
+     * Update visibility of the period (AM/PM) section based on current format
+     */
+    private updatePeriodSectionVisibility(timepicker: HTMLElement): void {
+        const state = this.getState(timepicker);
+        if (!state) return;
+
+        const periodSection = DOMUtils.querySelector('[data-timepicker-period-section]', timepicker) as HTMLElement;
+        if (periodSection) {
+            periodSection.style.display = state.format === '12' ? 'block' : 'none';
+        }
+    }
+
+    /**
+     * Update grid layout based on current format and settings
+     */
+    private updateGridLayout(timepicker: HTMLElement): void {
+        const state = this.getState(timepicker);
+        if (!state) return;
+
+        const gridContainer = DOMUtils.querySelector('[data-timepicker-grid]', timepicker) as HTMLElement;
+        if (!gridContainer) return;
+
+        // Calculate columns: hours + minutes + (seconds if enabled) + (period if 12h format)
+        let columns = 2; // hours + minutes
+        if (state.showSeconds) columns++;
+        if (state.format === '12') columns++; // AM/PM period
+
+        gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
     }
 
     /**

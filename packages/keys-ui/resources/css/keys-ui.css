@@ -43,6 +43,7 @@
     --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
     --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
 
+    /* Raw color palettes - Static base colors */
     --color-brand-50: oklch(0.98 0.013 70.64);
     --color-brand-100: oklch(0.95 0.04 70.1);
     --color-brand-200: oklch(0.895 0.081 69.29);
@@ -114,113 +115,66 @@
     --color-info-800: oklch(0.445 0.115 240.75);
     --color-info-900: oklch(0.373 0.094 240.75);
     --color-info-950: oklch(0.203 0.052 240.75);
+
+    /* SEMANTIC COLORS - Static for brand consistency */
+    --color-brand: var(--color-brand-500);
+    --color-brand-hover: var(--color-brand-600);
+    --color-brand-active: var(--color-brand-700);
+    --color-foreground-brand: light-dark(white, var(--color-brand-100));
+
+    --color-danger: var(--color-danger-500);
+    --color-danger-hover: var(--color-danger-600);
+    --color-danger-active: var(--color-danger-700);
+    --color-foreground-danger: light-dark(white, var(--color-danger-100));
+
+    --color-warning: var(--color-warning-500);
+    --color-warning-hover: var(--color-warning-600);
+    --color-warning-active: var(--color-warning-700);
+    --color-foreground-warning: light-dark(var(--color-neutral-900), var(--color-warning-100));
+
+    --color-success: var(--color-success-500);
+    --color-success-hover: var(--color-success-600);
+    --color-success-active: var(--color-success-700);
+    --color-foreground-success: light-dark(white, var(--color-success-100));
+
+    --color-info: var(--color-info-500);
+    --color-info-hover: var(--color-info-600);
+    --color-info-active: var(--color-info-700);
+    --color-foreground-info: light-dark(white, var(--color-info-100));
+
+    /* NEUTRAL COLORS - Responsive to theme context */
+    --color-surface: light-dark(white, var(--color-neutral-900));
+    --color-body: light-dark(var(--color-neutral-50), var(--color-neutral-950));
+    --color-foreground: light-dark(var(--color-neutral-800), var(--color-neutral-200));
+    --color-border: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+    --color-input: light-dark(var(--color-neutral-50), var(--color-neutral-950));
+    --color-muted: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+
+    /* Neutral interactive states */
+    --color-neutral: light-dark(var(--color-neutral-500), var(--color-neutral-400));
+    --color-neutral-hover: light-dark(var(--color-neutral-200), var(--color-neutral-950));
+    --color-neutral-active: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+    --color-neutral-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+    --color-foreground-neutral: light-dark(white, var(--color-neutral-100));
+
+    /* Disabled states for semantic colors */
+    --color-brand-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+    --color-danger-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+    --color-warning-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+    --color-success-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+    --color-info-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+
+    /* Inverse semantic tokens for tooltips and overlays */
+    --color-surface-inverse: light-dark(var(--color-neutral-900), white);
+    --color-border-inverse: light-dark(var(--color-neutral-700), var(--color-neutral-200));
+    --tooltip-dark-bg: light-dark(var(--color-neutral-900), var(--color-neutral-800));
 }
 
 :root {
     /* Enable automatic light/dark mode detection */
     color-scheme: light dark;
-
-    /* Core Layout Colors - Modern light-dark() approach */
-    --surface: light-dark(white, var(--color-neutral-900));
-    --body: light-dark(var(--color-neutral-50), var(--color-neutral-950));
-    --foreground: light-dark(var(--color-neutral-800), var(--color-neutral-200));
-    --border: light-dark(var(--color-neutral-200), var(--color-neutral-900));
-    --input: light-dark(var(--color-neutral-50), var(--color-neutral-950));
-    --muted: light-dark(var(--color-neutral-600), var(--color-neutral-400));
-
-    /* Semantic Colors - Consistent across themes */
-    --brand: var(--color-brand-500);
-    --brand-hover: var(--color-brand-600);
-    --brand-active: var(--color-brand-700);
-    --brand-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --foreground-brand: white;
-
-    --danger: var(--color-danger-500);
-    --danger-hover: var(--color-danger-600);
-    --danger-active: var(--color-danger-700);
-    --danger-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --foreground-danger: white;
-
-    --warning: var(--color-warning-500);
-    --warning-hover: var(--color-warning-600);
-    --warning-active: var(--color-warning-700);
-    --warning-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --foreground-warning: var(--color-neutral-900);
-
-    --success: var(--color-success-500);
-    --success-hover: var(--color-success-600);
-    --success-active: var(--color-success-700);
-    --success-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --foreground-success: white;
-
-    --info: var(--color-info-500);
-    --info-hover: var(--color-info-600);
-    --info-active: var(--color-info-700);
-    --info-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --foreground-info: white;
-
-    --neutral: light-dark(var(--color-neutral-500), var(--color-neutral-400));
-    --neutral-hover: light-dark(var(--color-neutral-600), var(--color-neutral-700));
-    --neutral-active: light-dark(var(--color-neutral-700), var(--color-neutral-200));
-    --neutral-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --foreground-neutral: white;
-
-    /* Inverse semantic tokens for tooltip arrows and other inverse color needs */
-    --color-surface-inverse: light-dark(var(--color-neutral-900), white);
-    --color-border-inverse: light-dark(var(--color-neutral-700), var(--color-neutral-200));
-
-    /* Tooltip-specific semantic tokens matching exact Tailwind class behavior */
-    --tooltip-dark-bg: light-dark(var(--color-neutral-900), var(--color-neutral-800));
 }
 
-@theme inline {
-    /* Core Layout Colors */
-    --color-surface: var(--surface);
-    --color-body: var(--body);
-    --color-foreground: var(--foreground);
-    --color-border: var(--border);
-    --color-input: var(--input);
-
-    /* Semantic Colors */
-    --color-brand: var(--brand);
-    --color-brand-hover: var(--brand-hover);
-    --color-brand-active: var(--brand-active);
-    --color-brand-disabled: var(--brand-disabled);
-    --color-foreground-brand: var(--foreground-brand);
-
-    --color-danger: var(--danger);
-    --color-danger-hover: var(--danger-hover);
-    --color-danger-active: var(--danger-active);
-    --color-danger-disabled: var(--danger-disabled);
-    --color-foreground-danger: var(--foreground-danger);
-
-    --color-warning: var(--warning);
-    --color-warning-hover: var(--warning-hover);
-    --color-warning-active: var(--warning-active);
-    --color-warning-disabled: var(--warning-disabled);
-    --color-foreground-warning: var(--foreground-warning);
-
-    --color-success: var(--success);
-    --color-success-hover: var(--success-hover);
-    --color-success-active: var(--success-active);
-    --color-success-disabled: var(--success-disabled);
-    --color-foreground-success: var(--foreground-success);
-
-    --color-info: var(--info);
-    --color-info-hover: var(--info-hover);
-    --color-info-active: var(--info-active);
-    --color-info-disabled: var(--info-disabled);
-    --color-foreground-info: var(--foreground-info);
-
-    --color-neutral: var(--neutral);
-    --color-neutral-hover: var(--neutral-hover);
-    --color-neutral-active: var(--neutral-active);
-    --color-neutral-disabled: var(--neutral-disabled);
-    --color-foreground-neutral: var(--foreground-neutral);
-
-    /* Muted Color */
-    --color-muted: var(--muted);
-}
 
 
 

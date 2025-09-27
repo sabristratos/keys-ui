@@ -135,8 +135,32 @@ export class DOMUtils {
      * Find form element associated with action button
      */
     static findFormElementForAction(button: HTMLElement): HTMLInputElement | HTMLTextAreaElement | null {
-        const container = this.findClosest(button, '.relative');
-        return this.findFormElement(container);
+        // Strategy 1: Direct input detection via data-input-actions attribute
+        let container = this.findClosest(button, '[data-input-actions="true"]');
+        if (container && (container.tagName.toLowerCase() === 'input' || container.tagName.toLowerCase() === 'textarea')) {
+            return container as HTMLInputElement | HTMLTextAreaElement;
+        }
+
+        // Strategy 2: Modern CSS :has() selector for containers with form elements
+        container = this.findClosest(button, '*:has(input[data-input-actions="true"]), *:has(textarea[data-input-actions="true"])');
+        if (container) {
+            const formElement = this.findFormElement(container);
+            if (formElement) {
+                return formElement;
+            }
+        }
+
+        // Strategy 3: Fallback - traverse up DOM tree to find any form element
+        let currentElement = button.parentElement;
+        while (currentElement) {
+            const formElement = this.findFormElement(currentElement);
+            if (formElement) {
+                return formElement;
+            }
+            currentElement = currentElement.parentElement;
+        }
+
+        return null;
     }
 
     /**
