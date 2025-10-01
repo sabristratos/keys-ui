@@ -7,12 +7,73 @@ import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
 
+/**
+ * Toast system configuration constants
+ */
+const TOAST_CONFIG = {
+    DEFAULT_TIMEOUT: 5000,
+    STACK_OFFSET: 72,
+    ANIMATION_DURATION: 300,
+    MAX_TOASTS: 10,
+    POSITIONS: ['top-left', 'top-right', 'top-center', 'bottom-left', 'bottom-right', 'bottom-center'] as const,
+    VARIANTS: ['info', 'success', 'warning', 'danger', 'neutral'] as const
+} as const;
+
+/**
+ * Toast selectors for DOM queries
+ */
+const SELECTORS = {
+    TOAST: '[data-keys-toast="true"]',
+    DISMISS_BUTTON: '[data-toast-dismiss]',
+    ACTIONS_CONTAINER: '[data-toast-actions]',
+    LIVEWIRE_COMPONENT: '[data-livewire-component]'
+} as const;
+
+/**
+ * Toast configuration data structure
+ */
+export interface ToastData {
+    title?: string;
+    message: string;
+    variant?: typeof TOAST_CONFIG.VARIANTS[number];
+    position?: typeof TOAST_CONFIG.POSITIONS[number];
+    duration?: number;
+    persistent?: boolean;
+    actions?: string;
+    icon?: string;
+}
+
+/**
+ * Toast options for programmatic creation
+ */
+export interface ToastOptions {
+    position?: typeof TOAST_CONFIG.POSITIONS[number];
+    duration?: number;
+    persistent?: boolean;
+    actions?: string;
+    icon?: string;
+}
+
+/**
+ * Internal toast state management
+ */
 interface ToastState {
     toasts: Map<string, HTMLElement>;
-    containers: Map<string, HTMLElement>;
     timers: Map<string, number>;
-    pausedTimers: Map<string, { remaining: number, startTime: number }>;
+    pausedTimers: Map<string, { remaining: number; startTime: number }>;
     toastCounter: number;
+}
+
+/**
+ * Livewire toast event data
+ */
+interface LivewireToastData {
+    variant: string;
+    title?: string;
+    message: string;
+    position?: string;
+    duration?: number;
+    persistent?: boolean;
 }
 
 export class ToastActions extends BaseActionClass<ToastState> {
@@ -29,12 +90,10 @@ export class ToastActions extends BaseActionClass<ToastState> {
      * Initialize the global toast system
      */
     private initializeToastSystem(): void {
-        // Create global state for toast system
         const globalElement = document.documentElement;
         if (!this.hasState(globalElement)) {
             const state: ToastState = {
                 toasts: new Map(),
-                containers: new Map(),
                 timers: new Map(),
                 pausedTimers: new Map(),
                 toastCounter: 0
@@ -49,8 +108,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Toast dismiss buttons - target dialogs specifically
-        EventUtils.handleDelegatedClick('[data-toast-dismiss]', (dismissButton, event) => {
+        EventUtils.handleDelegatedClick(`${SELECTORS.TOAST}[popover] [data-keys-button]${SELECTORS.DISMISS_BUTTON}`, (dismissButton, event) => {
             const dismissId = dismissButton.getAttribute('data-toast-dismiss');
             if (dismissId) {
                 event.preventDefault();
@@ -59,18 +117,17 @@ export class ToastActions extends BaseActionClass<ToastState> {
             }
         });
 
-        // Handle dialog close events
-        EventUtils.handleDelegatedEvent('close', 'dialog[data-keys-toast]', (dialog) => {
-            const id = dialog.id;
+        EventUtils.handleDelegatedEvent('toggle', `${SELECTORS.TOAST}[popover]`, (toast) => {
+            const id = toast.id;
             if (id) {
-                this.dispatchToastEvent('toast:close', id);
+                const isOpen = (toast as any).matches(':popover-open');
+                this.dispatchToastEvent(isOpen ? 'toast:show' : 'toast:close', id);
             }
         });
 
-        // Toast action buttons - target within dialogs
-        EventUtils.handleDelegatedClick('[data-toast-action]', (actionButton, event) => {
+        EventUtils.handleDelegatedClick(`${SELECTORS.TOAST}[popover] [data-toast-action]`, (actionButton, event) => {
             const action = actionButton.getAttribute('data-toast-action');
-            const toast = DOMUtils.findClosest(actionButton, 'dialog[data-keys-toast]');
+            const toast = DOMUtils.findClosest(actionButton, `${SELECTORS.TOAST}[popover]`);
             if (action && toast) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -78,18 +135,25 @@ export class ToastActions extends BaseActionClass<ToastState> {
             }
         });
 
-        // Pause/resume timers on hover - target dialog elements
-        EventUtils.handleDelegatedEvent('mouseenter', 'dialog[data-keys-toast]', (toast) => {
+        EventUtils.handleDelegatedEvent('mouseenter', `${SELECTORS.TOAST}[popover]`, (toast) => {
             this.pauseTimer(toast.id);
         });
 
-        EventUtils.handleDelegatedEvent('mouseleave', 'dialog[data-keys-toast]', (toast) => {
+        EventUtils.handleDelegatedEvent('mouseleave', `${SELECTORS.TOAST}[popover]`, (toast) => {
             this.resumeTimer(toast.id);
+        });
+
+        EventUtils.handleDelegatedEvent('keydown', `${SELECTORS.TOAST}[popover]`, (toast, event) => {
+            const keyboardEvent = event as KeyboardEvent;
+            if (keyboardEvent.key === 'Escape' && toast.hasAttribute('data-dismissible')) {
+                keyboardEvent.preventDefault();
+                this.dismiss(toast.id);
+            }
         });
     }
 
     /**
-     * Setup dynamic observer for new toast containers - uses BaseActionClass utility
+     * Setup dynamic observer for new toasts - uses BaseActionClass utility
      */
     protected setupDynamicObserver(): void {
         this.createDynamicObserver((addedNodes) => {
@@ -97,16 +161,9 @@ export class ToastActions extends BaseActionClass<ToastState> {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as HTMLElement;
 
-                    // Check if the added node is a toast container
-                    if (DOMUtils.hasDataAttribute(element, 'toast-container')) {
-                        this.discoverToasts();
-                    }
+                    const toasts = element.querySelectorAll('[data-keys-toast][popover]');
 
-                    // Check for toast containers and dialogs within the added node
-                    const containers = element.querySelectorAll('[data-toast-container]');
-                    const toasts = element.querySelectorAll('dialog[data-keys-toast]');
-
-                    if (containers.length > 0 || toasts.length > 0) {
+                    if (toasts.length > 0) {
                         this.discoverToasts();
                     }
                 }
@@ -115,28 +172,16 @@ export class ToastActions extends BaseActionClass<ToastState> {
     }
 
     /**
-     * Discover and register toast containers and existing toasts
+     * Discover and register existing toasts (no containers needed)
      */
     public discoverToasts(): void {
         const globalState = this.getGlobalState();
         if (!globalState) return;
 
-        // Discover containers
-        DOMUtils.findByDataAttribute('toast-container').forEach(container => {
-            const position = container.getAttribute('data-toast-container');
-            if (position) {
-                globalState.containers.set(position, container);
-            }
-        });
-
-        // Discover existing toast dialogs
-        document.querySelectorAll('dialog[data-keys-toast]').forEach(toastDialog => {
-            if (toastDialog instanceof HTMLDialogElement) {
-                const id = toastDialog.id;
-                if (id) {
-                    globalState.toasts.set(id, toastDialog);
-                    this.setupToastListeners(toastDialog);
-                }
+        document.querySelectorAll('[data-keys-toast][popover]').forEach(toastPopover => {
+            const id = toastPopover.id;
+            if (id) {
+                globalState.toasts.set(id, toastPopover as HTMLElement);
             }
         });
     }
@@ -156,16 +201,8 @@ export class ToastActions extends BaseActionClass<ToastState> {
         if (!globalState) return;
 
         globalState.toasts.set(id, toast);
-        this.setupToastListeners(toast);
     }
 
-    /**
-     * Set up individual toast event listeners (no longer needed with event delegation)
-     */
-    private setupToastListeners(toast: HTMLElement): void {
-        // Event listeners are now handled via event delegation in bindEventListeners
-        // This method is kept for backward compatibility but does nothing
-    }
 
     /**
      * Setup Livewire integration
@@ -189,44 +226,30 @@ export class ToastActions extends BaseActionClass<ToastState> {
 
     /**
      * Show a toast programmatically
+     * @param variant Toast type (info, success, warning, danger, neutral)
+     * @param data Toast configuration object
+     * @returns Whether the toast was successfully created and shown
      */
-    public show(variant: string, data: Record<string, any> = {}): boolean {
+    public show(variant: typeof TOAST_CONFIG.VARIANTS[number], data: ToastData = { message: '' }): boolean {
         const globalState = this.getGlobalState();
         if (!globalState) return false;
 
         const position = data.position || 'top-right';
-        const container = globalState.containers.get(position);
-
-        if (!container) {
-            return false;
-        }
-
         const toastId = `toast-${variant}-${position}-${++globalState.toastCounter}`;
 
         const toast = this.createToastElement(toastId, variant, position, data);
 
-        // Add toast to container or create dynamic container
-        if (container) {
-            container.appendChild(toast);
-        } else {
-            // Create a new container if none exists for this position
-            const newContainer = document.createElement('div');
-            newContainer.className = this.getContainerClasses(position);
-            newContainer.setAttribute('data-toast-container', position);
-            newContainer.appendChild(toast);
-            document.body.appendChild(newContainer);
+        const stackIndex = this.calculateStackPosition(position);
+        const stackOffset = stackIndex * TOAST_CONFIG.STACK_OFFSET;
+        toast.style.setProperty('--stack-offset', `${stackOffset}px`);
 
-            // Register the new container
-            globalState.containers.set(position, newContainer);
-        }
+        document.body.appendChild(toast);
 
-        // Show toast using dialog API
-        if (toast instanceof HTMLDialogElement) {
-            toast.show(); // Use show() instead of showModal() to avoid backdrop
-        }
+        this.showToastElement(toast);
+
         toast.setAttribute('data-toast-visible', 'true');
 
-        const duration = data.duration || 5000;
+        const duration = data.duration || TOAST_CONFIG.DEFAULT_TIMEOUT;
         const persistent = data.persistent === true;
 
         if (!persistent && duration > 0) {
@@ -234,7 +257,6 @@ export class ToastActions extends BaseActionClass<ToastState> {
         }
 
         globalState.toasts.set(toastId, toast);
-        this.setupToastListeners(toast);
 
         this.dispatchToastEvent('toast:show', toastId, data);
 
@@ -242,38 +264,80 @@ export class ToastActions extends BaseActionClass<ToastState> {
     }
 
     /**
-     * Create a toast dialog element dynamically to match Blade template
+     * Calculate stack position for toasts at a specific position
      */
-    private createToastElement(toastId: string, variant: string, position: string, data: Record<string, any>): HTMLDialogElement {
+    private calculateStackPosition(position: string): number {
+        const globalState = this.getGlobalState();
+        if (!globalState) return 0;
+
+        let stackIndex = 0;
+        globalState.toasts.forEach((toast) => {
+            if (toast.getAttribute('data-position') === position &&
+                toast.getAttribute('data-toast-visible') === 'true') {
+                stackIndex++;
+            }
+        });
+
+        return stackIndex;
+    }
+
+    /**
+     * Show toast element using Popover API with fallback
+     */
+    private showToastElement(toast: HTMLElement): void {
+        try {
+            (toast as any).showPopover();
+        } catch (error) {
+            console.warn('Popover API not supported, using fallback display');
+            toast.style.display = 'block';
+        }
+    }
+
+    /**
+     * Hide toast element using Popover API with fallback
+     */
+    private hideToastElement(toast: HTMLElement): void {
+        try {
+            (toast as any).hidePopover();
+        } catch (error) {
+            console.warn('Popover API hide failed, using manual hide');
+            toast.style.display = 'none';
+        }
+    }
+
+    /**
+     * Create a toast popover element dynamically to match Blade template
+     */
+    private createToastElement(toastId: string, variant: string, position: string, data: Record<string, any>): HTMLElement {
         const alertVariant = variant === 'error' ? 'danger' : variant;
 
-        // Create dialog element
-        const toastDialog = document.createElement('dialog') as HTMLDialogElement;
+        const toastPopover = document.createElement('div') as HTMLElement;
 
-        // Set dialog classes and attributes to match Blade template
-        toastDialog.className = this.getDialogClasses(position, alertVariant);
-        toastDialog.setAttribute('data-keys-toast', 'true');
-        toastDialog.setAttribute('data-variant', variant);
-        toastDialog.setAttribute('data-position', position);
-        toastDialog.setAttribute('data-element-type', 'dialog');
-        toastDialog.setAttribute('data-dismissible', 'true');
-        toastDialog.setAttribute('role', 'alert');
-        toastDialog.setAttribute('aria-live', 'assertive');
-        toastDialog.id = toastId;
+        toastPopover.className = this.getPopoverClasses(position, alertVariant);
+        toastPopover.setAttribute('data-keys-toast', 'true');
+        toastPopover.setAttribute('data-variant', variant);
+        toastPopover.setAttribute('data-position', position);
+        toastPopover.setAttribute('data-element-type', 'popover');
+        toastPopover.setAttribute('data-dismissible', 'true');
+        toastPopover.setAttribute('data-has-icon', 'true');
+        toastPopover.setAttribute('popover', 'manual');
+        toastPopover.setAttribute('role', 'status');
+        const ariaLive = (alertVariant === 'danger' || alertVariant === 'warning') ? 'assertive' : 'polite';
+        toastPopover.setAttribute('aria-live', ariaLive);
+        toastPopover.setAttribute('aria-atomic', 'true');
+        toastPopover.id = toastId;
 
-        // Set ARIA labels
         if (data.title) {
-            toastDialog.setAttribute('aria-labelledby', `${toastId}-title`);
-            toastDialog.setAttribute('data-has-title', 'true');
+            toastPopover.setAttribute('aria-labelledby', `${toastId}-title`);
+            toastPopover.setAttribute('data-has-title', 'true');
         }
-        toastDialog.setAttribute('aria-describedby', `${toastId}-message`);
+        toastPopover.setAttribute('aria-describedby', `${toastId}-message`);
 
-        // Create HTML that matches Blade template structure
-        toastDialog.innerHTML = `
-            <div class="p-4 space-y-3">
+        toastPopover.innerHTML = `
+            <div class="px-4 pt-4 pb-3">
                 <div class="flex items-start gap-3">
-                    <div class="flex-shrink-0 mt-0.5">
-                        <svg class="w-5 h-5 ${this.getIconColor(alertVariant)}" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-icon="true">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center ${this.getIconWrapperClasses(alertVariant)}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-icon="true">
                             ${this.getIconPath(alertVariant)}
                         </svg>
                     </div>
@@ -299,82 +363,52 @@ export class ToastActions extends BaseActionClass<ToastState> {
                         </button>
                     </div>
                 </div>
-                <div class="hidden flex gap-2 pt-1" data-toast-actions></div>
             </div>
         `;
 
-        this.updateToastContent(toastDialog, data);
+        this.updateToastContent(toastPopover, data);
 
-        return toastDialog;
+        return toastPopover;
     }
 
-    /**
-     * Get container classes for toast positioning
-     */
-    private getContainerClasses(position: string): string {
-        const base = 'fixed z-50';
-
-        return position === 'top-left' ? `${base} top-4 left-4` :
-               position === 'top-right' ? `${base} top-4 right-4` :
-               position === 'top-center' ? `${base} top-4 left-1/2 -translate-x-1/2` :
-               position === 'bottom-left' ? `${base} bottom-4 left-4` :
-               position === 'bottom-right' ? `${base} bottom-4 right-4` :
-               position === 'bottom-center' ? `${base} bottom-4 left-1/2 -translate-x-1/2` :
-               `${base} top-4 right-4`;
-    }
 
     /**
-     * Get dialog classes for toast styling to match Blade template
+     * Get popover classes for toast styling - matches Blade template exactly
      */
-    private getDialogClasses(position: string, variant: string): string {
-        let classes = 'max-w-sm w-full p-0 m-0 border rounded-lg shadow-lg backdrop:bg-transparent transition-all duration-300 ease-out';
+    private getPopoverClasses(position: string, variant: string): string {
+        let classes = 'max-w-sm w-fit h-fit rounded-lg shadow-lg text-foreground z-[9999] p-0 overflow-visible opacity-100';
 
-        // Initial state (hidden)
-        classes += ' translate-y-2 opacity-0 scale-95';
-
-        // Open state animations
-        classes += ' open:translate-y-0 open:opacity-100 open:scale-100';
-
-        // Position-specific animations
-        if (position.startsWith('bottom')) {
-            classes += ' -translate-y-2 open:translate-y-0';
-        }
-
-        // Hover effects
-        classes += ' hover:shadow-xl hover:-translate-y-1 focus-within:shadow-xl focus-within:-translate-y-1';
-
-        // Variant styling to match Blade template
         classes += ' ' + this.getVariantClasses(variant);
 
         return classes;
     }
 
     /**
-     * Get variant classes for alert styling
+     * Get variant classes - adaptive backgrounds that switch between light and dark mode
      */
     private getVariantClasses(variant: string): string {
         const variants: Record<string, string> = {
-            'info': 'bg-info-100 border-info-200 text-info-foreground',
-            'success': 'bg-success-100 border-success-200 text-success-foreground',
-            'warning': 'bg-warning-100 border-warning-200 text-warning-foreground',
-            'danger': 'bg-danger-100 border-danger-200 text-danger-foreground',
-            'neutral': 'bg-neutral-100 border-neutral-200 text-neutral-foreground'
+            'info': 'border border-info bg-info-subtle',
+            'success': 'border border-success bg-success-subtle',
+            'warning': 'border border-warning bg-warning-subtle',
+            'danger': 'border border-danger bg-danger-subtle',
+            'neutral': 'border border-neutral bg-neutral-subtle'
         };
         return variants[variant] || variants.info;
     }
 
     /**
-     * Get icon color for variant
+     * Get icon wrapper classes for variant - optimized for text contrast
      */
-    private getIconColor(variant: string): string {
-        const colors: Record<string, string> = {
-            'info': 'text-info',
-            'success': 'text-success',
-            'warning': 'text-warning',
-            'danger': 'text-danger',
-            'neutral': 'text-neutral'
+    private getIconWrapperClasses(variant: string): string {
+        const wrapperClasses: Record<string, string> = {
+            'info': 'bg-info text-white',
+            'success': 'bg-success text-white',
+            'warning': 'bg-warning text-black',
+            'danger': 'bg-danger text-white',
+            'neutral': 'bg-neutral text-white'
         };
-        return colors[variant] || colors.info;
+        return wrapperClasses[variant] || wrapperClasses.info;
     }
 
     /**
@@ -404,28 +438,52 @@ export class ToastActions extends BaseActionClass<ToastState> {
             return false;
         }
 
+        const position = toast.getAttribute('data-position');
+
         this.clearTimer(id);
         globalState.pausedTimers.delete(id);
 
         toast.setAttribute('data-toast-visible', 'false');
-        toast.setAttribute('data-toast-exiting', 'true');
 
-        // Close dialog and remove from DOM
-        if (toast instanceof HTMLDialogElement) {
-            toast.close();
+        this.hideToastElement(toast);
+
+        globalState.toasts.delete(id);
+
+        if (position) {
+            this.recalculateStackPositions(position);
         }
 
-        // Use timeout to allow exit animation
-        setTimeout(() => {
+        window.setTimeout(() => {
             if (toast.parentNode) {
                 toast.parentNode.removeChild(toast);
             }
-            globalState.toasts.delete(id);
-        }, 300); // Match transition duration
+        }, TOAST_CONFIG.ANIMATION_DURATION);
 
         this.dispatchToastEvent('toast:dismiss', id);
 
         return true;
+    }
+
+    /**
+     * Recalculate stack positions for all toasts at a specific position
+     */
+    private recalculateStackPositions(position: string): void {
+        const globalState = this.getGlobalState();
+        if (!globalState) return;
+
+        const toastsAtPosition: HTMLElement[] = [];
+
+        globalState.toasts.forEach((toast) => {
+            if (toast.getAttribute('data-position') === position &&
+                toast.getAttribute('data-toast-visible') === 'true') {
+                toastsAtPosition.push(toast);
+            }
+        });
+
+        toastsAtPosition.forEach((toast, index) => {
+            const stackOffset = index * TOAST_CONFIG.STACK_OFFSET;
+            toast.style.setProperty('--stack-offset', `${stackOffset}px`);
+        });
     }
 
     /**
@@ -443,91 +501,91 @@ export class ToastActions extends BaseActionClass<ToastState> {
     }
 
     /**
-     * Helper methods for convenience
+     * Convenience methods for common toast types
      */
-    public success(message: string, options: Record<string, any> = {}): boolean {
+
+    /**
+     * Show a success toast
+     * @param message Toast message
+     * @param options Additional toast options
+     * @returns Whether the toast was successfully created
+     */
+    public success(message: string, options: ToastOptions = {}): boolean {
         return this.show('success', { message, ...options });
     }
 
-    public error(message: string, options: Record<string, any> = {}): boolean {
-        return this.show('error', { message, ...options });
+    /**
+     * Show an error toast
+     * @param message Toast message
+     * @param options Additional toast options
+     * @returns Whether the toast was successfully created
+     */
+    public error(message: string, options: ToastOptions = {}): boolean {
+        return this.show('danger', { message, ...options });
     }
 
-    public warning(message: string, options: Record<string, any> = {}): boolean {
+    /**
+     * Show a warning toast
+     * @param message Toast message
+     * @param options Additional toast options
+     * @returns Whether the toast was successfully created
+     */
+    public warning(message: string, options: ToastOptions = {}): boolean {
         return this.show('warning', { message, ...options });
     }
 
-    public info(message: string, options: Record<string, any> = {}): boolean {
+    /**
+     * Show an info toast
+     * @param message Toast message
+     * @param options Additional toast options
+     * @returns Whether the toast was successfully created
+     */
+    public info(message: string, options: ToastOptions = {}): boolean {
         return this.show('info', { message, ...options });
     }
 
     /**
-     * Update toast content
+     * Update toast content with provided data
      */
     private updateToastContent(toast: HTMLElement, data: Record<string, any>): void {
-        const titleElement = DOMUtils.querySelector('[data-toast-title]', toast) as HTMLElement;
-        const messageElement = DOMUtils.querySelector('[data-toast-message]', toast) as HTMLElement;
-        const actionsElement = DOMUtils.querySelector('[data-toast-actions]', toast) as HTMLElement;
+        const titleElement = toast.querySelector(`#${toast.id}-title`) as HTMLElement;
+        const messageElement = toast.querySelector(`#${toast.id}-message`) as HTMLElement;
+        const actionsElement = toast.querySelector('[data-toast-actions]') as HTMLElement;
 
-        if (titleElement && data.title) {
-            titleElement.textContent = data.title;
-            titleElement.classList.remove('hidden');
-            // Update ARIA attributes
-            toast.setAttribute('data-has-title', 'true');
-        } else if (titleElement) {
-            titleElement.classList.add('hidden');
-            toast.removeAttribute('data-has-title');
+        if (titleElement) {
+            if (data.title) {
+                titleElement.textContent = data.title;
+                titleElement.classList.remove('hidden');
+                toast.setAttribute('data-has-title', 'true');
+            } else {
+                titleElement.classList.add('hidden');
+                toast.removeAttribute('data-has-title');
+            }
         }
 
         if (messageElement && data.message) {
             messageElement.textContent = data.message;
-            toast.setAttribute('data-has-content', 'true');
-        }
-
-        if (actionsElement && data.actions) {
-            actionsElement.innerHTML = data.actions;
-            actionsElement.classList.remove('hidden');
-        } else if (actionsElement) {
-            actionsElement.classList.add('hidden');
-        }
-
-        // Update data attributes
-        toast.setAttribute('data-timeout', String(data.duration || 5000));
-        if (data.persistent === true) {
-            toast.setAttribute('data-persistent', 'true');
-        }
-        if (data.duration > 0 && !data.persistent) {
-            toast.setAttribute('data-auto-hide', 'true');
-        }
-    }
-
-    /**
-     * Reset toast content for reuse
-     */
-    private resetToastContent(toast: HTMLElement): void {
-        const titleElement = DOMUtils.querySelector('[data-toast-title]', toast) as HTMLElement;
-        const messageElement = DOMUtils.querySelector('[data-toast-message]', toast) as HTMLElement;
-        const actionsElement = DOMUtils.querySelector('[data-toast-actions]', toast) as HTMLElement;
-
-        if (titleElement) {
-            titleElement.textContent = '';
-            titleElement.classList.add('hidden');
-        }
-
-        if (messageElement) {
-            messageElement.textContent = '';
         }
 
         if (actionsElement) {
-            actionsElement.innerHTML = '';
-            actionsElement.classList.add('hidden');
+            if (data.actions) {
+                actionsElement.innerHTML = data.actions;
+                actionsElement.classList.remove('hidden');
+            } else {
+                actionsElement.classList.add('hidden');
+            }
         }
 
-        toast.removeAttribute('data-timeout');
-        toast.removeAttribute('data-persistent');
-        toast.removeAttribute('data-auto-hide');
-        toast.removeAttribute('data-has-title');
-        toast.removeAttribute('data-has-content');
+        const duration = data.duration || TOAST_CONFIG.DEFAULT_TIMEOUT;
+        toast.setAttribute('data-timeout', String(duration));
+
+        if (data.persistent === true) {
+            toast.setAttribute('data-persistent', 'true');
+        }
+
+        if (duration > 0 && !data.persistent) {
+            toast.setAttribute('data-auto-hide', 'true');
+        }
     }
 
     /**
@@ -544,7 +602,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
             toast.setAttribute('data-toast-start-time', String(Date.now()));
         }
 
-        const timer = setTimeout(() => {
+        const timer = window.setTimeout(() => {
             this.dismiss(id);
         }, duration);
 
@@ -560,7 +618,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
 
         const timer = globalState.timers.get(id);
         if (timer) {
-            clearTimeout(timer);
+            window.clearTimeout(timer);
             globalState.timers.delete(id);
         }
     }
@@ -576,8 +634,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
         const toast = globalState.toasts.get(id);
 
         if (timer && toast) {
-            // Clear current timer and calculate remaining time
-            const duration = parseInt(toast.getAttribute('data-timeout') || '5000');
+            const duration = parseInt(toast.getAttribute('data-timeout') || String(TOAST_CONFIG.DEFAULT_TIMEOUT));
             const startTime = parseInt(toast.getAttribute('data-toast-start-time') || '0');
             const elapsed = Date.now() - startTime;
             const remaining = Math.max(0, duration - elapsed);
@@ -605,7 +662,6 @@ export class ToastActions extends BaseActionClass<ToastState> {
             const persistent = toast.getAttribute('data-persistent') === 'true';
 
             if (!persistent) {
-                // Timer already running, no need to resume
                 globalState.pausedTimers.delete(id);
             }
         } else if (toast && pausedInfo) {
@@ -660,7 +716,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
         return {
             id: toastId,
             visible: toast.getAttribute('data-toast-visible') === 'true',
-            open: toast instanceof HTMLDialogElement ? toast.open : false,
+            open: (toast as any).matches(':popover-open') || false,
             variant: toast.getAttribute('data-variant'),
             position: toast.getAttribute('data-position'),
             duration: parseInt(toast.getAttribute('data-timeout') || '0'),
@@ -678,23 +734,19 @@ export class ToastActions extends BaseActionClass<ToastState> {
         const globalState = this.getGlobalState();
         if (!globalState) return;
 
-        globalState.timers.forEach(timer => clearTimeout(timer));
+        globalState.timers.forEach(timer => window.clearTimeout(timer));
         globalState.timers.clear();
-
         globalState.pausedTimers.clear();
 
         globalState.toasts.forEach((toast) => {
-            this.resetToastContent(toast);
-            toast.style.display = 'none';
+            this.hideToastElement(toast);
             toast.setAttribute('data-toast-visible', 'false');
         });
 
         globalState.toasts.clear();
-        globalState.containers.clear();
     }
 }
 
-// Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         ToastActions.getInstance().init();
@@ -703,7 +755,6 @@ if (document.readyState === 'loading') {
     ToastActions.getInstance().init();
 }
 
-// Export for global access
 const toastActionsInstance = ToastActions.getInstance();
 (window as any).ToastActions = toastActionsInstance;
 

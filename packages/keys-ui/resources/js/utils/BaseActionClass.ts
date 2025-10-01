@@ -40,17 +40,13 @@ export abstract class BaseActionClass<TState = any> {
             return;
         }
 
-        // Pre-initialization hook
         this.onBeforeInit?.();
 
-        // Core initialization methods (required by subclasses)
         this.bindEventListeners();
         this.initializeElements();
 
-        // Setup dynamic content observation if needed
         this.setupDynamicObserver?.();
 
-        // Post-initialization hook
         this.onAfterInit?.();
 
         this.initialized = true;
@@ -86,19 +82,19 @@ export abstract class BaseActionClass<TState = any> {
      * State management utilities
      * Common operations used across multiple action classes
      */
-    protected getState(element: HTMLElement): TState | undefined {
+    public getState(element: HTMLElement): TState | undefined {
         return this.stateManager.get(element);
     }
 
-    protected setState(element: HTMLElement, state: TState): void {
+    public setState(element: HTMLElement, state: TState): void {
         this.stateManager.set(element, state);
     }
 
-    protected removeState(element: HTMLElement): boolean {
+    public removeState(element: HTMLElement): boolean {
         return this.stateManager.delete(element);
     }
 
-    protected hasState(element: HTMLElement): boolean {
+    public hasState(element: HTMLElement): boolean {
         return this.stateManager.has(element);
     }
 

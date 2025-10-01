@@ -1,4 +1,4 @@
-{{-- Hidden file input --}}
+
 <input
     type="file"
     class="file-input"
@@ -10,7 +10,7 @@
     {{ $attributes->merge($computedWireAttributes) }}
 />
 
-{{-- Empty state (default upload area) --}}
+
 <div class="upload-empty-state text-center transition-all duration-300 ease-in-out">
     <x-keys::icon
         name="heroicon-o-cloud-arrow-up"
@@ -57,11 +57,11 @@
     </div>
 </div>
 
-{{-- File selected state (transforms the upload area) --}}
+
 <div class="upload-file-state hidden transition-all duration-300 ease-in-out p-4">
     <div class="flex items-center justify-center">
         <div class="flex items-center space-x-4">
-            {{-- File preview thumbnail --}}
+            
             <div class="flex-shrink-0">
                 <img class="file-preview-image hidden w-20 h-20 object-cover rounded-lg border-2 border-border" alt="" />
                 <div class="file-icon flex items-center justify-center w-20 h-20 bg-surface border-2 border-border rounded-lg">
@@ -69,12 +69,12 @@
                 </div>
             </div>
 
-            {{-- File info --}}
+            
             <div class="flex-1 min-w-0">
                 <div class="file-name text-sm font-medium text-foreground truncate"></div>
                 <div class="file-size text-xs text-muted mt-1"></div>
 
-                {{-- Action buttons --}}
+                
                 <div class="flex items-center space-x-2 mt-3">
                     <x-keys::button
                         variant="outline"
@@ -94,11 +94,11 @@
         </div>
     </div>
 
-    {{-- Progress bar (for Livewire uploads) --}}
+    
     <div class="upload-progress hidden mt-4 w-full bg-surface rounded-full overflow-hidden h-1.5">
         <div class="upload-progress-bar bg-brand h-full transition-all duration-300 ease-out" style="width: 0%"></div>
     </div>
 </div>
 
-{{-- Error message container --}}
+
 <div class="error-message hidden mt-4 text-sm text-danger"></div>

@@ -24,10 +24,8 @@ export class TextareaActions extends BaseActionClass {
      * Initialize textarea elements - required by BaseActionClass
      */
     protected initializeElements(): void {
-        // Initialize auto-resize textareas
         this.initializeAutoResize();
 
-        // Initialize character count displays
         this.initializeCharacterCounts();
     }
 
@@ -35,27 +33,21 @@ export class TextareaActions extends BaseActionClass {
      * Bind event listeners - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Handle textarea input events for auto-resize and character counting
         EventUtils.handleDelegatedEvent('input', 'textarea[data-auto-resize="true"]', (textarea) => {
             this.handleAutoResize(textarea as HTMLTextAreaElement);
         });
 
-        // Handle character counting for textareas with character count displays
         EventUtils.handleDelegatedEvent('input', 'textarea[data-show-character-count="true"]', (textarea) => {
             this.updateCharacterCount(textarea as HTMLTextAreaElement);
         });
 
-        // Handle paste events for character counting
         EventUtils.handleDelegatedEvent('paste', 'textarea[data-show-character-count="true"]', (textarea) => {
-            // Use setTimeout to ensure paste content is processed
             setTimeout(() => {
                 this.updateCharacterCount(textarea as HTMLTextAreaElement);
             }, 0);
         });
 
-        // Handle cut events for character counting
         EventUtils.handleDelegatedEvent('cut', 'textarea[data-show-character-count="true"]', (textarea) => {
-            // Use setTimeout to ensure cut content is processed
             setTimeout(() => {
                 this.updateCharacterCount(textarea as HTMLTextAreaElement);
             }, 0);
@@ -88,7 +80,6 @@ export class TextareaActions extends BaseActionClass {
      * Setup auto-resize for a textarea element
      */
     private setupAutoResize(textarea: HTMLTextAreaElement): void {
-        // Store original min-height from rows attribute
         const rows = parseInt(textarea.getAttribute('rows') || '3');
         const lineHeight = this.getLineHeight(textarea);
         const padding = this.getVerticalPadding(textarea);
@@ -96,11 +87,9 @@ export class TextareaActions extends BaseActionClass {
 
         textarea.style.minHeight = `${minHeight}px`;
 
-        // Ensure textarea has the right styles for auto-resize
         textarea.style.resize = 'none';
         textarea.style.overflow = 'hidden';
 
-        // Set initial height
         this.handleAutoResize(textarea);
     }
 
@@ -108,18 +97,14 @@ export class TextareaActions extends BaseActionClass {
      * Handle auto-resize for textarea
      */
     private handleAutoResize(textarea: HTMLTextAreaElement): void {
-        // Reset height to auto to measure actual content height
         textarea.style.height = 'auto';
 
-        // Get the scroll height (actual content height)
         const scrollHeight = textarea.scrollHeight;
         const minHeight = parseInt(textarea.style.minHeight || '0');
 
-        // Set new height (at least min-height)
         const newHeight = Math.max(scrollHeight, minHeight);
         textarea.style.height = `${newHeight}px`;
 
-        // Dispatch custom event for other components that might need to react
         this.dispatchResizeEvent(textarea, newHeight);
     }
 
@@ -130,23 +115,19 @@ export class TextareaActions extends BaseActionClass {
         const id = textarea.id || textarea.name;
         if (!id) return;
 
-        // Find the character count display element
         const countDisplay = DOMUtils.querySelector(`[data-character-count][data-target-id="${id}"]`);
         if (!countDisplay) return;
 
         const currentLength = textarea.value.length;
         const maxLength = parseInt(countDisplay.dataset.maxLength || '0') || null;
 
-        // Update current count
         const currentCountSpan = DOMUtils.querySelector('[data-current-count]', countDisplay);
         if (currentCountSpan) {
             currentCountSpan.textContent = currentLength.toString();
         }
 
-        // Apply visual feedback based on character count
         this.applyCharacterCountFeedback(countDisplay, textarea, currentLength, maxLength);
 
-        // Dispatch event for other components
         this.dispatchCharacterCountEvent(textarea, currentLength, maxLength);
     }
 
@@ -161,22 +142,18 @@ export class TextareaActions extends BaseActionClass {
     ): void {
         if (!maxLength) return;
 
-        // Remove existing color classes
         countDisplay.classList.remove('text-muted', 'text-warning', 'text-danger');
         textarea.classList.remove('border-warning', 'border-danger', 'focus:border-warning', 'focus:border-danger', 'focus:ring-warning', 'focus:ring-danger');
 
         const percentage = (currentLength / maxLength) * 100;
 
         if (currentLength > maxLength) {
-            // Over limit - error state
             countDisplay.classList.add('text-danger');
             textarea.classList.add('border-danger', 'focus:border-danger', 'focus:ring-danger');
         } else if (percentage >= 90) {
-            // Near limit - warning state
             countDisplay.classList.add('text-warning');
             textarea.classList.add('border-warning', 'focus:border-warning', 'focus:ring-warning');
         } else {
-            // Normal state
             countDisplay.classList.add('text-muted');
         }
     }
@@ -189,7 +166,6 @@ export class TextareaActions extends BaseActionClass {
         const lineHeight = computedStyle.lineHeight;
 
         if (lineHeight === 'normal') {
-            // Estimate normal line height (usually 1.2 * font-size)
             const fontSize = parseFloat(computedStyle.fontSize);
             return fontSize * 1.2;
         }

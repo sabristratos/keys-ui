@@ -57,7 +57,6 @@ export class TableActions extends BaseActionClass<TableState> {
 
         this.setState(table, state);
 
-        // Initialize sort state from current DOM
         const sortedHeader = DOMUtils.querySelector('[data-sorted="true"]', table);
         if (sortedHeader) {
             const column = sortedHeader.getAttribute('data-sort-key') ||
@@ -68,7 +67,6 @@ export class TableActions extends BaseActionClass<TableState> {
             state.sortDirection = direction;
         }
 
-        // Initialize selection state
         this.updateSelectionState(table);
     }
 
@@ -76,23 +74,19 @@ export class TableActions extends BaseActionClass<TableState> {
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Sort header clicks
         EventUtils.handleDelegatedClick('[data-sortable="true"]', (sortHeader, event) => {
             event.preventDefault();
             this.handleSort(sortHeader);
         });
 
-        // Row selection checkboxes
         EventUtils.handleDelegatedChange('[data-table-row-select]', (target) => {
             this.handleRowSelection(target as HTMLInputElement);
         });
 
-        // Select all checkbox
         EventUtils.handleDelegatedChange('[data-table-select-all]', (target) => {
             this.handleSelectAll(target as HTMLInputElement);
         });
 
-        // Keyboard navigation
         EventUtils.handleDelegatedKeydown('[data-table="true"]', (target, event) => {
             this.handleKeyboard(event);
         });
@@ -107,12 +101,10 @@ export class TableActions extends BaseActionClass<TableState> {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as HTMLElement;
 
-                    // Check if the added node is a table
                     if (DOMUtils.hasDataAttribute(element, 'table', 'true')) {
                         this.initializeTable(element);
                     }
 
-                    // Check for tables within the added node
                     DOMUtils.findByDataAttribute('table', 'true', element).forEach(table => {
                         this.initializeTable(table);
                     });
@@ -148,22 +140,18 @@ export class TableActions extends BaseActionClass<TableState> {
         let newDirection: 'asc' | 'desc' | null = 'asc';
 
         if (state.sortColumn === column) {
-            // Toggle existing sort
             if (state.sortDirection === 'asc') {
                 newDirection = 'desc';
             } else if (state.sortDirection === 'desc') {
-                newDirection = null; // Remove sort
+                newDirection = null;
             }
         }
 
-        // Update state
         state.sortColumn = newDirection ? column : null;
         state.sortDirection = newDirection;
 
-        // Update UI
         this.updateSortUI(table, column, newDirection);
 
-        // Dispatch events
         this.dispatchSortEvent(table, {
             column,
             direction: newDirection || 'asc',
@@ -176,13 +164,11 @@ export class TableActions extends BaseActionClass<TableState> {
      * Update sort UI indicators
      */
     private updateSortUI(table: HTMLElement, column: string, direction: 'asc' | 'desc' | null): void {
-        // Clear all sort indicators
         const headers = DOMUtils.querySelectorAll('[data-sortable="true"]', table);
         headers.forEach((header) => {
             header.setAttribute('data-sorted', 'false');
             header.removeAttribute('data-direction');
 
-            // Update icons
             const icons = DOMUtils.querySelectorAll('.table-sort-icon', header);
             icons.forEach(icon => {
                 icon.setAttribute('data-icon', 'heroicon-o-chevron-up-down');
@@ -192,7 +178,6 @@ export class TableActions extends BaseActionClass<TableState> {
         });
 
         if (direction) {
-            // Set active sort indicator
             const activeHeader = table.querySelector(`[data-sort-key="${column}"]`) as HTMLElement;
             if (activeHeader) {
                 activeHeader.setAttribute('data-sorted', 'true');
@@ -248,14 +233,12 @@ export class TableActions extends BaseActionClass<TableState> {
         const rowCheckboxes = DOMUtils.querySelectorAll('[data-table-row-select]', table) as HTMLInputElement[];
 
         if (checkbox.checked) {
-            // Select all
             rowCheckboxes.forEach(cb => {
                 cb.checked = true;
                 const rowId = cb.getAttribute('data-row-id');
                 if (rowId) state.selectedRows.add(rowId);
             });
         } else {
-            // Deselect all
             rowCheckboxes.forEach(cb => {
                 cb.checked = false;
                 const rowId = cb.getAttribute('data-row-id');
@@ -280,7 +263,6 @@ export class TableActions extends BaseActionClass<TableState> {
         const totalRows = rowCheckboxes.length;
         const selectedCount = state.selectedRows.size;
 
-        // Update select all state
         if (selectedCount === 0) {
             state.selectAllState = 'none';
             if (selectAllCheckbox) {
@@ -301,7 +283,6 @@ export class TableActions extends BaseActionClass<TableState> {
             }
         }
 
-        // Update row states
         const rows = DOMUtils.querySelectorAll('[data-table-row]', table);
         rows.forEach(row => {
             const rowId = row.getAttribute('data-row-id');
@@ -323,13 +304,11 @@ export class TableActions extends BaseActionClass<TableState> {
     private handleKeyboard(e: KeyboardEvent): void {
         const target = e.target as HTMLElement;
 
-        // Space to toggle checkboxes
         if (e.key === ' ' && target.matches('[data-sortable="true"]')) {
             e.preventDefault();
             this.handleSort(target);
         }
 
-        // Enter to trigger sort
         if (e.key === 'Enter' && target.matches('[data-sortable="true"]')) {
             e.preventDefault();
             this.handleSort(target);
@@ -345,7 +324,6 @@ export class TableActions extends BaseActionClass<TableState> {
             cancelable: true
         });
 
-        // Livewire integration
         if (config.livewireMethod && window.Livewire) {
             const wireId = table.getAttribute('wire:id');
             if (wireId) {
@@ -366,7 +344,6 @@ export class TableActions extends BaseActionClass<TableState> {
             cancelable: true
         });
 
-        // Livewire integration
         const livewireMethod = table.getAttribute('data-selection-method');
         if (livewireMethod && window.Livewire) {
             const wireId = table.getAttribute('wire:id');
@@ -411,12 +388,9 @@ export class TableActions extends BaseActionClass<TableState> {
      * Clean up TableActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // TableActions doesn't have additional cleanup beyond base class
-        // Event listeners and observers are automatically cleaned up
     }
 }
 
-// Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         TableActions.getInstance().init();
@@ -425,7 +399,6 @@ if (document.readyState === 'loading') {
     TableActions.getInstance().init();
 }
 
-// Export for global access
 (window as any).TableActions = TableActions;
 
 declare global {

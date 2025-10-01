@@ -2,158 +2,203 @@
     $slotContent = $slot->toHtml();
     $isIconOnly = $isIconOnly($slotContent);
     $hasContent = !empty(trim(strip_tags($slotContent))) || !empty($icon);
+
+    $containerClasses = 'flex items-center';
+    if ($orientation === 'vertical') {
+        $containerClasses = 'flex flex-col justify-center';
+    }
+
+    if ($orientation === 'vertical') {
+        $spacingClasses = match ($spacing) {
+            'none' => 'h-0',
+            'xs' => 'h-4',
+            'sm' => 'h-6',
+            'md' => 'h-8',
+            'lg' => 'h-12',
+            'xl' => 'h-16',
+            default => 'h-8'
+        };
+    } else {
+        $spacingClasses = match ($spacing) {
+            'none' => 'my-0',
+            'xs' => 'my-2',
+            'sm' => 'my-3',
+            'md' => 'my-4',
+            'lg' => 'my-6',
+            'xl' => 'my-8',
+            default => 'my-4'
+        };
+    }
+
+    $lineBaseClasses = $orientation === 'vertical' ? 'h-full' : 'flex-1';
+
+    if ($orientation === 'vertical') {
+        $lineSizeClasses = match ($size) {
+            'xs' => 'border-l',
+            'sm' => 'border-l-2',
+            'md' => 'border-l-4',
+            'lg' => 'border-l-8',
+            default => 'border-l-2'
+        };
+    } else {
+        $lineSizeClasses = match ($size) {
+            'xs' => 'border-t',
+            'sm' => 'border-t-2',
+            'md' => 'border-t-4',
+            'lg' => 'border-t-8',
+            default => 'border-t-2'
+        };
+    }
+
+    $lineColorClasses = match ($color) {
+        'brand' => 'border-brand',
+        'success' => 'border-success',
+        'warning' => 'border-warning',
+        'danger' => 'border-danger',
+        'neutral' => 'border-border',
+        'blue' => 'border-blue-500',
+        'gray' => 'border-neutral-400',
+        'red' => 'border-red-500',
+        'green' => 'border-green-500',
+        'yellow' => 'border-yellow-500',
+        'indigo' => 'border-indigo-500',
+        'purple' => 'border-purple-500',
+        'pink' => 'border-pink-500',
+        default => 'border-border'
+    };
+
+    if ($variant === 'dashed') {
+        $lineClasses = $orientation === 'vertical'
+            ? "$lineBaseClasses border-l border-dashed $lineSizeClasses $lineColorClasses"
+            : "$lineBaseClasses border-t border-dashed $lineSizeClasses $lineColorClasses";
+    } else {
+        $lineClasses = $orientation === 'vertical'
+            ? "$lineBaseClasses border-l $lineSizeClasses $lineColorClasses"
+            : "$lineBaseClasses border-t $lineSizeClasses $lineColorClasses";
+    }
+
+    $gradientDirection = $orientation === 'vertical' ? 'bg-gradient-to-b' : 'bg-gradient-to-r';
+    $gradientColors = match ($color) {
+        'brand' => 'from-transparent via-brand to-transparent',
+        'success' => 'from-transparent via-success to-transparent',
+        'warning' => 'from-transparent via-warning to-transparent',
+        'danger' => 'from-transparent via-danger to-transparent',
+        'neutral' => 'from-transparent via-border to-transparent',
+        'blue' => 'from-transparent via-blue-500 to-transparent',
+        'gray' => 'from-transparent via-neutral-400 to-transparent',
+        'red' => 'from-transparent via-red-500 to-transparent',
+        'green' => 'from-transparent via-green-500 to-transparent',
+        'yellow' => 'from-transparent via-yellow-500 to-transparent',
+        'indigo' => 'from-transparent via-indigo-500 to-transparent',
+        'purple' => 'from-transparent via-purple-500 to-transparent',
+        'pink' => 'from-transparent via-pink-500 to-transparent',
+        default => 'from-transparent via-border to-transparent'
+    };
+
+    if ($orientation === 'vertical') {
+        $gradientSizeClasses = match ($size) {
+            'xs' => 'w-px h-full',
+            'sm' => 'w-0.5 h-full',
+            'md' => 'w-1 h-full',
+            'lg' => 'w-2 h-full',
+            default => 'w-0.5 h-full'
+        };
+    } else {
+        $gradientSizeClasses = match ($size) {
+            'xs' => 'h-px w-full',
+            'sm' => 'h-0.5 w-full',
+            'md' => 'h-1 w-full',
+            'lg' => 'h-2 w-full',
+            default => 'h-0.5 w-full'
+        };
+    }
+    $gradientClasses = "$gradientDirection $gradientColors $gradientSizeClasses";
+
+    $contentSizeClasses = match ($size) {
+        'xs' => 'text-xs px-2',
+        'sm' => 'text-sm px-3',
+        'md' => 'text-base px-4',
+        'lg' => 'text-lg px-5',
+        default => 'text-sm px-3'
+    };
+    $contentClasses = "bg-body px-3 text-foreground/60 $contentSizeClasses";
+
+    $iconSize = match ($size) {
+        'xs' => 'xs',
+        'sm' => 'sm',
+        'md' => 'md',
+        'lg' => 'lg',
+        default => 'sm'
+    };
+
+    $iconColorClasses = match ($color) {
+        'brand' => 'text-brand',
+        'success' => 'text-success',
+        'warning' => 'text-warning',
+        'danger' => 'text-danger',
+        'neutral' => 'text-foreground/60',
+        'blue' => 'text-blue-500',
+        'gray' => 'text-neutral-400',
+        'red' => 'text-red-500',
+        'green' => 'text-green-500',
+        'yellow' => 'text-yellow-500',
+        'indigo' => 'text-indigo-500',
+        'purple' => 'text-purple-500',
+        'pink' => 'text-pink-500',
+        default => 'text-foreground/60'
+    };
+
+    if ($orientation === 'vertical') {
+        $justifyClasses = match ($alignment) {
+            'left' => 'justify-start',
+            'center' => 'justify-center',
+            'right' => 'justify-end',
+            default => 'justify-center'
+        };
+    } else {
+        $justifyClasses = 'justify-center';
+    }
 @endphp
 
-<div {{ $attributes->merge(['class' => $containerClasses()]) }} role="separator"
+<div {{ $attributes->merge(['class' => "$containerClasses $spacingClasses"])->merge($dataAttributes) }}
+     role="separator"
      @if($orientation === 'vertical') aria-orientation="vertical" @endif>
 
     @if($variant === 'gradient')
-        {{-- Gradient separator --}}
-        <div class="{{ $gradientClasses() }}"></div>
+        
+        <div class="{{ $gradientClasses }}"></div>
 
     @elseif($variant === 'line' || $variant === 'dashed')
-        {{-- Simple line or dashed separator --}}
-        <div class="{{ $lineClasses() }}"></div>
+        
+        <div class="{{ $lineClasses }}"></div>
 
     @elseif(($variant === 'text' || $variant === 'icon') && $hasContent)
-        {{-- Text or icon separator with content --}}
+        
         @if($orientation === 'horizontal')
-            <div class="{{ $lineClasses() }}"></div>
-            <div class="{{ $contentClasses() }} {{ $justifyClasses() }}">
+            <div class="{{ $lineClasses }}"></div>
+            <div class="{{ $contentClasses }} {{ $justifyClasses }}">
                 @if($variant === 'icon' && $icon)
-                    <x-keys::icon :name="$icon" :size="$iconSize()" class="{{ $iconColorClasses() }}" />
+                    <x-keys::icon :name="$icon" :size="$iconSize" class="{{ $iconColorClasses }}" />
                 @elseif($variant === 'text' && !$isIconOnly)
                     {{ $slot }}
                 @endif
             </div>
-            <div class="{{ $lineClasses() }}"></div>
+            <div class="{{ $lineClasses }}"></div>
         @else
-            {{-- Vertical orientation --}}
-            <div class="{{ $lineClasses() }}"></div>
-            <div class="{{ $contentClasses() }} {{ $justifyClasses() }} py-2">
+            
+            <div class="{{ $lineClasses }}"></div>
+            <div class="{{ $contentClasses }} {{ $justifyClasses }} py-2">
                 @if($variant === 'icon' && $icon)
-                    <x-keys::icon :name="$icon" :size="$iconSize()" class="{{ $iconColorClasses() }}" />
+                    <x-keys::icon :name="$icon" :size="$iconSize" class="{{ $iconColorClasses }}" />
                 @elseif($variant === 'text' && !$isIconOnly)
                     <span class="writing-mode-vertical-rl text-orientation-mixed">{{ $slot }}</span>
                 @endif
             </div>
-            <div class="{{ $lineClasses() }}"></div>
+            <div class="{{ $lineClasses }}"></div>
         @endif
 
     @else
-        {{-- Fallback to simple line --}}
-        <div class="{{ $lineClasses() }}"></div>
+        
+        <div class="{{ $lineClasses }}"></div>
     @endif
 </div>
-
-<style>
-    /* Vertical text orientation for text separators */
-    .writing-mode-vertical-rl {
-        writing-mode: vertical-rl;
-    }
-
-    .text-orientation-mixed {
-        text-orientation: mixed;
-    }
-
-    /* Enhanced dashed line styles */
-    [data-separator="dashed"] .border-dashed {
-        border-style: dashed;
-        border-width: 1px;
-    }
-
-    /* Gradient separator enhancements */
-    [data-separator="gradient"] {
-        position: relative;
-    }
-
-    /* Hover effects for interactive separators */
-    [data-separator="text"]:hover .separator-content,
-    [data-separator="icon"]:hover .separator-content {
-        transition: all 0.2s ease-in-out;
-        transform: scale(1.05);
-    }
-
-    /* Focus styles for accessibility */
-    [role="separator"]:focus-within {
-        outline: 2px solid var(--color-brand);
-        outline-offset: 2px;
-        border-radius: 4px;
-    }
-
-    /* Dark mode specific adjustments */
-    .dark [data-separator] .separator-content {
-        background-color: var(--color-body);
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 640px) {
-        [data-separator="text"] .separator-content,
-        [data-separator="icon"] .separator-content {
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-        }
-    }
-
-    /* Animation for gradient separators */
-    [data-separator="gradient"] .gradient-line {
-        background-size: 200% 200%;
-        animation: gradient-shift 3s ease-in-out infinite;
-    }
-
-    @keyframes gradient-shift {
-        0%, 100% {
-            background-position: 0% 50%;
-        }
-        50% {
-            background-position: 100% 50%;
-        }
-    }
-
-    /* Enhanced border styles for different sizes */
-    .border-t-2 {
-        border-top-width: 2px;
-    }
-
-    .border-t-4 {
-        border-top-width: 4px;
-    }
-
-    .border-t-8 {
-        border-top-width: 8px;
-    }
-
-    .border-l-2 {
-        border-left-width: 2px;
-    }
-
-    .border-l-4 {
-        border-left-width: 4px;
-    }
-
-    .border-l-8 {
-        border-left-width: 8px;
-    }
-</style>
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add data attributes for CSS targeting
-    document.querySelectorAll('[role="separator"]').forEach(separator => {
-        const classes = separator.className;
-
-        if (classes.includes('border-dashed')) {
-            separator.setAttribute('data-separator', 'dashed');
-        } else if (classes.includes('bg-gradient')) {
-            separator.setAttribute('data-separator', 'gradient');
-        } else if (separator.querySelector('.separator-content')) {
-            const hasIcon = separator.querySelector('svg');
-            separator.setAttribute('data-separator', hasIcon ? 'icon' : 'text');
-        } else {
-            separator.setAttribute('data-separator', 'line');
-        }
-    });
-});
-</script>
-@endpush

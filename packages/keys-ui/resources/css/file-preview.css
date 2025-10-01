@@ -1,0 +1,41 @@
+/*
+ * Keys UI File Preview Component CSS
+ * File preview item states and progress animations
+ * Complex hover effects and state-specific styling
+ */
+
+@layer components {
+    /* ===== FILE PREVIEW ITEM COMPONENT ===== */
+    /* Hover scale effect for thumbnails */
+    .file-preview-item:hover .file-preview-thumbnail {
+        transform: scale(var(--scale-up-md));
+        transition: transform 0.2s ease;
+    }
+
+    /* State-specific styling with semantic colors */
+    .file-preview-item.upload-success {
+        border-color: var(--color-success);
+        background-color: color-mix(in srgb, var(--color-success) 5%, transparent);
+    }
+
+    .file-preview-item.upload-error {
+        border-color: var(--color-danger);
+        background-color: color-mix(in srgb, var(--color-danger) 5%, transparent);
+    }
+
+    .file-preview-item.uploading {
+        border-color: var(--color-brand);
+        background-color: color-mix(in srgb, var(--color-brand) 5%, transparent);
+    }
+
+    /* Progress bar animation - Custom keyframe */
+    @keyframes progress {
+        0% {
+            width: 0%;
+        }
+    }
+
+    .file-preview-item [data-progress-bar] {
+        animation: progress 0.3s ease-out;
+    }
+}

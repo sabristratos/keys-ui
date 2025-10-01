@@ -10,23 +10,23 @@ trait HasRTLSupport
     protected function getLogicalClass(string $property, string $value): string
     {
         $logicalMap = [
-            // Margin classes
-            'ml' => 'ms',  // margin-left -> margin-start
-            'mr' => 'me',  // margin-right -> margin-end
+            
+            'ml' => 'ms',  
+            'mr' => 'me',  
 
-            // Padding classes
-            'pl' => 'ps',  // padding-left -> padding-start
-            'pr' => 'pe',  // padding-right -> padding-end
+            
+            'pl' => 'ps',  
+            'pr' => 'pe',  
 
-            // Border classes
-            'border-l' => 'border-s',  // border-left -> border-start
-            'border-r' => 'border-e',  // border-right -> border-end
+            
+            'border-l' => 'border-s',  
+            'border-r' => 'border-e',  
 
-            // Positioning classes
+            
             'left' => 'start',
             'right' => 'end',
 
-            // Border radius classes
+            
             'rounded-l' => 'rounded-s',
             'rounded-r' => 'rounded-e',
             'rounded-tl' => 'rounded-ss',
@@ -34,7 +34,7 @@ trait HasRTLSupport
             'rounded-bl' => 'rounded-es',
             'rounded-br' => 'rounded-ee',
 
-            // Text alignment
+            
             'text-left' => 'text-start',
             'text-right' => 'text-end',
         ];
@@ -50,15 +50,15 @@ trait HasRTLSupport
     protected function convertToLogicalClasses(string $classes): string
     {
         $patterns = [
-            // Match margin/padding classes like ml-4, mr-2, etc.
+            
             '/\b(ml|mr|pl|pr)-([a-zA-Z0-9.\[\]\/%-]+)\b/',
-            // Match positioning classes like left-4, right-2, etc.
+            
             '/\b(left|right)-([a-zA-Z0-9.\[\]\/%-]+)\b/',
-            // Match border classes
+            
             '/\b(border-l|border-r)-([a-zA-Z0-9.\[\]\/%-]+)\b/',
-            // Match rounded classes
+            
             '/\b(rounded-[lr]|rounded-[tb][lr])-([a-zA-Z0-9.\[\]\/%-]+)\b/',
-            // Match text alignment
+            
             '/\b(text-left|text-right)\b/',
         ];
 
@@ -97,7 +97,7 @@ trait HasRTLSupport
     protected function getRTLFlexDirection(string $direction = 'row'): string
     {
         return match ($direction) {
-            'row' => 'flex-row', // Will be handled by CSS for RTL
+            'row' => 'flex-row', 
             'row-reverse' => 'flex-row-reverse',
             'col' => 'flex-col',
             'col-reverse' => 'flex-col-reverse',
@@ -111,7 +111,7 @@ trait HasRTLSupport
     protected function getRTLJustification(string $justify = 'start'): string
     {
         return match ($justify) {
-            'start' => 'justify-start', // CSS will handle RTL conversion
+            'start' => 'justify-start', 
             'end' => 'justify-end',
             'center' => 'justify-center',
             'between' => 'justify-between',
@@ -143,7 +143,7 @@ trait HasRTLSupport
     {
         $locale = app()->getLocale();
 
-        // Common RTL language codes
+        
         $rtlLocales = [
             'ar', 'he', 'fa', 'ur', 'ps', 'sd', 'ug', 'yi',
             'arc', 'ckb', 'dv', 'ha', 'ji', 'ku', 'ks', 'ms',

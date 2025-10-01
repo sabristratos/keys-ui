@@ -30,13 +30,13 @@ class Popover extends Component
         $this->id = $id ?? 'popover-'.uniqid();
         $this->variant = $variant;
 
-        // Validate size
+        
         if (! in_array($size, ComponentConstants::SIZES)) {
             $size = ComponentConstants::getDefaultSize();
         }
         $this->size = $size;
 
-        // Validate placement
+        
         if (! in_array($placement, ComponentConstants::POPOVER_PLACEMENTS)) {
             $placement = 'bottom';
         }
@@ -48,7 +48,7 @@ class Popover extends Component
 
     public function getBaseClasses(): string
     {
-        return 'keys-popover hidden absolute z-[2000] m-0 p-0 border-0 bg-transparent text-inherit';
+        return 'keys-popover z-[2000] m-0 p-0 border-0 bg-transparent text-inherit';
     }
 
     public function getContentClasses(): string
@@ -87,18 +87,12 @@ class Popover extends Component
         return trim($base.' '.$variantClasses);
     }
 
-    public function getTriggerClasses(): string
-    {
-        return 'keys-popover-trigger cursor-pointer focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2';
-    }
-
     public function render()
     {
         return view('keys::components.popover', [
             'baseClasses' => $this->getBaseClasses(),
             'contentClasses' => $this->getContentClasses(),
             'arrowClasses' => $this->getArrowClasses(),
-            'triggerClasses' => $this->getTriggerClasses(),
         ]);
     }
 }

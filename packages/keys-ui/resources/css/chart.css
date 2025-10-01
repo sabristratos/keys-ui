@@ -1,0 +1,240 @@
+@layer components {
+  :root {
+    --chart-color-1: var(--color-brand-500);
+    --chart-color-2: var(--color-info-500);
+    --chart-color-3: var(--color-success-500);
+    --chart-color-4: var(--color-warning-500);
+    --chart-color-5: var(--color-danger-500);
+    --chart-color-6: var(--color-neutral-500);
+    --chart-color-7: var(--color-info-400);
+    --chart-color-8: var(--color-success-400);
+    --chart-color-1-hover: var(--color-brand-600);
+    --chart-color-2-hover: var(--color-info-600);
+    --chart-color-3-hover: var(--color-success-600);
+    --chart-color-4-hover: var(--color-warning-600);
+    --chart-color-5-hover: var(--color-danger-600);
+    --chart-color-6-hover: var(--color-neutral-600);
+    --chart-color-7-hover: var(--color-info-500);
+    --chart-color-8-hover: var(--color-success-500);
+
+    --chart-grid-color: light-dark(var(--color-neutral-200), var(--color-neutral-700));
+    --chart-axis-color: light-dark(var(--color-neutral-400), var(--color-neutral-600));
+    --chart-text-color: light-dark(var(--color-neutral-700), var(--color-neutral-300));
+    --chart-title-color: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+  }
+
+  .chart-tooltip {
+    background-color: light-dark(var(--color-neutral-700), var(--color-neutral-800));
+    color: light-dark(var(--color-neutral-50), var(--color-neutral-100));
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: var(--z-tooltip);
+  }
+
+  [data-keys-chart="true"] {
+    color: var(--chart-text-color);
+  }
+
+  [data-keys-chart="true"] svg {
+    color: var(--chart-text-color);
+  }
+  .chart-bar-1 { fill: var(--chart-color-1); }
+  .chart-bar-2 { fill: var(--chart-color-2); }
+  .chart-bar-3 { fill: var(--chart-color-3); }
+  .chart-bar-4 { fill: var(--chart-color-4); }
+  .chart-bar-5 { fill: var(--chart-color-5); }
+  .chart-bar-6 { fill: var(--chart-color-6); }
+  .chart-bar-7 { fill: var(--chart-color-7); }
+  .chart-bar-8 { fill: var(--chart-color-8); }
+
+  .chart-bar-1:hover { fill: var(--chart-color-1-hover); }
+  .chart-bar-2:hover { fill: var(--chart-color-2-hover); }
+  .chart-bar-3:hover { fill: var(--chart-color-3-hover); }
+  .chart-bar-4:hover { fill: var(--chart-color-4-hover); }
+  .chart-bar-5:hover { fill: var(--chart-color-5-hover); }
+  .chart-bar-6:hover { fill: var(--chart-color-6-hover); }
+  .chart-bar-7:hover { fill: var(--chart-color-7-hover); }
+  .chart-bar-8:hover { fill: var(--chart-color-8-hover); }
+
+  [data-chart-item="true"] {
+    cursor: pointer;
+    transition: fill 0.2s ease, opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+    outline: none;
+  }
+
+  [data-keys-chart][data-chart-type="bar"] .chart-bar {
+    animation: chartBarGrow 0.8s ease-out forwards;
+    transform-origin: bottom;
+    transform: scaleY(0);
+  }
+
+  @keyframes chartBarGrow {
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  [data-chart-item="true"]:focus-visible:not(:active) {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  .chart-grid {
+    stroke: var(--chart-grid-color);
+    stroke-width: 1;
+    opacity: 0.3;
+  }
+
+  .chart-axis {
+    stroke: var(--chart-axis-color);
+    stroke-width: 2;
+  }
+
+  .chart-text {
+    fill: var(--chart-text-color);
+  }
+
+  .chart-title {
+    color: var(--chart-title-color);
+  }
+
+  .text-muted {
+    fill: var(--color-muted);
+  }
+
+  .chart-legend-1 { background-color: var(--chart-color-1); }
+  .chart-legend-2 { background-color: var(--chart-color-2); }
+  .chart-legend-3 { background-color: var(--chart-color-3); }
+  .chart-legend-4 { background-color: var(--chart-color-4); }
+  .chart-legend-5 { background-color: var(--chart-color-5); }
+  .chart-legend-6 { background-color: var(--chart-color-6); }
+  .chart-legend-7 { background-color: var(--chart-color-7); }
+  .chart-legend-8 { background-color: var(--chart-color-8); }
+
+  .chart-pie-slice {
+    stroke: light-dark(var(--color-neutral-50), var(--color-neutral-900));
+    stroke-width: 2;
+    outline: none;
+  }
+
+  .chart-pie-slice:hover {
+    opacity: 0.9;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  }
+
+  .chart-pie-slice:focus-visible:not(:active) {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 4px;
+  }
+
+  [data-keys-chart][data-chart-type="pie"] .chart-pie-slice {
+    animation: pieFadeIn 0.8s ease-out forwards;
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  @keyframes pieFadeIn {
+    0% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    60% {
+      transform: scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .chart-line {
+    stroke: var(--chart-color-1);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke-width 0.2s ease;
+  }
+
+  .chart-line-1 { stroke: var(--chart-color-1); }
+  .chart-line-2 { stroke: var(--chart-color-2); }
+  .chart-line-3 { stroke: var(--chart-color-3); }
+  .chart-line-4 { stroke: var(--chart-color-4); }
+  .chart-line-5 { stroke: var(--chart-color-5); }
+  .chart-line-6 { stroke: var(--chart-color-6); }
+  .chart-line-7 { stroke: var(--chart-color-7); }
+  .chart-line-8 { stroke: var(--chart-color-8); }
+
+  @keyframes lineDrawIn {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .chart-data-point {
+    stroke: light-dark(white, var(--color-neutral-900));
+    stroke-width: 2;
+    transition: r 0.2s ease, stroke-width 0.2s ease;
+  }
+
+  .chart-data-point:hover {
+    r: 7 !important;
+    stroke-width: 3;
+  }
+
+  [data-keys-chart][data-chart-type="line"] .chart-data-point,
+  [data-keys-chart][data-chart-type="area"] .chart-data-point {
+    animation: pointFadeIn 0.4s ease-out forwards;
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  @keyframes pointFadeIn {
+    0% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    60% {
+      transform: scale(1.2);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .chart-area-fill {
+    opacity: 0.2;
+    transition: opacity 0.2s ease;
+  }
+
+  .chart-sparkline {
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .chart-sparkline-point {
+    stroke: light-dark(white, var(--color-neutral-900));
+    stroke-width: 1;
+  }
+
+  .chart-sparkline-bar {
+    transition: opacity 0.2s ease;
+  }
+
+  .chart-sparkline-bar:hover {
+    opacity: 0.8;
+  }
+
+  .chart-sparkline-dot {
+    stroke: light-dark(white, var(--color-neutral-900));
+    stroke-width: 1;
+  }
+
+  .chart-sparkline-area {
+    opacity: 0.3;
+  }
+
+  [data-keys-chart][data-chart-type="sparkline"] {
+    display: inline-block;
+  }
+}

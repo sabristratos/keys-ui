@@ -31,11 +31,12 @@ class Button extends Component
      * @param  string|null  $iconSuccess  Icon for success state (multi-state)
      * @param  string|null  $labelToggle  Label for toggle state (multi-state)
      * @param  string|null  $labelSuccess  Label for success state (multi-state)
+     * @param  string|null  $popovertarget  ID of popover element to control
      */
     public function __construct(
         public string $variant = 'brand',
         public string $size = 'md',
-        public ?string $type = null,
+        public string $type = 'button',
         public ?string $href = null,
         public bool $disabled = false,
         public bool $loading = false,
@@ -46,7 +47,8 @@ class Button extends Component
         public ?string $iconToggle = null,
         public ?string $iconSuccess = null,
         public ?string $labelToggle = null,
-        public ?string $labelSuccess = null
+        public ?string $labelSuccess = null,
+        public ?string $popovertarget = null
     ) {
         if ($this->icon && ! $this->iconLeft) {
             $this->iconLeft = $this->icon;
@@ -198,6 +200,9 @@ class Button extends Component
             'isLink' => $this->isLink(),
             'isMultiState' => $this->isMultiState(),
             'dataAttributes' => $this->getDataAttributes(),
+            'getDataAttributesForSlot' => function($slotContent) {
+                return $this->getDataAttributesForSlot($slotContent);
+            },
         ]);
     }
 }

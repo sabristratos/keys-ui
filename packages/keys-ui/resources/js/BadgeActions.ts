@@ -21,21 +21,17 @@ export class BadgeActions extends BaseActionClass {
      * Initialize badge elements - required by BaseActionClass
      */
     protected initializeElements(): void {
-        // BadgeActions doesn't need to initialize specific elements on load
-        // Actions are handled via event delegation
     }
 
     /**
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Handle dismiss button clicks
         EventUtils.handleDelegatedClick('[data-dismiss-target]', (button, event) => {
             event.preventDefault();
             this.handleDismissClick(button as HTMLButtonElement);
         });
 
-        // Handle dismiss button keyboard activation
         EventUtils.handleDelegatedKeydown('[data-dismiss-target]', (button, event) => {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
@@ -62,7 +58,6 @@ export class BadgeActions extends BaseActionClass {
         const target = button.getAttribute('data-dismiss-target');
         if (!target) return null;
 
-        // Remove the # if present
         const targetId = target.startsWith('#') ? target.slice(1) : target;
         return DOMUtils.querySelector(`#${targetId}`);
     }
@@ -73,12 +68,10 @@ export class BadgeActions extends BaseActionClass {
     public dismissBadge(badge: HTMLElement): void {
         badge.classList.add('badge-dismissing');
 
-        // Combine scale and fade out animation
         badge.style.transition = 'all 250ms ease-out';
         badge.style.transform = 'scale(0.8)';
         badge.style.opacity = '0';
 
-        // Remove from DOM after animation
         setTimeout(() => {
             if (badge.parentNode) {
                 badge.parentNode.removeChild(badge);
@@ -94,7 +87,6 @@ export class BadgeActions extends BaseActionClass {
         badge.style.opacity = '0';
         badge.style.transform = 'scale(0.8)';
 
-        // Small delay then show with animation
         setTimeout(() => {
             badge.style.transition = 'all 250ms ease-out';
             badge.style.opacity = '1';
@@ -146,11 +138,9 @@ export class BadgeActions extends BaseActionClass {
 
         container.appendChild(badge);
 
-        // Initial hidden state
         badge.style.opacity = '0';
         badge.style.transform = 'scale(0.8)';
 
-        // Small delay then show
         setTimeout(() => {
             this.showBadge(badge);
         }, 10);
@@ -251,7 +241,6 @@ export class BadgeActions extends BaseActionClass {
             action
         } as BadgeActionEvent);
 
-        // Also dispatch on document for global listeners
         EventUtils.dispatchCustomEvent(document.body, 'badge-action', {
             badge,
             action
@@ -297,8 +286,6 @@ export class BadgeActions extends BaseActionClass {
      * Clean up BadgeActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // BadgeActions doesn't have additional cleanup beyond base class
-        // Event listeners are automatically cleaned up by browser
     }
 }
 

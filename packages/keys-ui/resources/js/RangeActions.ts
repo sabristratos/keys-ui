@@ -79,13 +79,12 @@ export class RangeActions extends BaseActionClass<RangeData> {
      */
     private initializeRange(container: HTMLElement): void {
         if (this.hasState(container)) {
-            return; // Already initialized
+            return;
         }
 
         const track = DOMUtils.querySelector('.range-track', container) as HTMLElement;
         if (!track) return;
 
-        // Parse configuration
         const config: RangeConfig = {
             min: parseFloat(track.dataset.min || '0'),
             max: parseFloat(track.dataset.max || '100'),
@@ -95,11 +94,9 @@ export class RangeActions extends BaseActionClass<RangeData> {
             disabled: track.dataset.disabled === 'true'
         };
 
-        // Get elements
         const elements = this.getElements(container, config);
         if (!elements.track) return;
 
-        // Initialize state
         const state: RangeState = {
             minValue: config.dual ? parseFloat(elements.inputs.min?.value || config.min.toString()) : config.min,
             maxValue: config.dual ? parseFloat(elements.inputs.max?.value || config.max.toString()) : config.max,
@@ -110,7 +107,6 @@ export class RangeActions extends BaseActionClass<RangeData> {
 
         this.setState(container, { config, state, elements });
 
-        // Set up handle interactions if not disabled
         if (!config.disabled) {
             this.setupHandleInteractions(container, elements);
         }
@@ -161,25 +157,19 @@ export class RangeActions extends BaseActionClass<RangeData> {
     private setupHandleInteractions(container: HTMLElement, elements: RangeElements): void {
         const { handles } = elements;
 
-        // Set up each handle
         Object.entries(handles).forEach(([handleType, handle]) => {
             if (!handle) return;
 
-            // Mouse events
             handle.addEventListener('mousedown', (e) => this.handleStart(e, container, handleType as any));
 
-            // Touch events
             handle.addEventListener('touchstart', (e) => this.handleStart(e, container, handleType as any), { passive: false });
 
-            // Keyboard events
             handle.addEventListener('keydown', (e) => this.handleKeydown(e, container, handleType as any));
 
-            // Focus events for accessibility
             handle.addEventListener('focus', () => this.handleFocus(container, handleType as any));
             handle.addEventListener('blur', () => this.handleBlur(container, handleType as any));
         });
 
-        // Track click for jumping to position
         elements.track.addEventListener('click', (e) => this.handleTrackClick(e, container));
     }
 
@@ -187,11 +177,9 @@ export class RangeActions extends BaseActionClass<RangeData> {
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Global mouse events for dragging
         EventUtils.addEventListener(document, 'mousemove', (e) => this.handleMove(e as MouseEvent));
         EventUtils.addEventListener(document, 'mouseup', (e) => this.handleEnd(e as MouseEvent));
 
-        // Global touch events for dragging
         EventUtils.addEventListener(document, 'touchmove', (e) => this.handleMove(e as TouchEvent), { passive: false });
         EventUtils.addEventListener(document, 'touchend', (e) => this.handleEnd(e as TouchEvent));
         EventUtils.addEventListener(document, 'touchcancel', (e) => this.handleEnd(e as TouchEvent));
@@ -206,12 +194,10 @@ export class RangeActions extends BaseActionClass<RangeData> {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as HTMLElement;
 
-                    // Check if the added node is a range
                     if (DOMUtils.hasDataAttribute(element, 'range', 'true')) {
                         this.initializeRange(element);
                     }
 
-                    // Check for ranges within the added node
                     DOMUtils.findByDataAttribute('range', 'true', element).forEach(range => {
                         this.initializeRange(range);
                     });
@@ -238,7 +224,6 @@ export class RangeActions extends BaseActionClass<RangeData> {
             handle.focus();
         }
 
-        // Add dragging class to container for smooth fill tracking
         container.classList.add('dragging');
 
         document.body.style.userSelect = 'none';
@@ -281,13 +266,11 @@ export class RangeActions extends BaseActionClass<RangeData> {
             handle.classList.remove('dragging');
         }
 
-        // Remove dragging class from container to re-enable smooth transitions
         container.classList.remove('dragging');
 
         rangeData.state.activeHandle = null;
         document.body.style.userSelect = '';
 
-        // Dispatch change event
         this.dispatchChangeEvent(container);
     }
 
@@ -357,7 +340,6 @@ export class RangeActions extends BaseActionClass<RangeData> {
         newValue = this.snapToTickIfNeeded(newValue, config);
 
         if (config.dual) {
-            // Determine which handle to move based on proximity
             const distToMin = Math.abs(newValue - state.minValue);
             const distToMax = Math.abs(newValue - state.maxValue);
             const handleType = distToMin <= distToMax ? 'min' : 'max';
@@ -378,7 +360,6 @@ export class RangeActions extends BaseActionClass<RangeData> {
 
         const { config, state, elements } = rangeData;
 
-        // Constrain dual range values
         if (config.dual) {
             if (handleType === 'min') {
                 newValue = Math.min(newValue, state.maxValue);
@@ -391,13 +372,10 @@ export class RangeActions extends BaseActionClass<RangeData> {
             state.singleValue = newValue;
         }
 
-        // Update visual elements
         this.updateVisualElements(container);
 
-        // Update form inputs
         this.updateFormInputs(container);
 
-        // Dispatch input events for real-time updates
         this.dispatchInputEvent(container);
     }
 
@@ -414,7 +392,6 @@ export class RangeActions extends BaseActionClass<RangeData> {
             const minPercent = this.valueToPercentage(state.minValue, config);
             const maxPercent = this.valueToPercentage(state.maxValue, config);
 
-            // Update handles
             if (elements.handles.min) {
                 elements.handles.min.style.left = `${minPercent}%`;
                 elements.handles.min.setAttribute('aria-valuenow', state.minValue.toString());
@@ -426,11 +403,9 @@ export class RangeActions extends BaseActionClass<RangeData> {
                 elements.handles.max.setAttribute('aria-valuetext', state.maxValue.toString());
             }
 
-            // Update fill
             elements.fill.style.left = `${minPercent}%`;
             elements.fill.style.width = `${maxPercent - minPercent}%`;
 
-            // Update value displays
             if (elements.valueDisplays.min) {
                 elements.valueDisplays.min.textContent = state.minValue.toString();
             }
@@ -440,17 +415,14 @@ export class RangeActions extends BaseActionClass<RangeData> {
         } else {
             const percent = this.valueToPercentage(state.singleValue, config);
 
-            // Update handle
             if (elements.handles.single) {
                 elements.handles.single.style.left = `${percent}%`;
                 elements.handles.single.setAttribute('aria-valuenow', state.singleValue.toString());
                 elements.handles.single.setAttribute('aria-valuetext', state.singleValue.toString());
             }
 
-            // Update fill
             elements.fill.style.width = `${percent}%`;
 
-            // Update value display
             if (elements.valueDisplays.single) {
                 elements.valueDisplays.single.textContent = state.singleValue.toString();
             }
@@ -484,10 +456,8 @@ export class RangeActions extends BaseActionClass<RangeData> {
         const range = config.max - config.min;
         let value = config.min + (percentage * range);
 
-        // Round to step
         value = Math.round(value / config.step) * config.step;
 
-        // Clamp to bounds
         return Math.max(config.min, Math.min(config.max, value));
     }
 
@@ -524,14 +494,12 @@ export class RangeActions extends BaseActionClass<RangeData> {
      * Handle focus events
      */
     private handleFocus(container: HTMLElement, handleType: 'min' | 'max' | 'single'): void {
-        // Could add visual focus feedback here if needed
     }
 
     /**
      * Handle blur events
      */
     private handleBlur(container: HTMLElement, handleType: 'min' | 'max' | 'single'): void {
-        // Could remove visual focus feedback here if needed
     }
 
     /**
@@ -552,7 +520,6 @@ export class RangeActions extends BaseActionClass<RangeData> {
             cancelable: true
         });
 
-        // Also dispatch on hidden inputs for form frameworks
         if (config.dual) {
             rangeData.elements.hiddenInputs.min?.dispatchEvent(new Event('input', { bubbles: true }));
             rangeData.elements.hiddenInputs.max?.dispatchEvent(new Event('input', { bubbles: true }));
@@ -579,7 +546,6 @@ export class RangeActions extends BaseActionClass<RangeData> {
             cancelable: true
         });
 
-        // Also dispatch on hidden inputs for form frameworks
         if (config.dual) {
             rangeData.elements.hiddenInputs.min?.dispatchEvent(new Event('change', { bubbles: true }));
             rangeData.elements.hiddenInputs.max?.dispatchEvent(new Event('change', { bubbles: true }));
@@ -636,12 +602,9 @@ export class RangeActions extends BaseActionClass<RangeData> {
      * Clean up RangeActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // RangeActions doesn't have additional cleanup beyond base class
-        // Event listeners and observers are automatically cleaned up
     }
 }
 
-// Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         RangeActions.getInstance().init();
@@ -650,7 +613,6 @@ if (document.readyState === 'loading') {
     RangeActions.getInstance().init();
 }
 
-// Export for global access
 (window as any).RangeActions = RangeActions;
 
 declare global {

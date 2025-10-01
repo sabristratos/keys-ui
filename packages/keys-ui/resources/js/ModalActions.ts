@@ -93,12 +93,10 @@ export class ModalActions extends BaseActionClass<ModalState> {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as HTMLElement;
 
-                    // Check if the added node is a modal
                     if (element.matches && element.matches('dialog[data-modal]')) {
                         this.initializeModal(element as HTMLDialogElement);
                     }
 
-                    // Check for modals within the added node
                     const modals = DOMUtils.querySelectorAll('dialog[data-modal]', element);
                     modals.forEach(modal => {
                         this.initializeModal(modal as HTMLDialogElement);
@@ -342,15 +340,13 @@ export class ModalActions extends BaseActionClass<ModalState> {
 
         setTimeout(() => {
             this.setInitialFocus(modal);
-        }, 50); // Small delay to ensure modal is fully rendered
+        }, 50);
     }
 
     /**
      * Clean up ModalActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // ModalActions doesn't have additional cleanup beyond base class
-        // Event listeners and observers are automatically cleaned up
     }
 }
 

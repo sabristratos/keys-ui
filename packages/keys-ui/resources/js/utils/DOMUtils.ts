@@ -13,7 +13,6 @@ export class DOMUtils {
      * Safely find the closest ancestor element matching selector
      */
     static findClosest(target: Node | Element | null, selector: string): HTMLElement | null {
-        // Handle text nodes and other non-Element nodes
         if (!target || !(target instanceof Element)) {
             return null;
         }
@@ -135,13 +134,11 @@ export class DOMUtils {
      * Find form element associated with action button
      */
     static findFormElementForAction(button: HTMLElement): HTMLInputElement | HTMLTextAreaElement | null {
-        // Strategy 1: Direct input detection via data-input-actions attribute
         let container = this.findClosest(button, '[data-input-actions="true"]');
         if (container && (container.tagName.toLowerCase() === 'input' || container.tagName.toLowerCase() === 'textarea')) {
             return container as HTMLInputElement | HTMLTextAreaElement;
         }
 
-        // Strategy 2: Modern CSS :has() selector for containers with form elements
         container = this.findClosest(button, '*:has(input[data-input-actions="true"]), *:has(textarea[data-input-actions="true"])');
         if (container) {
             const formElement = this.findFormElement(container);
@@ -150,7 +147,6 @@ export class DOMUtils {
             }
         }
 
-        // Strategy 3: Fallback - traverse up DOM tree to find any form element
         let currentElement = button.parentElement;
         while (currentElement) {
             const formElement = this.findFormElement(currentElement);

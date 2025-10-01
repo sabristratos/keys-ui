@@ -60,37 +60,37 @@ class TimePicker extends Component
         public bool $showSeconds = false,
         public string $formatMode = 'flexible'
     ) {
-        // Auto-generate ID when missing
+        
         $this->id = $this->id ?? $this->name ?? 'timepicker-'.uniqid();
 
-        // Validate formatMode
+        
         if (! in_array($this->formatMode, ['12', '24', 'flexible'])) {
             $this->formatMode = 'flexible';
         }
 
-        // Set format based on formatMode if format mode is fixed
+        
         if ($this->formatMode === '12') {
             $this->format = '12';
         } elseif ($this->formatMode === '24') {
             $this->format = '24';
         }
 
-        // Validate format
+        
         if (! in_array($this->format, ['12', '24'])) {
             $this->format = '24';
         }
 
-        // Validate step
+        
         if (! in_array($this->step, [1, 5, 15, 30])) {
             $this->step = 1;
         }
 
-        // Format time value if provided
+        
         if ($this->value) {
             $this->value = $this->formatTimeValue($this->value);
         }
 
-        // Set default placeholder based on format
+        
         if (! $this->placeholder) {
             $this->placeholder = $this->format === '12'
                 ? ($this->showSeconds ? 'h:mm:ss AM' : 'h:mm AM')
@@ -204,7 +204,7 @@ class TimePicker extends Component
                 }
             }
         } catch (\Exception $e) {
-            // Return original value if parsing fails
+            
         }
 
         return $time;

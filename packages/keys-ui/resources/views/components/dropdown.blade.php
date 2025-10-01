@@ -8,6 +8,6 @@
         {{ $trigger }}
     </x-slot:trigger>
 
-    {{-- Dropdown content goes directly in the Popover slot --}}
+    
     {{ $slot }}
 </x-keys::popover>

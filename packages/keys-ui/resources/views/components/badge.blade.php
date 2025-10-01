@@ -8,12 +8,10 @@
         'aria-label' => __('keys-ui::keys-ui.actions.remove_badge')
     ] : [];
 
-    // Base classes
     $baseClasses = $variant === 'subtle'
         ? 'inline-flex items-center gap-1.5 font-medium'
         : 'inline-flex items-center font-medium';
 
-    // Add layout classes for non-subtle variants
     if ($variant !== 'subtle') {
         if ($isIconOnly) {
             $baseClasses .= ' justify-center flex-shrink-0';
@@ -22,7 +20,6 @@
         }
     }
 
-    // Size classes
     if ($variant === 'subtle') {
         $sizeClasses = match ($size) {
             'xs' => 'text-xs',
@@ -46,7 +43,6 @@
             };
     }
 
-    // Shape classes
     $shapeClasses = match ($variant) {
         'simple' => 'rounded-full',
         'chip' => 'rounded-sm',
@@ -54,7 +50,6 @@
         default => 'rounded-full'
     };
 
-    // Color classes
     $colorClasses = $variant === 'subtle'
         ? 'text-foreground'
         : match ($color) {
@@ -75,7 +70,6 @@
             default => 'bg-blue-600 text-white'
         };
 
-    // Hover classes for dismissible badges
     $hoverClasses = ($dismissible && $variant !== 'subtle')
         ? match ($color) {
             'brand' => 'hover:bg-brand-hover',
@@ -96,7 +90,6 @@
         }
         : '';
 
-    // Dot color classes for subtle variant
     $dotColorClasses = match ($color) {
         'brand' => 'text-brand',
         'success' => 'text-success',
@@ -114,7 +107,6 @@
         default => 'text-blue-600'
     };
 
-    // Icon size
     $iconSize = match ($size) {
         'xs' => 'xs',
         'sm' => 'sm',
@@ -122,7 +114,6 @@
         default => 'sm'
     };
 
-    // Combine all classes
     $badgeClasses = trim("$baseClasses $sizeClasses $shapeClasses $colorClasses $hoverClasses");
 @endphp
 

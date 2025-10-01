@@ -39,7 +39,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
     }
 
     protected bindEventListeners(): void {
-        // Handle image thumbnail clicks
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedClick(
                 '[data-lightbox-trigger]',
@@ -47,7 +46,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
             )
         );
 
-        // Handle lightbox modal events
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedClick(
                 '[data-lightbox-close]',
@@ -55,7 +53,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
             )
         );
 
-        // Handle navigation buttons
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedClick(
                 '[data-lightbox-prev]',
@@ -70,50 +67,62 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
             )
         );
 
-        // Handle keyboard navigation
         this.cleanupFunctions.push(
             EventUtils.addEventListener(document, 'keydown', (event) => {
                 this.handleKeydown(event as KeyboardEvent);
             })
         );
 
-        // Handle modal background click
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedClick(
                 '[data-lightbox-modal]',
                 (element, event) => this.handleModalBackgroundClick(element, event)
             )
         );
+
+        this.cleanupFunctions.push(
+            EventUtils.handleDelegatedClick(
+                '[data-lightbox-trigger]',
+                (element, event) => this.handleTriggerClick(element, event)
+            )
+        );
     }
 
     protected initializeElements(): void {
-        // Find all file upload zones with lightbox enabled
+        console.log('[Lightbox] Initializing lightbox elements...');
+
         const fileUploadZones = DOMUtils.findByDataAttribute('file-upload-zone');
+        console.log('[Lightbox] Found file upload zones:', fileUploadZones.length);
         fileUploadZones.forEach(zone => {
             const hasLightbox = zone.getAttribute('data-lightbox') === 'true';
             if (hasLightbox) {
-                // Find the wrapper element for this zone
                 const wrapper = zone.parentElement;
                 if (wrapper) {
+                    console.log('[Lightbox] Initializing lightbox for upload zone');
                     this.initializeLightboxForUpload(wrapper);
                 }
             }
         });
 
-        // Find all standalone images with lightbox enabled
         const lightboxImages = DOMUtils.findByDataAttribute('lightbox-image');
+        console.log('[Lightbox] Found standalone images:', lightboxImages.length);
         lightboxImages.forEach(image => {
+            console.log('[Lightbox] Initializing lightbox for image:', image);
             this.initializeLightboxForImage(image);
         });
 
-        // Find all gallery containers with lightbox enabled
         const galleryContainers = DOMUtils.findByDataAttribute('gallery');
+        console.log('[Lightbox] Found gallery containers:', galleryContainers.length);
         galleryContainers.forEach(gallery => {
             const hasLightbox = gallery.getAttribute('data-lightbox') === 'true';
+            console.log('[Lightbox] Gallery has lightbox enabled:', hasLightbox, gallery);
             if (hasLightbox) {
+                console.log('[Lightbox] Initializing lightbox for gallery');
                 this.initializeLightboxForGallery(gallery);
             }
         });
+
+        console.log('[Lightbox] Initialization complete');
     }
 
     private initializeLightboxForUpload(uploadElement: HTMLElement): void {
@@ -121,7 +130,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
                          uploadElement.id ||
                          'upload-' + Date.now();
 
-        // Initialize empty state
         this.setState(uploadElement, {
             currentImageIndex: 0,
             images: [],
@@ -134,12 +142,10 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
         const imageId = imageElement.id || 'image-' + Date.now();
         const imageContainer = imageElement.closest('[data-lightbox-container]') || imageElement;
 
-        // Get image data
         const img = imageElement.querySelector('img') || imageElement as HTMLImageElement;
         if (img && img.tagName === 'IMG') {
             const lightboxImage = this.extractImageData(img, imageId);
 
-            // Initialize state with the single image
             this.setState(imageContainer as HTMLElement, {
                 currentImageIndex: 0,
                 images: [lightboxImage],
@@ -154,7 +160,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
                          galleryElement.id ||
                          'gallery-' + Date.now();
 
-        // Extract images from gallery
         const images: LightboxImage[] = [];
         const galleryImages = galleryElement.querySelectorAll('[data-gallery-image]');
 
@@ -165,7 +170,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
             }
         });
 
-        // Initialize state with gallery images
         this.setState(galleryElement, {
             currentImageIndex: 0,
             images: images,
@@ -184,6 +188,17 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
         }
     }
 
+    /**
+     * Extract image data from HTML image element for lightbox display
+     *
+     * Reads image source, alt text, and metadata attributes to build LightboxImage object.
+     * Falls back to extracting filename from src URL if data-filename not provided.
+     *
+     * @param img - The HTML image element to extract data from
+     * @param id - Unique identifier for this image in the lightbox
+     * @param index - Optional index for auto-generating alt text
+     * @returns LightboxImage object with all metadata for display
+     */
     private extractImageData(img: HTMLImageElement, id: string, index?: number): LightboxImage {
         return {
             id: id,
@@ -195,11 +210,55 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
         };
     }
 
+    /**
+     * Handle click on lightbox trigger element (image preview)
+     */
+    private handleTriggerClick(trigger: HTMLElement, event: MouseEvent): void {
+        console.log('[Lightbox] Trigger clicked:', trigger);
+        event.preventDefault();
+        event.stopPropagation();
+
+        const container = trigger.closest('.file-upload-wrapper') ||
+                         trigger.closest('[data-gallery]') ||
+                         trigger.closest('[data-lightbox-container]') ||
+                         trigger.closest('[data-keys-file-upload]');
+
+        if (!container) {
+            console.warn('[Lightbox] No container found for trigger:', trigger);
+            return;
+        }
+
+        console.log('[Lightbox] Found container:', container);
+
+        const state = this.getState(container as HTMLElement);
+        if (!state) {
+            console.warn('[Lightbox] No state found for container');
+            return;
+        }
+
+        console.log('[Lightbox] State:', state);
+
+        const imageId = trigger.getAttribute('data-lightbox-trigger');
+        if (!imageId) {
+            console.warn('[Lightbox] No image ID on trigger');
+            return;
+        }
+
+        const imageIndex = state.images.findIndex(img => img.id === imageId);
+        if (imageIndex === -1) {
+            console.warn('[Lightbox] Image not found in state:', imageId);
+            return;
+        }
+
+        console.log('[Lightbox] Opening lightbox at index:', imageIndex);
+
+        this.openLightbox(container as HTMLElement, imageIndex);
+    }
+
     private handleThumbnailClick(thumbnail: HTMLElement, event: MouseEvent): void {
         event.preventDefault();
         event.stopPropagation();
 
-        // Handle different types of lightbox triggers
         const lightboxContainer = this.findLightboxContainer(thumbnail);
         if (!lightboxContainer) {
             return;
@@ -210,24 +269,20 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
             return;
         }
 
-        // Determine image index
         let imageIndex = 0;
 
-        // For file upload triggers
         const fileId = thumbnail.getAttribute('data-lightbox-trigger');
         if (fileId) {
             imageIndex = state.images.findIndex(img => img.id === fileId);
         }
 
-        // For gallery triggers
         const galleryImageIndex = thumbnail.getAttribute('data-gallery-image');
         if (galleryImageIndex !== null) {
             imageIndex = parseInt(galleryImageIndex, 10);
         }
 
-        // For standalone image triggers
         if (thumbnail.hasAttribute('data-lightbox-image')) {
-            imageIndex = 0; // Single image always at index 0
+            imageIndex = 0;
         }
 
         if (imageIndex === -1 || imageIndex >= state.images.length) {
@@ -285,22 +340,17 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
             return;
         }
 
-        // Update state
         state.currentImageIndex = imageIndex;
         state.isOpen = true;
         this.setState(containerElement, state);
 
-        // Create or get modal
         const modal = this.getOrCreateLightboxModal(containerElement);
         this.currentModal = modal;
 
-        // Update modal content
         this.updateModalContent(modal, state);
 
-        // Show modal
         modal.showModal();
 
-        // Emit event
         EventUtils.dispatchCustomEvent(containerElement, 'lightbox:open', {
             imageIndex: imageIndex,
             image: state.images[imageIndex]
@@ -312,7 +362,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
             return;
         }
 
-        // Find the container element that owns this modal
         const containerElement = this.findContainerElementFromModal(this.currentModal);
 
         if (containerElement) {
@@ -322,7 +371,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
                 this.setState(containerElement, state);
             }
 
-            // Emit event
             EventUtils.dispatchCustomEvent(containerElement, 'lightbox:close', {});
         }
 
@@ -348,7 +396,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
 
         this.updateModalContent(this.currentModal, state);
 
-        // Emit event
         EventUtils.dispatchCustomEvent(containerElement, 'lightbox:navigate', {
             direction: 'previous',
             imageIndex: newIndex,
@@ -374,7 +421,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
 
         this.updateModalContent(this.currentModal, state);
 
-        // Emit event
         EventUtils.dispatchCustomEvent(containerElement, 'lightbox:navigate', {
             direction: 'next',
             imageIndex: newIndex,
@@ -396,19 +442,16 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
     }
 
     private getElementId(element: HTMLElement): string {
-        // For file uploads
         const fileUploadId = element.getAttribute('data-file-upload-id');
         if (fileUploadId) {
             return fileUploadId;
         }
 
-        // For galleries
         const galleryId = element.getAttribute('data-gallery-id');
         if (galleryId) {
             return galleryId;
         }
 
-        // Fallback to element ID
         return element.id || 'lightbox-' + Date.now();
     }
 
@@ -488,32 +531,27 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
         const currentImage = state.images[state.currentImageIndex];
         if (!currentImage) return;
 
-        // Update image
         const img = modal.querySelector('[data-lightbox-image]') as HTMLImageElement;
         if (img) {
             img.src = currentImage.src;
             img.alt = currentImage.alt;
         }
 
-        // Update title
         const title = modal.querySelector('[data-lightbox-title]');
         if (title) {
             title.textContent = currentImage.fileName;
         }
 
-        // Update size
         const size = modal.querySelector('[data-lightbox-size]');
         if (size) {
             size.textContent = currentImage.fileSize;
         }
 
-        // Update counter
         const counter = modal.querySelector('[data-lightbox-counter]');
         if (counter) {
             counter.textContent = `${state.currentImageIndex + 1} of ${state.images.length}`;
         }
 
-        // Update navigation visibility
         const prevBtn = modal.querySelector('[data-lightbox-prev]') as HTMLElement;
         const nextBtn = modal.querySelector('[data-lightbox-next]') as HTMLElement;
 
@@ -525,25 +563,21 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
     }
 
     private findLightboxContainer(trigger: HTMLElement): HTMLElement | null {
-        // For file uploads
         const uploadElement = DOMUtils.findClosest(trigger, '[data-file-upload-id]');
         if (uploadElement) {
             return uploadElement;
         }
 
-        // For galleries
         const galleryElement = DOMUtils.findClosest(trigger, '[data-gallery]');
         if (galleryElement) {
             return galleryElement;
         }
 
-        // For standalone images
         const imageContainer = DOMUtils.findClosest(trigger, '[data-lightbox-container]');
         if (imageContainer) {
             return imageContainer;
         }
 
-        // For images that are themselves the trigger
         if (trigger.hasAttribute('data-lightbox-image')) {
             return trigger;
         }
@@ -555,19 +589,16 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
         const modalId = modal.id;
         const elementId = modalId.replace('-lightbox-modal', '');
 
-        // Try to find file upload element first
         let element = document.querySelector(`[data-file-upload-id="${elementId}"]`);
         if (element) {
             return element as HTMLElement;
         }
 
-        // Try to find gallery element
         element = document.querySelector(`[data-gallery-id="${elementId}"]`);
         if (element) {
             return element as HTMLElement;
         }
 
-        // Fallback to element ID
         element = document.getElementById(elementId);
         if (element) {
             return element as HTMLElement;
@@ -576,7 +607,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
         return null;
     }
 
-    // Public method to add an image to the lightbox
     public addImage(element: HTMLElement, image: LightboxImage): void {
         const state = this.getState(element);
         if (!state) return;
@@ -585,7 +615,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
         this.setState(element, state);
     }
 
-    // Public method to add multiple images (for galleries)
     public addImages(element: HTMLElement, images: LightboxImage[]): void {
         const state = this.getState(element);
         if (!state) return;
@@ -594,7 +623,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
         this.setState(element, state);
     }
 
-    // Public method to set images (replace all)
     public setImages(element: HTMLElement, images: LightboxImage[]): void {
         const state = this.getState(element);
         if (!state) return;
@@ -603,7 +631,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
         this.setState(element, state);
     }
 
-    // Public method to remove an image from the lightbox
     public removeImage(containerElement: HTMLElement, imageId: string): void {
         const state = this.getState(containerElement);
         if (!state) return;
@@ -613,14 +640,12 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
 
         state.images.splice(imageIndex, 1);
 
-        // Adjust current index if necessary
         if (state.currentImageIndex >= state.images.length) {
             state.currentImageIndex = Math.max(0, state.images.length - 1);
         }
 
         this.setState(containerElement, state);
 
-        // Close lightbox if no images left and it's open
         if (state.images.length === 0 && state.isOpen) {
             this.closeLightbox();
         }
@@ -630,7 +655,6 @@ export class LightboxActions extends BaseActionClass<LightboxState> {
         this.cleanupFunctions.forEach(cleanup => cleanup());
         this.cleanupFunctions = [];
 
-        // Close any open modals
         if (this.currentModal) {
             this.currentModal.close();
             this.currentModal = null;

@@ -20,12 +20,11 @@
 
     $elementAttributes = $elementAttributes->merge($getDataAttributes());
 
-    // Use default button text if slot is empty
     $displayContent = trim(strip_tags($slotContent)) === '' ? $buttonText : $slotContent;
 @endphp
 
 <div class="add-to-cart-wrapper {{ $showQuantity ? 'flex items-center gap-2' : '' }}">
-    {{-- Quantity Selector (when enabled) --}}
+    
     @if($showQuantity && !$isIconOnly)
         <div class="quantity-selector flex items-center border border-border rounded-md overflow-hidden bg-surface">
             <button
@@ -62,7 +61,7 @@
         </div>
     @endif
 
-    {{-- Add to Cart Button --}}
+    
     <{{ $elementType() }} {{ $elementAttributes }}>
         @if($loading)
             <x-keys::loading :animation="$loadingAnimation" :size="$iconSize()" class="mr-2" />
@@ -98,7 +97,7 @@
             <span class="button-text">{{ $displayContent }}</span>
         @endunless
 
-        {{-- Price Display --}}
+        
         @if($showPrice && $formattedPrice && !$isIconOnly)
             <span class="button-price ml-auto text-sm font-semibold opacity-75">
                 {{ $formattedPrice }}
@@ -110,7 +109,7 @@
         @endif
     </{{ $elementType() }}>
 
-    {{-- Stock Status Indicator --}}
+    
     @if($stockLevel !== null && $stockLevel <= $stockWarningThreshold && $stockLevel > 0 && !$isIconOnly)
         <div class="stock-indicator text-xs text-warning mt-1">
             Only {{ $stockLevel }} left in stock
@@ -118,7 +117,7 @@
     @endif
 </div>
 
-{{-- Component-specific styles --}}
+
 <style>
     [data-add-to-cart="true"] {
         transition: all 200ms ease;

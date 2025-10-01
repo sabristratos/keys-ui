@@ -23,24 +23,24 @@ class Accordion extends Component
     ) {
         $this->id = $this->id ?? 'accordion-' . uniqid();
 
-        // Validate color
+        
         $validColors = ['brand', 'success', 'warning', 'danger', 'neutral'];
         if (!in_array($this->color, $validColors)) {
             $this->color = 'neutral';
         }
 
-        // Validate size
+        
         if (!in_array($this->size, ['xs', 'sm', 'md', 'lg'])) {
             $this->size = 'md';
         }
 
-        // Validate variant
+        
         $validVariants = ['default', 'flush', 'spaced', 'outlined', 'elevated'];
         if (!in_array($this->variant, $validVariants)) {
             $this->variant = 'default';
         }
 
-        // Validate rounded
+        
         $validRounded = ['none', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'];
         if (!in_array($this->rounded, $validRounded)) {
             $this->rounded = 'lg';
@@ -101,7 +101,7 @@ class Accordion extends Component
             'data-rounded' => $this->rounded,
         ];
 
-        // Add conditional state attributes
+        
         if ($this->disabled) {
             $attributes['data-disabled'] = 'true';
         }

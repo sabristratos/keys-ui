@@ -99,11 +99,11 @@ class UserManagementDemo extends Component
     public function save()
     {
         try {
-            // Clear previous messages
+            
             $this->errorMessage = '';
             $this->successMessage = '';
 
-            // Validate all fields
+            
             $this->validate();
 
             $isEditing = $this->editingUser !== null;
@@ -128,7 +128,7 @@ class UserManagementDemo extends Component
                 'experience_level' => $this->experience_level,
             ];
 
-            // Handle avatar upload
+            
             if ($this->avatar) {
                 try {
                     $avatarPath = $this->avatar->store('avatars', 'public');
@@ -139,7 +139,7 @@ class UserManagementDemo extends Component
                 }
             }
 
-            // Handle multiple attachments
+            
             if (!empty($this->attachments)) {
                 try {
                     $attachmentPaths = [];
@@ -153,7 +153,7 @@ class UserManagementDemo extends Component
                 }
             }
 
-            // Save or update user
+            
             if ($isEditing) {
                 $this->editingUser->update($userData);
                 $this->editingUser = null;
@@ -167,7 +167,7 @@ class UserManagementDemo extends Component
                 $this->successMessage = 'User created successfully!';
             }
 
-            // Reset form fields
+            
             $this->reset([
                 'first_name', 'last_name', 'email', 'birth_date', 'avatar', 'attachments',
                 'department', 'role', 'salary_range', 'skills', 'preferences',
@@ -179,10 +179,10 @@ class UserManagementDemo extends Component
             $this->loadUsers();
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Validation errors are automatically handled by Livewire
+            
             $this->errorMessage = 'Please fix the validation errors below.';
 
-            // Log validation details
+            
             logger('Validation failed during user creation:', [
                 'validation_errors' => $e->errors(),
                 'form_data' => collect($userData ?? [])->except(['avatar_path', 'attachments'])->toArray(),
@@ -193,7 +193,7 @@ class UserManagementDemo extends Component
         } catch (\Exception $e) {
             $this->errorMessage = 'An unexpected error occurred: ' . $e->getMessage();
 
-            // Comprehensive error logging
+            
             logger('User creation error:', [
                 'error' => $e->getMessage(),
                 'exception_class' => get_class($e),
@@ -228,7 +228,7 @@ class UserManagementDemo extends Component
             $this->salary_range = $user->salary_range;
             $this->skills = $user->skills ?? [];
             $this->preferences = $user->preferences ?? [];
-            $this->attachments = []; // Reset attachments for editing
+            $this->attachments = []; 
             $this->status = $user->status;
             $this->bio = $user->bio;
             $this->is_remote = $user->is_remote;
@@ -263,7 +263,7 @@ class UserManagementDemo extends Component
         if ($this->userToDelete) {
             $user = DemoUser::find($this->userToDelete);
             if ($user) {
-                // Clean up uploaded files
+                
                 if ($user->avatar_path) {
                     \Storage::disk('public')->delete($user->avatar_path);
                 }

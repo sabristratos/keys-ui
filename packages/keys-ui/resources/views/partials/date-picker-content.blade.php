@@ -1,6 +1,6 @@
-{{-- Date Picker Main Content Partial --}}
+
 @if(!$inline)
-    {{-- Popover Mode --}}
+    
     <x-keys::popover
         class="w-full"
         :id="'date-picker-dropdown-' . $id"
@@ -31,7 +31,7 @@
         </div>
     </x-keys::popover>
 @else
-    {{-- Inline Mode --}}
+    
     @include('keys::partials.date-picker-inline')
 
     <div class="mt-2">

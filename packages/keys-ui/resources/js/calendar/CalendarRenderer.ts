@@ -20,17 +20,16 @@ export class CalendarRenderer {
     public static generateCalendarGrid(calendar: HTMLElement, state: CalendarState, monthOffset: number = 0): Array<Array<CalendarDay>> {
         const currentMonth = this.addMonthsToDate(state.currentMonth + '-01', monthOffset);
         const year = parseInt(currentMonth.substring(0, 4));
-        const month = parseInt(currentMonth.substring(5, 7)) - 1; // JavaScript months are 0-indexed
+        const month = parseInt(currentMonth.substring(5, 7)) - 1;
 
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const startDate = new Date(firstDay);
-        startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
+        startDate.setDate(startDate.getDate() - firstDay.getDay());
 
         const weeks: Array<Array<CalendarDay>> = [];
         let currentWeek: Array<CalendarDay> = [];
 
-        // Generate 6 weeks to ensure consistent calendar height
         for (let i = 0; i < 42; i++) {
             const date = new Date(startDate);
             date.setDate(startDate.getDate() + i);
@@ -41,7 +40,6 @@ export class CalendarRenderer {
             const isSelected = state.selectedDate === dateString;
             const isDisabled = this.isDateDisabled(calendar, date, state);
 
-            // Range-specific properties
             const isInRange = state.isRange ? CalendarDateSelection.isDateInRange(dateString, state.startDate, state.endDate) : false;
             const isRangeStart = state.isRange ? CalendarDateSelection.isDateRangeStart(dateString, state.startDate) : false;
             const isRangeEnd = state.isRange ? CalendarDateSelection.isDateRangeEnd(dateString, state.endDate) : false;
@@ -215,21 +213,18 @@ export class CalendarRenderer {
     private static getDayButtonClasses(day: CalendarDay, calendar: HTMLElement, state: CalendarState): string {
         const size = calendar.dataset.size || 'md';
 
-        // Base button classes using Tailwind utilities
         const baseClasses = 'w-full h-full rounded-md border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-1';
 
-        // Size-specific classes
         const sizeClasses = {
             'sm': 'text-xs',
             'md': 'text-sm font-medium',
             'lg': 'text-base font-medium'
         }[size] || 'text-sm font-medium';
 
-        // State-specific classes
         let stateClasses = '';
 
         if (day.isDisabled) {
-            stateClasses = 'bg-surface text-muted border-transparent cursor-not-allowed opacity-50';
+            stateClasses = 'bg-surface text-muted border-transparent cursor-not-allowed opacity-40 hover:bg-surface hover:border-transparent';
         } else if (day.isSelected && !state.isRange) {
             stateClasses = 'bg-brand text-white border-brand-600 font-bold shadow-sm';
         } else if (day.isToday) {
@@ -271,12 +266,14 @@ export class CalendarRenderer {
 
         const dateString = this.formatDateString(date);
 
-        // Check min/max dates
         if (state.minDate && dateString < state.minDate) return true;
         if (state.maxDate && dateString > state.maxDate) return true;
 
-        // Check disabled dates array
-        return state.disabledDates.includes(dateString);
+        if (state.disabledDates && Array.isArray(state.disabledDates)) {
+            return state.disabledDates.includes(dateString);
+        }
+
+        return false;
     }
 
 

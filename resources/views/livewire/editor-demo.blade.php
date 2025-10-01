@@ -7,7 +7,7 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {{-- Editor Panel --}}
+        
         <div class="space-y-4">
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Rich Text Editor</h2>
@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            {{-- Editor Component --}}
+            
             <x-keys::editor
                 name="content"
                 wire:model.live="content"
@@ -50,25 +50,25 @@
                 ]"
             />
 
-            {{-- Editor Stats --}}
+            
             <div class="flex gap-4 text-sm text-gray-600 dark:text-gray-400">
                 <span>Words: <strong>{{ $wordCount }}</strong></span>
                 <span>Characters: <strong>{{ $characterCount }}</strong></span>
             </div>
         </div>
 
-        {{-- Rendered Output Panel --}}
+        
         <div class="space-y-4">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Live Preview</h2>
 
-            {{-- Rendered Content --}}
+            
             <div class="min-h-[300px] p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
                 <div class="prose dark:prose-invert max-w-none">
                     {!! $content ?: '<p class="text-gray-500 italic">Content will appear here as you type...</p>' !!}
                 </div>
             </div>
 
-            {{-- Raw HTML Display --}}
+            
             <div class="space-y-2">
                 <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Raw HTML Output:</h3>
                 <div class="p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md">
@@ -78,7 +78,7 @@
         </div>
     </div>
 
-    {{-- Technical Information --}}
+    
     <div class="mt-12 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
         <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">How It Works</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
@@ -103,7 +103,7 @@
         </div>
     </div>
 
-    {{-- Debug Panel (Development Only) --}}
+    
     @if(app()->environment('local'))
         <div class="mt-8 p-4 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
             <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Debug Information</h3>
@@ -115,7 +115,7 @@
         </div>
     @endif
 
-    {{-- CSS fix for Quill.js bullet lists in prose content --}}
+    
     <style>
         .prose ol li[data-list="bullet"] {
             list-style-type: disc !important;

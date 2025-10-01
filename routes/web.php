@@ -19,3 +19,12 @@ Route::get('/editor-demo', function () {
 })->name('editor.demo');
 
 Route::get('/user-demo', \App\Livewire\UserManagementDemo::class)->name('user.demo');
+
+Route::get('/sidebar-demo', function () {
+    return view('sidebar-demo');
+})->name('sidebar.demo');
+
+Route::get('/test-sidebar-default', function () {
+    return view('test-sidebar-default');
+})->name('test.sidebar.default');
+

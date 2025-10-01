@@ -45,7 +45,6 @@ export class EventUtils {
     ): () => void {
         target.addEventListener(eventType, handler, options);
 
-        // Return cleanup function
         return () => {
             target.removeEventListener(eventType, handler, options);
         };
@@ -63,7 +62,6 @@ export class EventUtils {
         const target = container || document;
 
         const eventHandler = (event: Event) => {
-            // Safely handle event.target which might be a text node
             const eventTarget = event.target as Node;
             let element: HTMLElement | null = null;
 

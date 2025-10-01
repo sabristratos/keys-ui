@@ -40,7 +40,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
     private cleanupFunctions: (() => void)[] = [];
 
     protected bindEventListeners(): void {
-        // Handle add to cart button clicks
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedClick(
                 '[data-add-to-cart="true"]',
@@ -48,7 +47,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
             )
         );
 
-        // Handle quantity decrease buttons
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedClick(
                 '.qty-decrease',
@@ -56,7 +54,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
             )
         );
 
-        // Handle quantity increase buttons
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedClick(
                 '.qty-increase',
@@ -64,7 +61,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
             )
         );
 
-        // Handle direct quantity input changes
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedInput(
                 '.qty-input',
@@ -72,7 +68,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
             )
         );
 
-        // Handle keyboard events for quantity inputs
         this.cleanupFunctions.push(
             EventUtils.handleDelegatedKeydown(
                 '.qty-input',
@@ -89,7 +84,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
     private initializeButton(button: HTMLElement): void {
         const state = this.extractStateFromButton(button);
         if (state) {
-            // Store original button text for reset
             const textElement = DOMUtils.querySelector('.button-text', button);
             if (textElement) {
                 state.originalText = textElement.textContent || '';
@@ -135,19 +129,16 @@ export class AddToCartActions extends BaseActionClass<CartState> {
             return;
         }
 
-        // Get current quantity from input if available
         const quantityInput = this.getQuantityInput(button);
         if (quantityInput) {
             state.quantity = parseInt(quantityInput.value) || 1;
         }
 
-        // Validate quantity
         if (!this.validateQuantity(state.quantity, state)) {
             this.showError(button, 'Invalid quantity');
             return;
         }
 
-        // Update state and UI
         state.isProcessing = true;
         this.setState(button, state);
         this.setButtonState(button, 'adding');
@@ -159,7 +150,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
                 state.inCart = response.inCart ?? true;
                 state.isProcessing = false;
 
-                // Update stock level if provided
                 if (response.stockLevel !== undefined) {
                     state.stockLevel = response.stockLevel;
                     DOMUtils.setDataAttribute(button, 'stockLevel', response.stockLevel.toString());
@@ -168,7 +158,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
                 this.setState(button, state);
                 this.setButtonState(button, 'added');
 
-                // Dispatch custom events
                 this.dispatchCartEvent(button, 'cart:added', {
                     productId: state.productId,
                     variantId: state.variantId,
@@ -176,7 +165,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
                     cartCount: response.cartCount
                 });
 
-                // Auto-reset after success animation
                 setTimeout(() => {
                     if (this.getState(button)?.inCart) {
                         this.setButtonState(button, 'default');
@@ -227,7 +215,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
             state.quantity = newValue;
             this.setState(cartButton, state);
 
-            // Dispatch quantity change event
             this.dispatchCartEvent(cartButton, 'cart:quantity-changed', {
                 productId: state.productId,
                 quantity: newValue,
@@ -259,14 +246,11 @@ export class AddToCartActions extends BaseActionClass<CartState> {
     }
 
     private handleQuantityKeydown(input: HTMLInputElement, event: KeyboardEvent): void {
-        // Allow: backspace, delete, tab, escape, enter, home, end, left, right, up, down
         if ([8, 9, 27, 13, 35, 36, 37, 39, 38, 40].includes(event.keyCode) ||
-            // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
             (event.ctrlKey && [65, 67, 86, 88].includes(event.keyCode))) {
             return;
         }
 
-        // Ensure that it is a number and stop the keypress
         if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) &&
             (event.keyCode < 96 || event.keyCode > 105)) {
             event.preventDefault();
@@ -294,7 +278,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
             formData.append('variant_id', state.variantId);
         }
 
-        // Add CSRF token for Laravel compatibility
         const csrfToken = DOMUtils.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         if (csrfToken) {
             formData.append('_token', csrfToken);
@@ -323,7 +306,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
             DOMUtils.addClass(button, state);
         }
 
-        // Update button text if available
         const textElement = DOMUtils.querySelector('.button-text', button);
         if (textElement) {
             const buttonState = this.getState(button);
@@ -338,7 +320,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
                     if (addedText) textElement.textContent = addedText;
                     break;
                 case 'default':
-                    // Reset to original text using stored value
                     if (buttonState?.originalText) {
                         textElement.textContent = buttonState.originalText;
                     }
@@ -351,7 +332,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
         const state = this.getState(button);
         if (!state) return;
 
-        // Update disabled state based on stock
         if (state.stockLevel !== undefined && state.stockLevel <= 0) {
             DOMUtils.toggleAttribute(button, 'disabled', 'true');
             DOMUtils.addClasses(button, ['cursor-not-allowed', 'opacity-50']);
@@ -368,13 +348,11 @@ export class AddToCartActions extends BaseActionClass<CartState> {
         const wrapper = DOMUtils.findClosest(button, '.add-to-cart-wrapper');
         if (!wrapper) return;
 
-        // Update decrease button
         const decreaseBtn = DOMUtils.querySelector('.qty-decrease', wrapper);
         if (decreaseBtn) {
             DOMUtils.toggleAttribute(decreaseBtn, 'disabled', state.quantity <= 1 ? 'true' : undefined);
         }
 
-        // Update increase button
         const increaseBtn = DOMUtils.querySelector('.qty-increase', wrapper);
         if (increaseBtn) {
             const atMax = state.quantity >= state.maxQuantity ||
@@ -382,7 +360,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
             DOMUtils.toggleAttribute(increaseBtn, 'disabled', atMax ? 'true' : undefined);
         }
 
-        // Update quantity input
         const input = this.getQuantityInput(button);
         if (input) {
             input.max = state.maxQuantity.toString();
@@ -401,7 +378,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
     private showError(button: HTMLElement, message: string): void {
         this.dispatchCartEvent(button, 'cart:error', { message });
 
-        // You could implement toast notifications here
         console.error('Add to Cart Error:', message);
     }
 
@@ -427,7 +403,6 @@ export class AddToCartActions extends BaseActionClass<CartState> {
     }
 }
 
-// Auto-initialize when DOM is ready
 if (typeof document !== 'undefined') {
     const initializeCart = () => {
         AddToCartActions.getInstance().init();

@@ -1,8 +1,7 @@
 @php
-    // Base classes for all alerts - consistent surface background
+
     $baseClasses = 'rounded-lg border bg-surface';
 
-    // Variant classes - use semantic design tokens where possible
     $variantClasses = match ($variant) {
         'info' => 'border-blue-600',
         'success' => 'border-green-600',
@@ -13,7 +12,6 @@
         default => 'border-blue-600'
     };
 
-    // Size classes
     $sizeClasses = match ($size) {
         'sm' => 'p-3 space-y-2 text-sm',
         'md' => 'p-4 space-y-3 text-sm',
@@ -21,7 +19,6 @@
         default => 'p-4 space-y-3 text-sm'
     };
 
-    // Icon color based on variant - using semantic design tokens
     $iconColor = match ($variant) {
         'info' => 'text-blue-600',
         'success' => 'text-green-600',
@@ -32,7 +29,6 @@
         default => 'text-blue-600'
     };
 
-    // Icon size based on alert size
     $iconSize = match ($size) {
         'sm' => 'sm',
         'md' => 'md',
@@ -40,7 +36,6 @@
         default => 'md'
     };
 
-    // Title classes based on size - use foreground for headings
     $titleClasses = match ($size) {
         'sm' => 'text-sm font-medium text-foreground',
         'md' => 'text-base font-medium text-foreground',
@@ -48,7 +43,6 @@
         default => 'text-base font-medium text-foreground'
     };
 
-    // Content classes based on size - use muted for body text
     $contentClasses = match ($size) {
         'sm' => 'text-xs text-muted',
         'md' => 'text-sm text-muted',
@@ -62,7 +56,6 @@
         'aria-live' => 'polite'
     ])->merge($dataAttributes);
 
-    // Add action data attribute if actions slot exists
     if (isset($actions)) {
         $elementAttributes = $elementAttributes->merge(['data-has-actions' => 'true']);
     }

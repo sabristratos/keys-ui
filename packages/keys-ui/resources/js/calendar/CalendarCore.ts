@@ -13,6 +13,7 @@
 
 import { BaseActionClass } from '../utils/BaseActionClass';
 import { DOMUtils } from '../utils/DOMUtils';
+import { DateUtils } from '../utils/DateUtils';
 import { CalendarDateSelection, CalendarState } from './CalendarDateSelection';
 import { CalendarRenderer } from './CalendarRenderer';
 import { CalendarNavigation } from './CalendarNavigation';
@@ -38,7 +39,7 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
             return;
         }
 
-        const calendarDataAttr = calendarElement.dataset.calendarData;
+        const calendarDataAttr = calendarElement.dataset.keysCalendarConfig;
         const isDisabled = calendarElement.dataset.disabled === 'true';
 
         let calendarData;
@@ -67,14 +68,15 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
                 'January', 'February', 'March', 'April', 'May', 'June',
                 'July', 'August', 'September', 'October', 'November', 'December'
             ],
-            viewMode: 'calendar'
+            viewMode: 'calendar',
+            format: calendarData.format || 'Y-m-d',
+            displayFormat: calendarData.displayFormat || calendarData.format || 'Y-m-d'
         };
 
         this.setState(calendarElement, state);
         this.renderCalendar(calendarElement);
         this.bindAllEventListeners(calendarElement);
 
-        // Initialize form integration
         CalendarFormIntegration.updateHiddenInput(calendarElement, state);
         CalendarFormIntegration.dispatchCalendarEvent(calendarElement, 'initialized', { state });
     }
@@ -83,7 +85,6 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
      * Bind all event listeners for a calendar
      */
     protected bindEventListeners(): void {
-        // Main event binding is handled per-calendar in bindAllEventListeners
     }
 
     /**
@@ -93,19 +94,15 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
         const state = this.getState(calendar);
         if (!state) return;
 
-        // Date selection events
         this.bindDateSelectionEvents(calendar);
 
-        // Navigation events
         this.bindNavigationEvents(calendar);
 
-        // Form integration events
         CalendarFormIntegration.bindFormEvents(calendar, state,
             (newState) => this.updateState(calendar, newState),
             () => this.renderCalendar(calendar)
         );
 
-        // Keyboard events
         CalendarKeyboard.bindKeyboardEvents(calendar, state,
             (newState) => this.updateState(calendar, newState),
             (dateString) => this.selectDate(calendar, dateString),
@@ -120,7 +117,6 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
         calendar.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
 
-            // Handle date button clicks
             if (target.dataset.calendarDayBtn !== undefined) {
                 const dateString = target.dataset.date;
                 if (dateString && !target.disabled) {
@@ -139,7 +135,6 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
             const state = this.getState(calendar);
             if (!state) return;
 
-            // Handle navigation buttons - traverse up to find button with data attribute
             const navButton = target.closest('[data-calendar-nav]') as HTMLElement;
             if (navButton) {
                 const direction = navButton.dataset.calendarNav as 'prev' | 'next';
@@ -150,7 +145,6 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
                 return;
             }
 
-            // Handle month/year button - traverse up to find button with data attribute
             const monthYearButton = target.closest('[data-calendar-month-year-btn]') as HTMLElement;
             if (monthYearButton) {
                 CalendarNavigation.toggleMonthYearDropdown(calendar, state,
@@ -160,7 +154,6 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
                 return;
             }
 
-            // Handle month selection in month grid - traverse up to find button with data attribute
             const monthButton = target.closest('[data-calendar-month-btn]') as HTMLElement;
             if (monthButton) {
                 const monthIndex = parseInt(monthButton.dataset.month || '0');
@@ -171,7 +164,6 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
                 return;
             }
 
-            // Handle year selection in year grid - traverse up to find button with data attribute
             const yearButton = target.closest('[data-calendar-year-option]') as HTMLElement;
             if (yearButton) {
                 const year = parseInt(yearButton.dataset.year || '0');
@@ -182,7 +174,6 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
                 return;
             }
 
-            // Handle year navigation arrows in month/year picker
             const yearNavButton = target.closest('[data-calendar-year-nav]') as HTMLElement;
             if (yearNavButton) {
                 const direction = yearNavButton.dataset.calendarYearNav as 'prev' | 'next';
@@ -208,12 +199,28 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
 
         this.renderCalendar(calendar);
         CalendarFormIntegration.updateHiddenInput(calendar, this.getState(calendar)!);
-        CalendarFormIntegration.dispatchCalendarEvent(calendar, 'dateSelected', {
-            selectedDate: state.isRange ? null : dateString,
-            startDate: state.isRange ? this.getState(calendar)?.startDate : null,
-            endDate: state.isRange ? this.getState(calendar)?.endDate : null,
-            source: 'userClick'
-        });
+
+        const updatedState = this.getState(calendar)!;
+        if (state.isRange) {
+            const formattedRange = updatedState.startDate && updatedState.endDate ?
+                DateUtils.formatRangeForDisplay(updatedState.startDate, updatedState.endDate, updatedState.displayFormat) :
+                (updatedState.startDate ? DateUtils.formatDateForDisplay(updatedState.startDate, updatedState.displayFormat) : '');
+
+            CalendarFormIntegration.dispatchCalendarEvent(calendar, 'rangeSelected', {
+                startDate: updatedState.startDate,
+                endDate: updatedState.endDate,
+                formattedRange: formattedRange,
+                source: 'userClick'
+            });
+        } else {
+            const formattedDate = DateUtils.formatDateForDisplay(dateString, updatedState.displayFormat);
+
+            CalendarFormIntegration.dispatchCalendarEvent(calendar, 'dateSelected', {
+                selectedDate: dateString,
+                formattedDate: formattedDate,
+                source: 'userClick'
+            });
+        }
     }
 
     /**
@@ -223,14 +230,12 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
         const state = this.getState(calendar);
         if (!state) return;
 
-        // Toggle quick selectors visibility based on view mode
         this.toggleQuickSelectors(calendar, state.viewMode);
 
         if (state.viewMode === 'calendar') {
             CalendarRenderer.renderCalendarGrid(calendar, state);
             CalendarKeyboard.initializeFocus(calendar, state);
         } else if (state.viewMode === 'month') {
-            // Month grid is rendered by CalendarNavigation
         } else if (state.viewMode === 'year') {
             CalendarNavigation.renderYearGrid(calendar, state,
                 (newState) => this.updateState(calendar, newState),
@@ -240,14 +245,16 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
     }
 
     /**
-     * Toggle quick selectors visibility based on view mode and isRange
+     * Toggle quick selectors visibility based on view mode, isRange, and selector configuration
      */
     private toggleQuickSelectors(calendar: HTMLElement, viewMode: string): void {
         const state = this.getState(calendar);
         const quickSelectors = calendar.querySelector('[data-view-mode-show="calendar"]') as HTMLElement;
         if (quickSelectors) {
-            // Only show quick selectors for range pickers in calendar view
-            if (viewMode === 'calendar' && state?.isRange) {
+            const selectorButtons = quickSelectors.querySelectorAll('[data-quick-selector]');
+            const hasConfiguredSelectors = selectorButtons.length > 0;
+
+            if (viewMode === 'calendar' && state?.isRange && hasConfiguredSelectors) {
                 quickSelectors.style.display = '';
             } else {
                 quickSelectors.style.display = 'none';
@@ -276,12 +283,10 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         const element = node as HTMLElement;
 
-                        // Check if the added element is a calendar
                         if (element.dataset.keysCalendar === 'true') {
                             this.initializeCalendar(element);
                         }
 
-                        // Check for calendars within the added element
                         const nestedCalendars = element.querySelectorAll('[data-keys-calendar="true"]');
                         nestedCalendars.forEach(calendar => {
                             this.initializeCalendar(calendar as HTMLElement);
@@ -335,7 +340,6 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
      * Cleanup when component is destroyed
      */
     protected onDestroy(): void {
-        // Cleanup keyboard event listeners for all calendars
         DOMUtils.findByDataAttribute('keys-calendar', 'true').forEach(calendar => {
             CalendarKeyboard.unbindKeyboardEvents(calendar);
         });

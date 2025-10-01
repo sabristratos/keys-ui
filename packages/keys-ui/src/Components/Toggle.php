@@ -18,7 +18,7 @@ class Toggle extends Component
         public string $size = 'md',
         public ?string $label = null,
         public ?string $description = null,
-        public ?string $hint = null,  // Add hint support
+        public ?string $hint = null,  
         public string $labelPosition = 'right',
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
@@ -109,7 +109,7 @@ class Toggle extends Component
             'data-value' => $this->value,
         ];
 
-        // State attributes
+        
         if ($this->checked) {
             $attributes['data-checked'] = 'true';
         }
@@ -126,7 +126,7 @@ class Toggle extends Component
             $attributes['data-invalid'] = 'true';
         }
 
-        // Content attributes
+        
         if ($this->hasContent()) {
             $attributes['data-has-content'] = 'true';
         }
@@ -143,7 +143,7 @@ class Toggle extends Component
             $attributes['data-has-hint'] = 'true';
         }
 
-        // Actions
+        
         if ($this->hasActions()) {
             $attributes['data-has-actions'] = 'true';
             $attributes['data-actions-count'] = count($this->actions);

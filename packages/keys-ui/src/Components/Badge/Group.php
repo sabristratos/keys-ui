@@ -45,27 +45,27 @@ class Group extends Component
         public bool $clearable = false,
         public ?string $label = null
     ) {
-        // Validate spacing
+        
         if (!in_array($this->spacing, ['tight', 'default', 'loose'])) {
             $this->spacing = 'default';
         }
 
-        // Validate orientation
+        
         if (!in_array($this->orientation, ['horizontal', 'vertical'])) {
             $this->orientation = 'horizontal';
         }
 
-        // Validate size if provided
+        
         if ($this->size && !in_array($this->size, ['xs', 'sm', 'md'])) {
             $this->size = null;
         }
 
-        // Validate alignment
+        
         if (!in_array($this->align, ['start', 'center', 'end', 'justify'])) {
             $this->align = 'start';
         }
 
-        // Validate max badges
+        
         if ($this->max !== null && $this->max < 1) {
             $this->max = 1;
         }
@@ -153,13 +153,38 @@ class Group extends Component
         return $this->clearable;
     }
 
+
     /**
-     * Generate comprehensive data attributes for badge group functionality.
+     * Check if the group has max badge limiting enabled.
      *
-     * Provides data attributes for JavaScript initialization, layout styling,
-     * size inheritance, and group action management.
+     * @return bool True if max badge limiting is enabled
+     */
+    public function hasMaxBadgeLimit(): bool
+    {
+        return $this->max !== null && $this->max > 0;
+    }
+
+    /**
+     * Get badge container classes for proper badge targeting.
      *
-     * @return array Complete set of data attributes for badge group element
+     * @return string CSS classes for badge container
+     */
+    public function getBadgeContainerClasses(): string
+    {
+        $classes = trim("{$this->getLayoutClasses()} {$this->getSpacingClasses()} {$this->getAlignmentClasses()}");
+
+        
+        if ($this->size) {
+            $classes .= " [&>[data-keys-badge]:not([data-size])]:badge-size-{$this->size}";
+        }
+
+        return $classes;
+    }
+
+    /**
+     * Get enhanced data attributes with max badge and container information.
+     *
+     * @return array Complete set of data attributes for badge group functionality
      */
     public function getDataAttributes(): array
     {
@@ -201,7 +226,9 @@ class Group extends Component
             'spacingClasses' => $this->getSpacingClasses(),
             'layoutClasses' => $this->getLayoutClasses(),
             'alignmentClasses' => $this->getAlignmentClasses(),
+            'badgeContainerClasses' => $this->getBadgeContainerClasses(),
             'dataAttributes' => $this->getDataAttributes(),
+            'hasMaxLimit' => $this->hasMaxBadgeLimit(),
         ]);
     }
 }

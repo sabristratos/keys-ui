@@ -2,7 +2,6 @@
     $checkboxAttributes = $attributes->whereStartsWith('wire:model');
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:model');
 
-    // Checkbox input classes - direct Tailwind utilities
     $checkboxBaseClasses = 'border transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 shrink-0';
 
     $checkboxSizeClasses = match ($size) {
@@ -18,7 +17,6 @@
         default => 'rounded'
     };
 
-    // Checkbox state classes
     if ($disabled) {
         $checkboxStateClasses = 'bg-neutral-100 border-neutral-300 text-neutral-400 cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-700';
     } elseif ($hasError()) {
@@ -50,7 +48,6 @@
 
     $checkboxClasses = "$checkboxBaseClasses $checkboxSizeClasses $checkboxVariantClasses $checkboxStateClasses";
 
-    // Wrapper classes - direct Tailwind utilities
     $gap = ($variant === 'card' && !$showInput) ? 'gap-0' : 'gap-3';
 
     $wrapperBaseClasses = match ($variant) {
@@ -89,7 +86,6 @@
         $wrapperBaseClasses .= ' border-danger';
     }
 
-    // Label classes - direct Tailwind utilities
     $labelSizeClasses = match ($size) {
         'sm' => 'text-sm',
         'md' => 'text-sm',

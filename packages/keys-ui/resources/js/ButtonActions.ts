@@ -25,7 +25,6 @@ export class ButtonActions extends BaseActionClass {
      * Initialize multi-state button elements - required by BaseActionClass
      */
     protected initializeElements(): void {
-        // Find all multi-state buttons
         const multiStateButtons = DOMUtils.querySelectorAll('[data-multi-state="true"]') as HTMLButtonElement[];
 
         multiStateButtons.forEach(button => {
@@ -37,14 +36,12 @@ export class ButtonActions extends BaseActionClass {
      * Initialize a single multi-state button
      */
     private initializeButton(button: HTMLButtonElement): void {
-        // Set up initial state
         this.buttonStates.set(button, {
             current: 'default',
             cycling: false,
             element: button
         });
 
-        // Ensure proper initial icon state
         this.updateIconState(button, 'default');
     }
 
@@ -52,13 +49,11 @@ export class ButtonActions extends BaseActionClass {
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Handle multi-state button clicks
         EventUtils.handleDelegatedClick('[data-multi-state="true"]', (button, event) => {
             event.preventDefault();
             this.handleButtonClick(button as HTMLButtonElement);
         });
 
-        // Handle keyboard activation
         EventUtils.handleDelegatedKeydown('[data-multi-state="true"]', (button, event) => {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
@@ -74,16 +69,13 @@ export class ButtonActions extends BaseActionClass {
         const state = this.buttonStates.get(button);
         if (!state || state.cycling) return;
 
-        // Determine next state
         const nextState = this.getNextState(state.current, button);
 
-        // Update state
         state.cycling = true;
         await this.transitionToState(button, nextState);
         state.current = nextState;
         state.cycling = false;
 
-        // Auto-return to default after success state
         if (nextState === 'success') {
             setTimeout(async () => {
                 if (state.current === 'success') {
@@ -95,7 +87,6 @@ export class ButtonActions extends BaseActionClass {
             }, 2000);
         }
 
-        // Dispatch custom event
         this.dispatchButtonEvent(button, nextState);
     }
 
@@ -108,13 +99,11 @@ export class ButtonActions extends BaseActionClass {
 
         switch (currentState) {
             case 'default':
-                // If has toggle, go to toggle; otherwise go to success if available
                 if (hasToggle) return 'toggle';
                 if (hasSuccess) return 'success';
                 return 'default';
 
             case 'toggle':
-                // From toggle, go to success if available, otherwise back to default
                 if (hasSuccess) return 'success';
                 return 'default';
 
@@ -128,13 +117,10 @@ export class ButtonActions extends BaseActionClass {
      * Transition button to a specific state
      */
     private async transitionToState(button: HTMLButtonElement, state: 'default' | 'toggle' | 'success'): Promise<void> {
-        // Update icon state
         this.updateIconState(button, state);
 
-        // Update label and accessibility
         this.updateButtonLabel(button, state);
 
-        // Add visual feedback for interactions
         if (state === 'success') {
             this.animateSuccessFeedback(button);
         }
@@ -148,7 +134,6 @@ export class ButtonActions extends BaseActionClass {
         const toggleIcon = DOMUtils.querySelector('.button-icon-toggle', button) as HTMLElement;
         const successIcon = DOMUtils.querySelector('.button-icon-success', button) as HTMLElement;
 
-        // Hide all icons first
         [defaultIcon, toggleIcon, successIcon].forEach(icon => {
             if (icon) {
                 icon.classList.remove('opacity-100', 'scale-110');
@@ -156,7 +141,6 @@ export class ButtonActions extends BaseActionClass {
             }
         });
 
-        // Show the appropriate icon
         let targetIcon: HTMLElement | null = null;
         switch (state) {
             case 'default':
@@ -190,7 +174,6 @@ export class ButtonActions extends BaseActionClass {
 
         switch (state) {
             case 'default':
-                // Use original label (stored or inferred from content)
                 const originalLabel = this.getOriginalLabel(button);
                 newLabel = originalLabel;
                 ariaLabel = originalLabel;
@@ -207,17 +190,14 @@ export class ButtonActions extends BaseActionClass {
                 break;
         }
 
-        // Update screen reader label
         if (newLabel && labelElement) {
             labelElement.textContent = newLabel;
         }
 
-        // Update aria-label
         if (ariaLabel) {
             button.setAttribute('aria-label', ariaLabel);
         }
 
-        // Update aria-pressed for toggle states
         if (state === 'toggle') {
             button.setAttribute('aria-pressed', 'true');
         } else {
@@ -229,20 +209,16 @@ export class ButtonActions extends BaseActionClass {
      * Get the original label for a button
      */
     private getOriginalLabel(button: HTMLButtonElement): string {
-        // Try to get from stored original label
         if (button.dataset.originalLabel) {
             return button.dataset.originalLabel;
         }
 
-        // Try to get from current content (first time)
         const textContent = button.textContent?.trim();
         if (textContent) {
-            // Store for future use
             button.dataset.originalLabel = textContent;
             return textContent;
         }
 
-        // Fallback to aria-label or default
         return button.getAttribute('aria-label') || 'Button';
     }
 
@@ -250,7 +226,6 @@ export class ButtonActions extends BaseActionClass {
      * Animate success feedback with scale and timing
      */
     private animateSuccessFeedback(button: HTMLButtonElement): void {
-        // Add temporary scale animation to the whole button
         button.classList.add('scale-105');
 
         setTimeout(() => {
@@ -275,7 +250,6 @@ export class ButtonActions extends BaseActionClass {
     public setButtonState(button: HTMLButtonElement, state: 'default' | 'toggle' | 'success'): void {
         const buttonState = this.buttonStates.get(button);
         if (!buttonState) {
-            // Initialize if not already done
             this.initializeButton(button);
         }
 
@@ -307,7 +281,6 @@ export class ButtonActions extends BaseActionClass {
      * Clean up ButtonActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // Clear button states
         this.buttonStates.clear();
     }
 }

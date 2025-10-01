@@ -46,7 +46,7 @@ class Calendar extends Component
         $this->id = $this->id ?? $this->name ?? 'calendar-'.uniqid();
         $this->currentMonth = $this->currentMonth ?? Carbon::now()->startOfMonth();
 
-        // Validate monthsToShow
+        
         if ($this->monthsToShow < 1 || $this->monthsToShow > 12) {
             $this->monthsToShow = 1;
         }
@@ -69,7 +69,7 @@ class Calendar extends Component
      */
     private function initializeRangeDateValues(): void
     {
-        $this->value = null; // Don't use single value in range mode
+        $this->value = null; 
 
         $this->startDate = $this->parseDate($this->startDate);
         $this->endDate = $this->parseDate($this->endDate);
@@ -82,7 +82,7 @@ class Calendar extends Component
     {
         $this->value = $this->parseDate($this->value);
 
-        // Clear range values in single date mode
+        
         $this->startDate = null;
         $this->endDate = null;
     }
@@ -107,27 +107,27 @@ class Calendar extends Component
      */
     private function parseDate(mixed $date): ?Carbon
     {
-        // Handle null or falsy values
+        
         if (! $date) {
             return null;
         }
 
-        // Return Carbon instances as-is
+        
         if ($date instanceof Carbon) {
             return $date;
         }
 
-        // Attempt to parse string values
+        
         if (is_string($date) && ! empty(trim($date))) {
             try {
                 return Carbon::parse($date);
             } catch (\Exception $e) {
-                // Return null for invalid date strings instead of throwing
+                
                 return null;
             }
         }
 
-        // Return null for unsupported types
+        
         return null;
     }
 
@@ -136,13 +136,13 @@ class Calendar extends Component
      */
     private function initializeConstraints(): void
     {
-        // Parse min date with start of day
+        
         if ($this->minDate) {
             $parsedMin = $this->parseDate($this->minDate);
             $this->minDate = $parsedMin?->startOfDay();
         }
 
-        // Parse max date with end of day
+        
         if ($this->maxDate) {
             $parsedMax = $this->parseDate($this->maxDate);
             $this->maxDate = $parsedMax?->endOfDay();
@@ -154,7 +154,7 @@ class Calendar extends Component
      */
     private function validateProperties(): void
     {
-        // Validate size
+        
         if (! in_array($this->size, ComponentConstants::CALENDAR_SIZES)) {
             $this->size = ComponentConstants::getDefaultSize();
         }
@@ -239,22 +239,22 @@ class Calendar extends Component
      */
     public function isDateDisabled(Carbon $date): bool
     {
-        // If the entire calendar is disabled, all dates are disabled
+        
         if ($this->disabled) {
             return true;
         }
 
-        // Check if date is before the minimum allowed date
+        
         if ($this->minDate instanceof Carbon && $date->lt($this->minDate)) {
             return true;
         }
 
-        // Check if date is after the maximum allowed date
+        
         if ($this->maxDate instanceof Carbon && $date->gt($this->maxDate)) {
             return true;
         }
 
-        // Check if date is in the explicitly disabled dates array
+        
         foreach ($this->disabledDates as $disabledDate) {
             try {
                 $disabled = Carbon::parse($disabledDate);
@@ -262,7 +262,7 @@ class Calendar extends Component
                     return true;
                 }
             } catch (\Exception $e) {
-                // Skip invalid date strings in the disabled dates array
+                
                 continue;
             }
         }
@@ -301,23 +301,23 @@ class Calendar extends Component
     public function getFormattedValue(): ?string
     {
         if ($this->isRange) {
-            // Format range mode: start,end or start, (partial) or null (empty)
+            
             $start = $this->startDate instanceof Carbon ? $this->startDate->format('Y-m-d') : '';
             $end = $this->endDate instanceof Carbon ? $this->endDate->format('Y-m-d') : '';
 
             if ($start && $end) {
-                // Complete range selection
+                
                 return $start.','.$end;
             } elseif ($start) {
-                // Partial range selection (only start date)
+                
                 return $start.',';
             } else {
-                // No dates selected
+                
                 return null;
             }
         }
 
-        // Single date mode - return formatted date or null
+        
         return $this->value instanceof Carbon ? $this->value->format('Y-m-d') : null;
     }
 
@@ -340,20 +340,20 @@ class Calendar extends Component
     public function getMonthYearDisplay(): string
     {
         if ($this->monthsToShow > 1) {
-            // Multi-month display - calculate start and end months
+            
             $startMonth = $this->currentMonth;
             $endMonth = $this->currentMonth->copy()->addMonths($this->monthsToShow - 1);
 
             if ($startMonth->year === $endMonth->year) {
-                // Same year - show "January - March 2024"
+                
                 return $startMonth->format('F').' - '.$endMonth->format('F Y');
             } else {
-                // Different years - show "December 2023 - February 2024"
+                
                 return $startMonth->format('F Y').' - '.$endMonth->format('F Y');
             }
         }
 
-        // Single month display - show "January 2024"
+        
         return $this->currentMonth->format('F Y');
     }
 
@@ -375,18 +375,18 @@ class Calendar extends Component
     public function getDataAttributes(): array
     {
         $attributes = [
-            // Component identification (Keys UI standard)
+            
             'data-keys-calendar' => 'true',
             'data-keys-component' => 'true',
 
-            // Core configuration
+            
             'data-variant' => $this->isRange ? 'range' : 'single',
             'data-size' => $this->size,
             'data-months-to-show' => (string) $this->monthsToShow,
             'id' => $this->id,
         ];
 
-        // State attributes
+        
         if ($this->disabled) {
             $attributes['data-disabled'] = 'true';
         }
@@ -399,7 +399,7 @@ class Calendar extends Component
             $attributes['data-required'] = 'true';
         }
 
-        // Range-specific attributes
+        
         if ($this->isRange) {
             $attributes['data-is-range'] = 'true';
 
@@ -427,7 +427,7 @@ class Calendar extends Component
             }
         }
 
-        // Constraint attributes
+        
         if ($this->minDate instanceof Carbon) {
             $attributes['data-has-min-date'] = 'true';
         }
@@ -440,7 +440,7 @@ class Calendar extends Component
             $attributes['data-has-disabled-dates'] = 'true';
         }
 
-        // Feature flags
+        
         if (! empty($this->quickSelectors) && $this->quickSelectors !== false) {
             $attributes['data-has-quick-selectors'] = 'true';
         }
@@ -483,29 +483,29 @@ class Calendar extends Component
      */
     public function getFilteredQuickSelectors(): array
     {
-        // If quickSelectors is false, return empty array
+        
         if ($this->quickSelectors === false) {
             return [];
         }
 
-        // If quickSelectors is true, use default selectors
+        
         $selectors = is_array($this->quickSelectors) ? $this->quickSelectors : $this->getDefaultQuickSelectors();
 
         if (! $this->isRange) {
-            // In single date mode, filter out range-only selectors
-            // but keep selectors that can work in both modes
+            
+            
             $selectors = array_filter($selectors, function ($selector) {
-                // Keep if no range flag (single date selectors)
+                
                 if (! isset($selector['range'])) {
                     return true;
                 }
 
-                // Keep if explicitly marked as compatible with single mode
+                
                 if (isset($selector['singleCompatible']) && $selector['singleCompatible']) {
                     return true;
                 }
 
-                // Filter out range-only selectors
+                
                 return ! $selector['range'];
             });
         }

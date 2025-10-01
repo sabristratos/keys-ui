@@ -1,12 +1,10 @@
 
 @php
-    // Base stack classes
+
     $baseClasses = 'flex items-center';
 
-    // Direction classes
     $directionClasses = $direction === 'rtl' ? 'flex-row-reverse' : 'flex-row';
 
-    // Spacing classes based on size and spacing preference
     $spacingClasses = match ($spacing) {
         'tight' => match ($size) {
             'xs' => '-space-x-1',
@@ -35,7 +33,6 @@
         default => '-space-x-2.5'
     };
 
-    // Handle RTL direction for spacing
     if ($direction === 'rtl') {
         $spacingClasses = str_replace('-space-x-', '-space-x-reverse ', $spacingClasses);
     }
@@ -44,12 +41,6 @@
 @endphp
 
 <div {{ $attributes->merge(['class' => $stackClasses])->merge($dataAttributes) }}>
-    {{--
-        The slot content will contain individual Avatar components.
-        Note: To limit the number of avatars shown, users should pass only
-        the desired avatars in the slot. The "+N more" functionality can be
-        implemented by the developer by counting their data and passing a
-        subset to the stack component.
-    --}}
+    
     {{ $slot }}
 </div>

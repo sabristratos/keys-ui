@@ -79,19 +79,19 @@ class Radio extends Component
             return $this->errors->isNotEmpty();
         }
 
-        // Handle Laravel MessageBag
+        
         if (is_object($this->errors) && method_exists($this->errors, 'any')) {
             return $this->errors->any();
         }
 
-        // Handle ViewErrorBag
+        
         if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
             try {
                 $bag = $this->errors->getBag('default');
 
                 return $bag && $bag->any();
             } catch (\Exception $e) {
-                // If getBag fails, treat as no errors
+                
                 return false;
             }
         }
@@ -173,7 +173,7 @@ class Radio extends Component
             'data-value' => $this->value,
         ];
 
-        // State attributes
+        
         if ($this->checked) {
             $attributes['data-checked'] = 'true';
         }
@@ -190,7 +190,7 @@ class Radio extends Component
             $attributes['data-invalid'] = 'true';
         }
 
-        // Content attributes
+        
         if ($this->hasContent()) {
             $attributes['data-has-content'] = 'true';
         }
@@ -204,13 +204,13 @@ class Radio extends Component
             $attributes['data-has-description'] = 'true';
         }
 
-        // Actions
+        
         if ($this->hasActions()) {
             $attributes['data-has-actions'] = 'true';
             $attributes['data-actions-count'] = count($this->actions);
         }
 
-        // Display mode
+        
         if (! $this->showInput) {
             $attributes['data-input-hidden'] = 'true';
         }

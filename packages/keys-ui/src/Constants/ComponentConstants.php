@@ -106,6 +106,21 @@ class ComponentConstants
     public const BADGE_VARIANTS = ['simple', 'chip', 'subtle'];
 
     /**
+     * Badge Group spacing options
+     */
+    public const BADGE_GROUP_SPACING = ['tight', 'default', 'loose'];
+
+    /**
+     * Badge Group orientation options
+     */
+    public const BADGE_GROUP_ORIENTATIONS = ['horizontal', 'vertical'];
+
+    /**
+     * Badge Group alignment options
+     */
+    public const BADGE_GROUP_ALIGNMENTS = ['start', 'center', 'end', 'justify'];
+
+    /**
      * Checkbox/Radio variants
      */
     public const FORM_VARIANTS = ['standard', 'bordered', 'colored', 'card'];
@@ -157,7 +172,7 @@ class ComponentConstants
     /**
      * Loading animations
      */
-    public const LOADING_ANIMATIONS = ['spinner', 'dots', 'pulse'];
+    public const LOADING_ANIMATIONS = ['spinner', 'dots', 'bars', 'pulse', 'wave', 'bounce'];
 
     /**
      * Image overlay colors

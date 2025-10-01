@@ -15,15 +15,12 @@ export class RadioActions extends BaseActionClass {
      * Initialize radio elements - required by BaseActionClass
      */
     protected initializeElements(): void {
-        // RadioActions doesn't need to initialize specific elements on load
-        // Actions are handled via event delegation
     }
 
     /**
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Handle label clicks
         EventUtils.handleDelegatedClick('label[for]', (label) => {
             const radioId = label.getAttribute('for');
             if (!radioId) return;
@@ -34,7 +31,6 @@ export class RadioActions extends BaseActionClass {
             this.focusRadioInput(radioInput);
         });
 
-        // Handle keyboard navigation
         EventUtils.handleDelegatedKeydown('input[type="radio"]', (target, event) => {
             const navigationHandler = EventUtils.createNavigationHandler({
                 onArrowDown: () => this.focusNextRadio(target as HTMLInputElement),
@@ -135,8 +131,6 @@ export class RadioActions extends BaseActionClass {
      * Clean up RadioActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // RadioActions doesn't have additional cleanup beyond base class
-        // Event listeners are automatically cleaned up by browser
     }
 }
 

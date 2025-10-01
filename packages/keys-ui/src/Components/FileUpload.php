@@ -4,9 +4,18 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
 
+/**
+ * FileUpload Component
+ *
+ * A comprehensive file upload component with drag-and-drop support, file preview,
+ * validation, and Livewire integration for real-time upload progress.
+ */
 class FileUpload extends Component
 {
+    use HandlesValidationErrors;
+
     public function __construct(
         public ?string $name = null,
         public ?string $id = null,
@@ -21,59 +30,59 @@ class FileUpload extends Component
         public bool $showErrors = true,
         public bool $dragDrop = true,
         public ?string $placeholder = null,
-        public string $previewStyle = 'transform'
+        public string $previewStyle = 'transform',
+        public bool $multiple = false,
+        public ?int $maxFiles = null
     ) {
-        $this->id = $this->id ?? $this->name ?? 'file-upload';
-        $this->placeholder = $this->placeholder ?? 'Drop files here or click to browse';
+        
+        $this->id = $this->id ?? $this->name ?? 'file-upload-' . uniqid();
+
+        
+        if ($this->placeholder === null) {
+            $this->placeholder = $this->multiple
+                ? 'Drop files here or click to browse'
+                : 'Drop file here or click to browse';
+        }
     }
 
+    /**
+     * Check if the component is using shorthand mode (with label).
+     */
     public function isShorthand(): bool
     {
         return !is_null($this->label);
     }
 
-    public function hasError(): bool
+    /**
+     * Check if Livewire is available and should be used for this component.
+     *
+     * Conservative check to prevent false positives:
+     * - Livewire class must exist
+     * - Component must have a name (required for wire:model)
+     * - Must be in a Livewire request context (has Livewire headers)
+     */
+    public function isLivewireMode(): bool
     {
-        if (is_null($this->errors)) {
+        if (!class_exists('Livewire\Component') || !app()->bound('livewire')) {
             return false;
         }
 
-        if (is_string($this->errors)) {
-            return !empty(trim($this->errors));
+        
+        if (empty($this->name)) {
+            return false;
         }
 
-        if (is_array($this->errors)) {
-            return !empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        // Handle Laravel MessageBag
-        if (is_object($this->errors) && method_exists($this->errors, 'any')) {
-            return $this->errors->any();
-        }
-
-        // Handle ViewErrorBag
-        if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
-            try {
-                $bag = $this->errors->getBag('default');
-                return $bag && $bag->any();
-            } catch (\Exception $e) {
-                // If getBag fails, treat as no errors
-                return false;
-            }
-        }
-
-        return false;
+        
+        $request = request();
+        return $request->hasHeader('X-Livewire') || $request->hasHeader('X-Livewire-Request');
     }
 
-    public function isLivewireMode(): bool
-    {
-        return class_exists('Livewire\Component') && app()->bound('livewire');
-    }
-
+    /**
+     * Convert human-readable file size to bytes.
+     *
+     * Supports: KB, MB, GB, or raw bytes
+     * Examples: "5MB", "100KB", "1GB", "1024"
+     */
     public function getMaxSizeInBytes(): ?int
     {
         if (!$this->maxSize) {
@@ -83,48 +92,42 @@ class FileUpload extends Component
         $size = trim(strtoupper($this->maxSize));
         $number = (int) $size;
 
-        if (str_contains($size, 'KB')) {
-            return $number * 1024;
-        }
-
-        if (str_contains($size, 'MB')) {
-            return $number * 1024 * 1024;
-        }
-
-        if (str_contains($size, 'GB')) {
-            return $number * 1024 * 1024 * 1024;
-        }
-
-        return $number;
-    }
-
-    public function baseClasses(): string
-    {
-        return 'relative border-2 border-dashed rounded-lg transition-all duration-200';
-    }
-
-    public function sizeClasses(): string
-    {
-        return match ($this->size) {
-            'sm' => 'p-4',
-            'md' => 'p-6',
-            'lg' => 'p-8',
-            default => 'p-6'
+        return match (true) {
+            str_contains($size, 'GB') => $number * 1024 * 1024 * 1024,
+            str_contains($size, 'MB') => $number * 1024 * 1024,
+            str_contains($size, 'KB') => $number * 1024,
+            default => $number
         };
     }
 
-    public function stateClasses(): string
+    /**
+     * Get formatted accepted file types for display.
+     *
+     * Converts MIME types like "image/png,application/pdf" to "PNG, PDF"
+     */
+    public function getFormattedAcceptedTypes(): string
     {
-        if ($this->disabled) {
-            return 'border-neutral bg-surface cursor-not-allowed opacity-50';
+        if ($this->accept === '*') {
+            return '';
         }
 
-        if ($this->hasError()) {
-            return 'border-danger bg-danger/5 hover:border-danger-hover';
-        }
+        $acceptedTypes = explode(',', $this->accept);
+        $displayTypes = array_map(
+            fn($type) => strtoupper(str_replace(['image/', 'application/', '.'], '', trim($type))),
+            $acceptedTypes
+        );
 
-        return 'border-border bg-surface hover:border-brand hover:bg-brand/5 focus-within:border-brand focus-within:bg-brand/5';
+        return implode(', ', $displayTypes);
     }
+
+    /**
+     * Get the appropriate icon size based on component size.
+     */
+    public function getIconSize(): string
+    {
+        return $this->size === 'sm' ? 'lg' : 'xl';
+    }
+
 
     public function getDataAttributes(): array
     {
@@ -134,6 +137,7 @@ class FileUpload extends Component
             'data-drag-drop' => $this->dragDrop ? 'true' : 'false',
             'data-livewire' => $this->isLivewireMode() ? 'true' : 'false',
             'data-preview-style' => $this->previewStyle,
+            'data-multiple' => $this->multiple ? 'true' : 'false',
         ];
 
         if ($this->disabled) {
@@ -157,6 +161,10 @@ class FileUpload extends Component
             $attributes['data-max-size-formatted'] = $this->maxSize;
         }
 
+        if ($this->maxFiles) {
+            $attributes['data-max-files'] = (string) $this->maxFiles;
+        }
+
         return $attributes;
     }
 
@@ -177,12 +185,17 @@ class FileUpload extends Component
         return $this->isLivewireMode() && $this->name;
     }
 
+    /**
+     * Render the file upload component.
+     */
     public function render()
     {
         return view('keys::components.file-upload', [
             'dataAttributes' => $this->getDataAttributes(),
             'computedWireAttributes' => $this->getComputedWireAttributes(),
             'shouldShowLivewireContent' => $this->shouldShowLivewireContent(),
+            'formattedAcceptedTypes' => $this->getFormattedAcceptedTypes(),
+            'iconSize' => $this->getIconSize(),
         ]);
     }
 }

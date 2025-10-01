@@ -1,0 +1,128 @@
+/*
+ * Keys UI Scrollbar Utilities
+ * Custom scrollbar implementation with cross-browser compatibility
+ * Multiple variants: default, thin, thick, hide
+ */
+
+@layer components {
+    /* ===== SCROLLBAR COMPONENTS ===== */
+    /* Custom Scrollbar Implementation - Modern browsers with cross-browser compatibility */
+    /* Base scrollbar styling - scoped to avoid global conflicts */
+    .scrollable,
+    [data-scrollable="true"],
+    [data-keys-component],
+    [data-select-options] {
+        /* Firefox */
+        scrollbar-width: thin;
+        scrollbar-color: light-dark(var(--color-neutral-300), var(--color-neutral-600)) transparent;
+    }
+
+    /* Webkit browsers (Chrome, Safari, Edge) */
+    .scrollable::-webkit-scrollbar,
+    [data-scrollable="true"]::-webkit-scrollbar,
+    [data-keys-component]::-webkit-scrollbar,
+    [data-select-options]::-webkit-scrollbar {
+        width: var(--width-scrollbar);
+        height: var(--width-scrollbar);
+    }
+
+    .scrollable::-webkit-scrollbar-track,
+    [data-scrollable="true"]::-webkit-scrollbar-track,
+    [data-keys-component]::-webkit-scrollbar-track,
+    [data-select-options]::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 3px;
+    }
+
+    .scrollable::-webkit-scrollbar-thumb,
+    [data-scrollable="true"]::-webkit-scrollbar-thumb,
+    [data-keys-component]::-webkit-scrollbar-thumb,
+    [data-select-options]::-webkit-scrollbar-thumb {
+        background: light-dark(var(--color-neutral-300), var(--color-neutral-600));
+        border-radius: 3px;
+        transition: background-color 0.2s ease;
+    }
+
+    .scrollable::-webkit-scrollbar-thumb:hover,
+    [data-scrollable="true"]::-webkit-scrollbar-thumb:hover,
+    [data-keys-component]::-webkit-scrollbar-thumb:hover,
+    [data-select-options]::-webkit-scrollbar-thumb:hover {
+        background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+    }
+
+    .scrollable::-webkit-scrollbar-thumb:active,
+    [data-scrollable="true"]::-webkit-scrollbar-thumb:active,
+    [data-keys-component]::-webkit-scrollbar-thumb:active,
+    [data-select-options]::-webkit-scrollbar-thumb:active {
+        background: light-dark(var(--color-neutral-500), var(--color-neutral-400));
+    }
+
+    .scrollable::-webkit-scrollbar-corner,
+    [data-scrollable="true"]::-webkit-scrollbar-corner,
+    [data-keys-component]::-webkit-scrollbar-corner,
+    [data-select-options]::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+
+    /* Thin scrollbar variant for Select components and small containers */
+    .scrollbar-thin,
+    [data-select-options] {
+        /* Firefox */
+        scrollbar-width: thin;
+        scrollbar-color: light-dark(var(--color-neutral-400), var(--color-neutral-500)) transparent;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar,
+    [data-select-options]::-webkit-scrollbar {
+        width: var(--width-scrollbar-thin);
+        height: var(--width-scrollbar-thin);
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb,
+    [data-select-options]::-webkit-scrollbar-thumb {
+        background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+        border-radius: 2px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover,
+    [data-select-options]::-webkit-scrollbar-thumb:hover {
+        background: light-dark(var(--color-neutral-500), var(--color-neutral-400));
+    }
+
+    /* Hide scrollbar variant */
+    .scrollbar-hide {
+        /* Firefox */
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Thick scrollbar variant for large content areas */
+    .scrollbar-thick {
+        /* Firefox */
+        scrollbar-width: auto;
+        scrollbar-color: light-dark(var(--color-neutral-300), var(--color-neutral-600)) light-dark(var(--color-neutral-100), var(--color-neutral-800));
+    }
+
+    .scrollbar-thick::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+    }
+
+    .scrollbar-thick::-webkit-scrollbar-track {
+        background: light-dark(var(--color-neutral-100), var(--color-neutral-800));
+        border-radius: 6px;
+    }
+
+    .scrollbar-thick::-webkit-scrollbar-thumb {
+        background: light-dark(var(--color-neutral-300), var(--color-neutral-600));
+        border-radius: 6px;
+        border: 2px solid light-dark(var(--color-neutral-100), var(--color-neutral-800));
+    }
+
+    .scrollbar-thick::-webkit-scrollbar-thumb:hover {
+        background: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+    }
+}

@@ -27,13 +27,13 @@ class Range extends Component
         public bool $optional = false,
         public string|array|Collection|null $errors = null,
         public bool $showErrors = true,
-        public ?string $icon = null,  // Add icon support
-        public ?string $hint = null,  // Add hint support
+        public ?string $icon = null,  
+        public ?string $hint = null,  
         public bool $hasError = false
     ) {
         $this->id = $this->id ?? $this->name;
 
-        // Handle dual range values
+        
         if ($this->dual) {
             if (is_array($this->value)) {
                 $this->minValue = $this->value[0] ?? $this->min;
@@ -46,17 +46,17 @@ class Range extends Component
             $this->value = $this->value ?? $this->min;
         }
 
-        // Auto-enable showTicks if ticks are provided
+        
         if (! empty($this->ticks)) {
             $this->showTicks = true;
         }
 
-        // Validate min/max
+        
         if ($this->min >= $this->max) {
             $this->max = $this->min + 1;
         }
 
-        // Ensure step is positive
+        
         if ($this->step <= 0) {
             $this->step = 1;
         }
@@ -95,19 +95,19 @@ class Range extends Component
             return $this->errors->isNotEmpty();
         }
 
-        // Handle Laravel MessageBag
+        
         if (is_object($this->errors) && method_exists($this->errors, 'any')) {
             return $this->errors->any();
         }
 
-        // Handle ViewErrorBag
+        
         if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
             try {
                 $bag = $this->errors->getBag('default');
 
                 return $bag && $bag->any();
             } catch (\Exception $e) {
-                // If getBag fails, treat as no errors
+                
                 return false;
             }
         }
@@ -187,7 +187,7 @@ class Range extends Component
             'data-value' => $this->dual ? json_encode([$this->minValue, $this->maxValue]) : $this->value,
         ];
 
-        // State attributes
+        
         if ($this->disabled) {
             $attributes['data-disabled'] = 'true';
         }
@@ -200,7 +200,7 @@ class Range extends Component
             $attributes['data-invalid'] = 'true';
         }
 
-        // Feature attributes
+        
         if ($this->showValues) {
             $attributes['data-show-values'] = 'true';
         }

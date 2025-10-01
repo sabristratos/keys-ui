@@ -103,14 +103,12 @@ export class TabsActions extends BaseActionClass<TabState> {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as HTMLElement;
 
-                    // Check if the added node is a tabs element
                     if (DOMUtils.hasDataAttribute(element, 'keys-tabs', 'true')) {
                         if (!this.hasState(element)) {
                             this.initializeTabsElement(element);
                         }
                     }
 
-                    // Check for tabs within the added node
                     const tabs = DOMUtils.findByDataAttribute('keys-tabs', 'true', element);
                     tabs.forEach(tabsEl => {
                         if (!this.hasState(tabsEl)) {
@@ -143,7 +141,6 @@ export class TabsActions extends BaseActionClass<TabState> {
 
         this.repositionMarker(tabsElement, targetTab);
 
-        // Only focus when activated via keyboard
         if (shouldFocus) {
             targetTab.focus();
         }

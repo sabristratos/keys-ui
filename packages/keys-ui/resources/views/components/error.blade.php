@@ -1,25 +1,48 @@
 @if($hasErrors())
     @php
+
         $messages = $getMessages();
+        $baseClasses = 'text-danger text-sm mt-1';
+
         $errorAttributes = $attributes->merge([
-            'class' => $baseClasses()
+            'class' => $baseClasses
+        ])->merge($dataAttributes);
+
+        if ($id) {
+            $errorAttributes = $errorAttributes->merge(['id' => $id]);
+        }
+
+        $errorAttributes = $errorAttributes->merge([
+            'role' => 'alert',
+            'aria-live' => 'polite'
         ]);
     @endphp
 
     <div {{ $errorAttributes }}>
         @if($showIcon && count($messages) === 1)
-            <div class="flex items-start gap-1">
-                <x-keys::icon name="exclamation-triangle" size="xs" class="text-danger mt-0.5 shrink-0" />
+            
+            <div class="flex items-center gap-1.5">
+                <x-keys::icon
+                    name="heroicon-o-exclamation-triangle"
+                    size="xs"
+                    class="text-danger mt-0.5 shrink-0"
+                />
                 <span>{{ $messages[0] }}</span>
             </div>
         @elseif(count($messages) === 1)
+            
             <span>{{ $messages[0] }}</span>
         @else
+            
             <ul class="list-disc list-inside space-y-1">
                 @foreach($messages as $message)
-                    <li class="flex items-start gap-1">
+                    <li class="flex items-center gap-1.5">
                         @if($showIcon)
-                            <x-keys::icon name="exclamation-triangle" size="xs" class="text-danger mt-0.5 shrink-0" />
+                            <x-keys::icon
+                                name="heroicon-o-exclamation-triangle"
+                                size="xs"
+                                class="text-danger mt-0.5 shrink-0"
+                            />
                         @endif
                         <span>{{ $message }}</span>
                     </li>

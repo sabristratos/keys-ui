@@ -13,7 +13,6 @@
 import { BaseActionClass } from './utils/BaseActionClass';
 import { EventUtils } from './utils/EventUtils';
 import { DOMUtils } from './utils/DOMUtils';
-import { FloatingManager, FloatingInstance } from './utils/FloatingManager';
 
 interface TimePickerState {
     isOpen: boolean;
@@ -27,7 +26,6 @@ interface TimePickerState {
     minTime: string | null;
     maxTime: string | null;
     value: string | null;
-    floating?: FloatingInstance;
 }
 
 interface ParsedTime {
@@ -96,26 +94,21 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Trigger click - let native popover handle the opening/closing
         EventUtils.handleDelegatedClick('[data-timepicker-trigger]', (trigger, event) => {
             console.log('🕒 TimePicker trigger clicked:', trigger);
-            // Don't prevent default - let native popover API handle the toggle
             const timepicker = DOMUtils.findClosest(trigger, '[data-keys-timepicker]') as HTMLElement;
             if (timepicker && !this.isDisabled(timepicker)) {
                 console.log('🕒 Native popover will handle toggle for:', timepicker);
-                // Update our internal state but let popover handle the UI
                 const state = this.getState(timepicker);
                 if (state) {
-                    // The popover will handle opening/closing, we just track state
                     console.log('🕒 Current TimePicker state:', state);
                 }
             } else {
                 console.log('🕒 TimePicker trigger ignored - disabled or not found');
-                event.preventDefault(); // Only prevent default if disabled
+                event.preventDefault();
             }
         });
 
-        // Clear button
         EventUtils.handleDelegatedClick('[data-timepicker-clear]', (clearButton, event) => {
             console.log('🕒 TimePicker clear button clicked:', clearButton);
             event.preventDefault();
@@ -127,7 +120,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         });
 
-        // Hour selection
         EventUtils.handleDelegatedClick('[data-timepicker-hour]', (hourButton, event) => {
             event.preventDefault();
             const timepicker = DOMUtils.findClosest(hourButton, '[data-keys-timepicker]') as HTMLElement;
@@ -137,7 +129,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         });
 
-        // Minute selection
         EventUtils.handleDelegatedClick('[data-timepicker-minute]', (minuteButton, event) => {
             event.preventDefault();
             const timepicker = DOMUtils.findClosest(minuteButton, '[data-keys-timepicker]') as HTMLElement;
@@ -147,7 +138,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         });
 
-        // Second selection
         EventUtils.handleDelegatedClick('[data-timepicker-second]', (secondButton, event) => {
             event.preventDefault();
             const timepicker = DOMUtils.findClosest(secondButton, '[data-keys-timepicker]') as HTMLElement;
@@ -157,7 +147,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         });
 
-        // Period selection
         EventUtils.handleDelegatedClick('[data-timepicker-period]', (periodButton, event) => {
             event.preventDefault();
             const timepicker = DOMUtils.findClosest(periodButton, '[data-keys-timepicker]') as HTMLElement;
@@ -167,7 +156,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         });
 
-        // Format toggle
         EventUtils.handleDelegatedClick('[data-timepicker-format]', (formatButton, event) => {
             event.preventDefault();
             const timepicker = DOMUtils.findClosest(formatButton, '[data-keys-timepicker]') as HTMLElement;
@@ -177,7 +165,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         });
 
-        // Now button
         EventUtils.handleDelegatedClick('[data-timepicker-now]', (nowButton, event) => {
             event.preventDefault();
             const timepicker = DOMUtils.findClosest(nowButton, '[data-keys-timepicker]') as HTMLElement;
@@ -186,7 +173,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         });
 
-        // Apply button
         EventUtils.handleDelegatedClick('[data-timepicker-apply]', (applyButton, event) => {
             event.preventDefault();
             const timepicker = DOMUtils.findClosest(applyButton, '[data-keys-timepicker]') as HTMLElement;
@@ -195,7 +181,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         });
 
-        // Cancel button
         EventUtils.handleDelegatedClick('[data-timepicker-cancel]', (cancelButton, event) => {
             event.preventDefault();
             const timepicker = DOMUtils.findClosest(cancelButton, '[data-keys-timepicker]') as HTMLElement;
@@ -204,22 +189,18 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         });
 
-        // Click outside to close
         EventUtils.addEventListener(document, 'click', (event) => {
             const target = event.target as Node;
 
-            // Check if the click was inside any timepicker element
             if (target && target instanceof Element) {
                 const closestTimePicker = target.closest('[data-keys-timepicker]');
 
-                // If click is not inside any timepicker, close all dropdowns
                 if (!closestTimePicker) {
                     this.closeAllDropdowns();
                 }
             }
         });
 
-        // Keyboard navigation
         EventUtils.handleDelegatedKeydown('[data-keys-timepicker]', (timepicker, event) => {
             this.handleKeydown(timepicker as HTMLElement, event);
         });
@@ -234,12 +215,10 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as HTMLElement;
 
-                    // Check if the added node is a timepicker
                     if (element.matches && element.matches('[data-keys-timepicker]')) {
                         this.initializeTimePicker(element);
                     }
 
-                    // Check for timepickers within the added node
                     DOMUtils.querySelectorAll('[data-keys-timepicker]', element).forEach(timepicker => {
                         this.initializeTimePicker(timepicker as HTMLElement);
                     });
@@ -274,8 +253,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         state.isOpen = true;
         this.setState(timepicker, state);
 
-        // For popover-based approach, we don't manually show/hide
-        // The popover component handles this through its own mechanisms
         const trigger = DOMUtils.querySelector('[data-timepicker-trigger]', timepicker) as HTMLElement;
 
         if (trigger) {
@@ -295,16 +272,9 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const state = this.getState(timepicker);
         if (!state) return;
 
-        // Clean up floating instance
-        if (state.floating) {
-            state.floating.cleanup();
-            state.floating = undefined;
-        }
-
         state.isOpen = false;
         this.setState(timepicker, state);
 
-        // Actually close the popover by finding and clicking the trigger or using popover API
         const trigger = DOMUtils.querySelector('[data-timepicker-trigger]', timepicker) as HTMLElement;
         const popover = DOMUtils.querySelector('[data-popover]', timepicker) as HTMLElement;
 
@@ -312,19 +282,16 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             trigger.setAttribute('aria-expanded', 'false');
         }
 
-        // Try to close using popover API if available
         if (popover && 'hidePopover' in popover) {
             try {
                 (popover as any).hidePopover();
             } catch (e) {
-                // Fallback: trigger click to close popover
                 console.log('Fallback: triggering click to close popover');
                 if (trigger) {
                     trigger.click();
                 }
             }
         } else if (trigger) {
-            // Fallback: trigger click to close popover
             trigger.click();
         }
 
@@ -403,33 +370,31 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         }
 
         if (fromFormat === '24' && toFormat === '12') {
-            // Convert 24h to 12h
             if (hour === 0) {
-                return { hour: 12, period: 'AM' }; // 00:XX → 12:XX AM (midnight)
+                return { hour: 12, period: 'AM' };
             } else if (hour >= 1 && hour <= 11) {
-                return { hour, period: 'AM' }; // 01:XX-11:XX → 1:XX-11:XX AM
+                return { hour, period: 'AM' };
             } else if (hour === 12) {
-                return { hour: 12, period: 'PM' }; // 12:XX → 12:XX PM (noon)
+                return { hour: 12, period: 'PM' };
             } else {
-                return { hour: hour - 12, period: 'PM' }; // 13:XX-23:XX → 1:XX-11:XX PM
+                return { hour: hour - 12, period: 'PM' };
             }
         } else if (fromFormat === '12' && toFormat === '24') {
-            // Convert 12h to 24h
             if (!period) {
                 throw new Error('Period (AM/PM) required for 12h to 24h conversion');
             }
 
             if (period === 'AM') {
                 if (hour === 12) {
-                    return { hour: 0 }; // 12:XX AM → 00:XX (midnight)
+                    return { hour: 0 };
                 } else {
-                    return { hour }; // 1:XX-11:XX AM → 01:XX-11:XX
+                    return { hour };
                 }
-            } else { // PM
+            } else {
                 if (hour === 12) {
-                    return { hour: 12 }; // 12:XX PM → 12:XX (noon)
+                    return { hour: 12 };
                 } else {
-                    return { hour: hour + 12 }; // 1:XX-11:XX PM → 13:XX-23:XX
+                    return { hour: hour + 12 };
                 }
             }
         }
@@ -444,15 +409,12 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const state = this.getState(timepicker);
         if (!state) return;
 
-        // Check if format switching is allowed
         const formatMode = timepicker.dataset.formatMode;
         if (formatMode === '12' || formatMode === '24') {
-            // Format is locked, don't allow switching
             console.warn(`TimePicker format is locked to ${formatMode}h mode. Cannot switch to ${format}h.`);
             return;
         }
 
-        // Convert hour if switching formats
         if (state.format !== format) {
             const conversion = this.convertHourBetweenFormats(state.hour, state.format, format, state.period);
             state.hour = conversion.hour;
@@ -481,7 +443,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
 
         const currentTime = this.getCurrentTime();
 
-        // Use standardized conversion method for consistency
         if (state.format === '12') {
             const conversion = this.convertHourBetweenFormats(currentTime.hour, '24', '12');
             state.hour = conversion.hour;
@@ -557,7 +518,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             case 'ArrowUp':
                 if (state.isOpen) {
                     event.preventDefault();
-                    // Navigate focus in dropdown
                 } else {
                     event.preventDefault();
                     this.incrementTime(timepicker, 'minute', 1);
@@ -567,7 +527,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             case 'ArrowDown':
                 if (state.isOpen) {
                     event.preventDefault();
-                    // Navigate focus in dropdown
                 } else {
                     event.preventDefault();
                     this.incrementTime(timepicker, 'minute', -1);
@@ -600,12 +559,10 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         switch (unit) {
             case 'hour':
                 if (state.format === '12') {
-                    // 12-hour format: 1-12
                     state.hour = state.hour + direction;
                     if (state.hour > 12) state.hour = 1;
                     if (state.hour < 1) state.hour = 12;
                 } else {
-                    // 24-hour format: 0-23
                     state.hour = state.hour + direction;
                     if (state.hour > 23) state.hour = 0;
                     if (state.hour < 0) state.hour = 23;
@@ -613,7 +570,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
                 break;
 
             case 'minute':
-                // Handle minute wrap-around with step intervals
                 state.minute = state.minute + (direction * state.step);
                 if (state.minute >= 60) {
                     state.minute = state.minute % 60;
@@ -624,7 +580,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
                 break;
 
             case 'second':
-                // Handle second wrap-around
                 state.second = state.second + direction;
                 if (state.second >= 60) {
                     state.second = 0;
@@ -654,7 +609,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const formattedTime = this.formatTimeValue(state);
         const display = DOMUtils.querySelector('[data-timepicker-display]', timepicker) as HTMLElement;
 
-        // Update display content with proper placeholder handling
         if (display) {
             if (formattedTime) {
                 display.innerHTML = formattedTime;
@@ -664,14 +618,12 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         }
 
-        // Update data attributes for styling
         if (formattedTime) {
             timepicker.dataset.hasValue = 'true';
         } else {
             delete timepicker.dataset.hasValue;
         }
 
-        // Update clear button visibility
         this.updateClearButtonVisibility(timepicker, formattedTime);
     }
 
@@ -679,7 +631,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
      * Update preview in dropdown
      */
     private updatePreview(timepicker: HTMLElement): void {
-        // Could add a preview display in the dropdown header
         this.updateDisplay(timepicker);
     }
 
@@ -694,7 +645,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             hiddenInput.value = value;
         }
 
-        // Update display content with proper placeholder handling
         if (display) {
             if (value) {
                 display.innerHTML = value;
@@ -704,17 +654,14 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         }
 
-        // Update data attributes for styling
         if (value) {
             timepicker.dataset.hasValue = 'true';
         } else {
             delete timepicker.dataset.hasValue;
         }
 
-        // Update clear button visibility
         this.updateClearButtonVisibility(timepicker, value);
 
-        // Update state
         const state = this.getState(timepicker);
         if (state) {
             state.value = value;
@@ -732,12 +679,10 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
 
         if (clearButton) {
             if (value && !timepicker.dataset.disabled) {
-                // Show clear button
                 clearButton.classList.remove('opacity-0', 'pointer-events-none');
                 clearButton.classList.add('pointer-events-auto');
                 console.log('🕒 Clear button shown');
             } else {
-                // Hide clear button
                 clearButton.classList.add('opacity-0', 'pointer-events-none');
                 clearButton.classList.remove('pointer-events-auto');
                 console.log('🕒 Clear button hidden');
@@ -752,24 +697,19 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const state = this.getState(timepicker);
         if (!state) return;
 
-        // Clear all selected states
         DOMUtils.querySelectorAll('.selected', timepicker).forEach(el => el.classList.remove('selected'));
 
-        // Set selected hour
         const hourButton = DOMUtils.querySelector(`[data-timepicker-hour="${state.hour}"]`, timepicker);
         if (hourButton) hourButton.classList.add('selected');
 
-        // Set selected minute
         const minuteButton = DOMUtils.querySelector(`[data-timepicker-minute="${state.minute}"]`, timepicker);
         if (minuteButton) minuteButton.classList.add('selected');
 
-        // Set selected second
         if (state.showSeconds) {
             const secondButton = timepicker.querySelector(`[data-timepicker-second="${state.second}"]`);
             if (secondButton) secondButton.classList.add('selected');
         }
 
-        // Set selected period
         if (state.format === '12') {
             const periodButton = timepicker.querySelector(`[data-timepicker-period="${state.period}"]`);
             if (periodButton) periodButton.classList.add('selected');
@@ -806,15 +746,12 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const hourContainer = DOMUtils.querySelector('[data-timepicker-hours]', timepicker);
         if (!hourContainer) return;
 
-        // Generate hour options based on format
         const hourOptions = state.format === '12' ?
-            Array.from({length: 12}, (_, i) => i + 1) : // 1-12 for 12h
-            Array.from({length: 24}, (_, i) => i);      // 0-23 for 24h
+            Array.from({length: 12}, (_, i) => i + 1) :
+            Array.from({length: 24}, (_, i) => i);
 
-        // Clear existing hour buttons
         hourContainer.innerHTML = '';
 
-        // Create new hour buttons
         hourOptions.forEach(hour => {
             const button = document.createElement('button');
             button.type = 'button';
@@ -824,16 +761,12 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             hourContainer.appendChild(button);
         });
 
-        // Validate current hour is valid for the format (no conversion needed here)
-        // Any format conversion should have already happened in setFormat()
         if (state.format === '12' && (state.hour < 1 || state.hour > 12)) {
-            // Fallback validation - should not normally happen
             state.hour = Math.max(1, Math.min(12, state.hour));
             this.setState(timepicker, state);
             this.updateDisplay(timepicker);
             this.updatePreview(timepicker);
         } else if (state.format === '24' && (state.hour < 0 || state.hour > 23)) {
-            // Fallback validation - should not normally happen
             state.hour = Math.max(0, Math.min(23, state.hour));
             this.setState(timepicker, state);
             this.updateDisplay(timepicker);
@@ -864,10 +797,9 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const gridContainer = DOMUtils.querySelector('[data-timepicker-grid]', timepicker) as HTMLElement;
         if (!gridContainer) return;
 
-        // Calculate columns: hours + minutes + (seconds if enabled) + (period if 12h format)
-        let columns = 2; // hours + minutes
+        let columns = 2;
         if (state.showSeconds) columns++;
-        if (state.format === '12') columns++; // AM/PM period
+        if (state.format === '12') columns++;
 
         gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
     }
@@ -883,86 +815,12 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
     }
 
     /**
-     * Position dropdown using Floating UI
-     */
-    private positionDropdown(timepicker: HTMLElement): void {
-        const dropdown = DOMUtils.querySelector('[data-timepicker-dropdown]', timepicker) as HTMLElement;
-        const trigger = DOMUtils.querySelector('[data-timepicker-trigger]', timepicker) as HTMLElement;
-
-        if (!dropdown || !trigger) return;
-
-        // Setup floating for time picker dropdown
-        this.setupFloating(timepicker, trigger, dropdown);
-    }
-
-    /**
-     * Setup floating for time picker using Floating UI
-     */
-    private setupFloating(timepicker: HTMLElement, trigger: HTMLElement, dropdown: HTMLElement): void {
-        const state = this.getState(timepicker);
-        if (!state) return;
-
-        // Clean up existing floating instance
-        if (state.floating) {
-            state.floating.cleanup();
-        }
-
-        // Get configuration
-        const position = timepicker.dataset.position || 'bottom';
-        const align = timepicker.dataset.align || 'start';
-        const offset = parseInt(timepicker.dataset.offset || '8');
-
-        // Convert position and align to Floating UI placement
-        let placement: any = position;
-        if (position === 'bottom' || position === 'top') {
-            if (align === 'start') placement = `${position}-start`;
-            else if (align === 'end') placement = `${position}-end`;
-        }
-
-        // Create floating element with enhanced Floating UI features
-        const floating = FloatingManager.getInstance().createFloating(trigger, dropdown, {
-            placement,
-            offset,
-            flip: {
-                fallbackStrategy: 'bestFit',
-                padding: 8
-            },
-            shift: {
-                padding: 8,
-                crossAxis: true
-            },
-            size: {
-                apply: ({ availableHeight }) => {
-                    // Apply adaptive height for time picker dropdowns
-                    const minHeight = 200;
-                    const maxHeight = Math.max(availableHeight - 16, minHeight);
-                    dropdown.style.maxHeight = `${maxHeight}px`;
-                    dropdown.style.overflowY = 'auto';
-                }
-            },
-            hide: {
-                strategy: 'escaped'
-            },
-            autoUpdate: {
-                ancestorScroll: true,
-                ancestorResize: true,
-                elementResize: true,
-                layoutShift: true
-            }
-        });
-
-        state.floating = floating;
-        this.setState(timepicker, state);
-    }
-
-    /**
      * Parse time string into components
      */
     private parseTime(timeString: string | null): ParsedTime | null {
         if (!timeString) return null;
 
         try {
-            // Try different formats
             const formats = [
                 /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i,
                 /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/
@@ -980,7 +838,6 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
                 }
             }
         } catch (e) {
-            // Return null if parsing fails
         }
 
         return null;
@@ -1085,16 +942,10 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
      * Clean up TimePickerActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // Clean up all floating instances
-        this.getAllStates().forEach((state, timepicker) => {
-            if (state.floating) {
-                state.floating.cleanup();
-            }
-        });
+        // Cleanup if needed in the future
     }
 }
 
-// Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         TimePickerActions.getInstance().init();
@@ -1103,7 +954,6 @@ if (document.readyState === 'loading') {
     TimePickerActions.getInstance().init();
 }
 
-// Export for global access
 (window as any).TimePickerActions = TimePickerActions;
 
 declare global {

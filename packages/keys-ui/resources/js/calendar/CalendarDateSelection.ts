@@ -21,7 +21,7 @@ export interface CalendarDay {
 }
 
 export interface CalendarState {
-    currentMonth: string; // YYYY-MM format
+    currentMonth: string;
     selectedDate: string | null;
     startDate: string | null;
     endDate: string | null;
@@ -36,6 +36,8 @@ export interface CalendarState {
     monthNames: string[];
     viewMode: 'calendar' | 'month' | 'year';
     rangeSelectionState: 'none' | 'selecting-start' | 'selecting-end';
+    format: string;
+    displayFormat: string;
 }
 
 export class CalendarDateSelection {
@@ -49,7 +51,6 @@ export class CalendarDateSelection {
         if (state.isRange) {
             this.handleRangeSelection(calendar, dateString, state, setState);
         } else {
-            // Single date selection
             setState({
                 selectedDate: dateString,
                 focusedDate: dateString
@@ -63,7 +64,6 @@ export class CalendarDateSelection {
     private static handleRangeSelection(calendar: HTMLElement, dateString: string, state: CalendarState, setState: (newState: Partial<CalendarState>) => void): void {
         const clickedDate = new Date(dateString);
 
-        // If no start date or we're resetting the range
         if (!state.startDate || state.rangeSelectionState === 'none') {
             setState({
                 startDate: dateString,
@@ -74,12 +74,10 @@ export class CalendarDateSelection {
             return;
         }
 
-        // If we have a start date and are selecting the end
         if (state.startDate && !state.endDate) {
             const startDate = new Date(state.startDate);
 
             if (clickedDate < startDate) {
-                // Clicked date is before start - make it the new start
                 setState({
                     startDate: dateString,
                     endDate: null,
@@ -87,7 +85,6 @@ export class CalendarDateSelection {
                     rangeSelectionState: 'selecting-end'
                 });
             } else if (clickedDate.getTime() === startDate.getTime()) {
-                // Clicked the same date - clear the range
                 setState({
                     startDate: null,
                     endDate: null,
@@ -95,7 +92,6 @@ export class CalendarDateSelection {
                     rangeSelectionState: 'none'
                 });
             } else {
-                // Valid end date
                 setState({
                     endDate: dateString,
                     focusedDate: dateString,
@@ -105,7 +101,6 @@ export class CalendarDateSelection {
             return;
         }
 
-        // If we have both start and end dates, start a new range
         setState({
             startDate: dateString,
             endDate: null,

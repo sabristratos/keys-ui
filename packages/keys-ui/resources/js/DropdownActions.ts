@@ -32,7 +32,6 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
             this.initializeDropdown(dropdown);
         });
 
-        // Initialize submenus alongside dropdowns
         DOMUtils.findByDataAttribute('submenu', 'true').forEach(submenu => {
             this.initializeDropdown(submenu);
         });
@@ -82,7 +81,6 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Handle all click events with a single delegated listener
         EventUtils.handleDelegatedClick('[data-submenu-trigger], [data-dropdown-trigger], [data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-dropdown-panel], [data-submenu-panel]', (element, event) => {
             if (element.matches('[data-submenu-trigger]')) {
                 event.preventDefault();
@@ -133,54 +131,108 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
             }
         });
 
-        // Handle click outside to close dropdowns
         EventUtils.addEventListener(document, 'click', (event) => {
             const target = event.target as Node;
 
-            // Check if the click was inside any dropdown element
             if (target && target instanceof Element) {
                 const closestDropdownElement = target.closest('[data-submenu-trigger], [data-dropdown-trigger], [data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-dropdown-panel], [data-submenu-panel]');
 
-                // If click is not inside any dropdown element, close all dropdowns
                 if (!closestDropdownElement) {
                     this.closeAllDropdowns();
                 }
             }
         });
 
-        // Handle submenu hover events - simulate click for auto popovers
+        // Improved hover behavior for submenus - immediate open, delayed close
+        let hoverTimeout: number | null = null;
+
         EventUtils.addEventListener(document, 'mouseenter', (event) => {
             const submenuTrigger = DOMUtils.findClosest(event.target as Element, '[data-submenu-trigger]') as HTMLElement;
             if (submenuTrigger && !this.isMobile()) {
-                // Find the associated popover trigger element (div with data-popover-trigger)
+                // Clear any pending close timeout
+                if (hoverTimeout) {
+                    clearTimeout(hoverTimeout);
+                    hoverTimeout = null;
+                }
+
                 const popoverTrigger = DOMUtils.findClosest(submenuTrigger, '[data-popover-trigger]') as HTMLElement;
                 if (popoverTrigger) {
-                    // Close any sibling submenus by finding other popover triggers in the same dropdown
-                    const dropdown = DOMUtils.findClosest(submenuTrigger, '[data-keys-dropdown]') as HTMLElement;
-                    if (dropdown) {
-                        const siblingTriggers = DOMUtils.querySelectorAll('[data-popover-trigger]', dropdown);
-                        siblingTriggers.forEach(trigger => {
-                            const popoverId = trigger.getAttribute('data-popover-trigger');
-                            if (popoverId && popoverId !== popoverTrigger.getAttribute('data-popover-trigger')) {
-                                const popover = document.getElementById(popoverId);
-                                if (popover && popover.matches(':popover-open')) {
-                                    (popover as any).hidePopover?.();
-                                }
-                            }
-                        });
-                    }
+                    const popoverId = popoverTrigger.getAttribute('data-popover-trigger');
+                    const popover = popoverId ? document.getElementById(popoverId) : null;
 
-                    // Open this submenu by simulating click on trigger after a short delay
-                    setTimeout(() => {
-                        if (submenuTrigger.matches(':hover')) {
-                            submenuTrigger.click();
+                    // Only open if not already open
+                    if (popover && !popover.matches(':popover-open')) {
+                        // Close sibling submenus in the same parent menu
+                        const parentMenu = DOMUtils.findClosest(submenuTrigger, '[role="menu"]');
+                        if (parentMenu) {
+                            const siblingTriggers = DOMUtils.querySelectorAll('[data-submenu-trigger]', parentMenu);
+                            siblingTriggers.forEach(trigger => {
+                                if (trigger !== submenuTrigger) {
+                                    const siblingPopoverId = trigger.getAttribute('data-popover-trigger');
+                                    if (siblingPopoverId) {
+                                        const siblingPopover = document.getElementById(siblingPopoverId);
+                                        if (siblingPopover && siblingPopover.matches(':popover-open')) {
+                                            // Skip animation when closing siblings to prevent flashing
+                                            const originalTransition = (siblingPopover as HTMLElement).style.transition;
+                                            (siblingPopover as HTMLElement).style.transition = 'none';
+                                            (siblingPopover as any).hidePopover?.();
+                                            // Reset transition after hide completes
+                                            requestAnimationFrame(() => {
+                                                (siblingPopover as HTMLElement).style.transition = originalTransition;
+                                            });
+                                        }
+                                    }
+                                }
+                            });
                         }
-                    }, 100);
+
+                        // Open this submenu immediately
+                        submenuTrigger.click();
+                    }
                 }
             }
         }, { capture: true });
 
-        // Handle keyboard navigation
+        // Handle mouse leave to close submenus with a small delay
+        EventUtils.addEventListener(document, 'mouseleave', (event) => {
+            const submenuTrigger = DOMUtils.findClosest(event.target as Element, '[data-submenu-trigger]') as HTMLElement;
+            if (submenuTrigger && !this.isMobile()) {
+                const popoverTrigger = DOMUtils.findClosest(submenuTrigger, '[data-popover-trigger]') as HTMLElement;
+                if (popoverTrigger) {
+                    const popoverId = popoverTrigger.getAttribute('data-popover-trigger');
+                    const popover = popoverId ? document.getElementById(popoverId) : null;
+
+                    if (popover && popover.matches(':popover-open')) {
+                        const relatedTarget = (event as any).relatedTarget as Element;
+
+                        // Don't close if moving into the submenu panel itself
+                        if (relatedTarget && (
+                            DOMUtils.findClosest(relatedTarget, `#${popoverId}`) ||
+                            relatedTarget.id === popoverId
+                        )) {
+                            return;
+                        }
+
+                        // Close with a small delay to allow moving to the submenu
+                        hoverTimeout = window.setTimeout(() => {
+                            // Check if mouse is now over the popover or another submenu trigger
+                            if (popover.matches(':hover')) {
+                                return;
+                            }
+
+                            // Check if mouse moved to a sibling submenu trigger
+                            const hoveredElement = document.querySelector(':hover');
+                            const hoveredSubmenuTrigger = hoveredElement ? DOMUtils.findClosest(hoveredElement, '[data-submenu-trigger]') : null;
+
+                            if (!hoveredSubmenuTrigger || hoveredSubmenuTrigger === submenuTrigger) {
+                                (popover as any).hidePopover?.();
+                            }
+                        }, 200);
+                    }
+                }
+            }
+        }, { capture: true });
+
         EventUtils.handleDelegatedKeydown('[data-dropdown="true"]', (dropdown, event) => {
             this.handleKeydown(dropdown, event);
         });
@@ -195,21 +247,18 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as HTMLElement;
 
-                    // Check if the added node is a dropdown
                     if (DOMUtils.hasDataAttribute(element, 'dropdown', 'true')) {
                         if (!this.hasState(element)) {
                             this.initializeDropdown(element);
                         }
                     }
 
-                    // Check if the added node is a submenu
                     if (DOMUtils.hasDataAttribute(element, 'submenu', 'true')) {
                         if (!this.hasState(element)) {
                             this.initializeDropdown(element);
                         }
                     }
 
-                    // Check for dropdowns within the added node
                     const dropdowns = DOMUtils.findByDataAttribute('dropdown', 'true', element);
                     dropdowns.forEach(dropdown => {
                         if (!this.hasState(dropdown)) {
@@ -217,7 +266,6 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
                         }
                     });
 
-                    // Check for submenus within the added node
                     const submenus = DOMUtils.findByDataAttribute('submenu', 'true', element);
                     submenus.forEach(submenu => {
                         if (!this.hasState(submenu)) {
@@ -256,12 +304,10 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         state.focusedIndex = -1;
         this.setState(dropdown, state);
 
-        // Find popover element (now the dropdown uses Popover component)
         const popover = DOMUtils.querySelector('[data-keys-popover]', dropdown) as HTMLElement;
         const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
 
         if (popover) {
-            // Use HTML Popover API instead of CSS classes
             (popover as any).showPopover?.();
         }
 
@@ -288,16 +334,13 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         this.closeSiblingSubmenus(submenu);
         this.setState(submenu, state);
 
-        // Find the popover element within the submenu
         const popover = DOMUtils.querySelector('[data-keys-popover]', submenu) as HTMLElement;
         const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
 
         if (popover) {
-            // Use HTML Popover API
             try {
                 (popover as any).showPopover?.();
             } catch (error) {
-                // Silently handle popover API errors
             }
         }
 
@@ -319,18 +362,15 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
 
         this.closeChildSubmenus(dropdown);
 
-        // No longer need FloatingManager cleanup - CSS anchor positioning handles this
 
         state.isOpen = false;
         state.focusedIndex = -1;
         this.setState(dropdown, state);
 
-        // Find popover element (now the dropdown uses Popover component)
         const popover = DOMUtils.querySelector('[data-keys-popover]', dropdown) as HTMLElement;
         const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
 
         if (popover) {
-            // Use HTML Popover API instead of CSS classes
             (popover as any).hidePopover?.();
         }
 
@@ -354,12 +394,10 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         state.focusedIndex = -1;
         this.setState(submenu, state);
 
-        // Find the popover element within the submenu
         const popover = DOMUtils.querySelector('[data-keys-popover]', submenu) as HTMLElement;
         const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
 
         if (popover) {
-            // Use HTML Popover API
             (popover as any).hidePopover?.();
         }
 
@@ -567,64 +605,6 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
     }
 
     /**
-     * Setup floating for dropdown using Floating UI
-     */
-    private setupFloating(dropdown: HTMLElement, trigger: HTMLElement, panel: HTMLElement): void {
-        const state = this.getState(dropdown);
-        if (!state) return;
-
-        // Clean up existing floating instance
-        if (state.floating) {
-            state.floating.cleanup();
-        }
-
-        // Parse configuration from dropdown attributes
-        const position = dropdown.dataset.position || 'bottom';
-        const align = dropdown.dataset.align || 'start';
-        const offset = parseInt(dropdown.dataset.offset || '8');
-
-        // Convert position and align to Floating UI placement
-        let placement: any = position;
-        if (position === 'bottom' || position === 'top') {
-            if (align === 'start') placement = `${position}-start`;
-            else if (align === 'end') placement = `${position}-end`;
-        } else if (position === 'left' || position === 'right') {
-            if (align === 'start') placement = `${position}-start`;
-            else if (align === 'end') placement = `${position}-end`;
-        }
-
-        // Create floating element with enhanced Floating UI features
-        const floating = FloatingManager.getInstance().createFloating(trigger, panel, {
-            placement,
-            offset,
-            flip: {
-                fallbackStrategy: 'bestFit',
-                padding: 8
-            },
-            shift: {
-                padding: 8,
-                crossAxis: true
-            },
-            hide: {
-                strategy: 'escaped'
-            },
-            autoUpdate: {
-                ancestorScroll: true,
-                ancestorResize: true,
-                elementResize: true,
-                layoutShift: true
-            }
-        });
-
-        state.floating = floating;
-        this.setState(dropdown, state);
-    }
-
-
-
-
-
-    /**
      * Check if dropdown is disabled
      */
     private isDisabled(dropdown: HTMLElement): boolean {
@@ -647,7 +627,6 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
      * Clean up DropdownActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // No FloatingManager cleanup needed - CSS anchor positioning handles this
     }
 }
 

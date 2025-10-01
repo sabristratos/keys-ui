@@ -28,7 +28,7 @@ class Editor extends Component
         public string $loadingAnimation = 'spinner',
         public string $loadingText = 'Loading...'
     ) {
-        // Default toolbar if none provided - using proper Quill format
+        
         if (empty($this->toolbar)) {
             $this->toolbar = [
                 ['bold', 'italic', 'underline'],
@@ -39,27 +39,27 @@ class Editor extends Component
             ];
         }
 
-        // Generate unique ID if not provided
+        
         if (!$this->id) {
             $this->id = 'editor-' . uniqid();
         }
 
-        // Validate size
+        
         if (!in_array($this->size, ['xs', 'sm', 'md', 'lg', 'xl'])) {
             $this->size = 'md';
         }
 
-        // Validate theme
+        
         if (!in_array($this->theme, ['snow', 'bubble'])) {
             $this->theme = 'snow';
         }
 
-        // Validate loading animation
+        
         if (!in_array($this->loadingAnimation, ['spinner', 'dots', 'pulse'])) {
             $this->loadingAnimation = 'spinner';
         }
 
-        // Set error state if errors are present
+        
         if (!$this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
@@ -73,7 +73,7 @@ class Editor extends Component
             'modules' => $this->getQuillModules()
         ];
 
-        // Add readOnly if disabled or loading
+        
         if ($this->disabled || $this->loading) {
             $config['readOnly'] = true;
         }
@@ -88,31 +88,35 @@ class Editor extends Component
         ];
     }
 
-    public function editorClasses(): string
-    {
-        $classes = "quill-editor quill-editor-{$this->size}";
-
-        $stateClasses = $this->stateClasses();
-        if ($stateClasses) {
-            $classes .= ' ' . $stateClasses;
-        }
-
-        return $classes;
-    }
-
-    public function containerClasses(): string
-    {
-        return "quill-container quill-container-{$this->size}";
-    }
-
     public function getDataAttributes(): array
     {
-        return [
+        $attributes = [
+            'data-keys-editor' => 'true',
             'data-quill-editor' => 'true',
             'data-editor-id' => $this->id,
             'data-size' => $this->size,
-            'data-disabled' => $this->disabled ? 'true' : 'false',
+            'data-theme' => $this->theme,
         ];
+
+        
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
+        }
+
+        if ($this->loading) {
+            $attributes['data-loading'] = 'true';
+            $attributes['data-loading-animation'] = $this->loadingAnimation;
+        }
+
+        if ($this->hasError()) {
+            $attributes['data-invalid'] = 'true';
+        }
+
+        if ($this->required) {
+            $attributes['data-required'] = 'true';
+        }
+
+        return $attributes;
     }
 
     public function getAccessibilityAttributes(): array
@@ -183,43 +187,11 @@ class Editor extends Component
         return false;
     }
 
-    public function stateClasses(): string
-    {
-        $classes = [];
-
-        if ($this->disabled || $this->loading) {
-            $classes[] = 'quill-editor-disabled';
-        }
-
-        if ($this->loading) {
-            $classes[] = 'quill-editor-loading';
-        }
-
-        if ($this->hasError()) {
-            $classes[] = 'quill-editor-error';
-        }
-
-        return implode(' ', $classes);
-    }
-
-    public function isDisabledOrLoading(): bool
-    {
-        return $this->disabled || $this->loading;
-    }
-
-    public function getEditorHeight(): string
-    {
-        return $this->height;
-    }
-
     public function render()
     {
         return view('keys::components.editor', [
             'quillConfig' => $this->getQuillConfig(),
-            'editorClasses' => $this->editorClasses(),
-            'containerClasses' => $this->containerClasses(),
             'dataAttributes' => $this->getDataAttributes(),
-            'editorHeight' => $this->getEditorHeight(),
             'accessibilityAttributes' => $this->getAccessibilityAttributes(),
             'toolbarAccessibilityAttributes' => $this->getToolbarAccessibilityAttributes(),
             'liveRegionId' => $this->getLiveRegionId(),

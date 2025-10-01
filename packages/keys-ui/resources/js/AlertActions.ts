@@ -21,21 +21,17 @@ export class AlertActions extends BaseActionClass {
      * Initialize alert elements - required by BaseActionClass
      */
     protected initializeElements(): void {
-        // AlertActions doesn't need to initialize specific elements on load
-        // Actions are handled via event delegation
     }
 
     /**
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Handle dismiss button clicks
         EventUtils.handleDelegatedClick('[data-dismiss-alert]', (button, event) => {
             event.preventDefault();
             this.handleDismissClick(button as HTMLButtonElement);
         });
 
-        // Handle dismiss button keyboard activation
         EventUtils.handleDelegatedKeydown('[data-dismiss-alert]', (button, event) => {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
@@ -68,14 +64,12 @@ export class AlertActions extends BaseActionClass {
     public dismissAlert(alert: HTMLElement): void {
         alert.classList.add('alert-dismissing');
 
-        // Use AnimationUtils for slide out + fade animation
         const slideAnimation = AnimationUtils.slideOut(alert, 'right', {
             duration: 300,
             easing: 'ease-out',
             distance: 100
         });
 
-        // Also animate height collapse
         const collapseAnimation = AnimationUtils.collapseHeight(alert, {
             toHeight: 0,
             duration: 300,
@@ -94,7 +88,6 @@ export class AlertActions extends BaseActionClass {
     public showAlert(alert: HTMLElement): void {
         alert.style.display = 'block';
 
-        // Use AnimationUtils for slide in animation
         AnimationUtils.slideIn(alert, 'right', {
             duration: 300,
             easing: 'ease-out',
@@ -138,16 +131,13 @@ export class AlertActions extends BaseActionClass {
 
         container.appendChild(alert);
 
-        // Initial hidden state
         alert.style.opacity = '0';
         alert.style.transform = 'translateX(100%)';
 
-        // Small delay then show
         setTimeout(() => {
             this.showAlert(alert);
         }, 10);
 
-        // Auto-dismiss with AnimationUtils timer
         if (duration && duration > 0) {
             AnimationUtils.createTimer(() => {
                 this.dismissAlert(alert);
@@ -260,7 +250,6 @@ export class AlertActions extends BaseActionClass {
             action
         } as AlertActionEvent);
 
-        // Also dispatch on document for global listeners
         EventUtils.dispatchCustomEvent(document.body, 'alert-action', {
             alert,
             action
@@ -303,8 +292,6 @@ export class AlertActions extends BaseActionClass {
      * Clean up AlertActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // AlertActions doesn't have additional cleanup beyond base class
-        // Event listeners are automatically cleaned up by browser
     }
 }
 

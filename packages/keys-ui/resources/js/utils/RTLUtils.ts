@@ -18,15 +18,10 @@ export class RTLUtils {
             return this.cachedDirection === 'rtl';
         }
 
-        // Check multiple sources for RTL detection
         const sources = [
-            // Check document direction
             document.documentElement.getAttribute('dir'),
-            // Check html lang attribute for RTL languages
             this.getDirectionFromLanguage(document.documentElement.getAttribute('lang')),
-            // Check body direction
             document.body?.getAttribute('dir'),
-            // Check computed style
             window.getComputedStyle(document.documentElement).direction
         ];
 
@@ -41,7 +36,6 @@ export class RTLUtils {
             }
         }
 
-        // Default to LTR
         this.cachedDirection = 'ltr';
         return false;
     }
@@ -52,7 +46,6 @@ export class RTLUtils {
     private static getDirectionFromLanguage(lang: string | null): string | null {
         if (!lang) return null;
 
-        // Common RTL language codes
         const rtlLanguages = [
             'ar', 'he', 'fa', 'ur', 'ps', 'sd', 'ug', 'yi',
             'arc', 'ckb', 'dv', 'ha', 'ji', 'ku', 'ks', 'ms',
@@ -79,25 +72,21 @@ export class RTLUtils {
         }
 
         const classMap = new Map([
-            // Margin classes
             ['ml-', 'mr-'],
             ['mr-', 'ml-'],
             ['ms-', 'me-'],
             ['me-', 'ms-'],
 
-            // Padding classes
             ['pl-', 'pr-'],
             ['pr-', 'pl-'],
             ['ps-', 'pe-'],
             ['pe-', 'ps-'],
 
-            // Border classes
             ['border-l-', 'border-r-'],
             ['border-r-', 'border-l-'],
             ['border-s-', 'border-e-'],
             ['border-e-', 'border-s-'],
 
-            // Border radius classes
             ['rounded-l-', 'rounded-r-'],
             ['rounded-r-', 'rounded-l-'],
             ['rounded-s-', 'rounded-e-'],
@@ -111,17 +100,14 @@ export class RTLUtils {
             ['rounded-es-', 'rounded-ee-'],
             ['rounded-ee-', 'rounded-es-'],
 
-            // Position classes
             ['left-', 'right-'],
             ['right-', 'left-'],
             ['start-', 'end-'],
             ['end-', 'start-'],
 
-            // Text alignment
             ['text-left', 'text-right'],
             ['text-right', 'text-left'],
 
-            // Flexbox
             ['justify-start', 'justify-end'],
             ['justify-end', 'justify-start'],
             ['items-start', 'items-end'],
@@ -129,11 +115,9 @@ export class RTLUtils {
             ['self-start', 'self-end'],
             ['self-end', 'self-start'],
 
-            // Float
             ['float-left', 'float-right'],
             ['float-right', 'float-left'],
 
-            // Clear
             ['clear-left', 'clear-right'],
             ['clear-right', 'clear-left'],
         ]);
@@ -141,11 +125,9 @@ export class RTLUtils {
         let transformedClasses = classes;
 
         for (const [ltr, rtl] of classMap) {
-            // Create regex patterns to match class with any suffix
             const ltrPattern = new RegExp(`\\b${ltr.replace('-', '\\-')}([\\w\\-\\.\\[\\]%\\/]+)?\\b`, 'g');
             const rtlPattern = new RegExp(`\\b${rtl.replace('-', '\\-')}([\\w\\-\\.\\[\\]%\\/]+)?\\b`, 'g');
 
-            // Replace LTR classes with RTL equivalents
             transformedClasses = transformedClasses.replace(ltrPattern, (match, suffix) => {
                 return rtl + (suffix || '');
             });
@@ -204,13 +186,11 @@ export class RTLUtils {
      * Listen for direction changes and clear cache
      */
     static observeDirectionChanges(): void {
-        // Observer for dir attribute changes
         const observer = new MutationObserver((mutations) => {
             for (const mutation of mutations) {
                 if (mutation.type === 'attributes' &&
                     (mutation.attributeName === 'dir' || mutation.attributeName === 'lang')) {
                     this.clearCache();
-                    // Dispatch custom event for components to react
                     document.dispatchEvent(new CustomEvent('keys:direction-change', {
                         detail: { isRTL: this.isRTL() }
                     }));
@@ -241,11 +221,9 @@ export class RTLUtils {
         let alignment = align;
 
         if (this.isRTL()) {
-            // Transform horizontal positions
             if (position === 'left') position = 'right';
             else if (position === 'right') position = 'left';
 
-            // Transform alignment for horizontal dropdowns
             if ((preferredPosition === 'top' || preferredPosition === 'bottom')) {
                 if (align === 'start') alignment = 'end';
                 else if (align === 'end') alignment = 'start';
@@ -259,7 +237,6 @@ export class RTLUtils {
      * Initialize RTL support globally
      */
     static initialize(): void {
-        // Add RTL class to document if needed
         if (this.isRTL()) {
             document.documentElement.classList.add('rtl');
             document.documentElement.setAttribute('dir', 'rtl');
@@ -268,10 +245,8 @@ export class RTLUtils {
             document.documentElement.setAttribute('dir', 'ltr');
         }
 
-        // Start observing direction changes
         this.observeDirectionChanges();
 
-        // Add CSS custom properties for RTL support
         const style = document.createElement('style');
         style.textContent = `
             :root {

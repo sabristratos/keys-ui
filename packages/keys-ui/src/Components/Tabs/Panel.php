@@ -11,7 +11,7 @@ class Panel extends Component
         public bool $preserveOffscreen = false,
         public ?string $className = null
     ) {
-        //
+        
     }
 
     public function getDataAttributes(): array
@@ -26,7 +26,7 @@ class Panel extends Component
             'id' => 'panel-'.$this->value,
         ];
 
-        // Add style attribute for non-preserveOffscreen panels
+        
         if (! $this->preserveOffscreen) {
             $attributes['style'] = 'display: none;';
         }

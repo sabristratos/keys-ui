@@ -1,12 +1,11 @@
 @php
-    // Container classes based on orientation
+
     $containerClasses = match ($orientation) {
         'vertical' => 'flex gap-6',
         'horizontal' => 'flex flex-col space-y-4',
         default => 'flex flex-col space-y-4'
     };
 
-    // Size classes
     $sizeClasses = match ($size) {
         'sm' => 'text-sm',
         'md' => 'text-sm',
@@ -14,7 +13,6 @@
         default => 'text-sm'
     };
 
-    // Tab list classes
     $tabListBaseClasses = 'tabs-list flex relative';
     $tabListOrientationClasses = match ($orientation) {
         'vertical' => 'flex-col space-y-1 min-w-0',
@@ -29,7 +27,6 @@
     };
     $tabListClasses = "$tabListBaseClasses $tabListOrientationClasses $tabListVariantClasses";
 
-    // Panels container classes
     $panelsContainerClasses = match ($orientation) {
         'vertical' => 'flex-1 min-w-0',
         'horizontal' => 'mt-4',
@@ -43,17 +40,17 @@
     <div class="{{ $tabListClasses }}" role="tablist" aria-label="Tabs" data-tabs-list="true">
         {{ $slot }}
 
-        {{-- Animated marker element --}}
+        
         <div class="tab-marker" data-tab-marker="true" aria-hidden="true"></div>
     </div>
 
-    {{-- Panels container --}}
+    
     <div class="{{ $panelsContainerClasses }}" data-tabs-panels="true">
         {{ $panels ?? '' }}
     </div>
 </div>
 
-{{-- Component-specific styles for animated marker --}}
+
 <style>
 [data-tabs="true"] {
     position: relative;

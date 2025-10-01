@@ -17,7 +17,7 @@
 </head>
 <body class="bg-body text-foreground font-sans antialiased">
     <script>
-        // Prevent FOUC and handle initial theme detection
+
         (function() {
             const theme = localStorage.getItem('theme');
             const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -31,7 +31,6 @@
             }
         })();
 
-        // Theme switching function
         function setTheme(theme) {
             if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
@@ -59,16 +58,15 @@
             });
         }
 
-        // Initialize theme buttons when DOM loads
         document.addEventListener('DOMContentLoaded', updateThemeButtons);
     </script>
 
     <div class="min-h-screen">
-        <!-- Header -->
+        
         <header class="bg-surface border-b border-border sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
-                    <!-- Logo and title -->
+                    
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
@@ -83,9 +81,9 @@
                         @endif
                     </div>
 
-                    <!-- Navigation and theme toggle -->
+                    
                     <div class="flex items-center gap-4">
-                        <!-- Navigation links -->
+                        
                         <nav class="hidden md:flex items-center gap-2">
                             <a href="/" class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-neutral/10 transition-colors">
                                 Home
@@ -100,7 +98,7 @@
 
                         <x-keys::separator orientation="vertical" spacing="none" class="h-6" />
 
-                        <!-- Theme toggle -->
+                        
                         <div class="flex gap-1 p-1 bg-surface rounded-lg border border-border">
                             <button
                                 onclick="setTheme('light')"
@@ -126,12 +124,12 @@
             </div>
         </header>
 
-        <!-- Main content -->
+        
         <main class="flex-1">
             {{ $slot }}
         </main>
 
-        <!-- Footer -->
+        
         <footer class="bg-surface border-t border-border mt-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div class="text-center text-sm text-muted">

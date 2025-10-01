@@ -1,7 +1,7 @@
-{{-- Hidden form input --}}
+
 <input type="hidden" name="{{ $name }}" value="{{ $value }}" class="timepicker-hidden-input">
 
-{{-- Display input --}}
+
 <div class="relative">
     <input
         type="text"
@@ -19,7 +19,7 @@
         role="combobox"
     >
 
-    {{-- Clock icon --}}
+    
     <div class="absolute inset-y-0 right-0 flex items-center">
         @if($clearable && $value)
             <button
@@ -38,10 +38,10 @@
     </div>
 </div>
 
-{{-- Dropdown --}}
+
 <div class="{{ $computedDropdownClasses }} hidden" data-timepicker-dropdown>
     <div class="p-3">
-        {{-- Format toggle (only in flexible mode) --}}
+        
         @if($formatMode === 'flexible')
             <div class="flex items-center justify-between mb-3 pb-2 border-b border-border">
                 <span class="text-sm font-medium text-foreground">Time Format</span>
@@ -64,9 +64,9 @@
             </div>
         @endif
 
-        {{-- Time selectors --}}
+        
         <div class="grid grid-cols-{{ $showSeconds ? ($format === '12' ? '4' : '3') : ($format === '12' ? '3' : '2') }} gap-2">
-            {{-- Hours --}}
+            
             <div class="flex flex-col">
                 <label class="text-xs font-medium text-muted mb-1">{{ $format === '12' ? 'Hour' : 'Hours' }}</label>
                 <div class="h-24 overflow-y-auto scrollbar-thin border border-border rounded bg-input">
@@ -82,7 +82,7 @@
                 </div>
             </div>
 
-            {{-- Minutes --}}
+            
             <div class="flex flex-col">
                 <label class="text-xs font-medium text-muted mb-1">Minutes</label>
                 <div class="h-24 overflow-y-auto scrollbar-thin border border-border rounded bg-input">
@@ -98,7 +98,7 @@
                 </div>
             </div>
 
-            {{-- Seconds (if enabled) --}}
+            
             @if($showSeconds)
                 <div class="flex flex-col">
                     <label class="text-xs font-medium text-muted mb-1">Seconds</label>
@@ -116,7 +116,7 @@
                 </div>
             @endif
 
-            {{-- Period (AM/PM for 12-hour format) --}}
+            
             @if($format === '12')
                 <div class="flex flex-col">
                     <label class="text-xs font-medium text-muted mb-1">Period</label>
@@ -135,7 +135,7 @@
             @endif
         </div>
 
-        {{-- Action buttons --}}
+        
         <div class="flex items-center justify-between mt-3 pt-2 border-t border-border">
             <button
                 type="button"

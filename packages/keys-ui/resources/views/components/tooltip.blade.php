@@ -1,94 +1,62 @@
-{{--
-  Keys UI Tooltip Component - Direct Attribute Application
 
-  This component applies tooltip data attributes directly to child elements,
-  eliminating wrapper interference with interactions.
-
-  Usage:
-  <x-keys::tooltip content="Save changes" placement="top">
-    <button>Save</button>
-  </x-keys::tooltip>
-
-  Or with rich content using the default slot:
-  <x-keys::tooltip placement="right">
-    <button>Info</button>
-    <x-slot>
-      <div class="space-y-2">
-        <div class="font-semibold">Rich Content</div>
-        <div>Detailed information here</div>
-      </div>
-    </x-slot>
-  </x-keys::tooltip>
-
-  Note: Rich content is detected when no 'content' prop is provided AND
-  the default slot contains template content. This creates a template element
-  that is referenced by the tooltip system for dynamic content injection.
---}}
 
 @php
-    // Determine if this is a rich content tooltip
-    // Rich content exists when we have no simple content prop AND we have a named template slot
+
     $hasRichContent = !$hasContent() && isset($template) && !empty(trim($template ?? ''));
-
-    // Use the consolidated tooltip data attributes
-    $allTooltipAttributes = $tooltipDataAttributes;
-
-    // Handle rich content templates
-    if ($hasRichContent) {
-        $allTooltipAttributes['data-tooltip'] = 'template';
-        $allTooltipAttributes['data-tooltip-template-id'] = $id . '-template';
-    }
-
-    // Add title fallback for accessibility when using simple content
-    if ($hasContent()) {
-        $allTooltipAttributes['title'] = $content;
-    }
-
-    // Convert attributes to JavaScript-safe format for the script
-    $attributesJson = json_encode($allTooltipAttributes, JSON_HEX_APOS | JSON_HEX_QUOT);
-    $wrapperId = 'tooltip-wrapper-' . uniqid();
 @endphp
 
-{{-- Template for rich content tooltips - CREATE FIRST to avoid race conditions --}}
-@if($hasRichContent)
-    <template id="{{ $id }}-template" data-tooltip-template="true">
-        {{ $template }}
-    </template>
-@endif
 
-{{-- Use transfer approach to apply tooltip attributes to child elements --}}
-<div id="{{ $wrapperId }}" data-tooltip-transfer="true" style="display: contents;">
+<span style="anchor-name: {{ $anchorName }};" class="flex" data-tooltip-trigger="{{ $id }}">
     {{ $slot }}
+</span>
+
+
+<div
+    id="{{ $id }}"
+    popover="manual"
+    data-keys-popover="true"
+    data-keys-tooltip="true"
+    data-placement="{{ $placement }}"
+    data-color="{{ $color }}"
+    {{ $attributes->only('data-sidebar-tooltip') }}
+    class="{{ $tooltipClasses }}"
+    style="--popover-anchor: {{ $anchorName }};"
+    role="tooltip"
+    aria-hidden="true"
+>
+
+    @if($hasContent())
+        {{ $content }}
+    @elseif($hasRichContent)
+        {{ $template }}
+    @endif
 </div>
 
-{{-- Script to transfer attributes from wrapper to first child --}}
 <script>
 (function() {
-    const wrapper = document.getElementById('{{ $wrapperId }}');
-    const attributes = {!! $attributesJson !!};
+    const trigger = document.querySelector('[data-tooltip-trigger="{{ $id }}"]');
+    const tooltip = document.getElementById('{{ $id }}');
+    if (!trigger || !tooltip) return;
 
-    if (!wrapper) {
-        console.warn('Tooltip wrapper not found:', '{{ $wrapperId }}');
-        return;
-    }
+    const isSidebarTooltip = tooltip.hasAttribute('data-sidebar-tooltip');
 
-    // Find the first interactive element or any element
-    const target = wrapper.querySelector('button, input, a, select, textarea, [tabindex], [role="button"]') ||
-                  wrapper.querySelector('*:not(script):not(template)') ||
-                  wrapper.firstElementChild;
+    let hideTimeout;
+    const show = () => {
+        // For sidebar tooltips, only show when sidebar is collapsed
+        if (isSidebarTooltip) {
+            const sidebar = trigger.closest('[data-keys-sidebar="true"]');
+            if (!sidebar || sidebar.dataset.collapsed !== 'true') {
+                return;
+            }
+        }
+        clearTimeout(hideTimeout);
+        tooltip.showPopover();
+    };
+    const hide = () => { hideTimeout = setTimeout(() => tooltip.hidePopover(), 100); };
 
-    if (target) {
-        // Transfer all tooltip attributes to the target element
-        Object.entries(attributes).forEach(([key, value]) => {
-            target.setAttribute(key, value);
-        });
-    }
-
-    // Remove the wrapper by moving its children to parent
-    const parent = wrapper.parentNode;
-    while (wrapper.firstChild) {
-        parent.insertBefore(wrapper.firstChild, wrapper);
-    }
-    wrapper.remove();
+    trigger.addEventListener('mouseenter', show);
+    trigger.addEventListener('mouseleave', hide);
+    tooltip.addEventListener('mouseenter', show);
+    tooltip.addEventListener('mouseleave', hide);
 })();
 </script>

@@ -17,7 +17,6 @@
 
     $iconClasses = 'flex-shrink-0 mr-3';
     $contentClasses = 'flex-1 min-w-0';
-    $kbdClasses = 'ml-auto text-xs text-muted font-mono bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded border';
 @endphp
 
 <{{ $elementType }}
@@ -56,6 +55,6 @@
     </div>
 
     @if($hasKbd())
-        <span class="{{ $kbdClasses }}">{{ $kbd }}</span>
+        <x-keys::kbd :keys="$kbd" variant="muted" size="xs" class="ml-auto" />
     @endif
 </{{ $elementType }}>

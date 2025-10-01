@@ -1,5 +1,5 @@
 <div {{ $editorContainerAttributes }}>
-    {{-- ARIA Live Region for Screen Reader Announcements --}}
+    
     <div
         id="{{ $liveRegionId }}"
         aria-live="polite"
@@ -8,7 +8,7 @@
         data-quill-live-region="true"
     ></div>
 
-    {{-- Quill Editor Container --}}
+    
     <div
         class="{{ $containerClasses }}"
         id="{{ $editorId }}"
@@ -20,7 +20,7 @@
         tabindex="0"
     ></div>
 
-    {{-- Loading Indicator --}}
+    
     @if($loading)
         <div class="loading-container">
             <div class="flex items-center space-x-2 text-muted">
@@ -30,7 +30,7 @@
         </div>
     @endif
 
-    {{-- Hidden Input for Form Submission --}}
+    
     @if($name)
         <input
             type="hidden"

@@ -6,15 +6,6 @@
         ? 'text-neutral-400 cursor-not-allowed bg-neutral-disabled dark:text-neutral-500'
         : 'text-foreground hover:bg-neutral-hover focus-visible:outline-none focus-visible:bg-neutral-hover cursor-pointer';
 
-    $panelBase = 'focus-visible:outline-none space-y-1 max-w-[85vw] w-max';
-
-    $panelSizeClasses = match ($size) {
-        'sm' => 'min-w-40 sm:min-w-40 p-1',
-        'md' => 'min-w-48 sm:min-w-48 p-1',
-        'lg' => 'min-w-56 sm:min-w-56 p-1',
-        default => 'min-w-48 sm:min-w-48 p-1'
-    };
-
     $iconClasses = 'flex-shrink-0 mr-3';
 @endphp
 
@@ -49,12 +40,13 @@
                 <x-keys::icon
                     name="heroicon-o-chevron-right"
                     size="sm"
-                    class="text-muted flex-shrink-0 transition-transform duration-200"
+                    class="flex-shrink-0 transition-transform duration-200"
+                    data-submenu-chevron="true"
                 />
             </button>
         </x-slot:trigger>
 
-        <div class="{{ $panelBase }} {{ $panelSizeClasses }}" {{ $attributes->only([])->merge($panelDataAttributes) }}>
+        <div role="menu" class="flex flex-col gap-0.5">
             {{ $slot }}
         </div>
     </x-keys::popover>

@@ -4,54 +4,81 @@ namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
 
+/**
+ * Toast Component
+ *
+ * Interactive notification system with positioning, variants, auto-dismiss functionality,
+ * and full accessibility support. Supports HTML Popover API for modern browsers.
+ */
 class Toast extends Component
 {
+    /**
+     * Valid toast positions
+     */
+    private const VALID_POSITIONS = [
+        'top-left', 'top-right', 'top-center',
+        'bottom-left', 'bottom-right', 'bottom-center'
+    ];
+
+    /**
+     * Valid toast variants
+     */
+    private const VALID_VARIANTS = [
+        'info', 'success', 'warning', 'danger', 'neutral'
+    ];
+
+    /**
+     * Default timeout value in milliseconds (0 = no auto-hide)
+     */
+    private const DEFAULT_TIMEOUT = 5000;
+
+    /**
+     * Create a new Toast component instance
+     *
+     * @param string $position Toast position on screen
+     * @param string $variant Toast variant/type (info, success, warning, danger, neutral)
+     * @param bool $dismissible Whether the toast can be manually dismissed
+     * @param bool $autoHide Whether the toast should auto-dismiss after timeout
+     * @param int $timeout Auto-dismiss timeout in milliseconds
+     * @param string $icon Custom icon override (defaults to variant icon)
+     * @param string $title Optional toast title
+     * @param string $message Toast message content
+     * @param bool $persistent Whether toast persists across page loads
+     * @param string $id Custom toast ID (auto-generated if empty)
+     */
     public function __construct(
         public string $position = 'top-right',
         public string $variant = 'info',
         public bool $dismissible = true,
         public bool $autoHide = true,
-        public int $timeout = 5000,
+        public int $timeout = self::DEFAULT_TIMEOUT,
         public string $icon = '',
         public string $title = '',
         public string $message = '',
         public bool $persistent = false,
         public string $id = ''
     ) {
-        // Validate position
-        $validPositions = ['top-left', 'top-right', 'top-center', 'bottom-left', 'bottom-right', 'bottom-center'];
-        if (! in_array($this->position, $validPositions)) {
-            $this->position = 'top-right';
-        }
-
-        // Validate variant
-        $validVariants = ['info', 'success', 'warning', 'danger', 'neutral'];
-        if (! in_array($this->variant, $validVariants)) {
-            $this->variant = 'info';
-        }
-
-        // Auto-generate ID if not provided
-        $this->id = $this->id ?: 'toast-'.uniqid();
-
-        // Validate timeout
-        if ($this->timeout < 0) {
-            $this->timeout = 5000;
-        }
+        
+        $this->position = in_array($position, self::VALID_POSITIONS) ? $position : 'top-right';
+        $this->variant = in_array($variant, self::VALID_VARIANTS) ? $variant : 'info';
+        $this->timeout = max(0, $timeout); 
+        $this->id = $this->id ?: 'toast-' . uniqid();
     }
 
-    public function hasContent(): bool
-    {
-        return ! empty($this->title) || ! empty($this->message);
-    }
-
+    /**
+     * Determine if toast should auto-hide based on configuration
+     */
     public function shouldAutoHide(): bool
     {
-        return $this->autoHide && ! $this->persistent && $this->timeout > 0;
+        return $this->autoHide && !$this->persistent && $this->timeout > 0;
     }
 
+    /**
+     * Get the icon for this toast variant
+     */
     public function getVariantIcon(): string
     {
-        if (! empty($this->icon)) {
+        if (!empty($this->icon)) {
             return $this->icon;
         }
 
@@ -65,6 +92,9 @@ class Toast extends Component
         };
     }
 
+    /**
+     * Generate comprehensive data attributes for CSS and JavaScript targeting
+     */
     public function getDataAttributes(): array
     {
         $attributes = [
@@ -74,30 +104,29 @@ class Toast extends Component
             'data-element-type' => 'dialog',
         ];
 
-        if ($this->dismissible) {
-            $attributes['data-dismissible'] = 'true';
+        
+        $conditionalAttributes = [
+            'data-dismissible' => $this->dismissible,
+            'data-auto-hide' => $this->shouldAutoHide(),
+            'data-persistent' => $this->persistent,
+            'data-has-title' => !empty($this->title),
+            'data-has-icon' => !empty($this->getVariantIcon()),
+        ];
+
+        foreach ($conditionalAttributes as $key => $condition) {
+            if ($condition) {
+                $attributes[$key] = 'true';
+            }
         }
 
+        
         if ($this->shouldAutoHide()) {
-            $attributes['data-auto-hide'] = 'true';
-            $attributes['data-timeout'] = $this->timeout;
+            $attributes['data-timeout'] = (string) $this->timeout;
         }
 
-        if ($this->persistent) {
-            $attributes['data-persistent'] = 'true';
-        }
-
-        if ($this->getVariantIcon()) {
-            $attributes['data-has-icon'] = 'true';
+        
+        if (!empty($this->getVariantIcon())) {
             $attributes['data-icon'] = $this->getVariantIcon();
-        }
-
-        if ($this->hasContent()) {
-            $attributes['data-has-content'] = 'true';
-        }
-
-        if (! empty($this->title)) {
-            $attributes['data-has-title'] = 'true';
         }
 
         return $attributes;

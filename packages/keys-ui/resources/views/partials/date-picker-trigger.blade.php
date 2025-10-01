@@ -1,4 +1,4 @@
-{{-- Date Picker Trigger Button Partial --}}
+
 @if($customTrigger)
     <div class="cursor-pointer" data-date-picker-trigger>
         {!! $customTrigger !!}

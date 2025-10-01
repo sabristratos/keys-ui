@@ -20,7 +20,7 @@ class Dropdown extends Component
         $this->id = $this->id ?? 'dropdown-' . uniqid();
 
 
-        // Validate position using base placements (top, bottom, left, right)
+        
         $basePlacements = ['top', 'bottom', 'left', 'right'];
         if (!in_array($this->position, $basePlacements)) {
             $this->position = 'bottom';
@@ -39,13 +39,13 @@ class Dropdown extends Component
 
     public function dropdownClasses(): string
     {
-        // No wrapper classes needed - Popover component handles the container
+        
         return '';
     }
 
     public function panelClasses(): string
     {
-        // Simplified classes for dropdown panel - positioning is handled by Popover component
+        
         $base = 'bg-surface border border-border rounded-lg shadow-lg space-y-1 max-w-[90vw] w-max';
 
         $sizeClasses = match ($this->size) {
@@ -60,7 +60,7 @@ class Dropdown extends Component
 
     public function getComputedPlacement(): string
     {
-        // Map position + align to popover placement format
+        
         return match ($this->position) {
             'top' => match ($this->align) {
                 'start' => 'top-start',
@@ -96,13 +96,13 @@ class Dropdown extends Component
             'data-offset' => $this->offset,
             'data-disabled' => $this->disabled ? 'true' : 'false',
             'data-modal' => $this->modal ? 'true' : 'false',
-            'class' => $this->panelClasses() // Add panel classes to the popover
+            'class' => $this->panelClasses() 
         ];
     }
 
     public function triggerClasses(): string
     {
-        // Minimal trigger classes - let the trigger content handle its own styling
+        
         return '';
     }
 

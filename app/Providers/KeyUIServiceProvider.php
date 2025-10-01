@@ -11,7 +11,7 @@ class KeyUIServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        
     }
 
     /**
@@ -19,6 +19,6 @@ class KeyUIServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        
     }
 }

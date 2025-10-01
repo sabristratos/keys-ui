@@ -1,4 +1,4 @@
-{{-- File Preview Item Partial --}}
+
 @php
     $isImage = str_starts_with($fileType ?? '', 'image/');
     $fileIconName = $getFileIconName($fileType ?? '', $fileName ?? '');
@@ -16,11 +16,11 @@
     data-file-status="{{ $status ?? 'pending' }}"
     role="listitem"
 >
-    {{-- File Thumbnail --}}
+    
     <div class="flex items-center space-x-4 flex-1 min-w-0">
         <div class="file-preview-thumbnail flex-shrink-0">
             @if($isImage && !empty($previewUrl ?? null))
-                {{-- Use Keys UI Image component for image previews --}}
+                
                 <x-keys::image
                     :src="$previewUrl"
                     :alt="'Preview of ' . ($fileName ?? 'image')"
@@ -30,7 +30,7 @@
                     radius="md"
                     class="w-12 h-12"
                 >
-                    {{-- Overlay with file info on hover --}}
+                    
                     <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-md flex items-center justify-center">
                         <div class="text-center text-white text-xs px-2">
                             <div class="font-medium truncate max-w-20" title="{{ $fileName ?? '' }}">
@@ -43,14 +43,14 @@
                     </div>
                 </x-keys::image>
             @else
-                {{-- File type icon for non-images --}}
+                
                 <div class="w-12 h-12 rounded-md bg-surface border border-border flex items-center justify-center text-muted group-hover:text-foreground transition-colors">
                     <x-keys::icon :name="$fileIconName" size="md" />
                 </div>
             @endif
         </div>
 
-        {{-- File Information --}}
+        
         <div class="min-w-0 flex-1">
             <p class="text-sm font-medium text-foreground truncate group-hover:text-brand transition-colors" title="{{ $fileName ?? '' }}">
                 {{ $fileName ?? 'Unknown file' }}
@@ -67,24 +67,24 @@
         </div>
     </div>
 
-    {{-- Action Buttons --}}
+    
     <div class="flex items-center space-x-2 flex-shrink-0">
-        {{-- Upload Progress Indicator --}}
+        
         @if(($status ?? '') === 'uploading')
             <x-keys::loading size="xs" class="text-brand" />
         @endif
 
-        {{-- Success Indicator --}}
+        
         @if(($status ?? '') === 'success')
             <x-keys::icon name="heroicon-o-check-circle" size="sm" class="text-success" />
         @endif
 
-        {{-- Error Indicator --}}
+        
         @if(($status ?? '') === 'error')
             <x-keys::icon name="heroicon-o-exclamation-triangle" size="sm" class="text-danger" />
         @endif
 
-        {{-- Delete Button --}}
+        
         <x-keys::button
             variant="ghost"
             size="xs"
@@ -96,7 +96,7 @@
         />
     </div>
 
-    {{-- Progress Bar for Upload Status --}}
+    
     @if(($status ?? '') === 'uploading' && ($showProgress ?? true))
         <div class="absolute bottom-0 left-0 right-0 h-1 bg-border rounded-b-lg overflow-hidden">
             <div

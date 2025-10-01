@@ -45,11 +45,11 @@ class EditorDemo extends Component
 
     public function submitContent()
     {
-        // Manual submit method for testing Livewire integration
-        // This will help us debug why automatic sync isn't working
+        
+        
         $this->updateStats();
 
-        // Log the current content for debugging
+        
         \Log::info('Manual submit triggered', [
             'content_length' => strlen($this->content),
             'html_preview' => substr($this->content, 0, 500),

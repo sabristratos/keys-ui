@@ -2,31 +2,31 @@
     $slotContent = $slot->toHtml();
     $isIconOnly = $isIconOnly($slotContent);
 
-    // Base classes for all buttons
-    $baseClasses = 'flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+    $baseClasses = 'flex items-center justify-center whitespace-nowrap font-medium cursor-pointer transition-all duration-150 ease-linear focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 *:data-icon:pointer-events-none *:data-icon:shrink-0 *:data-icon:transition-all *:data-icon:duration-150';
 
-    // Variant classes
+    $buttonHighlight = 'shadow-[var(--shadow-button-highlight)]';
+
     $variantClasses = match ($variant) {
-        'brand' => 'border border-brand bg-brand text-foreground-brand hover:border-brand-hover hover:bg-brand-hover active:border-brand-active active:bg-brand-active disabled:border-brand-disabled disabled:bg-brand-disabled focus-visible:ring-brand',
-        'danger' => 'border border-danger bg-danger text-foreground-danger hover:border-danger-hover hover:bg-danger-hover active:border-danger-active active:bg-danger-active disabled:border-danger-disabled disabled:bg-danger-disabled focus-visible:ring-danger',
-        'warning' => 'border border-warning bg-warning text-foreground-warning hover:border-warning-hover hover:bg-warning-hover active:border-warning-active active:bg-warning-active disabled:border-warning-disabled disabled:bg-warning-disabled focus-visible:ring-warning',
-        'success' => 'border border-success bg-success text-foreground-success hover:border-success-hover hover:bg-success-hover active:border-success-active active:bg-success-active disabled:border-success-disabled disabled:bg-success-disabled focus-visible:ring-success',
-        'info' => 'border border-info bg-info text-foreground-info hover:border-info-hover hover:bg-info-hover active:border-info-active active:bg-info-active disabled:border-info-disabled disabled:bg-info-disabled focus-visible:ring-info',
-        'neutral' => 'border border-neutral bg-neutral text-foreground-neutral hover:border-neutral-hover hover:bg-neutral-hover active:border-neutral-active active:bg-neutral-active disabled:border-neutral-disabled disabled:bg-neutral-disabled focus-visible:ring-neutral',
-        'ghost' => 'border border-transparent bg-transparent text-foreground hover:bg-surface active:bg-border disabled:text-neutral-disabled focus-visible:ring-neutral',
-        'outline' => 'bg-transparent border border-border text-foreground hover:border-brand hover:bg-brand hover:text-foreground-brand active:bg-border disabled:text-neutral-disabled focus-visible:ring-neutral',
-        default => 'border border-brand bg-brand text-foreground-brand hover:border-brand-hover hover:bg-brand-hover active:border-brand-active active:bg-brand-active disabled:border-brand-disabled disabled:bg-brand-disabled focus-visible:ring-brand'
+        'brand' => "bg-brand text-foreground-brand shadow-xs-skeumorphic ring-1 ring-transparent ring-inset hover:bg-brand-hover active:bg-brand-active active:scale-[0.98] disabled:bg-brand-disabled disabled:shadow-xs focus-visible:ring-brand {$buttonHighlight} *:data-icon:text-button-brand-icon hover:*:data-icon:text-button-brand-icon-hover",
+        'secondary' => 'bg-surface text-foreground shadow-xs-skeumorphic ring-1 ring-border ring-inset hover:bg-muted active:bg-border active:scale-[0.98] disabled:bg-surface disabled:text-muted disabled:shadow-xs focus-visible:ring-neutral',
+        'danger' => "bg-danger text-foreground-danger shadow-xs-skeumorphic ring-1 ring-transparent ring-inset hover:bg-danger-hover active:bg-danger-active active:scale-[0.98] disabled:bg-danger-disabled disabled:shadow-xs focus-visible:ring-danger {$buttonHighlight} *:data-icon:text-button-danger-icon hover:*:data-icon:text-button-danger-icon-hover",
+        'warning' => "bg-warning text-foreground-warning shadow-xs-skeumorphic ring-1 ring-transparent ring-inset hover:bg-warning-hover active:bg-warning-active active:scale-[0.98] disabled:bg-warning-disabled disabled:shadow-xs focus-visible:ring-warning {$buttonHighlight} *:data-icon:text-button-warning-icon hover:*:data-icon:text-button-warning-icon-hover",
+        'success' => "bg-success text-foreground-success shadow-xs-skeumorphic ring-1 ring-transparent ring-inset hover:bg-success-hover active:bg-success-active active:scale-[0.98] disabled:bg-success-disabled disabled:shadow-xs focus-visible:ring-success {$buttonHighlight} *:data-icon:text-button-success-icon hover:*:data-icon:text-button-success-icon-hover",
+        'info' => "bg-info text-foreground-info shadow-xs-skeumorphic ring-1 ring-transparent ring-inset hover:bg-info-hover active:bg-info-active active:scale-[0.98] disabled:bg-info-disabled disabled:shadow-xs focus-visible:ring-info {$buttonHighlight} *:data-icon:text-button-info-icon hover:*:data-icon:text-button-info-icon-hover",
+        'neutral' => "bg-neutral text-foreground-neutral shadow-xs-skeumorphic ring-1 ring-transparent ring-inset hover:bg-neutral-hover active:bg-neutral-active active:scale-[0.98] disabled:bg-neutral-disabled disabled:shadow-xs focus-visible:ring-neutral {$buttonHighlight}",
+        'ghost' => 'bg-transparent text-foreground shadow-xs ring-1 ring-transparent ring-inset hover:bg-surface active:bg-border active:scale-[0.98] disabled:text-muted focus-visible:ring-neutral',
+        'outline' => 'bg-transparent text-foreground shadow-xs ring-1 ring-border ring-inset hover:ring-brand hover:bg-brand hover:text-foreground-brand active:bg-border active:scale-[0.98] disabled:text-muted focus-visible:ring-neutral',
+        default => "bg-brand text-foreground-brand shadow-xs-skeumorphic ring-1 ring-transparent ring-inset hover:bg-brand-hover active:bg-brand-active active:scale-[0.98] disabled:bg-brand-disabled disabled:shadow-xs focus-visible:ring-brand {$buttonHighlight} *:data-icon:text-button-brand-icon hover:*:data-icon:text-button-brand-icon-hover"
     };
 
-    // Size classes based on icon-only state
     $sizeClasses = $isIconOnly
         ? match ($size) {
-            'xs' => 'p-1 text-xs rounded-sm w-max h-max',
-            'sm' => 'p-1.5 text-sm rounded-md w-max h-max',
-            'md' => 'p-2 text-sm rounded-md w-max h-max',
-            'lg' => 'p-2.5 text-base rounded-lg w-max h-max',
-            'xl' => 'p-3 text-lg rounded-lg w-max h-max',
-            default => 'p-2 text-sm rounded-md w-max h-max'
+            'xs' => 'px-2 py-1 text-xs rounded-md aspect-square',
+            'sm' => 'px-3 py-1.5 text-sm rounded-lg aspect-square',
+            'md' => 'px-4 py-2 text-sm rounded-lg aspect-square',
+            'lg' => 'px-6 py-2.5 text-base rounded-xl aspect-square',
+            'xl' => 'px-8 py-3 text-lg rounded-2xl aspect-square',
+            default => 'px-4 py-2 text-sm rounded-lg aspect-square'
         }
         : match ($size) {
             'xs' => 'px-2 py-1 text-xs rounded-sm',
@@ -37,42 +37,45 @@
             default => 'px-4 py-2 text-sm rounded-md'
         };
 
-    // Disabled classes
-    $disabledClasses = ($disabled || $loading) ? 'cursor-not-allowed opacity-50' : '';
+    $disabledClasses = ($disabled || $loading) ? 'cursor-not-allowed' : '';
 
-    // Multi-state positioning
-    $positionClasses = $isMultiState ? 'relative' : '';
+    $loadingClasses = $loading ? match ($variant) {
+        'brand' => 'bg-brand-hover',
+        'danger' => 'bg-danger-hover',
+        'warning' => 'bg-warning-hover',
+        'success' => 'bg-success-hover',
+        'info' => 'bg-info-hover',
+        default => ''
+    } : '';
 
-    // Icon size for child components
-    $iconSize = match ($size) {
-        'xs' => 'xs',
-        'sm' => 'sm',
-        'md' => 'sm',
-        'lg' => 'md',
-        'xl' => 'lg',
-        default => 'sm'
-    };
+    $iconSize = $isIconOnly
+        ? match ($size) {
+            'xs' => 'sm',
+            'sm' => 'md',
+            'md' => 'md',
+            'lg' => 'lg',
+            'xl' => 'xl',
+            default => 'md'
+        }
+        : match ($size) {
+            'xs' => 'xs',
+            'sm' => 'sm',
+            'md' => 'sm',
+            'lg' => 'md',
+            'xl' => 'lg',
+            default => 'sm'
+        };
 
-    $elementAttributes = $attributes->merge([
-        'class' => trim("$baseClasses $variantClasses $sizeClasses $disabledClasses $positionClasses")
-    ]);
-
-    if ($elementType === 'button') {
-        $elementAttributes = $elementAttributes->merge([
-            'type' => $buttonType,
-            'disabled' => $disabled || $loading
-        ]);
-    } elseif ($elementType === 'a') {
-        $elementAttributes = $elementAttributes->merge([
-            'href' => $href
-        ]);
-    }
-
-    // Merge data attributes with slot-dependent attributes
-    $elementAttributes = $elementAttributes->merge($dataAttributes)->merge($getDataAttributesForSlot($slotContent));
 @endphp
 
-<{{ $elementType }} {{ $elementAttributes }}>
+<{{ $elementType }}
+    @if($elementType === 'button') type="{{ $buttonType }}" @endif
+    @if($elementType === 'a') href="{{ $href }}" @endif
+    @if($elementType === 'button' && ($disabled || $loading)) disabled @endif
+    @if($elementType === 'button' && $popovertarget) popovertarget="{{ $popovertarget }}" @endif
+    {{ $attributes->merge([
+        'class' => trim("$baseClasses $variantClasses $sizeClasses $disabledClasses $loadingClasses"),
+    ])->merge($dataAttributes)->merge($getDataAttributesForSlot($slotContent)) }}>
     @if($loading)
         <x-keys::loading :animation="$loadingAnimation" :size="$iconSize" class="mr-2" />
     @elseif($iconLeft && !$loading)
@@ -106,7 +109,7 @@
     @endif
 
     @unless($isIconOnly)
-        {{ $slot }}
+        <span data-text="true" class="px-0.5 transition-all duration-150">{{ $slot }}</span>
     @endunless
 
     @if($iconRight && !$loading && !$isIconOnly)

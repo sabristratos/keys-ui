@@ -1,30 +1,82 @@
 @php
-    $percentage = $computedData['percentage'];
-    $displayValue = $computedData['display_value'];
-    $ariaLabel = $computedData['aria_label'];
-    $isComplete = $computedData['is_complete'];
+
+    $baseClasses = 'progress-wrapper';
+
+    $heightClasses = match ($size) {
+        'xs' => 'h-1',
+        'sm' => 'h-2',
+        'md' => 'h-3',
+        'lg' => 'h-4',
+        'xl' => 'h-6',
+        default => 'h-3'
+    };
+
+    $textClasses = match ($size) {
+        'xs', 'sm' => 'text-xs',
+        'md' => 'text-sm',
+        'lg', 'xl' => 'text-base',
+        default => 'text-sm'
+    };
+
+    $colorClasses = match ($color) {
+        'brand' => 'bg-brand',
+        'success' => 'bg-success',
+        'warning' => 'bg-warning',
+        'danger' => 'bg-danger',
+        'info' => 'bg-info',
+        'neutral' => 'bg-neutral',
+        default => 'bg-brand'
+    };
+
+    $containerClasses = "progress-container relative overflow-hidden rounded-full bg-border {$heightClasses}";
+
+    $barClasses = "progress-bar h-full rounded-full transition-all duration-300 ease-out {$colorClasses}";
+
+    if ($animated) {
+        $barClasses .= ' progress-animated';
+    } elseif ($striped) {
+        $barClasses .= ' progress-striped';
+    }
+
+    $wrapperAttributes = $attributes->merge([
+        'class' => $baseClasses
+    ])->merge($dataAttributes);
+
+    if ($id) {
+        $wrapperAttributes = $wrapperAttributes->merge(['id' => $id]);
+    }
 @endphp
 
-<div {{ $attributes->merge(['class' => $baseClasses()])->merge($dataAttributes) }}>
+<div {{ $wrapperAttributes }}>
+    
     @if($label || $showValue || $showPercentage)
         <div class="progress-header flex items-center justify-between mb-2">
             @if($label)
-                <span class="progress-label font-medium text-foreground {{ $textClasses() }}">
+                <span class="progress-label font-medium text-foreground {{ $textClasses }}">
                     {{ $label }}
                 </span>
             @endif
 
             @if($showValue || $showPercentage)
-                <span class="progress-value text-muted {{ $textClasses() }}">
+                <span class="progress-value text-muted {{ $textClasses }}">
                     {{ $displayValue }}
                 </span>
             @endif
         </div>
     @endif
 
-    <div class="{{ $containerClasses() }}" role="progressbar" aria-valuenow="{{ $value }}" aria-valuemin="0" aria-valuemax="{{ $max }}" aria-label="{{ $ariaLabel }}">
+    
+    <div
+        class="{{ $containerClasses }}"
+        role="progressbar"
+        aria-valuenow="{{ $value }}"
+        aria-valuemin="0"
+        aria-valuemax="{{ $max }}"
+        aria-label="{{ $ariaLabel }}"
+    >
+        
         <div
-            class="{{ $barClasses() }}"
+            class="{{ $barClasses }}"
             style="width: {{ $percentage }}%"
             data-progress-value="{{ $value }}"
             data-progress-max="{{ $max }}"
@@ -32,14 +84,16 @@
         ></div>
     </div>
 
+    
     @if($status)
         <div class="progress-status mt-1">
-            <span class="text-muted {{ $textClasses() }}">
+            <span class="text-muted {{ $textClasses }}">
                 {{ $status }}
             </span>
         </div>
     @endif
 </div>
+
 
 <style>
     .progress-animated .progress-bar {

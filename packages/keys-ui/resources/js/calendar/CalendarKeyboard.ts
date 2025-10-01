@@ -22,7 +22,6 @@ export class CalendarKeyboard {
 
         const { key, ctrlKey, shiftKey } = event;
 
-        // Prevent default for navigation keys
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End', 'Enter', ' ', 'Escape'].includes(key)) {
             event.preventDefault();
         }
@@ -115,15 +114,13 @@ export class CalendarKeyboard {
         const newDate = new Date(currentDate);
         newDate.setMonth(currentDate.getMonth() + months);
 
-        // Adjust for month overflow (e.g., Jan 31 + 1 month = Feb 28/29)
         if (newDate.getDate() !== currentDate.getDate()) {
-            newDate.setDate(0); // Go to last day of previous month
+            newDate.setDate(0);
         }
 
         const newDateString = this.formatDateString(newDate);
 
         if (this.isDateNavigable(newDateString, state)) {
-            // Check if we need to change the current month view
             const newMonth = this.formatYearMonth(newDate);
             if (newMonth !== state.currentMonth) {
                 setState({
@@ -147,9 +144,8 @@ export class CalendarKeyboard {
         const newDate = new Date(currentDate);
         newDate.setFullYear(currentDate.getFullYear() + years);
 
-        // Handle leap year edge case (Feb 29)
         if (newDate.getMonth() !== currentDate.getMonth()) {
-            newDate.setDate(0); // Go to last day of previous month
+            newDate.setDate(0);
         }
 
         const newDateString = this.formatDateString(newDate);
@@ -171,7 +167,7 @@ export class CalendarKeyboard {
         if (!state.focusedDate) return;
 
         const currentDate = new Date(state.focusedDate);
-        const daysToSubtract = currentDate.getDay(); // Sunday = 0
+        const daysToSubtract = currentDate.getDay();
         const weekStart = new Date(currentDate);
         weekStart.setDate(currentDate.getDate() - daysToSubtract);
 
@@ -189,7 +185,7 @@ export class CalendarKeyboard {
         if (!state.focusedDate) return;
 
         const currentDate = new Date(state.focusedDate);
-        const daysToAdd = 6 - currentDate.getDay(); // Saturday = 6
+        const daysToAdd = 6 - currentDate.getDay();
         const weekEnd = new Date(currentDate);
         weekEnd.setDate(currentDate.getDate() + daysToAdd);
 
@@ -229,7 +225,6 @@ export class CalendarKeyboard {
             setState({ viewMode: 'calendar' });
             setTimeout(() => onRender(), 100);
         } else if (state.isRange && state.rangeSelectionState === 'selecting-end') {
-            // Cancel partial range selection
             setState({
                 rangeSelectionState: 'none',
                 startDate: null,
@@ -245,13 +240,10 @@ export class CalendarKeyboard {
     private static focusDate(calendar: HTMLElement, dateString: string, state: CalendarState, setState: (newState: Partial<CalendarState>) => void, onRender: () => void): void {
         setState({ focusedDate: dateString });
 
-        // Update tabindex and focus the date button
-        // Remove tabindex from all date buttons
         calendar.querySelectorAll('[data-calendar-day-btn]').forEach(btn => {
             btn.setAttribute('tabindex', '-1');
         });
 
-        // Set tabindex and focus on the target date
         const targetButton = calendar.querySelector(`[data-calendar-day-btn][data-date="${dateString}"]`) as HTMLButtonElement;
         if (targetButton) {
             targetButton.setAttribute('tabindex', '0');
@@ -306,10 +298,8 @@ export class CalendarKeyboard {
      * Set up keyboard event listeners for a calendar
      */
     public static bindKeyboardEvents(calendar: HTMLElement, state: CalendarState, setState: (newState: Partial<CalendarState>) => void, onSelect: (dateString: string) => void, onRender: () => void): void {
-        // Remove existing listener to prevent duplicates
         calendar.removeEventListener('keydown', calendar.dataset.keydownHandler as any);
 
-        // Create new handler and store reference
         const keydownHandler = (event: KeyboardEvent) => {
             this.handleKeydown(calendar, event, state, setState, onSelect, onRender);
         };
@@ -317,7 +307,6 @@ export class CalendarKeyboard {
         calendar.dataset.keydownHandler = keydownHandler.toString();
         calendar.addEventListener('keydown', keydownHandler);
 
-        // Ensure the calendar is focusable
         if (!calendar.hasAttribute('tabindex')) {
             calendar.setAttribute('tabindex', '0');
         }
@@ -327,14 +316,12 @@ export class CalendarKeyboard {
      * Initialize focus for a calendar
      */
     public static initializeFocus(calendar: HTMLElement, state: CalendarState): void {
-        // Set initial focus on the focused date or today
         const focusDate = state.focusedDate || this.getTodayDate();
 
         const targetButton = calendar.querySelector(`[data-calendar-day-btn][data-date="${focusDate}"]`) as HTMLButtonElement;
         if (targetButton) {
             targetButton.setAttribute('tabindex', '0');
 
-            // Only auto-focus if the calendar itself is focused
             if (document.activeElement === calendar) {
                 targetButton.focus();
             }

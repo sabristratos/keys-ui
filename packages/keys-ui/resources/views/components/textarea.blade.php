@@ -2,10 +2,8 @@
     $textareaAttributes = $attributes->whereStartsWith('wire:');
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:');
 
-    // Base classes for all textareas
-    $baseClasses = 'block w-full rounded-md border transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+    $baseClasses = 'input-base block';
 
-    // Size classes
     $sizeClasses = match ($size) {
         'xs' => 'px-2.5 py-1 text-xs',
         'sm' => 'px-3 py-1.5 text-sm',
@@ -15,7 +13,6 @@
         default => 'px-3 py-2 text-sm'
     };
 
-    // Resize classes
     $resizeClasses = match ($resize) {
         'none' => 'resize-none',
         'both' => 'resize',
@@ -24,17 +21,14 @@
         default => 'resize-y'
     };
 
-    // State classes
-    $stateClasses = '';
     if ($disabled) {
-        $stateClasses = 'bg-surface border-border text-muted cursor-not-allowed opacity-50';
+        $stateClasses = 'input-disabled text-muted';
     } elseif ($hasError()) {
-        $stateClasses = 'bg-input border-danger text-foreground focus-visible:border-danger focus-visible:ring-danger';
+        $stateClasses = 'input-error text-foreground';
     } else {
-        $stateClasses = 'bg-input border-border text-foreground focus-visible:border-brand focus-visible:ring-brand hover:border-neutral';
+        $stateClasses = 'input-default text-foreground';
     }
 
-    // Icon padding
     $leftPadding = '';
     $rightPadding = '';
 
@@ -51,7 +45,7 @@
 
     if ($iconRight || $hasActions()) {
         if ($hasActions()) {
-            // Calculate action padding dynamically
+
             $actionsCount = count($configuredActions());
             $actionWidth = match ($actionSize) {
                 'xs' => 24,
@@ -87,10 +81,8 @@
         'cols' => $cols,
     ], fn($value) => !is_null($value)));
 
-    // Merge data attributes
     $textareaAttributes = $textareaAttributes->merge($dataAttributes);
 
-    // Icon size based on textarea size
     $iconSize = match ($size) {
         'xs' => 'xs',
         'sm' => 'xs',
@@ -100,10 +92,8 @@
         default => 'sm'
     };
 
-    // Icon positioning classes (textarea-specific - use top positioning)
     $iconPositionClasses = 'absolute top-3 flex items-center pointer-events-none';
 
-    // Icon offset classes based on size
     $iconOffsets = match ($size) {
         'xs' => ['left' => 'left-2.5', 'right' => 'right-2.5'],
         'sm' => ['left' => 'left-3', 'right' => 'right-3'],
@@ -113,7 +103,6 @@
         default => ['left' => 'left-3', 'right' => 'right-3']
     };
 
-    // Action size and container classes
     $computedActionSize = match ($actionSize) {
         'xs' => 'xs',
         'sm' => 'sm',
@@ -133,7 +122,7 @@
         <div class="relative mt-1 focus-within:[&_[data-icon]]:text-brand">
             @if($iconLeft)
                 <div class="{{ $iconPositionClasses }} {{ $iconOffsets['left'] }}" data-icon>
-                    <x-keys::icon name="{{ $iconLeft }}" size="{{ $iconSize }}" class="text-neutral" />
+                    <x-keys::icon name="{{ $iconLeft }}" size="{{ $iconSize }}" />
                 </div>
             @endif
 
@@ -172,7 +161,7 @@
 
             @if($iconRight && !$hasActions())
                 <div class="{{ $iconPositionClasses }} {{ $iconOffsets['right'] }}" data-icon>
-                    <x-keys::icon name="{{ $iconRight }}" size="{{ $iconSize }}" class="text-neutral" />
+                    <x-keys::icon name="{{ $iconRight }}" size="{{ $iconSize }}" />
                 </div>
             @endif
         </div>
@@ -205,7 +194,7 @@
     <div class="relative focus-within:[&_[data-icon]]:text-brand" {{ $wrapperAttributes->only('class') }}>
         @if($iconLeft)
             <div class="{{ $iconPositionClasses }} {{ $iconOffsets['left'] }}" data-icon>
-                <x-keys::icon name="{{ $iconLeft }}" size="{{ $iconSize }}" class="text-neutral" />
+                <x-keys::icon name="{{ $iconLeft }}" size="{{ $iconSize }}" />
             </div>
         @endif
 
@@ -244,7 +233,7 @@
 
         @if($iconRight && !$hasActions())
             <div class="{{ $iconPositionClasses }} {{ $iconOffsets['right'] }}" data-icon>
-                <x-keys::icon name="{{ $iconRight }}" size="{{ $iconSize }}" class="text-neutral" />
+                <x-keys::icon name="{{ $iconRight }}" size="{{ $iconSize }}" />
             </div>
         @endif
     </div>

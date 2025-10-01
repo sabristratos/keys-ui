@@ -45,7 +45,7 @@ class BuildAssetsCommand extends Command
 
         $this->info('Building Keys UI assets...');
 
-        // Install dependencies if needed
+        
         if (!$this->dependenciesInstalled()) {
             $this->info('Installing package dependencies...');
             if (!$this->installDependencies()) {
@@ -53,7 +53,7 @@ class BuildAssetsCommand extends Command
             }
         }
 
-        // Build assets
+        
         if ($this->option('watch')) {
             return $this->watchAssets();
         }
@@ -62,7 +62,7 @@ class BuildAssetsCommand extends Command
             return 1;
         }
 
-        // Publish assets if requested
+        
         if ($this->option('publish')) {
             $this->publishAssets();
         }
@@ -136,15 +136,15 @@ class BuildAssetsCommand extends Command
         $this->info('🚀 Auto-deployment enabled - assets will be copied to public directory');
         $this->info('Press Ctrl+C to stop watching');
 
-        // Start vite watcher in background
+        
         $viteProcess = Process::path($this->packagePath)
             ->start(['npm', 'run', 'watch']);
 
-        // Watch for changes in dist directory and auto-deploy
+        
         $distPath = $this->packagePath . '/dist';
         $publicPath = public_path('vendor/keys-ui');
 
-        // Ensure public directory exists
+        
         if (!File::isDirectory($publicPath)) {
             File::makeDirectory($publicPath, 0755, true);
         }
@@ -152,7 +152,7 @@ class BuildAssetsCommand extends Command
         $lastModified = [];
 
         while ($viteProcess->running()) {
-            // Check for changes in dist files
+            
             $files = ['keys-ui.umd.js', 'keys-ui.es.js', 'style.css'];
 
             foreach ($files as $file) {
@@ -164,14 +164,14 @@ class BuildAssetsCommand extends Command
                     if (!isset($lastModified[$file]) || $lastModified[$file] !== $currentModified) {
                         $lastModified[$file] = $currentModified;
 
-                        // Copy changed file to public directory
+                        
                         $targetFile = $file === 'keys-ui.umd.js' ? 'keys-ui.min.js' : $file;
                         $publicFile = $publicPath . '/' . $targetFile;
 
                         File::copy($distFile, $publicFile);
                         $this->line("✅ Deployed: {$targetFile}");
 
-                        // Also copy as original name for completeness
+                        
                         if ($file === 'keys-ui.umd.js') {
                             File::copy($distFile, $publicPath . '/keys-ui.umd.js');
                         }
@@ -179,7 +179,7 @@ class BuildAssetsCommand extends Command
                 }
             }
 
-            // Check every 500ms
+            
             usleep(500000);
         }
 

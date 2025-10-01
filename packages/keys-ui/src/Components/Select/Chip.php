@@ -15,22 +15,22 @@ class Chip extends Component
         public bool $removable = true,
         public ?string $id = null
     ) {
-        // Auto-generate ID if not provided
+        
         if (! $this->id) {
             $this->id = 'select-chip-'.uniqid();
         }
 
-        // Validate size
+        
         if (! in_array($this->size, ComponentConstants::BADGE_SIZES)) {
             $this->size = 'sm';
         }
 
-        // Validate color - use same colors as Badge component
+        
         if (! ComponentConstants::isValidColorForComponent($this->color, 'badge')) {
             $this->color = 'blue';
         }
 
-        // Use label as value fallback
+        
         if (empty($this->label) && ! empty($this->value)) {
             $this->label = $this->value;
         }

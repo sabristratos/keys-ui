@@ -8,13 +8,10 @@
  * - Dynamic editor creation and cleanup
  */
 
-// Use global Quill instance for consistency
-// import Quill from 'quill'; // Removed direct import
-import 'quill/dist/quill.snow.css';
+import 'quill/dist/quill.core.css';
 import { BaseActionClass } from './utils/BaseActionClass';
 import { DOMUtils } from './utils/DOMUtils';
 
-// Type definition for global Quill
 declare global {
     interface Window {
         Quill: any;
@@ -22,7 +19,7 @@ declare global {
 }
 
 interface EditorState {
-    quillInstance: any; // Using any since we're using global Quill
+    quillInstance: any;
     containerElement: HTMLElement;
     hiddenInput: HTMLInputElement | null;
     config: any;
@@ -68,7 +65,6 @@ class LivewireIntegration {
      * Get the wire:model property name from the editor container
      */
     static getWireModelProperty(editor: HTMLElement): string | null {
-        // First check data attributes on the editor container
         if (editor.dataset.wireModel) {
             return editor.dataset.wireModel;
         }
@@ -77,14 +73,12 @@ class LivewireIntegration {
             return editor.dataset.livewireProperty;
         }
 
-        // Check for wire:model attributes on the editor container
         for (const attr of editor.attributes) {
             if (attr.name.startsWith('wire:model')) {
                 return attr.value;
             }
         }
 
-        // Fallback: check hidden input if it exists (for backward compatibility)
         const hiddenInput = editor.querySelector('[data-quill-input="true"]') as HTMLElement;
         if (hiddenInput) {
             for (const attr of hiddenInput.attributes) {
@@ -144,7 +138,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
      * Bind event listeners - minimal for Quill integration
      */
     protected bindEventListeners(): void {
-        // Quill handles most events internally, minimal setup needed
     }
 
     /**
@@ -156,12 +149,10 @@ export class EditorActions extends BaseActionClass<EditorState> {
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as HTMLElement;
 
-                    // Check if the added node is a Quill editor
                     if (DOMUtils.hasDataAttribute(element, 'quill-editor', 'true')) {
                         this.initializeQuillEditor(element);
                     }
 
-                    // Check for Quill editors within the added node
                     const editors = DOMUtils.findByDataAttribute('quill-editor', 'true', element);
                     editors.forEach(editor => this.initializeQuillEditor(editor));
                 }
@@ -181,7 +172,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
      * Initialize a single Quill editor element
      */
     private initializeQuillEditor(editor: HTMLElement): void {
-        // Ensure DOM is ready before initializing
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 this.initializeQuillEditor(editor);
@@ -195,7 +185,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
             return;
         }
 
-        // Check if already initialized
         if (this.hasState(editor)) {
             return;
         }
@@ -208,22 +197,17 @@ export class EditorActions extends BaseActionClass<EditorState> {
             return;
         }
 
-        // Get configuration from data attribute
         const configData = DOMUtils.getDataAttribute(containerElement as HTMLElement, 'quillConfig');
 
-        // Get initial value from hidden input (Livewire binding) or data attribute (fallback)
         let initialValue = '';
         if (hiddenInput && hiddenInput.value) {
-            // Primary: Use value from hidden input (Livewire wire:model)
             initialValue = hiddenInput.value;
         } else {
-            // Fallback: Use data attribute for non-Livewire usage (JSON encoded)
             const dataValue = DOMUtils.getDataAttribute(containerElement as HTMLElement, 'quill-value');
             if (dataValue) {
                 try {
                     initialValue = JSON.parse(dataValue);
                 } catch (e) {
-                    // If JSON parsing fails, use as plain string
                     initialValue = dataValue;
                 }
             }
@@ -251,7 +235,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
         }
 
 
-        // Initialize Quill instance using global Quill
         let quillInstance: any;
         try {
             if (!window.Quill) {
@@ -264,19 +247,15 @@ export class EditorActions extends BaseActionClass<EditorState> {
             return;
         }
 
-        // Set initial content using proper Quill API
         if (initialValue) {
             try {
-                // Use Quill's proper content setting method
                 quillInstance.clipboard.dangerouslyPasteHTML(initialValue);
             } catch (e) {
                 console.warn('Failed to set initial content:', e);
-                // Fallback to text if HTML parsing fails
                 quillInstance.setText(initialValue);
             }
         }
 
-        // Check for Livewire integration
         const isLivewireEnabled = LivewireIntegration.isLivewireEnabled(editor);
 
         const state: EditorState = {
@@ -291,10 +270,8 @@ export class EditorActions extends BaseActionClass<EditorState> {
 
         this.setState(editor, state);
 
-        // Set up content change listener for form synchronization
         this.setupContentSync(state);
 
-        // Set up accessibility features
         this.setupAccessibilityFeatures(state);
 
     }
@@ -306,19 +283,15 @@ export class EditorActions extends BaseActionClass<EditorState> {
         const isLivewireEnabled = LivewireIntegration.isLivewireEnabled(state.containerElement);
 
 
-        // Listen to Quill text-change events - let Livewire handle debouncing
         state.quillInstance.on('text-change', (delta: any, oldDelta: any, source: string) => {
 
-            // Sync to Livewire if enabled (direct approach like SelectActions)
             if (isLivewireEnabled) {
                 this.syncToLivewireWithState(state);
             } else {
-                // Fallback to hidden input for non-Livewire forms
                 this.syncQuillToInput(state);
             }
         });
 
-        // Initial sync
         if (isLivewireEnabled) {
             this.syncToLivewireWithState(state);
         } else {
@@ -334,11 +307,9 @@ export class EditorActions extends BaseActionClass<EditorState> {
             const newValue = state.quillInstance.root.innerHTML;
             const oldValue = state.hiddenInput.value;
 
-            // Only update if content has changed
             if (newValue !== oldValue) {
                 state.hiddenInput.value = newValue;
 
-                // Dispatch input event for Livewire wire:model
                 this.dispatchLivewireInputEvent(state.hiddenInput, newValue);
             }
         }
@@ -348,7 +319,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
      * Dispatch proper input events for Livewire integration
      */
     private dispatchLivewireInputEvent(input: HTMLInputElement, value: string): void {
-        // Use proper InputEvent constructor for better Livewire compatibility
         const inputEvent = new InputEvent('input', {
             bubbles: true,
             cancelable: true,
@@ -357,7 +327,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
         });
         input.dispatchEvent(inputEvent);
 
-        // Also dispatch change event for completeness
         const changeEvent = new Event('change', { bubbles: true, cancelable: true });
         input.dispatchEvent(changeEvent);
     }
@@ -378,11 +347,9 @@ export class EditorActions extends BaseActionClass<EditorState> {
         if (!state) return;
 
         try {
-            // Use proper Quill API for setting content
             state.quillInstance.clipboard.dangerouslyPasteHTML(content);
         } catch (e) {
             console.warn('Failed to set editor content:', e);
-            // Fallback to text if HTML parsing fails
             state.quillInstance.setText(content);
         }
         this.syncQuillToInput(state);
@@ -421,13 +388,10 @@ export class EditorActions extends BaseActionClass<EditorState> {
      * Set up accessibility features for the editor
      */
     private setupAccessibilityFeatures(state: EditorState): void {
-        // Add keyboard navigation enhancements
         this.setupKeyboardNavigation(state);
 
-        // Set up content change announcements
         this.setupContentAnnouncements(state);
 
-        // Add toolbar accessibility enhancements
         this.setupToolbarAccessibility(state);
     }
 
@@ -435,7 +399,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
      * Set up keyboard navigation enhancements
      */
     private setupKeyboardNavigation(state: EditorState): void {
-        // Add keyboard shortcuts information
         state.quillInstance.keyboard.addBinding({
             key: 'F1',
             handler: () => {
@@ -444,7 +407,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
             }
         });
 
-        // Enhance focus management
         state.containerElement.addEventListener('focus', () => {
             if (state.liveRegion) {
                 this.announceToLiveRegion(state, 'Rich text editor focused. Press F1 for keyboard shortcuts.');
@@ -457,16 +419,14 @@ export class EditorActions extends BaseActionClass<EditorState> {
      */
     private setupContentAnnouncements(state: EditorState): void {
         let typingTimer: number | null = null;
-        const typingDelay = 2000; // 2 second delay after typing stops
+        const typingDelay = 2000;
 
         state.quillInstance.on('text-change', (delta: any, oldDelta: any, source: string) => {
             if (source === 'user') {
-                // Clear previous timer
                 if (typingTimer) {
                     clearTimeout(typingTimer);
                 }
 
-                // Set new timer for announcement
                 typingTimer = window.setTimeout(() => {
                     const text = state.quillInstance.getText().trim();
                     const wordCount = text ? text.split(/\s+/).length : 0;
@@ -478,7 +438,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
             }
         });
 
-        // Announce formatting changes
         state.quillInstance.on('selection-change', (range: any, oldRange: any, source: string) => {
             if (range && source === 'user') {
                 const formats = state.quillInstance.getFormat(range);
@@ -494,21 +453,16 @@ export class EditorActions extends BaseActionClass<EditorState> {
         const toolbar = state.containerElement.querySelector('.ql-toolbar');
         if (!toolbar) return;
 
-        // Add toolbar accessibility attributes
         toolbar.setAttribute('role', 'toolbar');
         toolbar.setAttribute('aria-label', 'Rich text editor toolbar');
 
-        // Enhance button accessibility
         const buttons = toolbar.querySelectorAll('button');
         buttons.forEach((button, index) => {
-            // Add accessible names based on Quill button classes
             this.enhanceButtonAccessibility(button as HTMLButtonElement);
 
-            // Add tabindex management for roving tabindex pattern
             button.setAttribute('tabindex', index === 0 ? '0' : '-1');
         });
 
-        // Add keyboard navigation for toolbar
         toolbar.addEventListener('keydown', (e) => {
             this.handleToolbarKeyboard(e as KeyboardEvent, buttons);
         });
@@ -531,7 +485,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
             'ql-header[value="2"]': 'Heading 2'
         };
 
-        // Find matching label
         for (const [className, label] of Object.entries(buttonLabels)) {
             if (button.classList.contains(className.split('[')[0]) ||
                 button.matches(`[${className.split('[')[1]}`)) {
@@ -575,7 +528,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
                 return;
         }
 
-        // Update tabindex and focus
         buttons[currentIndex].setAttribute('tabindex', '-1');
         buttons[nextIndex].setAttribute('tabindex', '0');
         (buttons[nextIndex] as HTMLElement).focus();
@@ -587,14 +539,12 @@ export class EditorActions extends BaseActionClass<EditorState> {
     private announceToLiveRegion(state: EditorState, message: string): void {
         if (!state.liveRegion) return;
 
-        // Throttle announcements to avoid overwhelming screen readers
         const now = Date.now();
         if (now - state.lastAnnouncementTime < 1000) return;
 
         state.liveRegion.textContent = message;
         state.lastAnnouncementTime = now;
 
-        // Clear message after a delay to allow for new announcements
         setTimeout(() => {
             if (state.liveRegion) {
                 state.liveRegion.textContent = '';
@@ -642,12 +592,10 @@ export class EditorActions extends BaseActionClass<EditorState> {
      * Synchronize content from Quill to Livewire using provided state
      */
     private syncToLivewireWithState(state: EditorState): void {
-        // We already have the state, so no need to look it up
         const quillContent = state.quillInstance.root.innerHTML;
         const formattedValue = LivewireIntegration.formatValueForLivewire(quillContent);
 
 
-        // Use the container element to find the Livewire component
         LivewireIntegration.updateLivewireProperty(state.containerElement, formattedValue);
     }
 
@@ -655,7 +603,6 @@ export class EditorActions extends BaseActionClass<EditorState> {
      * Reinitialize editor after DOM morphing
      */
     private reinitializeAfterMorph(editor: HTMLElement): void {
-        // Check if the editor element still exists and needs reinitialization
         const containerElement = DOMUtils.querySelector(`[data-quill-container="true"]`, editor);
         if (containerElement && !this.hasState(editor)) {
             this.initializeQuillEditor(editor);
@@ -686,9 +633,7 @@ export class EditorActions extends BaseActionClass<EditorState> {
      * Clean up EditorActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // Clean up Quill instances
         this.stateManager.forEach((state) => {
-            // Quill doesn't have a destroy method, but we can remove event listeners
             state.quillInstance.off('text-change');
         });
     }

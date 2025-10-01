@@ -24,47 +24,47 @@ class Gallery extends Component
         public int $autoplayDelay = 3000,
         public ?string $id = null
     ) {
-        // Validate type
+        
         if (!in_array($this->type, ['basic', 'thumbnail', 'ecommerce'])) {
             $this->type = 'thumbnail';
         }
 
-        // Validate layout
+        
         if (!in_array($this->layout, ['default', 'masonry', 'grid'])) {
             $this->layout = 'default';
         }
 
-        // Validate aspect ratio
+        
         if (!in_array($this->aspectRatio, ['auto', 'square', 'video', 'photo', 'wide'])) {
             $this->aspectRatio = 'auto';
         }
 
-        // Validate radius
+        
         if (!in_array($this->radius, ['none', 'sm', 'md', 'lg', 'xl', 'full'])) {
             $this->radius = 'lg';
         }
 
-        // Validate thumbnail position
+        
         if (!in_array($this->thumbnailPosition, ['bottom', 'side', 'top', 'overlay', 'overlay-top'])) {
             $this->thumbnailPosition = 'bottom';
         }
 
-        // Validate grid columns
+        
         if ($this->gridColumns < 1 || $this->gridColumns > 6) {
             $this->gridColumns = 3;
         }
 
-        // Validate thumbnail size
+        
         if (!in_array($this->thumbnailSize, ComponentConstants::GALLERY_THUMBNAIL_SIZES)) {
             $this->thumbnailSize = 'sm';
         }
 
-        // Generate ID if not provided
+        
         if (empty($this->id)) {
             $this->id = 'gallery-' . uniqid();
         }
 
-        // Process images to ensure consistent structure
+        
         $this->images = $this->processImages($this->images);
     }
 
@@ -74,7 +74,7 @@ class Gallery extends Component
     protected function processImages(array $images): array
     {
         return array_map(function ($image, $index) {
-            // Handle different input formats
+            
             if (is_string($image)) {
                 $image = ['src' => $image];
             }
@@ -104,7 +104,7 @@ class Gallery extends Component
      */
     public function shouldShowThumbnails(): bool
     {
-        // Alternative layouts (masonry/grid) don't use thumbnails - they show all images directly
+        
         if ($this->isAlternativeLayout()) {
             return false;
         }
@@ -120,161 +120,7 @@ class Gallery extends Component
         return $this->images[0] ?? null;
     }
 
-    /**
-     * Generate container classes
-     */
-    public function containerClasses(): string
-    {
-        $baseClasses = 'gallery-container relative';
-        $radiusClasses = $this->radiusClasses();
-        $typeClasses = "gallery-{$this->type}";
 
-        return trim("{$baseClasses} {$typeClasses} {$radiusClasses}");
-    }
-
-    /**
-     * Generate main image container classes
-     */
-    public function mainImageClasses(): string
-    {
-        $baseClasses = 'gallery-main relative overflow-hidden';
-        $radiusClasses = $this->radiusClasses();
-        $aspectClasses = $this->aspectRatioClasses();
-
-        return trim("{$baseClasses} {$aspectClasses} {$radiusClasses}");
-    }
-
-    /**
-     * Generate thumbnail container classes
-     */
-    public function thumbnailContainerClasses(): string
-    {
-        $baseClasses = 'gallery-thumbnails';
-
-        $layoutClasses = match ($this->thumbnailPosition) {
-            'bottom' => 'flex flex-wrap gap-2 mt-4 justify-center p-1',
-            'top' => 'flex flex-wrap gap-2 mb-4 justify-center p-1',
-            'side' => 'flex flex-col gap-2 ml-4 p-1',
-            'overlay' => 'flex items-center gap-2 p-2 bg-black/20 backdrop-blur-sm rounded-lg overflow-x-auto scrollbar-hide',
-            'overlay-top' => 'flex items-center gap-2 p-2 bg-black/20 backdrop-blur-sm rounded-lg overflow-x-auto scrollbar-hide',
-            default => 'flex flex-wrap gap-2 mt-4 justify-center p-1'
-        };
-
-        return trim("{$baseClasses} {$layoutClasses}");
-    }
-
-    /**
-     * Generate thumbnail classes
-     */
-    public function thumbnailClasses(): string
-    {
-        $baseClasses = 'gallery-thumbnail relative cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-brand-500 overflow-hidden';
-
-        // Add flex-shrink-0 for overlay position to prevent thumbnails from shrinking
-        if ($this->thumbnailPosition === 'overlay') {
-            $baseClasses .= ' flex-shrink-0';
-        }
-
-        $sizeClasses = $this->thumbnailSizeClasses();
-        $radiusClasses = match ($this->radius) {
-            'none' => '',
-            'sm' => 'rounded-sm',
-            'md' => 'rounded-md',
-            'lg' => 'rounded-md',
-            'xl' => 'rounded-lg',
-            'full' => 'rounded-lg',
-            default => 'rounded-md'
-        };
-
-        return trim("{$baseClasses} {$sizeClasses} {$radiusClasses}");
-    }
-
-    /**
-     * Generate gallery layout classes for main container
-     */
-    public function galleryLayoutClasses(): string
-    {
-        if ($this->thumbnailPosition === 'side' && $this->shouldShowThumbnails()) {
-            return 'flex flex-row';
-        }
-
-        return 'flex flex-col';
-    }
-
-    /**
-     * Generate aspect ratio classes
-     */
-    protected function aspectRatioClasses(): string
-    {
-        return match ($this->aspectRatio) {
-            'square' => 'aspect-square',
-            'video' => 'aspect-video',
-            'photo' => 'aspect-[4/3]',
-            'wide' => 'aspect-[21/9]',
-            'auto' => '',
-            default => ''
-        };
-    }
-
-    /**
-     * Generate radius classes
-     */
-    protected function radiusClasses(): string
-    {
-        return match ($this->radius) {
-            'sm' => 'rounded-sm',
-            'md' => 'rounded-md',
-            'lg' => 'rounded-lg',
-            'xl' => 'rounded-xl',
-            'full' => 'rounded-full',
-            'none' => '',
-            default => ''
-        };
-    }
-
-    /**
-     * Generate thumbnail size classes
-     */
-    protected function thumbnailSizeClasses(): string
-    {
-        return match ($this->thumbnailSize) {
-            'xs' => 'w-12 h-12',
-            'sm' => 'w-16 h-16',
-            'md' => 'w-20 h-20',
-            'lg' => 'w-24 h-24',
-            default => 'w-16 h-16'
-        };
-    }
-
-    /**
-     * Generate layout wrapper classes
-     */
-    public function layoutWrapperClasses(): string
-    {
-        return match ($this->layout) {
-            'masonry' => 'gallery-masonry-container',
-            'grid' => 'gallery-grid-container',
-            default => 'gallery-default-layout'
-        };
-    }
-
-    /**
-     * Generate grid-specific classes
-     */
-    public function gridLayoutClasses(): string
-    {
-        $columnClasses = match ($this->gridColumns) {
-            1 => 'grid-cols-1',
-            2 => 'grid-cols-1 sm:grid-cols-2',
-            3 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-            4 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
-            5 => 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5',
-            6 => 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6',
-            default => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-        };
-
-        return "grid gap-4 {$columnClasses}";
-    }
 
     /**
      * Check if layout is alternative (masonry/grid)
@@ -282,6 +128,52 @@ class Gallery extends Component
     public function isAlternativeLayout(): bool
     {
         return in_array($this->layout, ['masonry', 'grid']);
+    }
+
+    /**
+     * Get comprehensive data attributes for CSS/JS targeting
+     */
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-gallery' => 'true',
+            'data-gallery-id' => $this->id,
+            'data-type' => $this->type,
+            'data-layout' => $this->layout,
+            'data-aspect-ratio' => $this->aspectRatio,
+            'data-radius' => $this->radius,
+            'data-thumbnail-position' => $this->thumbnailPosition,
+            'data-thumbnail-size' => $this->thumbnailSize,
+            'data-grid-columns' => $this->gridColumns,
+            'data-masonry-columns' => $this->masonryColumns,
+            'data-total-images' => count($this->images),
+        ];
+
+        
+        if ($this->showThumbnails) {
+            $attributes['data-show-thumbnails'] = 'true';
+        }
+        if ($this->autoplay) {
+            $attributes['data-autoplay'] = 'true';
+            $attributes['data-autoplay-delay'] = $this->autoplayDelay;
+        }
+        if ($this->loop) {
+            $attributes['data-loop'] = 'true';
+        }
+        if ($this->lightbox) {
+            $attributes['data-lightbox'] = 'true';
+        }
+        if ($this->shouldShowThumbnails()) {
+            $attributes['data-has-thumbnails'] = 'true';
+        }
+        if ($this->isAlternativeLayout()) {
+            $attributes['data-alternative-layout'] = 'true';
+        }
+        if ($this->hasImages()) {
+            $attributes['data-has-images'] = 'true';
+        }
+
+        return $attributes;
     }
 
     /**
@@ -307,6 +199,7 @@ class Gallery extends Component
     {
         return view('keys::components.gallery', [
             'computedGalleryData' => $this->getComputedGalleryData(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

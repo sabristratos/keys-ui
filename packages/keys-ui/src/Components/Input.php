@@ -42,6 +42,8 @@ class Input extends Component
      * @param  string  $actionVariant  Action button variant
      * @param  string  $actionSize  Action button size
      * @param  bool  $hasError  Force error state
+     * @param  string|null  $prefix  Prefix text (e.g., "https://", "$")
+     * @param  string|null  $postfix  Postfix text (e.g., "@twitter.com", "USD")
      */
     public function __construct(
         public string $type = 'text',
@@ -68,7 +70,9 @@ class Input extends Component
         public ?string $externalUrl = null,
         public string $actionVariant = 'ghost',
         public string $actionSize = 'xs',
-        public bool $hasError = false
+        public bool $hasError = false,
+        public ?string $prefix = null,
+        public ?string $postfix = null
     ) {
         if ($this->icon && ! $this->iconLeft) {
             $this->iconLeft = $this->icon;
@@ -292,6 +296,14 @@ class Input extends Component
             $attributes['data-has-value'] = 'true';
         }
 
+        if ($this->prefix) {
+            $attributes['data-has-prefix'] = 'true';
+        }
+
+        if ($this->postfix) {
+            $attributes['data-has-postfix'] = 'true';
+        }
+
         return $attributes;
     }
 
@@ -303,6 +315,11 @@ class Input extends Component
         return view('keys::components.input', [
             'computedActionData' => $this->getComputedActionData(),
             'dataAttributes' => $this->getDataAttributes(),
+            'hasError' => $this->hasError(),
+            'configuredActions' => $this->configuredActions(),
+            'isShorthand' => $this->isShorthand(),
+            'prefix' => $this->prefix,
+            'postfix' => $this->postfix,
         ]);
     }
 }

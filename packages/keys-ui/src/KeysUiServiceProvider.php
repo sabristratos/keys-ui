@@ -10,17 +10,25 @@ use Keys\UI\Components\Alert;
 use Keys\UI\Components\Avatar;
 use Keys\UI\Components\Avatar\Stack;
 use Keys\UI\Components\Badge;
+use Keys\UI\Components\Badge\Group as BadgeGroup;
 use Keys\UI\Components\Breadcrumbs;
 use Keys\UI\Components\Breadcrumbs\Item;
 use Keys\UI\Components\Button;
 use Keys\UI\Components\Button\Group;
 use Keys\UI\Components\Calendar;
 use Keys\UI\Components\Card;
+use Keys\UI\Components\Card\Actions as CardActions;
+use Keys\UI\Components\Card\Body as CardBody;
+use Keys\UI\Components\Card\Footer as CardFooter;
+use Keys\UI\Components\Card\Header as CardHeader;
 use Keys\UI\Components\Checkbox;
+use Keys\UI\Components\Chart;
 use Keys\UI\Components\ChoiceGroup;
+use Keys\UI\Components\ColorPicker;
 use Keys\UI\Components\DatePicker;
 use Keys\UI\Components\Dropdown;
 use Keys\UI\Components\Editor;
+use Keys\UI\Components\EmptyState;
 use Keys\UI\Components\Error;
 use Keys\UI\Components\Field;
 use Keys\UI\Components\FileUpload;
@@ -29,8 +37,10 @@ use Keys\UI\Components\HeadingDecorator;
 use Keys\UI\Components\Icon;
 use Keys\UI\Components\Image;
 use Keys\UI\Components\Input;
+use Keys\UI\Components\Kbd;
 use Keys\UI\Components\Label;
 use Keys\UI\Components\Loading;
+use Keys\UI\Components\Main;
 use Keys\UI\Components\Menu;
 use Keys\UI\Components\Menu\Checkbox as MenuCheckbox;
 use Keys\UI\Components\Menu\Item as MenuItem;
@@ -42,11 +52,22 @@ use Keys\UI\Components\Popover;
 use Keys\UI\Components\Progress;
 use Keys\UI\Components\Radio;
 use Keys\UI\Components\Range;
+use Keys\UI\Components\Rating;
 use Keys\UI\Components\Scripts;
 use Keys\UI\Components\Select;
 use Keys\UI\Components\Select\Chip;
 use Keys\UI\Components\Select\Option;
 use Keys\UI\Components\Separator;
+use Keys\UI\Components\Sidebar;
+use Keys\UI\Components\Sidebar\Divider as SidebarDivider;
+use Keys\UI\Components\Sidebar\Item as SidebarItem;
+use Keys\UI\Components\Sidebar\Section as SidebarSection;
+use Keys\UI\Components\Sidebar\Toggle as SidebarToggle;
+use Keys\UI\Components\Slideout;
+use Keys\UI\Components\Social\Links as SocialLinks;
+use Keys\UI\Components\Social\Share as SocialShare;
+use Keys\UI\Components\Steps;
+use Keys\UI\Components\Steps\Step;
 use Keys\UI\Components\Table;
 use Keys\UI\Components\Table\Body;
 use Keys\UI\Components\Table\Cell;
@@ -117,6 +138,10 @@ class KeysUiServiceProvider extends ServiceProvider
             __DIR__.'/../lang' => $this->app->langPath('vendor/keys-ui'),
         ], 'keys-ui-lang');
 
+        $this->publishes([
+            __DIR__.'/../resources/views/layouts' => resource_path('views/components/layouts'),
+        ], 'keys-ui-layouts');
+
         Blade::component('keys::accordion', Accordion::class);
         Blade::component('keys::icon', Icon::class);
         Blade::component('keys::loading', Loading::class);
@@ -125,13 +150,21 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::calendar', Calendar::class);
         Blade::component('keys::date-picker', DatePicker::class);
         Blade::component('keys::card', Card::class);
+        Blade::component('keys::card.header', CardHeader::class);
+        Blade::component('keys::card.body', CardBody::class);
+        Blade::component('keys::card.footer', CardFooter::class);
+        Blade::component('keys::card.actions', CardActions::class);
         Blade::component('keys::label', Label::class);
         Blade::component('keys::error', Error::class);
         Blade::component('keys::input', Input::class);
         Blade::component('keys::textarea', Textarea::class);
         Blade::component('keys::checkbox', Checkbox::class);
+        Blade::component('keys::kbd', Kbd::class);
+        Blade::component('keys::chart', Chart::class);
+        Blade::component('keys::color-picker', ColorPicker::class);
         Blade::component('keys::radio', Radio::class);
         Blade::component('keys::range', Range::class);
+        Blade::component('keys::rating', Rating::class);
         Blade::component('keys::choice-group', ChoiceGroup::class);
         Blade::component('keys::field', Field::class);
         Blade::component('keys::alert', Alert::class);
@@ -145,12 +178,15 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::avatar', Avatar::class);
         Blade::component('keys::avatar.stack', Stack::class);
         Blade::component('keys::badge', Badge::class);
+        Blade::component('keys::badge.group', BadgeGroup::class);
         Blade::component('keys::breadcrumbs', Breadcrumbs::class);
         Blade::component('keys::breadcrumbs.item', Item::class);
         Blade::component('keys::modal', Modal::class);
+        Blade::component('keys::slideout', Slideout::class);
         Blade::component('keys::toast', Toast::class);
         Blade::component('keys::dropdown', Dropdown::class);
         Blade::component('keys::editor', Editor::class);
+        Blade::component('keys::empty-state', EmptyState::class);
         Blade::component('keys::menu', Menu::class);
         Blade::component('keys::menu.item', MenuItem::class);
         Blade::component('keys::menu.checkbox', MenuCheckbox::class);
@@ -173,9 +209,22 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::add-to-cart', AddToCart::class);
         Blade::component('keys::progress', Progress::class);
         Blade::component('keys::separator', Separator::class);
+        Blade::component('keys::steps', Steps::class);
+        Blade::component('keys::steps.step', Step::class);
         Blade::component('keys::popover', Popover::class);
         Blade::component('keys::scripts', Scripts::class);
         Blade::component('keys::file-upload', FileUpload::class);
+        Blade::component('keys::sidebar', Sidebar::class);
+        Blade::component('keys::sidebar.section', SidebarSection::class);
+        Blade::component('keys::sidebar.item', SidebarItem::class);
+        Blade::component('keys::sidebar.divider', SidebarDivider::class);
+        Blade::component('keys::sidebar.toggle', SidebarToggle::class);
+        Blade::component('keys::main', Main::class);
+        Blade::component('keys::social.share', SocialShare::class);
+        Blade::component('keys::social.links', SocialLinks::class);
+
+        // Register anonymous layout components
+        Blade::anonymousComponentPath(__DIR__.'/../resources/views/layouts', 'keys-layouts');
 
         $this->app->alias(KeysManager::class, 'keys');
     }

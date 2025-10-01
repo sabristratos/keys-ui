@@ -1,5 +1,5 @@
 @php
-    // Panel classes
+
     $baseClasses = 'tabs-panel focus-visible:outline-none';
     $customClasses = $className ?? '';
     $panelClasses = trim("$baseClasses $customClasses");

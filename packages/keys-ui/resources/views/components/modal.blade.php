@@ -1,39 +1,88 @@
 @php
+
+    $dialogClasses = 'w-full h-full max-w-none max-h-none m-0 p-0 border-0 bg-transparent';
+    if ($animate) {
+        $dialogClasses .= ' transition-opacity transition-transform duration-300 ease-out starting:opacity-0 starting:scale-95';
+    }
+
+    $backdropClasses = match ($backdrop) {
+        'dark' => 'backdrop:bg-black/75',
+        'blur' => 'backdrop:bg-black/50 backdrop:backdrop-blur-sm',
+        'none' => 'backdrop:bg-transparent',
+        default => 'backdrop:bg-black/50'
+    };
+    $dialogClasses .= ' ' . $backdropClasses;
+
+    $containerClasses = 'flex w-full h-full p-4';
+    if ($centered) {
+        $containerClasses .= ' items-center justify-center';
+    } else {
+        $containerClasses .= ' items-start justify-center pt-16';
+    }
+
+    $modalClasses = 'relative bg-surface border border-border shadow-xl rounded-lg';
+
+    $sizeClasses = match ($size) {
+        'xs' => 'max-w-xs',
+        'sm' => 'max-w-sm',
+        'md' => 'max-w-md',
+        'lg' => 'max-w-lg',
+        'xl' => 'max-w-xl',
+        'full' => 'max-w-full w-full max-h-full',
+        default => 'max-w-md'
+    };
+
+    if ($scrollable && $size !== 'full') {
+        $modalClasses .= ' max-h-[80vh] flex flex-col';
+    }
+
+    $modalClasses .= ' ' . $sizeClasses;
+
+    $headerClasses = 'flex items-center justify-between p-6 border-b border-border';
+    if ($scrollable) {
+        $headerClasses .= ' flex-shrink-0';
+    }
+
+    $bodyClasses = 'p-6';
+    if ($scrollable) {
+        $bodyClasses .= ' flex-1 overflow-y-auto';
+    }
+
+    $footerClasses = 'flex items-center justify-end gap-3 p-6 border-t border-border';
+    if ($scrollable) {
+        $footerClasses .= ' flex-shrink-0';
+    }
+
     $dialogAttributes = $attributes
         ->except(['header', 'footer', 'wire:model', 'wire:open', 'wire:close', 'wire:escape', 'wire:cancel', '@open', '@close', '@escape', '@cancel'])
         ->merge([
             'id' => $id,
-            'class' => $computedDialogClasses,
+            'class' => $dialogClasses,
             'closedby' => $closedby,
-            'data-modal' => true,
-            'data-backdrop' => $backdrop,
-            'data-scrollable' => $scrollable ? 'true' : 'false',
         ])
-        ->merge($livewireAttributes);
-
-    // All modals now use CSS animations by default
-
-    $dialogAttributes = $dialogAttributes->merge($eventAttributes)->merge($dataAttributes);
+        ->merge($livewireAttributes)
+        ->merge($eventAttributes)
+        ->merge($dataAttributes);
 @endphp
 
 <dialog {{ $dialogAttributes }}>
-    <div class="{{ $computedContainerClasses }}">
-        <div class="{{ $computedModalClasses }}" role="document">
-            
+    <div class="{{ $containerClasses }}">
+        <div class="{{ $modalClasses }}" role="document">
+
             @isset($header)
-                <header class="{{ $computedHeaderClasses }}">
+                <header class="{{ $headerClasses }}">
                     {{ $header }}
                 </header>
             @endisset
 
-            
-            <main class="{{ $computedBodyClasses }}">
+
+            <main class="{{ $bodyClasses }}">
                 {{ $slot }}
             </main>
 
-            
+
             @isset($footer)
-                <footer class="{{ $computedFooterClasses }}">
+                <footer class="{{ $footerClasses }}">
                     {{ $footer }}
                 </footer>
             @endisset
@@ -42,7 +91,7 @@
 
 
     
-    @if($isLivewireEnabled())
+    @if($isLivewireEnabled)
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const modal = document.getElementById('{{ $id }}');
@@ -62,8 +111,8 @@
                     });
 
                     modal.addEventListener('close', () => {
-                        @if($getWireModelAttribute())
-                            @this.set('{{ $getWireModelAttribute() }}', false);
+                        @if($wireModelAttribute)
+                            @this.set('{{ $wireModelAttribute }}', false);
                         @endif
 
                         Livewire.dispatch('modalClosed', { id: '{{ $id }}' });
@@ -111,3 +160,89 @@
         </script>
     @endif
 </dialog>
+
+
+@once
+<style>
+/* ===== SCROLLABLE MODAL SUPPORT ===== */
+/* Scrollable modal body styling */
+dialog[data-keys-modal="true"][data-scrollable="true"] main {
+    max-height: calc(80vh - 12rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(156 163 175 / 0.5) transparent;
+}
+
+dialog[data-keys-modal="true"][data-scrollable="true"] main::-webkit-scrollbar {
+    width: 6px;
+}
+
+dialog[data-keys-modal="true"][data-scrollable="true"] main::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+dialog[data-keys-modal="true"][data-scrollable="true"] main::-webkit-scrollbar-thumb {
+    background: rgb(156 163 175 / 0.5);
+    border-radius: 3px;
+}
+
+dialog[data-keys-modal="true"][data-scrollable="true"] main::-webkit-scrollbar-thumb:hover {
+    background: rgb(156 163 175 / 0.7);
+}
+
+/* ===== FOCUS MANAGEMENT ===== */
+/* Remove default focus outline on dialog */
+dialog[data-keys-modal="true"]:focus-visible {
+    outline: none;
+}
+
+/* Focus styling for close buttons and interactive elements */
+dialog[data-keys-modal="true"] [data-modal-close]:focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* ===== SIZE VARIANT ANIMATIONS ===== */
+/* Different animation scales for different modal sizes */
+dialog[data-keys-modal="true"][data-size="xs"][data-animate="true"] {
+    transform: scale(0.9);
+}
+
+dialog[data-keys-modal="true"][data-size="xl"][data-animate="true"],
+dialog[data-keys-modal="true"][data-size="full"][data-animate="true"] {
+    transform: scale(0.98);
+}
+
+/* ===== RESPONSIVE BEHAVIOR ===== */
+/* Mobile-specific modal behavior */
+@media (max-width: 640px) {
+    dialog[data-keys-modal="true"] {
+        margin: 1rem;
+    }
+
+    dialog[data-keys-modal="true"][data-scrollable="true"] main {
+        max-height: calc(80vh - 8rem);
+    }
+}
+
+/* ===== LIVEWIRE INTEGRATION ENHANCEMENTS ===== */
+/* Enhanced styling for Livewire modals */
+dialog[data-keys-modal="true"][data-livewire-enabled="true"] {
+    /* Livewire-specific optimizations can be added here */
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+/* Dark mode backdrop adjustments */
+@media (prefers-color-scheme: dark) {
+    dialog[data-keys-modal="true"]::backdrop {
+        background: rgb(0 0 0 / 0.7);
+    }
+
+    dialog[data-keys-modal="true"][data-backdrop="dark"]::backdrop {
+        background: rgb(0 0 0 / 0.85);
+    }
+}
+
+</style>
+@endonce

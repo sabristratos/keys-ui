@@ -7,7 +7,7 @@ use Livewire\Attributes\Rule;
 
 class SelectTest extends Component
 {
-    // Single select values
+    
     #[Rule('required')]
     public $basicSelect = '';
 
@@ -16,7 +16,7 @@ class SelectTest extends Component
     public $countrySelect = '';
     public $statusSelect = '';
 
-    // Multiple select values
+    
     #[Rule('required|array|min:1')]
     public $multipleSkills = [];
 
@@ -24,20 +24,20 @@ class SelectTest extends Component
     public $multipleCountries = [];
     public $multiplePriorities = [];
 
-    // Dynamic option loading
+    
     public $selectedCategory = '';
     public $availableProducts = [];
 
-    // Form validation testing
+    
     public $validationEnabled = false;
     public $formSubmitted = false;
     public $lastSubmissionData = null;
 
-    // Real-time update testing
+    
     public $realtimeValue = '';
     public $realtimeCounter = 0;
 
-    // Country options for testing
+    
     public $countries = [
         'us' => 'United States',
         'uk' => 'United Kingdom',
@@ -49,7 +49,7 @@ class SelectTest extends Component
         'cn' => 'China',
     ];
 
-    // Skill options for multiple select
+    
     public $skills = [
         'php' => 'PHP',
         'javascript' => 'JavaScript',
@@ -61,7 +61,7 @@ class SelectTest extends Component
         'docker' => 'Docker',
     ];
 
-    // Priority options
+    
     public $priorities = [
         'urgent' => 'Urgent',
         'high' => 'High Priority',
@@ -70,7 +70,7 @@ class SelectTest extends Component
         'backlog' => 'Backlog',
     ];
 
-    // Category -> Products mapping for dynamic loading
+    
     public $categoryProducts = [
         'electronics' => [
             'laptop' => 'Laptop Computer',
@@ -95,7 +95,7 @@ class SelectTest extends Component
 
     public function mount()
     {
-        // Set some default values for testing
+        
         $this->basicSelect = 'option2';
         $this->multipleSkills = ['php', 'laravel'];
         $this->countrySelect = 'us';
@@ -104,7 +104,7 @@ class SelectTest extends Component
 
     public function updatedSelectedCategory($value)
     {
-        // Dynamic product loading based on category
+        
         $this->availableProducts = $this->categoryProducts[$value] ?? [];
         $this->reset(['formSubmitted', 'lastSubmissionData']);
     }
@@ -167,7 +167,7 @@ class SelectTest extends Component
             'lastSubmissionData',
         ]);
 
-        // Reset to default values
+        
         $this->mount();
     }
 

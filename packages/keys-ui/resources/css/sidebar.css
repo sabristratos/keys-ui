@@ -1,0 +1,149 @@
+/**
+ * Sidebar Component Styles
+ * Width management and collapsed state styling
+ */
+
+/* Width custom properties for different sizes */
+[data-keys-sidebar] {
+    --sidebar-width-xs: 12rem;
+    --sidebar-width-sm: 14rem;
+    --sidebar-width-md: 16rem;
+    --sidebar-width-lg: 18rem;
+    --sidebar-width-xl: 20rem;
+    --sidebar-width-collapsed: 4rem;
+}
+
+/* Apply width based on data-width attribute */
+[data-keys-sidebar][data-width="xs"]:not([data-collapsed="true"]) {
+    width: var(--sidebar-width-xs);
+}
+
+[data-keys-sidebar][data-width="sm"]:not([data-collapsed="true"]) {
+    width: var(--sidebar-width-sm);
+}
+
+[data-keys-sidebar][data-width="md"]:not([data-collapsed="true"]) {
+    width: var(--sidebar-width-md);
+}
+
+[data-keys-sidebar][data-width="lg"]:not([data-collapsed="true"]) {
+    width: var(--sidebar-width-lg);
+}
+
+[data-keys-sidebar][data-width="xl"]:not([data-collapsed="true"]) {
+    width: var(--sidebar-width-xl);
+}
+
+/* Collapsed width on desktop only */
+@media (min-width: 1024px) {
+    [data-keys-sidebar][data-collapsed="true"] {
+        width: var(--sidebar-width-collapsed);
+    }
+}
+
+/* Mobile behavior - always full width or hidden */
+@media (max-width: 1023px) {
+    [data-keys-sidebar][data-collapsible="true"] {
+        position: fixed;
+        inset-block: 0;
+        z-index: 50;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    [data-keys-sidebar][data-collapsible="true"][data-collapsed="true"] {
+        transform: translateX(-100%);
+    }
+
+    [data-keys-sidebar][data-collapsible="true"][data-collapsed="false"] {
+        transform: translateX(0);
+    }
+}
+
+/* Force all sidebar sections to show content when collapsed (for icon visibility) */
+@media (min-width: 1024px) {
+    /* Force details elements to show content */
+    [data-keys-sidebar][data-collapsed="true"] details[data-keys-sidebar-section] {
+        display: block;
+    }
+
+    /* Hide section headings (NAVIGATION, TEAM, etc.) when collapsed */
+    [data-keys-sidebar][data-collapsed="true"] details[data-keys-sidebar-section] > summary {
+        display: none !important;
+    }
+
+    /* Force content div to show (the items with icons) */
+    [data-keys-sidebar][data-collapsed="true"] details[data-keys-sidebar-section] > div {
+        display: block !important;
+    }
+}
+
+/* Hide tooltip when sidebar is expanded */
+[data-keys-sidebar]:not([data-collapsed="true"]) [data-sidebar-item][title] {
+    pointer-events: auto;
+}
+
+/* Show tooltip only when sidebar is collapsed */
+@media (min-width: 1024px) {
+    [data-keys-sidebar][data-collapsed="true"] [data-sidebar-item][title] {
+        position: relative;
+    }
+}
+
+/* Maintain .sidebar-collapsed class for Tailwind arbitrary variants */
+@media (min-width: 1024px) {
+    [data-keys-sidebar].sidebar-collapsed {
+        /* Class exists for Tailwind lg:[.sidebar-collapsed_&]:hidden patterns */
+    }
+}
+
+/**
+ * Responsive Header Visibility Rules
+ * Controls what shows in the header based on screen size and collapsed state
+ */
+
+/* Mobile: Show full branding when sidebar is open (collapsed="false") */
+@media (max-width: 1023px) {
+    /* When sidebar is open, show everything */
+    [data-keys-sidebar][data-collapsed="false"] [data-sidebar-logo],
+    [data-keys-sidebar][data-collapsed="false"] [data-sidebar-branding],
+    [data-keys-sidebar][data-collapsed="false"] [data-sidebar-custom-header],
+    [data-keys-sidebar][data-collapsed="false"] [data-sidebar-toggle-wrapper] {
+        display: block;
+    }
+
+    /* When sidebar is closed, only show toggle button (in mobile header, not in sidebar) */
+    [data-keys-sidebar][data-collapsed="true"] [data-sidebar-logo],
+    [data-keys-sidebar][data-collapsed="true"] [data-sidebar-branding],
+    [data-keys-sidebar][data-collapsed="true"] [data-sidebar-custom-header] {
+        display: none;
+    }
+}
+
+/* Desktop collapsed: Show logo (if provided) + toggle, hide branding text */
+@media (min-width: 1024px) {
+    [data-keys-sidebar][data-collapsed="true"] [data-sidebar-branding],
+    [data-keys-sidebar][data-collapsed="true"] [data-sidebar-custom-header] {
+        display: none;
+    }
+
+    [data-keys-sidebar][data-collapsed="true"] [data-sidebar-logo],
+    [data-keys-sidebar][data-collapsed="true"] [data-sidebar-toggle-wrapper] {
+        display: block;
+    }
+
+    /* Center and allow wrapping when collapsed */
+    [data-keys-sidebar][data-collapsed="true"] [data-sidebar-header] > div {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+/* Desktop expanded: Show everything */
+@media (min-width: 1024px) {
+    [data-keys-sidebar][data-collapsed="false"] [data-sidebar-logo],
+    [data-keys-sidebar][data-collapsed="false"] [data-sidebar-branding],
+    [data-keys-sidebar][data-collapsed="false"] [data-sidebar-custom-header],
+    [data-keys-sidebar][data-collapsed="false"] [data-sidebar-toggle-wrapper] {
+        display: block;
+    }
+}

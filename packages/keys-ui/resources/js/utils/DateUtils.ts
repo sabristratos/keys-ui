@@ -45,20 +45,32 @@ export class DateUtils {
         const month = date.getMonth() + 1;
         const day = date.getDate();
 
-        const replacements: Record<string, string> = {
-            'Y': String(year),
-            'y': String(year).slice(-2),
-            'F': this.MONTH_NAMES[month - 1],
-            'M': this.MONTH_NAMES_SHORT[month - 1],
-            'm': String(month).padStart(2, '0'),
-            'n': String(month),
-            'd': String(day).padStart(2, '0'),
-            'j': String(day),
-        };
+        const replacements: Array<[string, string]> = [
+            ['YYYY', String(year)],
+            ['YY', String(year).slice(-2)],
+            ['Y', String(year)],
+            ['y', String(year).slice(-2)],
+
+            ['MMMM', this.MONTH_NAMES[month - 1]],
+            ['MMM', this.MONTH_NAMES_SHORT[month - 1]],
+            ['MM', String(month).padStart(2, '0')],
+            ['M', this.MONTH_NAMES_SHORT[month - 1]],
+            ['mm', String(month).padStart(2, '0')],
+            ['m', String(month).padStart(2, '0')],
+            ['n', String(month)],
+
+            ['F', this.MONTH_NAMES[month - 1]],
+
+            ['DD', String(day).padStart(2, '0')],
+            ['dd', String(day).padStart(2, '0')],
+            ['d', String(day).padStart(2, '0')],
+            ['j', String(day)],
+        ];
 
         let result = format;
-        for (const [key, value] of Object.entries(replacements)) {
-            result = result.replace(new RegExp(key, 'g'), value);
+
+        for (const [token, value] of replacements) {
+            result = result.replace(new RegExp(token, 'g'), value);
         }
 
         return result;
@@ -274,20 +286,15 @@ export class DateUtils {
     static parseInputDate(input: string, expectedFormat?: string): Date | null {
         if (!input || !input.trim()) return null;
 
-        // Try standard Date parsing first
         try {
             const date = new Date(input);
             if (!isNaN(date.getTime())) {
                 return date;
             }
         } catch (e) {
-            // Continue to format-specific parsing
         }
 
-        // If we have an expected format, try to parse accordingly
         if (expectedFormat) {
-            // This could be enhanced with more sophisticated format parsing
-            // For now, rely on standard Date parsing
         }
 
         return null;

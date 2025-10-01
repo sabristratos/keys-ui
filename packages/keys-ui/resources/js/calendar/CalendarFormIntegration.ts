@@ -12,6 +12,7 @@
 import { CalendarState } from './CalendarDateSelection';
 import { CalendarDateSelection } from './CalendarDateSelection';
 import { CalendarNavigation } from './CalendarNavigation';
+import { DateUtils } from '../utils/DateUtils';
 
 export class CalendarFormIntegration {
 
@@ -46,7 +47,6 @@ export class CalendarFormIntegration {
             rangeInput.value = CalendarDateSelection.formatRangeForDisplay(state.startDate, state.endDate);
         }
 
-        // Dispatch change events for framework integration
         [startInput, endInput, rangeInput].forEach(input => {
             if (input) {
                 this.dispatchInputChangeEvent(input);
@@ -70,17 +70,14 @@ export class CalendarFormIntegration {
      * Dispatch change event on input for framework integration
      */
     private static dispatchInputChangeEvent(input: HTMLInputElement): void {
-        // Create and dispatch both input and change events
         const inputEvent = new Event('input', { bubbles: true });
         const changeEvent = new Event('change', { bubbles: true });
 
         input.dispatchEvent(inputEvent);
         input.dispatchEvent(changeEvent);
 
-        // Trigger Livewire updates if present
         if ((window as any).Livewire && input.hasAttribute('wire:model')) {
             (window as any).Livewire.hook('message.processed', () => {
-                // Livewire will handle the update
             });
         }
     }
@@ -97,6 +94,10 @@ export class CalendarFormIntegration {
         switch (selectorValue) {
             case 'today':
                 selectedDate = this.formatDateString(today);
+                if (this.isDateDisabled(selectedDate, state)) {
+                    console.warn('Today is disabled and cannot be selected');
+                    return;
+                }
                 if (state.isRange) {
                     startDate = selectedDate;
                     endDate = selectedDate;
@@ -107,6 +108,10 @@ export class CalendarFormIntegration {
                 const yesterday = new Date(today);
                 yesterday.setDate(yesterday.getDate() - 1);
                 selectedDate = this.formatDateString(yesterday);
+                if (this.isDateDisabled(selectedDate, state)) {
+                    console.warn('Yesterday is disabled and cannot be selected');
+                    return;
+                }
                 if (state.isRange) {
                     startDate = selectedDate;
                     endDate = selectedDate;
@@ -163,14 +168,12 @@ export class CalendarFormIntegration {
                 return;
         }
 
-        // Navigate to the relevant month if needed first
         const targetDate = endDate || selectedDate;
         let targetMonth = state.currentMonth;
         if (targetDate) {
             targetMonth = this.formatYearMonth(new Date(targetDate));
         }
 
-        // Update state based on mode - always force calendar view and update month
         if (state.isRange && startDate && endDate) {
             setState({
                 startDate,
@@ -192,12 +195,53 @@ export class CalendarFormIntegration {
         onRender();
         CalendarNavigation.updateMonthYearDisplay(calendar, state.monthNames, targetMonth);
         this.updateHiddenInput(calendar, state);
-        this.dispatchCalendarEvent(calendar, 'dateSelected', {
-            selectedDate,
-            startDate,
-            endDate,
-            source: 'quickSelector'
-        });
+
+        const formattedSelectedDate = selectedDate ? DateUtils.formatDateForDisplay(selectedDate, state.displayFormat) : null;
+        const formattedStartDate = startDate ? DateUtils.formatDateForDisplay(startDate, state.displayFormat) : null;
+        const formattedEndDate = endDate ? DateUtils.formatDateForDisplay(endDate, state.displayFormat) : null;
+
+        if (state.isRange && startDate && endDate) {
+            this.dispatchCalendarEvent(calendar, 'rangeSelected', {
+                startDate,
+                endDate,
+                formattedRange: DateUtils.formatRangeForDisplay(startDate, endDate, state.displayFormat),
+                source: 'quickSelector'
+            });
+        } else if (!state.isRange && selectedDate) {
+            this.dispatchCalendarEvent(calendar, 'dateSelected', {
+                selectedDate,
+                formattedDate: formattedSelectedDate,
+                source: 'quickSelector'
+            });
+        }
+    }
+
+    /**
+     * Check if a date is disabled based on calendar constraints
+     */
+    private static isDateDisabled(dateString: string, state: CalendarState): boolean {
+        const dateObj = DateUtils.parseDate(dateString);
+        if (!dateObj) return true;
+
+        if (state.minDate) {
+            const minDateObj = DateUtils.parseDate(state.minDate);
+            if (minDateObj && dateObj < minDateObj) {
+                return true;
+            }
+        }
+
+        if (state.maxDate) {
+            const maxDateObj = DateUtils.parseDate(state.maxDate);
+            if (maxDateObj && dateObj > maxDateObj) {
+                return true;
+            }
+        }
+
+        if (state.disabledDates && state.disabledDates.includes(dateString)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -209,7 +253,7 @@ export class CalendarFormIntegration {
                 CalendarDateSelection.clearSelection(calendar, state, setState);
                 onRender();
                 this.updateHiddenInput(calendar, state);
-                this.dispatchCalendarEvent(calendar, 'dateCleared', {
+                this.dispatchCalendarEvent(calendar, 'cleared', {
                     source: 'footerAction'
                 });
                 break;
@@ -217,6 +261,11 @@ export class CalendarFormIntegration {
             case 'today':
                 const today = this.formatDateString(new Date());
                 const todayMonth = this.formatYearMonth(new Date());
+
+                if (this.isDateDisabled(today, state)) {
+                    console.warn('Today is disabled and cannot be selected');
+                    return;
+                }
 
                 if (state.isRange) {
                     setState({
@@ -237,10 +286,15 @@ export class CalendarFormIntegration {
                 onRender();
                 CalendarNavigation.updateMonthYearDisplay(calendar, state.monthNames, todayMonth);
                 this.updateHiddenInput(calendar, state);
+
+                const formattedToday = DateUtils.formatDateForDisplay(today, state.displayFormat);
+
                 this.dispatchCalendarEvent(calendar, 'dateSelected', {
                     selectedDate: state.isRange ? null : today,
                     startDate: state.isRange ? today : null,
                     endDate: state.isRange ? today : null,
+                    formattedDate: state.isRange ? null : formattedToday,
+                    formattedRange: state.isRange ? `${formattedToday} - ${formattedToday}` : null,
                     source: 'footerAction'
                 });
                 break;
@@ -265,7 +319,6 @@ export class CalendarFormIntegration {
 
         calendar.dispatchEvent(event);
 
-        // Also dispatch on document for global listeners
         document.dispatchEvent(new CustomEvent(`keys:calendar:${eventName}`, {
             bubbles: true,
             cancelable: true,
@@ -280,20 +333,26 @@ export class CalendarFormIntegration {
      * Bind form integration event listeners
      */
     public static bindFormEvents(calendar: HTMLElement, state: CalendarState, setState: (newState: Partial<CalendarState>) => void, onRender: () => void): void {
-        // Quick selector events with proper event delegation - only for range pickers
-        if (state.isRange) {
-            calendar.addEventListener('click', (e) => {
-                const selectorButton = (e.target as HTMLElement).closest('[data-quick-selector]') as HTMLElement;
-                if (selectorButton) {
+        calendar.addEventListener('quickSelector:clicked', (event: any) => {
+            const selectorValue = event.detail?.value;
+            if (selectorValue) {
+                this.handleQuickSelector(calendar, selectorValue, state, setState, onRender);
+            }
+        });
+
+        calendar.addEventListener('click', (e) => {
+            const selectorButton = (e.target as HTMLElement).closest('[data-quick-selector]') as HTMLElement;
+            if (selectorButton) {
+                const parentDatePicker = calendar.closest('[data-keys-date-picker]');
+                if (!parentDatePicker) {
                     const selectorValue = selectorButton.dataset.quickSelector;
                     if (selectorValue) {
                         this.handleQuickSelector(calendar, selectorValue, state, setState, onRender);
                     }
                 }
-            });
-        }
+            }
+        });
 
-        // Footer action events
         calendar.querySelectorAll('[data-calendar-action]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const action = (e.target as HTMLElement).dataset.calendarAction;

@@ -30,12 +30,10 @@ export class CalendarNavigation {
 
         const newMonth = this.formatYearMonth(newDate);
 
-        // Check navigation constraints
         if (!this.canNavigateToMonth(newDate, state)) {
             return;
         }
 
-        // Update state and re-render
         setState({
             currentMonth: newMonth,
             viewMode: 'calendar'
@@ -155,7 +153,6 @@ export class CalendarNavigation {
 
         gridContainer.innerHTML = html;
 
-        // Bind month selection events
         this.bindMonthGridEvents(calendar, state, setState, onRender);
     }
 
@@ -230,7 +227,6 @@ export class CalendarNavigation {
 
         gridContainer.innerHTML = html;
 
-        // Bind year selection events
         this.bindYearGridEvents(calendar, state, setState, onRender);
     }
 
@@ -400,7 +396,6 @@ export class CalendarNavigation {
      * Bind month grid event listeners
      */
     private static bindMonthGridEvents(calendar: HTMLElement, state: CalendarState, setState: (newState: Partial<CalendarState>) => void, onRender: () => void): void {
-        // Month selection
         calendar.querySelectorAll('[data-calendar-month-btn]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const monthIndex = parseInt((e.target as HTMLElement).dataset.month || '0');
@@ -408,17 +403,7 @@ export class CalendarNavigation {
             });
         });
 
-        // Year navigation
-        calendar.querySelectorAll('[data-calendar-year-nav]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const direction = (e.target as HTMLElement).dataset.calendarYearNav as 'prev' | 'next';
-                const currentYear = parseInt(state.currentMonth.substring(0, 4));
-                const newYear = direction === 'prev' ? currentYear - 1 : currentYear + 1;
-                this.selectYear(calendar, newYear, state, setState, onRender);
-            });
-        });
 
-        // Year button (opens year grid)
         calendar.querySelector('[data-calendar-year-btn]')?.addEventListener('click', () => {
             setState({ viewMode: 'year' });
             this.renderYearGrid(calendar, state, setState, onRender);
@@ -429,7 +414,6 @@ export class CalendarNavigation {
      * Bind year grid event listeners
      */
     private static bindYearGridEvents(calendar: HTMLElement, state: CalendarState, setState: (newState: Partial<CalendarState>) => void, onRender: () => void): void {
-        // Year selection
         calendar.querySelectorAll('[data-calendar-year-option]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const year = parseInt((e.target as HTMLElement).dataset.year || '0');
@@ -437,7 +421,6 @@ export class CalendarNavigation {
             });
         });
 
-        // Decade navigation
         calendar.querySelectorAll('[data-calendar-decade-nav]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const direction = (e.target as HTMLElement).dataset.calendarDecadeNav as 'prev' | 'next';

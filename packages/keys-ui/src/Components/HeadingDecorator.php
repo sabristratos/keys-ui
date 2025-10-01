@@ -24,7 +24,7 @@ class HeadingDecorator extends Component
         }
 
 
-        // Set default animations for variants
+        
         if ($this->animation === null) {
             $this->animation = match ($this->variant) {
                 'underline' => 'draw',
@@ -33,81 +33,6 @@ class HeadingDecorator extends Component
             };
         }
     }
-
-    public function componentClasses(): string
-    {
-        $baseClasses = 'inline relative';
-
-        return trim($baseClasses);
-    }
-
-    public function variantClasses(): string
-    {
-        return match ($this->variant) {
-            'gradient' => $this->gradientClasses(),
-            'highlight' => $this->highlightClasses(),
-            'underline' => $this->underlineClasses(),
-            'glow' => $this->glowClasses(),
-            'outline' => $this->outlineClasses(),
-            default => ''
-        };
-    }
-
-    protected function gradientClasses(): string
-    {
-        $baseClasses = 'bg-gradient-to-r bg-clip-text text-transparent font-bold';
-
-        return match ($this->color) {
-            'brand' => "{$baseClasses} from-brand-500 to-brand-600",
-            'success' => "{$baseClasses} from-green-500 to-emerald-600",
-            'warning' => "{$baseClasses} from-yellow-500 to-orange-600",
-            'danger' => "{$baseClasses} from-red-500 to-pink-600",
-            'rainbow' => "{$baseClasses} from-purple-500 via-blue-500 via-green-500 to-yellow-500",
-            'blue' => "{$baseClasses} from-blue-500 to-cyan-600",
-            'purple' => "{$baseClasses} from-purple-500 to-indigo-600",
-            'pink' => "{$baseClasses} from-pink-500 to-rose-600",
-            default => "{$baseClasses} from-brand-500 to-brand-600"
-        };
-    }
-
-    protected function highlightClasses(): string
-    {
-        $baseClasses = 'px-1 py-0.5 rounded-sm font-medium relative';
-
-        return match ($this->color) {
-            'brand' => "{$baseClasses} bg-brand-100 text-brand-800",
-            'success' => "{$baseClasses} bg-green-100 text-green-800",
-            'warning' => "{$baseClasses} bg-yellow-100 text-yellow-800",
-            'danger' => "{$baseClasses} bg-red-100 text-red-800",
-            'neutral' => "{$baseClasses} bg-neutral-100 text-neutral-800",
-            default => "{$baseClasses} bg-brand-100 text-brand-800"
-        };
-    }
-
-    protected function underlineClasses(): string
-    {
-        return 'font-medium relative';
-    }
-
-    protected function glowClasses(): string
-    {
-        $baseClasses = 'font-medium relative';
-
-        return match ($this->color) {
-            'brand' => "{$baseClasses} text-brand-700",
-            'success' => "{$baseClasses} text-green-700",
-            'warning' => "{$baseClasses} text-yellow-700",
-            'danger' => "{$baseClasses} text-red-700",
-            'neutral' => "{$baseClasses} text-neutral-700",
-            default => "{$baseClasses} text-brand-700"
-        };
-    }
-
-    protected function outlineClasses(): string
-    {
-        return 'font-bold';
-    }
-
 
     public function getAnimationName(): string
     {
@@ -156,8 +81,30 @@ class HeadingDecorator extends Component
         };
     }
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-heading-decorator' => 'true',
+            'data-variant' => $this->variant,
+            'data-color' => $this->color,
+        ];
+
+        if ($this->animation && $this->animation !== 'none') {
+            $attributes['data-animation'] = $this->animation;
+        }
+
+        $animationName = $this->getAnimationName();
+        if (!empty($animationName)) {
+            $attributes['data-animation-name'] = $animationName;
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
-        return view('keys::components.heading-decorator');
+        return view('keys::components.heading-decorator', [
+            'dataAttributes' => $this->getDataAttributes(),
+        ]);
     }
 }

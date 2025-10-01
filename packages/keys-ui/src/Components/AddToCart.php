@@ -7,7 +7,7 @@ use Keys\UI\Components\Button;
 class AddToCart extends Button
 {
     public function __construct(
-        // Button inherited props
+        
         public string $variant = 'brand',
         public string $size = 'md',
         public ?string $type = null,
@@ -22,7 +22,7 @@ class AddToCart extends Button
         public ?string $labelToggle = null,
         public ?string $labelSuccess = null,
 
-        // AddToCart specific props
+        
         public ?string $productId = null,
         public ?string $variantId = null,
         public int $quantity = 1,
@@ -40,14 +40,14 @@ class AddToCart extends Button
         public string $outOfStockText = 'Out of Stock',
         public string $ajaxUrl = '/cart/add'
     ) {
-        // Set cart-specific defaults only if no icon specified
+        
         if (!$this->iconLeft) {
             $this->iconLeft = 'heroicon-o-shopping-cart';
         }
         $this->iconToggle = $this->iconToggle ?: 'heroicon-o-arrow-path';
         $this->iconSuccess = $this->iconSuccess ?: 'heroicon-o-check';
 
-        // Set default labels if not provided
+        
         if (!$this->labelToggle) {
             $this->labelToggle = $this->addingText;
         }
@@ -55,12 +55,12 @@ class AddToCart extends Button
             $this->labelSuccess = $this->addedText;
         }
 
-        // Handle stock-based disabling
+        
         if ($this->stockLevel !== null && $this->stockLevel <= 0) {
             $this->disabled = true;
         }
 
-        // Validate quantity constraints
+        
         if ($this->maxQuantity && $this->quantity > $this->maxQuantity) {
             $this->quantity = $this->maxQuantity;
         }
@@ -69,7 +69,7 @@ class AddToCart extends Button
             $this->quantity = $this->stockLevel;
         }
 
-        // Call parent constructor
+        
         parent::__construct(
             variant: $this->variant,
             size: $this->size,
@@ -107,11 +107,11 @@ class AddToCart extends Button
             return null;
         }
 
-        // Simple price formatting - can be enhanced with proper localization
+        
         $numericPrice = is_numeric($this->price) ? (float) $this->price : null;
 
         if ($numericPrice === null) {
-            return $this->price; // Return as-is if not numeric
+            return $this->price; 
         }
 
         return $this->currency . number_format($numericPrice, 2);
@@ -126,7 +126,7 @@ class AddToCart extends Button
     {
         $attributes = [];
 
-        // Add cart-specific data attributes
+        
         $attributes['data-add-to-cart'] = 'true';
 
         if ($this->productId) {
@@ -156,7 +156,7 @@ class AddToCart extends Button
 
     public function getDataAttributes(): array
     {
-        // Merge parent data attributes with cart-specific ones
+        
         return array_merge(
             parent::getDataAttributes(),
             $this->getAddToCartDataAttributes()

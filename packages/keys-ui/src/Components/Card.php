@@ -8,13 +8,19 @@ class Card extends Component
 {
     public function __construct(
         public string $variant = 'default',
+        public string $colorVariant = 'neutral',
         public string $padding = 'md',
         public string $rounded = 'md',
         public string $shadow = 'sm',
-        public bool $interactive = false,
         public bool $selected = false,
+        public bool $loading = false,
+        public ?string $loadingText = null,
         public ?string $href = null,
-        public bool $disabled = false
+        public bool $disabled = false,
+        public ?string $imageUrl = null,
+        public ?string $imageAlt = null,
+        public string $imagePosition = 'top',
+        public string $density = 'comfortable'
     ) {}
 
     public function isLink(): bool
@@ -31,103 +37,14 @@ class Card extends Component
         return 'div';
     }
 
-    public function baseClasses(): string
+    public function hasImage(): bool
     {
-        return 'block transition-all duration-200';
+        return !is_null($this->imageUrl);
     }
 
-    public function variantClasses(): string
+    public function shouldShowSkeleton(): bool
     {
-        return match ($this->variant) {
-            'default' => 'bg-surface border border-border',
-            'elevated' => 'bg-surface border border-border',
-            'outlined' => 'bg-transparent border-2 border-border',
-            'filled' => 'bg-body border border-transparent',
-            default => 'bg-surface border border-border'
-        };
-    }
-
-    public function paddingClasses(): string
-    {
-        return match ($this->padding) {
-            'none' => '',
-            'xs' => 'p-2',
-            'sm' => 'p-3',
-            'md' => 'p-4',
-            'lg' => 'p-6',
-            'xl' => 'p-8',
-            default => 'p-4'
-        };
-    }
-
-    public function roundedClasses(): string
-    {
-        return match ($this->rounded) {
-            'none' => '',
-            'xs' => 'rounded-sm',
-            'sm' => 'rounded',
-            'md' => 'rounded-md',
-            'lg' => 'rounded-lg',
-            'xl' => 'rounded-xl',
-            '2xl' => 'rounded-2xl',
-            '3xl' => 'rounded-3xl',
-            default => 'rounded-md'
-        };
-    }
-
-    public function shadowClasses(): string
-    {
-        if ($this->variant === 'elevated') {
-            $baseShadow = match ($this->shadow) {
-                'none' => '',
-                'xs' => 'shadow-xs',
-                'sm' => 'shadow-sm',
-                'md' => 'shadow-md',
-                'lg' => 'shadow-lg',
-                'xl' => 'shadow-xl',
-                '2xl' => 'shadow-2xl',
-                default => 'shadow-sm'
-            };
-            return $this->shadow === 'none' ? '' : ($baseShadow ?: 'shadow-sm');
-        }
-
-        if ($this->shadow !== 'none' && $this->shadow !== 'sm') {
-            return match ($this->shadow) {
-                'xs' => 'shadow-xs',
-                'md' => 'shadow-md',
-                'lg' => 'shadow-lg',
-                'xl' => 'shadow-xl',
-                '2xl' => 'shadow-2xl',
-                default => ''
-            };
-        }
-
-        return '';
-    }
-
-    public function interactiveClasses(): string
-    {
-        if (! $this->interactive || $this->disabled) {
-            return '';
-        }
-
-        $hoverClasses = match ($this->variant) {
-            'default' => 'hover:shadow-sm hover:border-neutral',
-            'elevated' => 'hover:shadow-md hover:-translate-y-0.5',
-            'outlined' => 'hover:bg-surface hover:border-neutral',
-            'filled' => 'hover:bg-surface',
-            default => 'hover:shadow-sm hover:border-neutral'
-        };
-
-        $focusClasses = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2';
-        $activeClasses = 'active:scale-[0.98]';
-
-        return trim("{$hoverClasses} {$focusClasses} {$activeClasses}");
-    }
-
-    public function disabledClasses(): string
-    {
-        return $this->disabled ? 'opacity-50 cursor-not-allowed' : '';
+        return $this->loading;
     }
 
     public function getDataAttributes(): array
@@ -135,22 +52,38 @@ class Card extends Component
         $attributes = [
             'data-keys-card' => 'true',
             'data-variant' => $this->variant,
+            'data-color-variant' => $this->colorVariant,
             'data-padding' => $this->padding,
             'data-rounded' => $this->rounded,
             'data-shadow' => $this->shadow,
+            'data-element-type' => $this->elementType(),
+            'data-density' => $this->density,
         ];
-
-        if ($this->interactive) {
-            $attributes['data-interactive'] = 'true';
-        }
 
         if ($this->selected) {
             $attributes['data-selected'] = 'true';
         }
 
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
+        }
+
+        if ($this->loading) {
+            $attributes['data-loading'] = 'true';
+            $attributes['aria-busy'] = 'true';
+            if ($this->loadingText) {
+                $attributes['aria-label'] = $this->loadingText;
+            }
+        }
+
         if ($this->href) {
             $attributes['data-href'] = $this->href;
             $attributes['data-clickable'] = 'true';
+        }
+
+        if ($this->hasImage()) {
+            $attributes['data-has-image'] = 'true';
+            $attributes['data-image-position'] = $this->imagePosition;
         }
 
         return $attributes;

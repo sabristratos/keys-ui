@@ -30,6 +30,7 @@ interface GalleryState {
     isAutoplayActive: boolean;
     autoplayInterval: number | null;
     touchStartX: number;
+    touchStartY?: number;
     touchEndX: number;
     isDragging: boolean;
     totalImages: number;
@@ -41,8 +42,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
 
     constructor() {
         super();
-        this.lightboxActions = new LightboxActions();
-        // Auto-initialize when constructed
+        this.lightboxActions = LightboxActions.getInstance();
         this.init();
     }
 
@@ -50,9 +50,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Initialize gallery elements - required by BaseActionClass
      */
     protected initializeElements(): void {
-        // Initialize lightbox first
-        this.lightboxActions.init();
-
         DOMUtils.findByDataAttribute('gallery', 'true').forEach(gallery => {
             this.initializeGallery(gallery);
         });
@@ -62,7 +59,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Bind event listeners - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Global keyboard navigation
         EventUtils.handleDelegatedKeydown('[data-gallery="true"]', (element, event) => {
             const galleryId = element.dataset.galleryId;
             if (galleryId) {
@@ -73,6 +69,12 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
 
     /**
      * Extract image data from gallery DOM elements
+     *
+     * Scans all gallery slides and extracts image metadata for state management.
+     * Looks for data attributes (caption, title, description) on img elements.
+     *
+     * @param galleryElement - The gallery container element
+     * @returns Array of GalleryImage objects with extracted metadata
      */
     private extractImageData(galleryElement: HTMLElement): GalleryImage[] {
         const images: GalleryImage[] = [];
@@ -86,7 +88,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
                     src: imgElement.src,
                     alt: imgElement.alt || `Image ${index + 1}`,
                     caption: imgElement.getAttribute('data-caption'),
-                    thumbnail: imgElement.src, // Default to same as src
+                    thumbnail: imgElement.src,
                     title: imgElement.getAttribute('data-title'),
                     description: imgElement.getAttribute('data-description')
                 });
@@ -106,7 +108,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const totalImages = parseInt(galleryElement.dataset.totalImages || '0');
         const images = this.extractImageData(galleryElement);
 
-        // Initialize state
         this.setState(galleryElement, {
             currentIndex: 0,
             isAutoplayActive: galleryElement.dataset.autoplay === 'true',
@@ -118,21 +119,16 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             images
         });
 
-        // Set up event listeners
         this.setupGalleryEventListeners(galleryElement, galleryId);
 
-        // Initialize autoplay if enabled
         if (galleryElement.dataset.autoplay === 'true') {
             this.startAutoplay(galleryId, galleryElement);
         }
 
-        // Set initial accessibility attributes
         this.updateAccessibility(galleryElement, galleryId);
 
-        // Initialize image error handling
         this.initializeImageErrorHandling(galleryElement);
 
-        // Start preloading adjacent images
         this.preloadAdjacentImages(galleryElement, 0);
     }
 
@@ -140,7 +136,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Set up event listeners for gallery interactions
      */
     private setupGalleryEventListeners(galleryElement: HTMLElement, galleryId: string): void {
-        // Navigation button clicks
         const prevButton = galleryElement.querySelector('[data-gallery-action="prev"]') as HTMLElement;
         const nextButton = galleryElement.querySelector('[data-gallery-action="next"]') as HTMLElement;
 
@@ -156,14 +151,12 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             });
         }
 
-        // Thumbnail clicks and keyboard navigation
         const thumbnails = galleryElement.querySelectorAll('[data-gallery-thumbnail]');
         thumbnails.forEach((thumbnail, index) => {
             EventUtils.addEventListener(thumbnail as HTMLElement, 'click', () => {
                 this.goToImage(galleryId, galleryElement, index);
             });
 
-            // Keyboard support for thumbnails
             EventUtils.addEventListener(thumbnail as HTMLElement, 'keydown', (e: Event) => {
                 const keyboardEvent = e as KeyboardEvent;
                 if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') {
@@ -173,7 +166,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             });
         });
 
-        // Autoplay toggle
         const autoplayToggle = galleryElement.querySelector('[data-gallery-action="toggle-autoplay"]') as HTMLElement;
         if (autoplayToggle) {
             EventUtils.addEventListener(autoplayToggle, 'click', () => {
@@ -181,10 +173,8 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             });
         }
 
-        // Touch/swipe events
         this.setupTouchEvents(galleryElement, galleryId);
 
-        // Pause autoplay on hover
         EventUtils.addEventListener(galleryElement, 'mouseenter', () => {
             this.pauseAutoplayOnHover(galleryId);
         });
@@ -195,54 +185,87 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
     }
 
     /**
-     * Set up touch/swipe event listeners
+     * Set up touch/swipe event listeners (simplified for scroll-based navigation)
      */
     private setupTouchEvents(galleryElement: HTMLElement, galleryId: string): void {
-        const mainImage = galleryElement.querySelector('.gallery-main');
-        if (!mainImage) return;
+        const scrollContainer = galleryElement.querySelector('.gallery-scroll-container') as HTMLElement;
+        if (!scrollContainer) return;
 
-        // Touch start
-        EventUtils.addEventListener(mainImage as HTMLElement, 'touchstart', (e: Event) => {
+        EventUtils.addEventListener(scrollContainer, 'scroll', () => {
+            this.updateCurrentIndexFromScroll(galleryElement, scrollContainer);
+        });
+
+        EventUtils.addEventListener(scrollContainer, 'touchstart', (e: Event) => {
             const touchEvent = e as TouchEvent;
             const state = this.getState(galleryElement);
             if (!state) return;
 
             state.touchStartX = touchEvent.touches[0].clientX;
-            state.isDragging = true;
             this.setState(galleryElement, state);
         });
 
-        // Touch move
-        EventUtils.addEventListener(mainImage as HTMLElement, 'touchmove', (e: Event) => {
+        EventUtils.addEventListener(scrollContainer, 'touchmove', (e: Event) => {
             const touchEvent = e as TouchEvent;
             const state = this.getState(galleryElement);
-            if (!state?.isDragging) return;
+            if (!state || !touchEvent.touches[0]) return;
 
-            state.touchEndX = touchEvent.touches[0].clientX;
-            this.setState(galleryElement, state);
-        });
+            const currentX = touchEvent.touches[0].clientX;
+            const currentY = touchEvent.touches[0].clientY;
 
-        // Touch end
-        EventUtils.addEventListener(mainImage as HTMLElement, 'touchend', () => {
-            const state = this.getState(galleryElement);
-            if (!state?.isDragging) return;
+            if (!state.touchStartY) {
+                state.touchStartY = currentY;
+            }
 
-            state.isDragging = false;
-            const touchDiff = state.touchStartX - state.touchEndX;
-            const threshold = 50; // Minimum swipe distance
+            const horizontalDiff = Math.abs(currentX - state.touchStartX);
+            const verticalDiff = Math.abs(currentY - state.touchStartY);
+            const threshold = 10;
 
-            if (Math.abs(touchDiff) > threshold) {
-                if (touchDiff > 0) {
-                    // Swipe left - next image
-                    this.navigateToImage(galleryId, galleryElement, 'next');
-                } else {
-                    // Swipe right - previous image
-                    this.navigateToImage(galleryId, galleryElement, 'prev');
-                }
+            if (horizontalDiff > threshold && horizontalDiff > verticalDiff) {
+                e.preventDefault();
             }
 
             this.setState(galleryElement, state);
         });
+    }
+
+    /**
+     * Update current index based on scroll position
+     *
+     * Calculates which slide is closest to the center of the viewport during scroll.
+     * Updates gallery state and UI elements (thumbnails, counter) when the centered slide changes.
+     * Used for scroll-snap navigation to keep UI in sync with scroll position.
+     *
+     * @param galleryElement - The gallery container element
+     * @param scrollContainer - The scrollable container with gallery slides
+     */
+    private updateCurrentIndexFromScroll(galleryElement: HTMLElement, scrollContainer: HTMLElement): void {
+        const slides = scrollContainer.querySelectorAll('.gallery-slide');
+        if (slides.length === 0) return;
+
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const containerCenter = containerRect.left + containerRect.width / 2;
+
+        let closestIndex = 0;
+        let closestDistance = Infinity;
+
+        slides.forEach((slide, index) => {
+            const slideRect = slide.getBoundingClientRect();
+            const slideCenter = slideRect.left + slideRect.width / 2;
+            const distance = Math.abs(slideCenter - containerCenter);
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestIndex = index;
+            }
+        });
+
+        const state = this.getState(galleryElement);
+        if (state && state.currentIndex !== closestIndex) {
+            state.currentIndex = closestIndex;
+            this.setState(galleryElement, state);
+            this.updateThumbnails(galleryElement, closestIndex);
+            this.updateCounter(galleryElement, closestIndex);
+        }
     }
 
     /**
@@ -279,7 +302,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
                 this.toggleAutoplay(galleryId, galleryElement);
                 break;
             case 'Enter':
-                // Allow Enter key to activate focused thumbnail
                 const target = e.target as HTMLElement;
                 if (target.hasAttribute('data-gallery-thumbnail')) {
                     e.preventDefault();
@@ -297,15 +319,12 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const isLightboxEnabled = galleryElement.dataset.lightbox === 'true';
         const state = this.getState(galleryElement);
 
-        // If lightbox is enabled, close it first
         if (isLightboxEnabled) {
             this.closeLightbox(galleryElement);
         } else if (state?.isAutoplayActive) {
-            // Otherwise, pause autoplay if active
             this.pauseAutoplay(galleryId, galleryElement);
         }
 
-        // Announce action to screen readers
         this.announceAction(galleryElement, 'Gallery navigation closed');
     }
 
@@ -313,10 +332,8 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      * Close lightbox using the unified LightboxActions
      */
     private closeLightbox(galleryElement: HTMLElement): void {
-        // Use the unified lightbox system
-        const state = (this.lightboxActions as any).getState(galleryElement);
+        const state = this.lightboxActions.getState(galleryElement);
         if (state && state.isOpen) {
-            // The lightbox will handle the closing automatically
             this.emitGalleryEvent(galleryElement, 'gallery:lightboxClose', {});
             this.announceAction(galleryElement, 'Lightbox closed');
         }
@@ -329,7 +346,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const liveRegion = galleryElement.querySelector('[data-gallery-live]') as HTMLElement;
         if (liveRegion) {
             liveRegion.textContent = message;
-            // Clear after a short delay
             setTimeout(() => {
                 if (liveRegion.textContent === message) {
                     liveRegion.textContent = '';
@@ -375,11 +391,9 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const totalImages = parseInt(galleryElement.dataset.totalImages || '0');
         if (index < 0 || index >= totalImages) return;
 
-        // Update state
         state.currentIndex = index;
         this.setState(galleryElement, state);
 
-        // Update UI
         this.updateImageDisplay(galleryElement, index);
         this.updateThumbnails(galleryElement, index);
         this.updateCounter(galleryElement, index);
@@ -389,7 +403,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         this.announceImageChange(galleryElement, index, totalImages);
         this.preloadAdjacentImages(galleryElement, index);
 
-        // Emit custom event
         this.emitGalleryEvent(galleryElement, 'gallery:imageChanged', {
             currentIndex: index,
             galleryId: galleryId
@@ -397,18 +410,29 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
     }
 
     /**
-     * Update image display
+     * Update image display using container-only scrolling (no page scroll hijacking)
      */
     private updateImageDisplay(galleryElement: HTMLElement, index: number): void {
-        const slides = galleryElement.querySelectorAll('.gallery-slide');
+        const scrollContainer = galleryElement.querySelector('.gallery-scroll-container') as HTMLElement;
+        if (!scrollContainer) return;
+
+        const slideWidth = scrollContainer.offsetWidth;
+        const targetScrollLeft = slideWidth * index;
+
+        scrollContainer.scrollTo({
+            left: targetScrollLeft,
+            behavior: 'smooth'
+        });
+
+        const slides = scrollContainer.querySelectorAll('.gallery-slide');
         slides.forEach((slide, i) => {
             const slideElement = slide as HTMLElement;
             if (i === index) {
-                slideElement.classList.remove('opacity-0');
-                slideElement.classList.add('opacity-100', 'active');
+                slideElement.classList.add('active');
+                slideElement.setAttribute('aria-current', 'true');
             } else {
-                slideElement.classList.remove('opacity-100', 'active');
-                slideElement.classList.add('opacity-0');
+                slideElement.classList.remove('active');
+                slideElement.removeAttribute('aria-current');
             }
         });
     }
@@ -449,8 +473,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const titleElement = galleryElement.querySelector('[data-gallery-title]') as HTMLElement;
         const descriptionElement = galleryElement.querySelector('[data-gallery-description]') as HTMLElement;
 
-        // This would need to be enhanced to get image data from a data attribute or global variable
-        // For now, we'll skip this implementation as it requires additional data structure
     }
 
     /**
@@ -471,7 +493,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
     }
 
     /**
-     * Start autoplay
+     * Start autoplay with scroll-based navigation
      */
     private startAutoplay(galleryId: string, galleryElement: HTMLElement): void {
         const state = this.getState(galleryElement);
@@ -480,12 +502,39 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const delay = parseInt(galleryElement.dataset.autoplayDelay || '3000');
 
         state.autoplayInterval = window.setInterval(() => {
-            this.navigateToImage(galleryId, galleryElement, 'next');
+            this.navigateToImageWithScroll(galleryId, galleryElement, 'next');
         }, delay);
 
         state.isAutoplayActive = true;
         this.setState(galleryElement, state);
         this.updateAutoplayButton(galleryElement, true);
+    }
+
+    /**
+     * Navigate using scroll-based approach
+     */
+    private navigateToImageWithScroll(galleryId: string, galleryElement: HTMLElement, direction: 'prev' | 'next'): void {
+        const state = this.getState(galleryElement);
+        if (!state) return;
+
+        const totalImages = parseInt(galleryElement.dataset.totalImages || '0');
+        const isLoop = galleryElement.dataset.loop === 'true';
+
+        let newIndex = state.currentIndex;
+
+        if (direction === 'next') {
+            newIndex = state.currentIndex + 1;
+            if (newIndex >= totalImages) {
+                newIndex = isLoop ? 0 : totalImages - 1;
+            }
+        } else {
+            newIndex = state.currentIndex - 1;
+            if (newIndex < 0) {
+                newIndex = isLoop ? totalImages - 1 : 0;
+            }
+        }
+
+        this.goToImage(galleryId, galleryElement, newIndex);
     }
 
     /**
@@ -526,23 +575,19 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const autoplayButton = galleryElement.querySelector('.gallery-autoplay-toggle') as HTMLElement;
 
         if (autoplayButton) {
-            // Update aria attributes
             autoplayButton.setAttribute('aria-pressed', isPlaying.toString());
             autoplayButton.setAttribute('aria-label', isPlaying ? 'Pause autoplay' : 'Resume autoplay');
 
-            // Use Button component's icon toggle functionality
             const defaultIcon = autoplayButton.querySelector('.button-icon-default') as HTMLElement;
             const toggleIcon = autoplayButton.querySelector('.button-icon-toggle') as HTMLElement;
 
             if (defaultIcon && toggleIcon) {
                 if (isPlaying) {
-                    // Show pause icon (default)
                     defaultIcon.classList.remove('opacity-0');
                     defaultIcon.classList.add('opacity-100');
                     toggleIcon.classList.remove('opacity-100');
                     toggleIcon.classList.add('opacity-0');
                 } else {
-                    // Show play icon (toggle)
                     defaultIcon.classList.remove('opacity-100');
                     defaultIcon.classList.add('opacity-0');
                     toggleIcon.classList.remove('opacity-0');
@@ -597,7 +642,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             currentSlide.setAttribute('aria-label', `Image ${state.currentIndex + 1} of ${totalImages}`);
         }
 
-        // Remove aria-current from other slides
         const allSlides = galleryElement.querySelectorAll('[data-gallery-slide]');
         allSlides.forEach((slide, index) => {
             if (index !== state.currentIndex) {
@@ -620,17 +664,14 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
     private announceImageChange(galleryElement: HTMLElement, index: number, totalImages: number): void {
         const liveRegion = galleryElement.querySelector('[data-gallery-live]') as HTMLElement;
         if (liveRegion) {
-            // Get image information
             const imageElements = galleryElement.querySelectorAll('[data-gallery-slide]');
             const currentImage = imageElements[index] as HTMLElement;
             const imgElement = currentImage?.querySelector('img');
             const altText = imgElement?.getAttribute('alt') || `Image ${index + 1}`;
 
-            // Create announcement
             const announcement = `Showing ${altText}, image ${index + 1} of ${totalImages}`;
             liveRegion.textContent = announcement;
 
-            // Clear announcement after a delay to allow for new announcements
             setTimeout(() => {
                 if (liveRegion.textContent === announcement) {
                     liveRegion.textContent = '';
@@ -647,18 +688,15 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         imageElements.forEach((img) => {
             const imgElement = img as HTMLImageElement;
 
-            // Add loading state
             if (!imgElement.complete) {
                 this.setImageLoadingState(imgElement, true);
             }
 
-            // Handle successful image load
             imgElement.addEventListener('load', () => {
                 this.setImageLoadingState(imgElement, false);
                 this.setImageErrorState(imgElement, false);
             });
 
-            // Handle image load errors
             imgElement.addEventListener('error', () => {
                 this.setImageLoadingState(imgElement, false);
                 this.setImageErrorState(imgElement, true);
@@ -667,7 +705,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             });
         });
 
-        // Handle thumbnail image errors
         const thumbnailImages = galleryElement.querySelectorAll('.gallery-thumbnail img');
         thumbnailImages.forEach((img) => {
             const imgElement = img as HTMLImageElement;
@@ -706,7 +743,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             container.classList.add('gallery-image-error');
             container.setAttribute('aria-label', 'Image failed to load');
 
-            // Create error placeholder if it doesn't exist
             if (!container.querySelector('.gallery-error-placeholder')) {
                 this.createImageErrorPlaceholder(container);
             }
@@ -714,7 +750,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             container.classList.remove('gallery-image-error');
             container.removeAttribute('aria-label');
 
-            // Remove error placeholder
             const errorPlaceholder = container.querySelector('.gallery-error-placeholder');
             if (errorPlaceholder) {
                 errorPlaceholder.remove();
@@ -733,7 +768,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             container.classList.add('gallery-thumbnail-error');
             imgElement.style.display = 'none';
 
-            // Create thumbnail error placeholder if it doesn't exist
             if (!container.querySelector('.gallery-thumbnail-error-placeholder')) {
                 this.createThumbnailErrorPlaceholder(container);
             }
@@ -749,7 +783,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         placeholder.innerHTML = `
             <div class="text-center">
                 <div class="w-16 h-16 mx-auto mb-3 text-muted opacity-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <svg xmlns="http:
                         <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                     </svg>
                 </div>
@@ -766,7 +800,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const placeholder = document.createElement('div');
         placeholder.className = 'gallery-thumbnail-error-placeholder absolute inset-0 flex items-center justify-center bg-surface border border-border rounded text-muted';
         placeholder.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+            <svg xmlns="http:
                 <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
             </svg>
         `;
@@ -780,10 +814,8 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const totalImages = parseInt(galleryElement.dataset.totalImages || '0');
         const isLoop = galleryElement.dataset.loop === 'true';
 
-        // Determine which images to preload (previous and next)
         const imagesToPreload: number[] = [];
 
-        // Add previous image
         const prevIndex = currentIndex - 1;
         if (prevIndex >= 0) {
             imagesToPreload.push(prevIndex);
@@ -791,7 +823,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             imagesToPreload.push(totalImages - 1);
         }
 
-        // Add next image
         const nextIndex = currentIndex + 1;
         if (nextIndex < totalImages) {
             imagesToPreload.push(nextIndex);
@@ -799,17 +830,14 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
             imagesToPreload.push(0);
         }
 
-        // Preload the images
         imagesToPreload.forEach(index => {
             const slideElement = galleryElement.querySelector(`[data-gallery-slide="${index}"]`) as HTMLElement;
             if (slideElement) {
                 const imgElement = slideElement.querySelector('img') as HTMLImageElement;
                 if (imgElement && imgElement.src && !imgElement.complete) {
-                    // Create a new image element to trigger preloading
                     const preloadImg = new Image();
                     preloadImg.src = imgElement.src;
 
-                    // Add error handling for preloading
                     preloadImg.onerror = () => {
                         console.warn(`Failed to preload image: ${preloadImg.src}`);
                     };
@@ -826,20 +854,16 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const maxRetries = 2;
 
         if (retryCount < maxRetries) {
-            // Increment retry count
             imgElement.dataset.retryCount = (retryCount + 1).toString();
 
-            // Retry loading after a short delay
             setTimeout(() => {
                 const originalSrc = imgElement.src;
                 imgElement.src = '';
                 imgElement.src = originalSrc + '?retry=' + retryCount;
-            }, 1000 * (retryCount + 1)); // Exponential backoff
+            }, 1000 * (retryCount + 1));
         } else {
-            // Check if all images failed to load
             this.checkGalleryHealth(galleryElement);
 
-            // Announce error to screen readers
             this.announceAction(galleryElement, 'Image failed to load');
         }
     }
@@ -851,7 +875,6 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         const totalImages = galleryElement.querySelectorAll('.gallery-slide img').length;
         const failedImages = galleryElement.querySelectorAll('.gallery-image-error').length;
 
-        // If more than half the images failed, show gallery-wide error
         if (failedImages > totalImages / 2) {
             this.setGalleryErrorState(galleryElement, true);
         }

@@ -1,5 +1,5 @@
 @php
-    // Avatar container classes
+
     $baseClasses = 'inline-block flex-shrink-0 relative';
     $sizeClasses = match ($size) {
         'xs' => 'w-6 h-6 text-xs',
@@ -15,7 +15,6 @@
         default => 'rounded-full'
     };
 
-    // Color classes for fallback (initials/icon) - used for both direct fallback and JavaScript fallback
     $colorClasses = '';
     if (!$hasImage()) {
         $colorClasses = match ($color) {
@@ -35,7 +34,6 @@
         };
     }
 
-    // Fallback color classes - always available for JavaScript fallback
     $fallbackColorClasses = match ($color) {
         'brand' => 'bg-brand text-brand-foreground',
         'success' => 'bg-success text-success-foreground',
@@ -56,13 +54,10 @@
 
     $avatarClasses = trim("$baseClasses $sizeClasses $shapeClasses $colorClasses $borderClasses");
 
-    // Image classes
     $imageClasses = "w-full h-full object-cover $shapeClasses";
 
-    // Initials/Icon container classes
     $initialsClasses = 'flex items-center justify-center w-full h-full font-medium select-none';
 
-    // Status indicator classes
     $statusClasses = '';
     if ($status) {
         $statusBaseClasses = 'absolute bottom-0 right-0 block rounded-full ring-2 ring-white dark:ring-neutral-800';
@@ -84,7 +79,6 @@
         $statusClasses = trim("$statusBaseClasses $statusSizeClasses $statusColorClasses");
     }
 
-    // Icon size for fallback
     $iconSize = match ($size) {
         'xs' => 'xs',
         'sm' => 'sm',
@@ -94,7 +88,7 @@
 
 <div {{ $attributes->merge(['class' => $avatarClasses])->merge($dataAttributes) }}>
     @if($hasImage())
-        {{-- Primary image --}}
+        
         <img
             src="{{ $src }}"
             alt="{{ $alt }}"
@@ -102,7 +96,7 @@
             @if($lazy) loading="lazy" @endif
         />
 
-        {{-- Hidden fallback container for JavaScript error handling with proper styling --}}
+        
         <div data-avatar-fallback="true" style="display: none;" class="{{ $fallbackColorClasses }} {{ $shapeClasses }} w-full h-full">
             @if($shouldShowInitialsFallback())
                 <span class="{{ $initialsClasses }}">
@@ -115,12 +109,12 @@
             @endif
         </div>
     @elseif($hasInitials())
-        {{-- Show initials directly when no image provided --}}
+        
         <span class="{{ $initialsClasses }}">
             {{ $getInitials() }}
         </span>
     @else
-        {{-- Show icon directly when no image or name provided --}}
+        
         <span class="{{ $initialsClasses }}">
             <x-keys::icon name="heroicon-o-user" :size="$iconSize" />
         </span>

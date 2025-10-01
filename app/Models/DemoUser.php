@@ -40,7 +40,7 @@ class DemoUser extends Model
         'experience_level' => 'integer',
     ];
 
-    // Accessors
+    
     public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
@@ -85,7 +85,7 @@ class DemoUser extends Model
         };
     }
 
-    // Scopes
+    
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');
@@ -106,7 +106,7 @@ class DemoUser extends Model
         return $query->where('priority_level', $priority);
     }
 
-    // Helper methods
+    
     public static function getDepartments(): array
     {
         return [

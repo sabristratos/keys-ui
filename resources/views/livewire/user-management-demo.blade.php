@@ -1,26 +1,26 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-    {{-- Flash Messages --}}
+    
     @if (session()->has('message'))
         <x-keys::alert variant="success" dismissible>
             {{ session('message') }}
         </x-keys::alert>
     @endif
 
-    {{-- Error Messages --}}
+    
     @if (!empty($errorMessage))
         <x-keys::alert variant="danger" dismissible>
             {{ $errorMessage }}
         </x-keys::alert>
     @endif
 
-    {{-- Success Messages --}}
+    
     @if (!empty($successMessage))
         <x-keys::alert variant="success" dismissible>
             {{ $successMessage }}
         </x-keys::alert>
     @endif
 
-    {{-- User Form --}}
+    
     <x-keys::card>
         <x-slot:header>
             <div class="flex items-center justify-between">
@@ -41,7 +41,7 @@
         </x-slot:header>
 
         <form wire:submit="save" class="space-y-6">
-            {{-- Basic Information --}}
+            
             <div class="space-y-4">
                 <h3 class="text-lg font-medium text-foreground border-b border-border pb-2">Basic Information</h3>
 
@@ -79,7 +79,7 @@
                     required
                 />
 
-                {{-- Profile Avatar --}}
+                
                 <x-keys::file-upload
                     wire:model="avatar"
                     name="avatar"
@@ -91,7 +91,7 @@
                 />
             </div>
 
-            {{-- Work Information --}}
+            
             <div class="space-y-4">
                 <h3 class="text-lg font-medium text-foreground border-b border-border pb-2">Work Information</h3>
 
@@ -141,7 +141,7 @@
                 />
             </div>
 
-            {{-- Skills & Preferences --}}
+            
             <div class="space-y-4">
                 <h3 class="text-lg font-medium text-foreground border-b border-border pb-2">Skills & Preferences</h3>
 
@@ -178,7 +178,7 @@
                 </div>
             </div>
 
-            {{-- Status & Priority --}}
+            
             <div class="space-y-4">
                 <h3 class="text-lg font-medium text-foreground border-b border-border pb-2">Status & Settings</h3>
 
@@ -223,7 +223,7 @@
                     </div>
                 </div>
 
-                {{-- Supporting Documents Note --}}
+                
                 <div class="p-4 bg-surface border border-border rounded-lg">
                     <div class="flex items-start gap-3">
                         <x-keys::icon name="heroicon-o-information-circle" size="sm" class="text-brand mt-0.5" />
@@ -248,7 +248,7 @@
                 />
             </div>
 
-            {{-- Submit Button --}}
+            
             <div class="flex justify-end pt-4 border-t border-border">
                 <x-keys::button type="submit" variant="brand" size="lg">
                     {{ $editingUser ? 'Update User' : 'Create User' }}
@@ -257,7 +257,7 @@
         </form>
     </x-keys::card>
 
-    {{-- Users Table --}}
+    
     <x-keys::card>
         <x-slot:header>
             <div class="flex items-center justify-between">
@@ -374,7 +374,7 @@
         @endif
     </x-keys::card>
 
-    {{-- Delete Confirmation Modal --}}
+    
     @if($showDeleteConfirm)
         <x-keys::modal
             wire:model="showDeleteConfirm"

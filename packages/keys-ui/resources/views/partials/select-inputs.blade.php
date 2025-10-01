@@ -1,4 +1,4 @@
-{{-- Hidden inputs for form submission - handles both Livewire and standard form submission --}}
+
 
 @if($isLivewireEnabled ?? false)
     @if($multiple)

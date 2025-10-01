@@ -15,7 +15,7 @@
     </head>
     <body class="bg-body text-foreground font-sans">
         <script>
-            // Prevent FOUC and handle initial theme detection
+
             (function() {
                 const theme = localStorage.getItem('theme');
                 const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -30,7 +30,7 @@
             })();
         </script>
 
-        <!-- Navigation Bar -->
+        
         <nav class="bg-surface border-b border-border p-4">
             <div class="max-w-6xl mx-auto flex items-center justify-between">
                 <div class="flex items-center gap-6">
@@ -48,7 +48,7 @@
                     </div>
                 </div>
 
-                <!-- Theme Switcher -->
+                
                 <div class="flex gap-2 p-1 bg-body rounded-lg border border-border">
                     <button
                         onclick="setTheme('light')"
@@ -75,12 +75,12 @@
             </div>
         </nav>
 
-        <!-- Main Content -->
+        
         <main class="min-h-screen">
             @livewire('select-test')
         </main>
 
-        <!-- Theme Management Script -->
+        
         <script>
             function setTheme(theme) {
                 const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -112,10 +112,8 @@
                 });
             }
 
-            // Initialize theme buttons
             updateThemeButtons();
 
-            // Listen for system theme changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
                 if (!localStorage.getItem('theme')) {
                     document.documentElement.classList.toggle('dark', e.matches);

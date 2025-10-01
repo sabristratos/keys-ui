@@ -1,6 +1,6 @@
-{{-- Shared Calendar Body Content - Used by both shorthand and non-shorthand modes --}}
 
-<!-- Calendar Header -->
+
+
 <div class="calendar-header flex items-center justify-between {{ $headerClasses }} border-b border-border">
     <x-keys::button
         variant="ghost"
@@ -37,58 +37,49 @@
     </x-keys::button>
 </div>
 
-<!-- Calendar Main Content - Side Layout -->
+
 <div class="calendar-main-content flex flex-col md:flex-row gap-4" data-calendar-main-content>
-    <!-- Quick Selectors Sidebar - Show for both single and range pickers when configured -->
+    
     @if(isset($quickSelectors) && is_array($quickSelectors) && count($quickSelectors) > 0)
         <div class="calendar-quick-selectors md:w-max flex-shrink-0 order-first p-2" data-view-mode-show="calendar">
             <div class="text-xs font-medium text-muted mb-2">Quick select:</div>
             <div class="flex flex-wrap md:flex-col gap-1">
                 @foreach($quickSelectors as $selector)
-                    @php
-                        // Filter selectors based on picker type
-                        // Range pickers: show all selectors
-                        // Single pickers: only show selectors that don't have 'range' => true
-                        $showSelector = $isRange || !isset($selector['range']) || !$selector['range'];
-                    @endphp
-
-                    @if($showSelector)
-                        <x-keys::button
-                            variant="ghost"
-                            size="xs"
-                            class="transition-all duration-200 hover:scale-105 md:justify-start md:w-full"
-                            data-quick-selector="{{ $selector['value'] }}"
-                            :title="$selector['description'] ?? $selector['label']"
-                            aria-label="{{ $selector['description'] ?? $selector['label'] }}"
-                        >
-                            {{ $selector['label'] }}
-                        </x-keys::button>
-                    @endif
+                    <x-keys::button
+                        variant="ghost"
+                        size="xs"
+                        class="transition-all duration-200 hover:scale-105 md:justify-start md:w-full"
+                        data-quick-selector="{{ $selector['value'] }}"
+                        :title="$selector['description'] ?? $selector['label']"
+                        aria-label="{{ $selector['description'] ?? $selector['label'] }}"
+                    >
+                        {{ $selector['label'] }}
+                    </x-keys::button>
                 @endforeach
             </div>
         </div>
     @endif
 
-    <!-- Calendar Grid Container -->
+    
     <div class="calendar-grid-wrapper flex-1 p-2" data-calendar-grid-wrapper>
         @if($monthsToShow > 1)
             <div class="calendar-multi-month-grid grid gap-8"
                  style="grid-template-columns: repeat({{ min($monthsToShow, 3) }}, 1fr);">
                 @for($i = 0; $i < $monthsToShow; $i++)
                     <div class="calendar-grid" data-calendar-grid-container data-month-index="{{ $i }}">
-                        <!-- Dynamic calendar grid will be populated by JavaScript -->
+                        
                     </div>
                 @endfor
             </div>
         @else
             <div class="calendar-grid" data-calendar-grid-container>
-                <!-- Dynamic calendar grid will be populated by JavaScript -->
+                
             </div>
         @endif
     </div>
 </div>
 
-<!-- Calendar Footer - Improved Design -->
+
 <div class="calendar-footer flex items-center justify-between p-3 border-t border-border bg-surface">
     <div class="flex items-center gap-2">
         <x-keys::button
@@ -119,7 +110,7 @@
     </div>
 </div>
 
-<!-- Hidden Input for Form Submission -->
+
 @if($name)
     @if($isRange)
         <input type="hidden"

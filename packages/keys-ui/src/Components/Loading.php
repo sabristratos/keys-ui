@@ -5,48 +5,88 @@ namespace Keys\UI\Components;
 use Illuminate\View\Component;
 use Keys\UI\Constants\ComponentConstants;
 
+/**
+ * Loading Component
+ *
+ * Displays loading indicators with various animations following modern CLAUDE.md patterns.
+ *
+ * Features:
+ * - Multiple animation types (spinner, dots, bars, pulse, wave, bounce)
+ * - Size variants (xs, sm, md, lg, xl)
+ * - Auto-generated IDs for accessibility
+ * - Comprehensive data attributes
+ * - Direct Tailwind utilities in template
+ * - Business logic only in PHP class
+ */
 class Loading extends Component
 {
+    /**
+     * Create a new Loading component instance.
+     *
+     * @param  string  $animation  Animation type
+     * @param  string  $size  Size variant (xs, sm, md, lg, xl)
+     * @param  string|null  $label  Accessibility label for screen readers
+     * @param  string|null  $id  Custom ID for the loading element
+     */
     public function __construct(
         public string $animation = 'spinner',
-        public string $size = 'md'
+        public string $size = 'md',
+        public ?string $label = null,
+        public ?string $id = null
     ) {
-        if (!in_array($this->animation, ComponentConstants::LOADING_ANIMATIONS)) {
+        
+        $this->id = $this->id ?? 'loading-' . uniqid();
+
+        
+        $validAnimations = defined('Keys\UI\Constants\ComponentConstants::LOADING_ANIMATIONS')
+            ? ComponentConstants::LOADING_ANIMATIONS
+            : ['spinner', 'dots', 'bars', 'pulse', 'wave', 'bounce'];
+
+        if (!in_array($this->animation, $validAnimations)) {
             $this->animation = 'spinner';
         }
 
-        if (!ComponentConstants::isValidSize($this->size)) {
-            $this->size = ComponentConstants::getDefaultSize();
+        
+        $validSizes = defined('Keys\UI\Constants\ComponentConstants::ICON_SIZES')
+            ? ComponentConstants::ICON_SIZES
+            : ['xs', 'sm', 'md', 'lg', 'xl'];
+
+        if (!in_array($this->size, $validSizes)) {
+            $this->size = 'md';
+        }
+
+        
+        if (!$this->label) {
+            $this->label = 'Loading...';
         }
     }
 
-    public function sizeClasses(): string
+    /**
+     * Generate comprehensive data attributes for loading functionality.
+     *
+     * @return array Complete set of data attributes for loading element
+     */
+    public function getDataAttributes(): array
     {
-        return match ($this->size) {
-            'xs' => 'w-3 h-3',
-            'sm' => 'w-4 h-4',
-            'md' => 'w-5 h-5',
-            'lg' => 'w-6 h-6',
-            'xl' => 'w-8 h-8',
-            default => 'w-5 h-5'
-        };
+        return [
+            'data-keys-loading' => 'true',
+            'data-animation' => $this->animation,
+            'data-size' => $this->size,
+            'aria-label' => $this->label,
+            'role' => 'status',
+            'aria-live' => 'polite',
+        ];
     }
 
-    public function animationClasses(): string
-    {
-        return match ($this->animation) {
-            'spinner' => 'animate-spin',
-            'pulse' => 'animate-ping',
-            'bounce' => 'animate-bounce',
-            'dots' => 'animate-bounce',
-            'bars' => 'animate-pulse',
-            'wave' => 'animate-pulse',
-            default => 'animate-spin'
-        };
-    }
-
+    /**
+     * Render the loading component.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
     public function render()
     {
-        return view('keys::components.loading');
+        return view('keys::components.loading', [
+            'dataAttributes' => $this->getDataAttributes(),
+        ]);
     }
 }

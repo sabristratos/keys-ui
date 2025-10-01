@@ -1,5 +1,5 @@
 @php
-    // Container classes based on responsive and bordered settings
+
     $containerClasses = '';
     if ($responsive) {
         $containerClasses .= 'overflow-x-auto ';
@@ -9,7 +9,6 @@
     }
     $containerClasses = trim($containerClasses);
 
-    // Table classes based on size and variants
     $tableBaseClasses = 'min-w-full divide-y divide-border';
     $tableSizeClasses = match ($size) {
         'sm' => 'text-sm',

@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @import "./quill-editor.css";
-@import "./components.css";
+@import "./toast.css";
+@import "./chart.css";
+@import "./popover.css";
+@import "./file-upload.css";
+@import "./table.css";
+@import "./file-preview.css";
+@import "./scrollbar.css";
+@import "./sidebar.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -13,28 +20,25 @@
     --radius-2xl: calc(var(--radius-base) * 2);
     --radius-3xl: calc(var(--radius-base) * 3);
 
-    /* Icon positioning scale - component-specific positioning */
-    --icon-offset-sm: 0.625rem;  /* 10px - small inputs */
-    --icon-offset-md: 0.75rem;   /* 12px - medium inputs */
-    --icon-offset-lg: 0.875rem;  /* 14px - large inputs */
+    --icon-offset-sm: 0.625rem;
+    --icon-offset-md: 0.75rem;
+    --icon-offset-lg: 0.875rem;
 
-    /* Scale values for transforms */
-    --scale-down: 0.95;      /* hover/focus scale down */
-    --scale-up-sm: 1.02;     /* drag hover effect */
-    --scale-up-md: 1.05;     /* thumbnail hover */
+    --inset-button-highlight: 1px;
 
-    /* Z-index scale - systematic layering */
-    --z-dropdown: 50;        /* dropdown/popover layer */
-    --z-overlay: 1000;       /* modal/overlay layer */
-    --z-tooltip: 9999;       /* tooltip layer */
-    --z-file-input: 10;      /* file input overlay */
+    --scale-down: 0.95;
+    --scale-up-sm: 1.02;
+    --scale-up-md: 1.05;
 
-    /* Progress and dimension values */
-    --height-progress-thin: 6px;    /* thin progress bars */
-    --width-scrollbar-thin: 4px;    /* thin scrollbars */
-    --width-scrollbar: 6px;         /* standard scrollbars */
+    --z-dropdown: 50;
+    --z-overlay: 1000;
+    --z-tooltip: 9999;
+    --z-file-input: 10;
 
-    /* Subtler shadow system */
+    --height-progress-thin: 6px;
+    --width-scrollbar-thin: 4px;
+    --width-scrollbar: 6px;
+
     --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
     --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.025);
@@ -43,18 +47,33 @@
     --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
     --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
 
-    /* Raw color palettes - Static base colors */
-    --color-brand-50: oklch(0.98 0.013 70.64);
-    --color-brand-100: oklch(0.95 0.04 70.1);
-    --color-brand-200: oklch(0.895 0.081 69.29);
-    --color-brand-300: oklch(0.827 0.129 67.69);
-    --color-brand-400: oklch(0.754 0.172 65.72);
-    --color-brand-500: oklch(0.705 0.19 62.83);
-    --color-brand-600: oklch(0.633 0.179 56.24);
-    --color-brand-700: oklch(0.525 0.148 50.75);
-    --color-brand-800: oklch(0.432 0.119 48.56);
-    --color-brand-900: oklch(0.367 0.098 49.72);
-    --color-brand-950: oklch(0.199 0.053 52.01);
+    --shadow-button-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+
+    --shadow-skeumorphic: 0px 0px 0px 1px light-dark(rgba(10, 13, 18, 0.12), rgba(255, 255, 255, 0.15)) inset, 0px -2px 0px 0px light-dark(rgba(10, 13, 18, 0.05), rgba(255, 255, 255, 0.05)) inset;
+
+    --shadow-skeumorphic-hover: 0px 0px 0px 1px light-dark(rgba(10, 13, 18, 0.20), rgba(255, 255, 255, 0.25)) inset, 0px -2px 0px 0px light-dark(rgba(10, 13, 18, 0.05), rgba(255, 255, 255, 0.05)) inset;
+
+    --shadow-skeumorphic-danger: 0px 0px 0px 1px light-dark(rgba(220, 38, 38, 0.5), rgba(239, 68, 68, 0.5)) inset, 0px -2px 0px 0px light-dark(rgba(10, 13, 18, 0.05), rgba(255, 255, 255, 0.05)) inset;
+
+    --shadow-skeumorphic-brand: 0px 0px 0px 1px light-dark(var(--color-brand-400), var(--color-brand-600)) inset, 0px -2px 0px 0px light-dark(rgba(10, 13, 18, 0.05), rgba(255, 255, 255, 0.05)) inset;
+
+    --shadow-xs-skeumorphic: var(--shadow-skeumorphic), var(--shadow-xs);
+    --shadow-sm-skeumorphic: var(--shadow-skeumorphic), var(--shadow-sm);
+    --shadow-md-skeumorphic: var(--shadow-skeumorphic), var(--shadow-md);
+    --shadow-xs-skeumorphic-hover: var(--shadow-skeumorphic-hover), var(--shadow-xs);
+    --shadow-xs-skeumorphic-danger: var(--shadow-skeumorphic-danger), var(--shadow-xs);
+    --shadow-xs-skeumorphic-brand: var(--shadow-skeumorphic-brand), var(--shadow-xs);
+    --color-brand-50: oklch(0.957 0.062 154.97);
+    --color-brand-100: oklch(0.926 0.116 155.05);
+    --color-brand-200: oklch(0.849 0.2 154.52);
+    --color-brand-300: oklch(0.79 0.185 154.69);
+    --color-brand-400: oklch(0.724 0.17 154.65);
+    --color-brand-500: oklch(0.629 0.148 154.7);
+    --color-brand-600: oklch(0.53 0.124 154.68);
+    --color-brand-700: oklch(0.429 0.101 154.45);
+    --color-brand-800: oklch(0.328 0.077 154.48);
+    --color-brand-900: oklch(0.234 0.055 155.3);
+    --color-brand-950: oklch(0.184 0.044 153.93);
 
     --color-neutral-50: oklch(0.985 0.003 247.858);
     --color-neutral-100: oklch(0.961 0.008 247.839);
@@ -116,63 +135,118 @@
     --color-info-900: oklch(0.373 0.094 240.75);
     --color-info-950: oklch(0.203 0.052 240.75);
 
-    /* SEMANTIC COLORS - Static for brand consistency */
     --color-brand: var(--color-brand-500);
     --color-brand-hover: var(--color-brand-600);
     --color-brand-active: var(--color-brand-700);
-    --color-foreground-brand: light-dark(white, var(--color-brand-100));
+    --color-foreground-brand: white;
 
     --color-danger: var(--color-danger-500);
     --color-danger-hover: var(--color-danger-600);
     --color-danger-active: var(--color-danger-700);
-    --color-foreground-danger: light-dark(white, var(--color-danger-100));
+    --color-foreground-danger: white;
 
     --color-warning: var(--color-warning-500);
     --color-warning-hover: var(--color-warning-600);
     --color-warning-active: var(--color-warning-700);
-    --color-foreground-warning: light-dark(var(--color-neutral-900), var(--color-warning-100));
+    --color-foreground-warning: light-dark(var(--color-neutral-900), white);
 
     --color-success: var(--color-success-500);
     --color-success-hover: var(--color-success-600);
     --color-success-active: var(--color-success-700);
-    --color-foreground-success: light-dark(white, var(--color-success-100));
+    --color-foreground-success: white;
 
     --color-info: var(--color-info-500);
     --color-info-hover: var(--color-info-600);
     --color-info-active: var(--color-info-700);
-    --color-foreground-info: light-dark(white, var(--color-info-100));
+    --color-foreground-info: white;
 
-    /* NEUTRAL COLORS - Responsive to theme context */
     --color-surface: light-dark(white, var(--color-neutral-900));
-    --color-body: light-dark(var(--color-neutral-50), var(--color-neutral-950));
+    --color-surface-secondary: light-dark(var(--color-neutral-50), var(--color-neutral-800));
+    --color-body: light-dark(var(--color-neutral-100), var(--color-neutral-950));
     --color-foreground: light-dark(var(--color-neutral-800), var(--color-neutral-200));
     --color-border: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --color-input: light-dark(var(--color-neutral-50), var(--color-neutral-950));
+    --color-input: light-dark(white, var(--color-neutral-950));
     --color-muted: light-dark(var(--color-neutral-600), var(--color-neutral-400));
 
-    /* Neutral interactive states */
-    --color-neutral: light-dark(var(--color-neutral-500), var(--color-neutral-400));
-    --color-neutral-hover: light-dark(var(--color-neutral-200), var(--color-neutral-950));
-    --color-neutral-active: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+    --color-neutral: light-dark(var(--color-neutral-100), var(--color-neutral-700));
+    --color-neutral-hover: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+    --color-neutral-active: light-dark(var(--color-neutral-200), var(--color-neutral-700));
     --color-neutral-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --color-foreground-neutral: light-dark(white, var(--color-neutral-100));
+    --color-foreground-neutral: light-dark(var(--color-neutral-900), var(--color-neutral-100));
 
-    /* Disabled states for semantic colors */
     --color-brand-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
     --color-danger-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
     --color-warning-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
     --color-success-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
     --color-info-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
 
-    /* Inverse semantic tokens for tooltips and overlays */
+    --color-success-subtle: light-dark(var(--color-success-50), var(--color-success-950));
+    --color-warning-subtle: light-dark(var(--color-warning-50), var(--color-warning-950));
+    --color-danger-subtle: light-dark(var(--color-danger-50), var(--color-danger-950));
+    --color-info-subtle: light-dark(var(--color-info-50), var(--color-info-950));
+    --color-neutral-subtle: light-dark(var(--color-neutral-50), var(--color-neutral-950));
+
     --color-surface-inverse: light-dark(var(--color-neutral-900), white);
     --color-border-inverse: light-dark(var(--color-neutral-700), var(--color-neutral-200));
     --tooltip-dark-bg: light-dark(var(--color-neutral-900), var(--color-neutral-800));
+
+    --color-button-brand-icon: light-dark(rgba(255, 255, 255, 0.9), var(--color-brand-200));
+    --color-button-brand-icon-hover: light-dark(rgba(255, 255, 255, 1), var(--color-brand-100));
+    --color-button-danger-icon: light-dark(rgba(255, 255, 255, 0.9), var(--color-danger-200));
+    --color-button-danger-icon-hover: light-dark(rgba(255, 255, 255, 1), var(--color-danger-100));
+    --color-button-success-icon: light-dark(rgba(255, 255, 255, 0.9), var(--color-success-200));
+    --color-button-success-icon-hover: light-dark(rgba(255, 255, 255, 1), var(--color-success-100));
+    --color-button-warning-icon: light-dark(rgba(255, 255, 255, 0.9), var(--color-warning-200));
+    --color-button-warning-icon-hover: light-dark(rgba(255, 255, 255, 1), var(--color-warning-100));
+    --color-button-info-icon: light-dark(rgba(255, 255, 255, 0.9), var(--color-info-200));
+    --color-button-info-icon-hover: light-dark(rgba(255, 255, 255, 1), var(--color-info-100));
 }
 
 :root {
-    /* Enable automatic light/dark mode detection */
     color-scheme: light dark;
+}
+
+@layer components {
+    .input-base {
+        @apply w-full rounded-md transition-colors duration-200
+               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    }
+
+    .input-wrapper-base {
+        @apply flex items-center w-full rounded-md transition-all duration-200
+               focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2;
+    }
+
+    .input-trigger-base {
+        @apply flex items-center justify-between w-full rounded-md transition-colors duration-200
+               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    }
+
+    .input-default {
+        @apply bg-input shadow-xs-skeumorphic
+               focus-visible:shadow-xs-skeumorphic-brand focus-visible:ring-brand
+               hover:shadow-xs-skeumorphic-hover;
+    }
+
+    .input-wrapper-default {
+        @apply bg-input shadow-xs-skeumorphic
+               focus-within:shadow-xs-skeumorphic-brand focus-within:ring-brand
+               hover:shadow-xs-skeumorphic-hover;
+    }
+
+    .input-error {
+        @apply bg-input shadow-xs-skeumorphic-danger
+               focus-visible:shadow-xs-skeumorphic-danger focus-visible:ring-danger;
+    }
+
+    .input-wrapper-error {
+        @apply bg-input shadow-xs-skeumorphic-danger
+               focus-within:shadow-xs-skeumorphic-danger focus-within:ring-danger;
+    }
+
+    .input-disabled {
+        @apply bg-surface shadow-xs cursor-not-allowed opacity-50;
+    }
 }
 
 

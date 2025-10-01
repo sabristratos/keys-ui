@@ -1,17 +1,15 @@
-{{-- Keys UI Scripts Auto-Injection Component --}}
+
 @php
-    // Check for published assets (deployed by BuildAssetsCommand)
+
     $jsPath = 'vendor/keys-ui/keys-ui.min.js';
     $jsExists = file_exists(public_path($jsPath));
     $jsUrl = $jsExists ? asset($jsPath) : '';
 
-    // Add cache busting in production
     if (!app()->hasDebugModeEnabled() && $jsExists) {
         $hash = substr(md5_file(public_path($jsPath)), 0, 8);
         $jsUrl .= '?v=' . $hash;
     }
 
-    // Prepare translations for injection
     $translations = [
         'feedback' => [
             'copied_clipboard' => __('keys-ui::keys-ui.feedback.copied_clipboard'),
@@ -31,16 +29,16 @@
 @endphp
 
 @if($jsExists)
-    {{-- Inject translations and config --}}
+    
     <script>
         window.KeysUITranslations = @json($translations);
         window.KeysUIConfig = @json($config);
     </script>
 
-    {{-- Load main Keys UI JavaScript --}}
+    
     <script src="{{ $jsUrl }}" defer></script>
 
-    {{-- Auto-initialize when DOM is ready --}}
+    
     <script defer>
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof KeysUI !== 'undefined' && KeysUI.init) {
@@ -49,8 +47,8 @@
         });
     </script>
 @else
-    {{-- Development warning --}}
-    <!-- Keys UI JavaScript not found. Assets may need to be built. -->
+    
+    
     <script>
         console.warn('Keys UI: JavaScript assets not found. Run "composer install" or "composer update" to ensure assets are available.');
     </script>

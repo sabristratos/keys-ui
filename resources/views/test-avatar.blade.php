@@ -8,26 +8,26 @@
     <div class="p-8 space-y-8">
         <h1 class="text-3xl font-bold mb-8">Avatar Components Test</h1>
 
-        {{-- Basic Avatars --}}
+        
         <section>
             <h2 class="text-xl font-semibold mb-4">Basic Avatars</h2>
             <div class="flex items-center space-x-4">
-                {{-- Image Avatar --}}
+                
                 <x-keys::avatar
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
                     name="John Doe"
                     alt="John Doe's profile picture"
                 />
 
-                {{-- Initials Avatar --}}
+                
                 <x-keys::avatar name="Jane Smith" />
 
-                {{-- Fallback Icon Avatar --}}
+                
                 <x-keys::avatar />
             </div>
         </section>
 
-        {{-- Avatar Sizes --}}
+        
         <section>
             <h2 class="text-xl font-semibold mb-4">Avatar Sizes</h2>
             <div class="flex items-center space-x-4">
@@ -54,7 +54,7 @@
             </div>
         </section>
 
-        {{-- Avatar Shapes --}}
+        
         <section>
             <h2 class="text-xl font-semibold mb-4">Avatar Shapes</h2>
             <div class="flex items-center space-x-4">
@@ -69,7 +69,7 @@
             </div>
         </section>
 
-        {{-- Avatar Colors --}}
+        
         <section>
             <h2 class="text-xl font-semibold mb-4">Avatar Colors</h2>
             <div class="flex flex-wrap gap-4">
@@ -108,7 +108,7 @@
             </div>
         </section>
 
-        {{-- Avatar Status Indicators --}}
+        
         <section>
             <h2 class="text-xl font-semibold mb-4">Avatar Status Indicators</h2>
             <div class="flex items-center space-x-4">
@@ -131,7 +131,7 @@
             </div>
         </section>
 
-        {{-- Avatar with Borders --}}
+        
         <section>
             <h2 class="text-xl font-semibold mb-4">Avatar with Borders</h2>
             <div class="flex items-center space-x-4">
@@ -141,12 +141,12 @@
             </div>
         </section>
 
-        {{-- Avatar Stacks --}}
+        
         <section>
             <h2 class="text-xl font-semibold mb-4">Avatar Stacks</h2>
 
             <div class="space-y-6">
-                {{-- Default Stack --}}
+                
                 <div>
                     <h3 class="text-lg font-medium mb-2">Default Stack</h3>
                     <x-keys::avatar.stack>
@@ -157,7 +157,7 @@
                     </x-keys::avatar.stack>
                 </div>
 
-                {{-- Large Stack --}}
+                
                 <div>
                     <h3 class="text-lg font-medium mb-2">Large Stack</h3>
                     <x-keys::avatar.stack size="lg">
@@ -169,7 +169,7 @@
                     </x-keys::avatar.stack>
                 </div>
 
-                {{-- Tight Spacing Stack --}}
+                
                 <div>
                     <h3 class="text-lg font-medium mb-2">Tight Spacing Stack</h3>
                     <x-keys::avatar.stack spacing="tight">
@@ -179,7 +179,7 @@
                     </x-keys::avatar.stack>
                 </div>
 
-                {{-- Right-to-Left Stack --}}
+                
                 <div>
                     <h3 class="text-lg font-medium mb-2">Right-to-Left Stack</h3>
                     <x-keys::avatar.stack direction="rtl">
@@ -191,11 +191,11 @@
             </div>
         </section>
 
-        {{-- Mixed Examples --}}
+        
         <section>
             <h2 class="text-xl font-semibold mb-4">Mixed Examples</h2>
             <div class="space-y-4">
-                {{-- Team with status indicators --}}
+                
                 <div>
                     <h3 class="text-lg font-medium mb-2">Team with Status</h3>
                     <x-keys::avatar.stack>
@@ -206,7 +206,7 @@
                     </x-keys::avatar.stack>
                 </div>
 
-                {{-- Mixed sizes and shapes --}}
+                
                 <div class="flex items-center space-x-4">
                     <x-keys::avatar name="Square Large" size="lg" shape="square" color="purple" />
                     <x-keys::avatar name="Circle Medium" size="md" shape="circle" color="teal" status="online" />

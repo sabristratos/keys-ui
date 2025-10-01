@@ -1,0 +1,568 @@
+@layer components {
+@supports (position-try-fallbacks: flip-block) {
+    /* Enhanced fallback chains for better mobile responsiveness */
+    [data-keys-popover][data-placement="top"] {
+        position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="bottom"] {
+        position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="left"] {
+        position-try-fallbacks: flip-inline, flip-block, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="right"] {
+        position-try-fallbacks: flip-inline, flip-block, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="top-start"] {
+        position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="top-end"] {
+        position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="bottom-start"] {
+        position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="bottom-end"] {
+        position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="left-start"] {
+        position-try-fallbacks: flip-inline, flip-block, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="left-end"] {
+        position-try-fallbacks: flip-inline, flip-block, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="right-start"] {
+        position-try-fallbacks: flip-inline, flip-block, flip-block flip-inline;
+    }
+
+    [data-keys-popover][data-placement="right-end"] {
+        position-try-fallbacks: flip-inline, flip-block, flip-block flip-inline;
+    }
+}
+
+/* Custom @position-try definitions - always available */
+@position-try --dropdown-flip-to-top {
+    inset: auto;
+    bottom: anchor(top);
+    left: anchor(center);
+    transform: translateX(-50%);
+    margin-bottom: 0.5rem;
+}
+
+@position-try --dropdown-flip-to-bottom {
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(center);
+    transform: translateX(-50%);
+    margin-top: 0.5rem;
+}
+
+@position-try --dropdown-flip-to-left {
+    inset: auto;
+    right: anchor(left);
+    top: anchor(center);
+    transform: translateY(-50%);
+    margin-right: 0.5rem;
+}
+
+@position-try --dropdown-flip-to-right {
+    inset: auto;
+    left: anchor(right);
+    top: anchor(center);
+    transform: translateY(-50%);
+    margin-left: 0.5rem;
+}
+
+@position-try --dropdown-flip-to-top-start {
+    inset: auto;
+    bottom: anchor(top);
+    left: anchor(left);
+    margin-bottom: 0.5rem;
+}
+
+@position-try --dropdown-flip-to-top-end {
+    inset: auto;
+    bottom: anchor(top);
+    right: anchor(right);
+    margin-bottom: 0.5rem;
+}
+
+@position-try --dropdown-flip-to-bottom-start {
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(left);
+    margin-top: 0.5rem;
+}
+
+@position-try --dropdown-flip-to-bottom-end {
+    inset: auto;
+    top: anchor(bottom);
+    right: anchor(right);
+    margin-top: 0.5rem;
+}
+
+/* Submenu-specific position-try definitions */
+@position-try --submenu-flip-to-left {
+    inset: auto;
+    right: anchor(left);
+    top: anchor(center);
+    transform: translateY(-50%);
+    margin-right: 0.5rem;
+}
+
+@position-try --submenu-flip-to-bottom {
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(left);
+    margin-top: 0.5rem;
+}
+
+@position-try --submenu-flip-to-top {
+    inset: auto;
+    bottom: anchor(top);
+    left: anchor(left);
+    margin-bottom: 0.5rem;
+}
+
+@position-try --submenu-flip-to-bottom-start {
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(left);
+    margin-top: 0.5rem;
+}
+
+@position-try --submenu-flip-to-bottom-end {
+    inset: auto;
+    top: anchor(bottom);
+    right: anchor(right);
+    margin-top: 0.5rem;
+}
+
+/* Base popover styles - CSS anchor positioning cannot be handled by Tailwind */
+[data-keys-popover] {
+    position-anchor: var(--popover-anchor);
+    inset: auto;
+}
+
+/* Position-visibility for graceful overflow handling - only when explicitly needed */
+@supports (position-visibility: no-overflow) {
+    [data-keys-popover][data-hide-on-overflow="true"] {
+        position-visibility: no-overflow;
+    }
+}
+
+/* Mobile-specific responsive enhancements - Regular Dropdowns Only */
+@media (max-width: 768px) {
+    /* General mobile constraints for regular dropdowns */
+    [data-dropdown="true"] [data-keys-popover],
+    [data-keys-popover]:not([data-submenu="true"] [data-keys-popover]) {
+        /* Height constraint and scrolling - width handled by PHP classes */
+        max-height: 80vh;
+        overflow: auto;
+    }
+
+    /* More aggressive repositioning on small screens - Regular dropdowns only */
+    @supports (position-try-fallbacks: flip-block) {
+        [data-dropdown="true"] [data-keys-popover][data-placement="bottom"],
+        [data-dropdown="true"] [data-keys-popover][data-placement="bottom-start"],
+        [data-dropdown="true"] [data-keys-popover][data-placement="bottom-end"] {
+            position-try-fallbacks:
+                flip-block,
+                flip-inline,
+                flip-block flip-inline,
+                --dropdown-flip-to-top,
+                --dropdown-flip-to-left,
+                --dropdown-flip-to-right;
+        }
+
+        [data-dropdown="true"] [data-keys-popover][data-placement="top"],
+        [data-dropdown="true"] [data-keys-popover][data-placement="top-start"],
+        [data-dropdown="true"] [data-keys-popover][data-placement="top-end"] {
+            position-try-fallbacks:
+                flip-block,
+                flip-inline,
+                flip-block flip-inline,
+                --dropdown-flip-to-bottom,
+                --dropdown-flip-to-left,
+                --dropdown-flip-to-right;
+        }
+
+        [data-dropdown="true"] [data-keys-popover][data-placement="left"],
+        [data-dropdown="true"] [data-keys-popover][data-placement="left-start"],
+        [data-dropdown="true"] [data-keys-popover][data-placement="left-end"] {
+            position-try-fallbacks:
+                flip-inline,
+                flip-block,
+                flip-block flip-inline,
+                --dropdown-flip-to-right,
+                --dropdown-flip-to-bottom,
+                --dropdown-flip-to-top;
+        }
+
+        [data-dropdown="true"] [data-keys-popover][data-placement="right"],
+        [data-dropdown="true"] [data-keys-popover][data-placement="right-start"],
+        [data-dropdown="true"] [data-keys-popover][data-placement="right-end"] {
+            position-try-fallbacks:
+                flip-inline,
+                flip-block,
+                flip-block flip-inline,
+                --dropdown-flip-to-left,
+                --dropdown-flip-to-bottom,
+                --dropdown-flip-to-top;
+        }
+    }
+}
+
+/* Submenu-specific responsive positioning */
+@media (max-width: 768px) {
+    [data-submenu="true"] [data-keys-popover] {
+        /* Submenu specific mobile constraints - width handled by PHP classes */
+        max-height: 70vh;
+        overflow: auto;
+    }
+
+    /* Mobile accordion pattern - override right positioning with bottom */
+    [data-submenu="true"] [data-keys-popover][data-placement^="right"] {
+        /* Force accordion-style opening on mobile */
+        inset: auto;
+        top: anchor(bottom);
+        left: anchor(left);
+        right: auto;
+        transform: none;
+        margin-top: 0.5rem;
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    [data-submenu="true"] [data-keys-popover][data-placement^="left"] {
+        /* Force accordion-style opening on mobile */
+        inset: auto;
+        top: anchor(bottom);
+        left: anchor(left);
+        right: auto;
+        transform: none;
+        margin-top: 0.5rem;
+        margin-left: 0;
+    }
+
+    /* Enhanced mobile fallbacks for submenus */
+    @supports (position-try-fallbacks: flip-block) {
+        [data-submenu="true"] [data-keys-popover][data-placement^="right"] {
+            position-try-fallbacks:
+                flip-inline,
+                flip-block,
+                flip-block flip-inline,
+                --submenu-flip-to-left,
+                --submenu-flip-to-bottom,
+                --submenu-flip-to-top;
+        }
+
+        [data-submenu="true"] [data-keys-popover][data-placement^="left"] {
+            position-try-fallbacks:
+                flip-inline,
+                flip-block,
+                flip-block flip-inline,
+                --dropdown-flip-to-right,
+                --submenu-flip-to-bottom,
+                --submenu-flip-to-top;
+        }
+    }
+
+    /* Fallback for older browsers - submenu mobile positioning */
+    @supports (position-try-fallbacks: --test) and (not (position-try-fallbacks: flip-block)) {
+        [data-submenu="true"] [data-keys-popover][data-placement^="right"] {
+            position-try-fallbacks: --submenu-flip-to-left, --submenu-flip-to-bottom;
+        }
+
+        [data-submenu="true"] [data-keys-popover][data-placement^="left"] {
+            position-try-fallbacks: --dropdown-flip-to-right, --submenu-flip-to-bottom;
+        }
+    }
+}
+
+/* Desktop submenu fallbacks */
+@supports (position-try-fallbacks: flip-block) {
+    [data-submenu="true"] [data-keys-popover][data-placement^="right"] {
+        position-try-fallbacks: flip-inline, flip-block;
+    }
+
+    [data-submenu="true"] [data-keys-popover][data-placement^="left"] {
+        position-try-fallbacks: flip-inline, flip-block;
+    }
+}
+
+/* Custom fallbacks for older browsers - desktop submenu */
+@supports (position-try-fallbacks: --test) and (not (position-try-fallbacks: flip-block)) {
+    [data-submenu="true"] [data-keys-popover][data-placement^="right"] {
+        position-try-fallbacks: --submenu-flip-to-left;
+    }
+
+    [data-submenu="true"] [data-keys-popover][data-placement^="left"] {
+        position-try-fallbacks: --dropdown-flip-to-right;
+    }
+}
+
+/* Placement variants - CSS anchor positioning with anchor() function */
+[data-keys-popover][data-placement="top"] {
+    inset: auto;
+    bottom: anchor(top);
+    left: anchor(center);
+    transform: translateX(-50%);
+    margin-bottom: 0.5rem;
+}
+
+[data-keys-popover][data-placement="bottom"] {
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(center);
+    transform: translateX(-50%);
+    margin-top: 0.5rem;
+}
+
+[data-keys-popover][data-placement="left"] {
+    inset: auto;
+    right: anchor(left);
+    top: anchor(center);
+    transform: translateY(-50%);
+    margin-right: 0.5rem;
+}
+
+[data-keys-popover][data-placement="right"] {
+    inset: auto;
+    left: anchor(right);
+    top: anchor(center);
+    transform: translateY(-50%);
+    margin-left: 0.5rem;
+}
+
+[data-keys-popover][data-placement="top-start"] {
+    inset: auto;
+    bottom: anchor(top);
+    left: anchor(left);
+    margin-bottom: 0.5rem;
+}
+
+[data-keys-popover][data-placement="top-end"] {
+    inset: auto;
+    bottom: anchor(top);
+    right: anchor(right);
+    margin-bottom: 0.5rem;
+}
+
+[data-keys-popover][data-placement="bottom-start"] {
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(left);
+    margin-top: 0.5rem;
+}
+
+[data-keys-popover][data-placement="bottom-end"] {
+    inset: auto;
+    top: anchor(bottom);
+    right: anchor(right);
+    margin-top: 0.5rem;
+}
+
+[data-keys-popover][data-placement="left-start"] {
+    inset: auto;
+    right: anchor(left);
+    top: anchor(top);
+    margin-right: 0.5rem;
+}
+
+[data-keys-popover][data-placement="left-end"] {
+    inset: auto;
+    right: anchor(left);
+    bottom: anchor(bottom);
+    margin-right: 0.5rem;
+}
+
+[data-keys-popover][data-placement="right-start"] {
+    inset: auto;
+    left: anchor(right);
+    top: anchor(top);
+    margin-left: 0.5rem;
+}
+
+[data-keys-popover][data-placement="right-end"] {
+    inset: auto;
+    left: anchor(right);
+    bottom: anchor(bottom);
+    margin-left: 0.5rem;
+}
+
+/* Custom position-try fallbacks for older browsers that support @position-try but not predefined flip values */
+@supports (position-try-fallbacks: --test) and (not (position-try-fallbacks: flip-block)) {
+    [data-keys-popover][data-placement="top"] {
+        position-try-fallbacks: --dropdown-flip-to-bottom;
+    }
+
+    [data-keys-popover][data-placement="bottom"] {
+        position-try-fallbacks: --dropdown-flip-to-top;
+    }
+
+    [data-keys-popover][data-placement="left"] {
+        position-try-fallbacks: --dropdown-flip-to-right;
+    }
+
+    [data-keys-popover][data-placement="right"] {
+        position-try-fallbacks: --dropdown-flip-to-left;
+    }
+
+    [data-keys-popover][data-placement="top-start"] {
+        position-try-fallbacks: --dropdown-flip-to-bottom-start;
+    }
+
+    [data-keys-popover][data-placement="top-end"] {
+        position-try-fallbacks: --dropdown-flip-to-bottom-end;
+    }
+
+    [data-keys-popover][data-placement="bottom-start"] {
+        position-try-fallbacks: --dropdown-flip-to-top-start;
+    }
+
+    [data-keys-popover][data-placement="bottom-end"] {
+        position-try-fallbacks: --dropdown-flip-to-top-end;
+    }
+
+    [data-keys-popover][data-placement="left-start"] {
+        position-try-fallbacks: --dropdown-flip-to-right;
+    }
+
+    [data-keys-popover][data-placement="left-end"] {
+        position-try-fallbacks: --dropdown-flip-to-right;
+    }
+
+    [data-keys-popover][data-placement="right-start"] {
+        position-try-fallbacks: --dropdown-flip-to-left;
+    }
+
+    [data-keys-popover][data-placement="right-end"] {
+        position-try-fallbacks: --dropdown-flip-to-left;
+    }
+} /* End custom position-try fallbacks */
+
+/* Show when popover is open - Override Tailwind's hidden class */
+[data-keys-popover]:popover-open {
+    display: block !important;
+}
+
+/* Fix scrollbar issue when popover opens - Apply only to popover components */
+body:has([data-keys-popover]:popover-open) {
+    scrollbar-gutter: stable;
+}
+
+/* Smooth enter animations with @starting-style - slide in from anchor */
+@starting-style {
+    /* Top placement - slide down from anchor */
+    [data-keys-popover][data-placement="top"]:popover-open {
+        opacity: 0;
+        transform: translateX(-50%) translateY(8px) scale(0.95);
+    }
+
+    /* Bottom placement - slide up from anchor */
+    [data-keys-popover][data-placement="bottom"]:popover-open {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-8px) scale(0.95);
+    }
+
+    /* Left placement - slide right from anchor */
+    [data-keys-popover][data-placement="left"]:popover-open {
+        opacity: 0;
+        transform: translateY(-50%) translateX(8px) scale(0.95);
+    }
+
+    /* Right placement - slide left from anchor */
+    [data-keys-popover][data-placement="right"]:popover-open {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-8px) scale(0.95);
+    }
+
+    /* Start placements - slide with scale */
+    [data-keys-popover][data-placement*="start"]:popover-open {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    /* End placements - slide with scale */
+    [data-keys-popover][data-placement*="end"]:popover-open {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+[data-keys-popover]:popover-open {
+    opacity: 1;
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out,
+                overlay 0.2s ease-out allow-discrete,
+                display 0.2s ease-out allow-discrete;
+}
+
+/* Smooth exit animations */
+[data-keys-popover]:not(:popover-open) {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.2s ease-in, transform 0.2s ease-in,
+                overlay 0.2s ease-in allow-discrete,
+                display 0.2s ease-in allow-discrete;
+}
+
+/* Base state */
+[data-keys-popover] {
+    opacity: 0;
+}
+
+/* Animation transforms by placement - Combined transforms with placement-specific logic */
+[data-keys-popover][data-placement="top"] {
+    transform: translateX(-50%) scale(var(--scale-down));
+}
+[data-keys-popover][data-placement="top"]:popover-open {
+    transform: translateX(-50%) scale(1);
+}
+
+[data-keys-popover][data-placement="bottom"] {
+    transform: translateX(-50%) scale(var(--scale-down));
+}
+[data-keys-popover][data-placement="bottom"]:popover-open {
+    transform: translateX(-50%) scale(1);
+}
+
+[data-keys-popover][data-placement="left"] {
+    transform: translateY(-50%) scale(var(--scale-down));
+}
+[data-keys-popover][data-placement="left"]:popover-open {
+    transform: translateY(-50%) scale(1);
+}
+
+[data-keys-popover][data-placement="right"] {
+    transform: translateY(-50%) scale(var(--scale-down));
+}
+[data-keys-popover][data-placement="right"]:popover-open {
+    transform: translateY(-50%) scale(1);
+}
+
+[data-keys-popover][data-placement*="start"] {
+    transform: scale(var(--scale-down));
+}
+[data-keys-popover][data-placement*="start"]:popover-open {
+    transform: scale(1);
+}
+
+[data-keys-popover][data-placement*="end"] {
+    transform: scale(var(--scale-down));
+}
+[data-keys-popover][data-placement*="end"]:popover-open {
+    transform: scale(1);
+}
+
+}

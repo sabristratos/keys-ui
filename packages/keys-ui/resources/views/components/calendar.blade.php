@@ -1,11 +1,9 @@
 @php
     $wireAttributes = $attributes->whereStartsWith('wire:');
 
-    // Calendar base styling using direct Tailwind utilities
     $baseWidth = $monthsToShow > 1 ? 'min-w-[560px] w-full' : 'min-w-[280px] w-max';
     $baseClasses = 'user-select-none text-foreground';
 
-    // Size-based styling
     $sizeClasses = match ($size) {
         'sm' => 'text-sm',
         'md' => 'text-sm',
@@ -13,7 +11,6 @@
         default => 'text-sm'
     };
 
-    // State-based styling
     $stateClasses = '';
     if ($disabled) {
         $stateClasses = 'opacity-60 pointer-events-none';
@@ -23,7 +20,6 @@
         $stateClasses = 'border-border hover:border-neutral-300 dark:hover:border-neutral-600';
     }
 
-    // Header size styling
     $headerClasses = match ($size) {
         'sm' => 'px-3 py-2 text-sm font-medium',
         'md' => 'px-4 py-3 text-sm font-semibold',
@@ -31,7 +27,6 @@
         default => 'px-4 py-3 text-sm font-semibold'
     };
 
-    // Cell size styling
     $cellClasses = match ($size) {
         'sm' => 'w-8 h-8 text-xs',
         'md' => 'w-10 h-10 text-sm',
@@ -41,7 +36,7 @@
 
     $containerAttributes = $attributes->whereDoesntStartWith('wire:')->merge([
         'class' => trim($baseWidth . ' ' . $baseClasses . ' ' . $sizeClasses . ' ' . $stateClasses),
-        'data-calendar-data' => json_encode($computedInitialData),
+        'data-keys-calendar-config' => json_encode($computedInitialData),
     ])->merge($dataAttributes);
 @endphp
 
@@ -57,7 +52,7 @@
     </div>
 @endif
 
-{{-- Calendar component now uses Tailwind utilities and JavaScript-based dynamic styling --}}
+
 <style>
 
 

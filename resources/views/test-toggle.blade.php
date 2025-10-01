@@ -8,7 +8,7 @@
     <div class="p-8">
         <h1 class="text-2xl mb-6">Toggle Component Test</h1>
 
-        {{-- Small toggle --}}
+        
         <div class="mb-6">
             <h2 class="text-lg font-semibold mb-2">Small Toggle</h2>
             <x-keys::toggle
@@ -19,7 +19,7 @@
             />
         </div>
 
-        {{-- Medium toggle --}}
+        
         <div class="mb-6">
             <h2 class="text-lg font-semibold mb-2">Medium Toggle (Default)</h2>
             <x-keys::toggle
@@ -30,7 +30,7 @@
             />
         </div>
 
-        {{-- Large toggle --}}
+        
         <div class="mb-6">
             <h2 class="text-lg font-semibold mb-2">Large Toggle</h2>
             <x-keys::toggle
@@ -41,7 +41,7 @@
             />
         </div>
 
-        {{-- Toggle with actions --}}
+        
         <div class="mt-8">
             <h2 class="text-lg font-semibold mb-2">Toggle with Actions</h2>
             <x-keys::toggle

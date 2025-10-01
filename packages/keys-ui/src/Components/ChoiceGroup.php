@@ -62,47 +62,6 @@ class ChoiceGroup extends Component
         return false;
     }
 
-    public function fieldsetClasses(): string
-    {
-        return 'space-y-3';
-    }
-
-    public function legendClasses(): string
-    {
-        $sizeClasses = match ($this->size) {
-            'sm' => 'text-sm',
-            'md' => 'text-base',
-            'lg' => 'text-lg',
-            default => 'text-base'
-        };
-
-        $colorClasses = $this->disabled ? 'text-neutral-500 dark:text-neutral-400' : 'text-foreground';
-
-        return trim('font-medium mb-2 ' . $sizeClasses . ' ' . $colorClasses);
-    }
-
-    public function descriptionClasses(): string
-    {
-        $sizeClasses = match ($this->size) {
-            'sm' => 'text-xs',
-            'md' => 'text-sm',
-            'lg' => 'text-sm',
-            default => 'text-sm'
-        };
-
-        return trim('text-muted mb-3 ' . $sizeClasses);
-    }
-
-    public function choicesClasses(): string
-    {
-        return match ($this->layout) {
-            'stacked' => 'space-y-3',
-            'grid' => 'grid grid-cols-1 md:grid-cols-2 gap-3',
-            'inline' => 'flex flex-wrap gap-4',
-            default => 'space-y-3'
-        };
-    }
-
     public function hasLegend(): bool
     {
         return ! is_null($this->legend) && ! empty(trim($this->legend));
@@ -147,8 +106,43 @@ class ChoiceGroup extends Component
         return ($this->name ?? 'choicegroup') . '-description';
     }
 
+    public function getDataAttributes(): array
+    {
+        $attributes = [
+            'data-keys-choice-group' => 'true',
+            'data-type' => $this->type,
+            'data-layout' => $this->layout,
+            'data-size' => $this->size,
+        ];
+
+        if ($this->disabled) {
+            $attributes['data-disabled'] = 'true';
+        }
+
+        if ($this->required) {
+            $attributes['data-required'] = 'true';
+        }
+
+        if ($this->hasError()) {
+            $attributes['data-invalid'] = 'true';
+        }
+
+        if ($this->hasLegend()) {
+            $attributes['data-has-legend'] = 'true';
+        }
+
+        if ($this->hasDescription()) {
+            $attributes['data-has-description'] = 'true';
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
-        return view('keys::components.choice-group');
+        return view('keys::components.choice-group', [
+            'dataAttributes' => $this->getDataAttributes(),
+            'accessibilityAttributes' => $this->getAccessibilityAttributes(),
+        ]);
     }
 }

@@ -1,494 +1,565 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<x-layouts.sidebar title="Keys UI - Component Library">
+    <div class="space-y-16">
+        {{-- Hero Section --}}
+        <section>
+            <h1 class="text-4xl font-bold text-foreground mb-4">Welcome to Keys UI</h1>
+            <p class="text-lg text-muted max-w-3xl">
+                A modern Blade components library built specifically for Laravel 12 and Tailwind v4.
+                Build beautiful dashboards and applications with pre-styled, accessible components.
+            </p>
+        </section>
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        {{-- Popover & Dropdown Testing --}}
+        <section class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-foreground mb-4">Popover & Dropdown Components</h2>
+                <p class="text-lg text-muted max-w-3xl">
+                    Versatile popover menus with CSS anchor positioning. Features include menu items with icons, keyboard shortcuts, nested submenus, separators, and multiple variants. All positioning happens via CSS - No Floating UI needed!
+                </p>
+            </div>
 
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {{-- Basic Popover (Bottom) --}}
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-foreground">Basic Popover (Bottom)</h3>
+                    <x-keys::popover id="basic-popover" placement="bottom-start">
+                        <x-slot:trigger>
+                            <x-keys::button variant="brand">
+                                Open Menu
+                            </x-keys::button>
+                        </x-slot:trigger>
 
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <keys:scripts />
-    </head>
-    <body class="bg-body text-foreground font-sans">
-        <div class="container mx-auto px-8 py-12">
-            <div class="max-w-7xl mx-auto">
-                <!-- Header -->
-                <div class="text-center mb-16">
-                    <h1 class="text-4xl font-bold text-foreground mb-4">Keys UI Component Library</h1>
-                    <p class="text-xl text-muted-foreground mb-8">
-                        Modern Blade components for Laravel applications
-                    </p>
-
-                    <div class="flex flex-wrap justify-center gap-2 mb-8">
-                        <x-keys::badge color="brand" icon="heroicon-o-code-bracket">Modern Components</x-keys::badge>
-                        <x-keys::badge color="success" icon="heroicon-o-check-circle">Laravel Ready</x-keys::badge>
-                        <x-keys::badge color="info" icon="heroicon-o-sparkles">Tailwind v4</x-keys::badge>
-                        <x-keys::badge color="purple" icon="heroicon-o-cpu-chip">Performance</x-keys::badge>
-                    </div>
-                </div>
-
-
-
-                <!-- DatePicker Test Section -->
-                <section class="mb-20">
-                    <div class="text-center mb-12">
-                        <h2 class="text-3xl font-bold text-foreground mb-4">DatePicker Test</h2>
-                        <p class="text-lg text-muted-foreground">
-                            Testing DatePicker with various configurations and feature sets
-                        </p>
-                    </div>
-
-                    <div class="max-w-4xl mx-auto space-y-8">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <!-- Basic DatePickers -->
-                            <div class="space-y-6">
-                                <h3 class="text-xl font-semibold mb-4">Basic DatePickers</h3>
-
-                                <x-keys::date-picker
-                                    name="basic_date"
-                                    label="Basic DatePicker"
-                                    placeholder="Select a date"
-                                    value="2024-03-15"
-                                />
-
-                                <x-keys::date-picker
-                                    name="clearable_date"
-                                    label="Clearable DatePicker"
-                                    placeholder="Select a date"
-                                    clearable
-                                    value="2024-04-20"
-                                />
-
-                                <x-keys::date-picker
-                                    name="with_icon_date"
-                                    label="With Left Icon"
-                                    placeholder="Select a date"
-                                    icon-left="heroicon-o-user"
-                                    clearable
-                                />
-                            </div>
-
-                            <!-- Advanced DatePickers -->
-                            <div class="space-y-6">
-                                <h3 class="text-xl font-semibold mb-4">Advanced Features</h3>
-
-                                <x-keys::date-picker
-                                    name="range_date"
-                                    label="Date Range Picker"
-                                    placeholder="Select date range"
-                                    :is-range="true"
-                                    :quick-selectors="true"
-                                    clearable
-                                />
-
-                                <x-keys::date-picker
-                                    name="quick_date"
-                                    label="With Quick Selectors"
-                                    placeholder="Select a date"
-                                    :quick-selectors="true"
-                                    clearable
-                                />
-
-                                <x-keys::date-picker
-                                    name="custom_format_date"
-                                    label="Custom Format (F j, Y)"
-                                    placeholder="Select a date"
-                                    format="Y-m-d"
-                                    display-format="F j, Y"
-                                    clearable
-                                    value="2024-12-25"
-                                />
+                        <div class="p-4 space-y-2">
+                            <p class="text-sm text-foreground font-medium">Menu Title</p>
+                            <div class="space-y-1">
+                                <a href="#" class="block px-3 py-2 text-sm text-foreground hover:bg-surface-hover rounded">Dashboard</a>
+                                <a href="#" class="block px-3 py-2 text-sm text-foreground hover:bg-surface-hover rounded">Profile</a>
+                                <a href="#" class="block px-3 py-2 text-sm text-foreground hover:bg-surface-hover rounded">Settings</a>
                             </div>
                         </div>
+                    </x-keys::popover>
+                </div>
 
-                        <!-- Inline Calendar -->
-                        <div class="border border-border rounded-lg p-6">
-                            <h3 class="text-xl font-semibold mb-4">Inline Calendar</h3>
-                            <x-keys::date-picker
-                                name="inline_date"
-                                label="Always Visible Calendar"
-                                :inline="true"
-                                value="2024-06-15"
+                {{-- Top Aligned --}}
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-foreground">Top Aligned</h3>
+                    <x-keys::popover id="top-popover" placement="top">
+                        <x-slot:trigger>
+                            <x-keys::button variant="brand">
+                                Open Top
+                            </x-keys::button>
+                        </x-slot:trigger>
+
+                        <div class="p-4">
+                            <p class="text-sm text-foreground">This popover opens above the trigger button!</p>
+                        </div>
+                    </x-keys::popover>
+                </div>
+
+                {{-- Right Aligned --}}
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-foreground">Right Side</h3>
+                    <x-keys::popover id="right-popover" placement="right">
+                        <x-slot:trigger>
+                            <x-keys::button variant="outline">
+                                Open Right
+                            </x-keys::button>
+                        </x-slot:trigger>
+
+                        <div class="p-4">
+                            <p class="text-sm text-foreground">Opens to the right!</p>
+                        </div>
+                    </x-keys::popover>
+                </div>
+
+                {{-- Left Side --}}
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-foreground">Left Side</h3>
+                    <x-keys::popover id="left-popover" placement="left">
+                        <x-slot:trigger>
+                            <x-keys::button variant="outline">
+                                Open Left
+                            </x-keys::button>
+                        </x-slot:trigger>
+
+                        <div class="p-4">
+                            <p class="text-sm text-foreground">Opens to the left!</p>
+                        </div>
+                    </x-keys::popover>
+                </div>
+
+                {{-- Settings Menu with Icons and Separators --}}
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-foreground">Settings Menu</h3>
+                    <x-keys::dropdown id="settings-menu">
+                        <x-slot:trigger>
+                            <x-keys::button variant="brand" icon-left="heroicon-o-cog-6-tooth">
+                                Settings
+                            </x-keys::button>
+                        </x-slot:trigger>
+
+                        <x-keys::menu>
+                            <x-keys::menu.item href="#" icon="heroicon-o-user">
+                                Profile Settings
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-bell">
+                                Notifications
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-shield-check">
+                                Privacy & Security
+                            </x-keys::menu.item>
+
+                            <x-keys::menu.separator />
+
+                            <x-keys::menu.item href="#" icon="heroicon-o-paint-brush">
+                                Appearance
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-language">
+                                Language
+                            </x-keys::menu.item>
+
+                            <x-keys::menu.separator />
+
+                            <x-keys::menu.item href="#" icon="heroicon-o-question-mark-circle">
+                                Help & Support
+                            </x-keys::menu.item>
+                        </x-keys::menu>
+                    </x-keys::dropdown>
+                </div>
+
+                {{-- User Profile Menu --}}
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-foreground">User Profile</h3>
+                    <x-keys::dropdown id="user-menu">
+                        <x-slot:trigger>
+                            <x-keys::button variant="outline" icon-left="heroicon-o-user-circle">
+                                Account
+                            </x-keys::button>
+                        </x-slot:trigger>
+
+                        <x-keys::menu>
+                            <x-keys::menu.item href="#" icon="heroicon-o-user">
+                                View Profile
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-cog-6-tooth" kbd="⌘,">
+                                Settings
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-credit-card">
+                                Billing
+                            </x-keys::menu.item>
+
+                            <x-keys::menu.separator />
+
+                            <x-keys::menu.item href="#" icon="heroicon-o-information-circle">
+                                About
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-document-text">
+                                Documentation
+                            </x-keys::menu.item>
+
+                            <x-keys::menu.separator />
+
+                            <x-keys::menu.item href="#" icon="heroicon-o-arrow-right-on-rectangle" variant="danger">
+                                Sign Out
+                            </x-keys::menu.item>
+                        </x-keys::menu>
+                    </x-keys::dropdown>
+                </div>
+
+                {{-- Navigation with Nested Submenus --}}
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-foreground">Nested Navigation</h3>
+                    <x-keys::dropdown id="nav-menu">
+                        <x-slot:trigger>
+                            <x-keys::button variant="brand" icon-left="heroicon-o-squares-2x2">
+                                More
+                            </x-keys::button>
+                        </x-slot:trigger>
+
+                        <x-keys::menu>
+                            <x-keys::menu.item href="#" icon="heroicon-o-home">
+                                Dashboard
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-chart-bar">
+                                Analytics
+                            </x-keys::menu.item>
+
+                            <x-keys::menu.separator />
+
+                            <x-keys::menu.submenu heading="Products" icon="heroicon-o-shopping-bag">
+                                <x-keys::menu.item href="#" icon="heroicon-o-plus">
+                                    Add Product
+                                </x-keys::menu.item>
+                                <x-keys::menu.item href="#" icon="heroicon-o-queue-list">
+                                    View All Products
+                                </x-keys::menu.item>
+                                <x-keys::menu.item href="#" icon="heroicon-o-archive-box">
+                                    Inventory
+                                </x-keys::menu.item>
+
+                                <x-keys::menu.separator />
+
+                                <x-keys::menu.submenu heading="Categories" icon="heroicon-o-folder">
+                                    <x-keys::menu.item href="#" icon="heroicon-o-tag">
+                                        Electronics
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item href="#" icon="heroicon-o-tag">
+                                        Clothing
+                                    </x-keys::menu.item>
+                                    <x-keys::menu.item href="#" icon="heroicon-o-tag">
+                                        Books
+                                    </x-keys::menu.item>
+                                </x-keys::menu.submenu>
+                            </x-keys::menu.submenu>
+
+                            <x-keys::menu.submenu heading="Team" icon="heroicon-o-user-group">
+                                <x-keys::menu.item href="#" icon="heroicon-o-user-plus">
+                                    Invite Members
+                                </x-keys::menu.item>
+                                <x-keys::menu.item href="#" icon="heroicon-o-users">
+                                    Manage Team
+                                </x-keys::menu.item>
+                                <x-keys::menu.item href="#" icon="heroicon-o-adjustments-horizontal">
+                                    Team Settings
+                                </x-keys::menu.item>
+                            </x-keys::menu.submenu>
+
+                            <x-keys::menu.separator />
+
+                            <x-keys::menu.item href="#" icon="heroicon-o-cog-6-tooth">
+                                Settings
+                            </x-keys::menu.item>
+                        </x-keys::menu>
+                    </x-keys::dropdown>
+                </div>
+
+                {{-- Actions Menu with Keyboard Shortcuts --}}
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-foreground">Actions Menu</h3>
+                    <x-keys::dropdown id="actions-menu" align="end">
+                        <x-slot:trigger>
+                            <x-keys::button variant="ghost" icon="heroicon-o-ellipsis-vertical" />
+                        </x-slot:trigger>
+
+                        <x-keys::menu>
+                            <x-keys::menu.item href="#" icon="heroicon-o-pencil" kbd="⌘E">
+                                Edit
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-document-duplicate" kbd="⌘D">
+                                Duplicate
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-share" kbd="⌘⇧S">
+                                Share
+                            </x-keys::menu.item>
+
+                            <x-keys::menu.separator />
+
+                            <x-keys::menu.item href="#" icon="heroicon-o-arrow-down-tray">
+                                Download
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-archive-box">
+                                Archive
+                            </x-keys::menu.item>
+
+                            <x-keys::menu.separator />
+
+                            <x-keys::menu.item href="#" icon="heroicon-o-trash" variant="danger" kbd="⌘⌫">
+                                Delete
+                            </x-keys::menu.item>
+                        </x-keys::menu>
+                    </x-keys::dropdown>
+                </div>
+
+                {{-- Different Sizes --}}
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-foreground">Small Menu</h3>
+                    <x-keys::dropdown id="small-menu" size="sm">
+                        <x-slot:trigger>
+                            <x-keys::button variant="outline" size="sm">
+                                Small
+                            </x-keys::button>
+                        </x-slot:trigger>
+
+                        <x-keys::menu>
+                            <x-keys::menu.item href="#" icon="heroicon-o-home">
+                                Home
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-cog-6-tooth">
+                                Settings
+                            </x-keys::menu.item>
+                        </x-keys::menu>
+                    </x-keys::dropdown>
+                </div>
+
+                {{-- Large Size --}}
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-foreground">Large Menu</h3>
+                    <x-keys::dropdown id="large-menu" size="lg">
+                        <x-slot:trigger>
+                            <x-keys::button variant="brand" size="lg">
+                                Large
+                            </x-keys::button>
+                        </x-slot:trigger>
+
+                        <x-keys::menu>
+                            <x-keys::menu.item href="#" icon="heroicon-o-rocket-launch">
+                                Get Started
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-book-open">
+                                Learn More
+                            </x-keys::menu.item>
+                            <x-keys::menu.item href="#" icon="heroicon-o-phone">
+                                Contact Us
+                            </x-keys::menu.item>
+                        </x-keys::menu>
+                    </x-keys::dropdown>
+                </div>
+            </div>
+
+            <div class="mt-8 p-4 bg-success/10 border border-success rounded-lg">
+                <p class="text-sm text-foreground font-medium">✅ All positioning powered by CSS Anchor Positioning!</p>
+                <p class="text-xs text-muted mt-1">Floating UI (@floating-ui/dom) has been completely removed. Everything uses native CSS anchor positioning with the @oddbird/css-anchor-positioning polyfill for browser compatibility.</p>
+            </div>
+        </section>
+
+        {{-- Social Share & Links Components --}}
+        <section class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-foreground mb-4">Social Share & Links</h2>
+                <p class="text-lg text-muted max-w-3xl">
+                    Pre-built social media components with 13 custom icons. Share content or link to profiles with consistent styling and layouts.
+                </p>
+            </div>
+
+            <div class="space-y-12">
+                {{-- Social Share Demos --}}
+                <div>
+                    <h3 class="text-xl font-semibold text-foreground mb-6">Social Share Component</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {{-- Basic Share --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">Basic Share (Icon Only)</h4>
+                            <x-keys::social.share
+                                :platforms="['facebook', 'twitter', 'linkedin', 'whatsapp']"
+                                variant="outline"
+                                size="md"
+                            />
+                        </div>
+
+                        {{-- With Labels --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">With Labels</h4>
+                            <x-keys::social.share
+                                :platforms="['facebook', 'twitter', 'linkedin']"
+                                variant="brand"
+                                size="sm"
+                                :show-labels="true"
+                            />
+                        </div>
+
+                        {{-- Attached Buttons --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">Attached Style</h4>
+                            <x-keys::social.share
+                                :platforms="['facebook', 'twitter', 'linkedin', 'reddit']"
+                                variant="outline"
+                                size="sm"
+                                :attached="true"
+                            />
+                        </div>
+
+                        {{-- Ghost Variant --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">Ghost Variant</h4>
+                            <x-keys::social.share
+                                :platforms="['facebook', 'twitter', 'pinterest', 'whatsapp']"
+                                variant="ghost"
+                                size="lg"
+                            />
+                        </div>
+
+                        {{-- All Platforms --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">All Platforms</h4>
+                            <x-keys::social.share
+                                :platforms="['facebook', 'twitter', 'linkedin', 'whatsapp', 'pinterest', 'reddit', 'telegram']"
+                                variant="outline"
+                                size="xs"
+                            />
+                        </div>
+
+                        {{-- Vertical Layout --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">Vertical Layout</h4>
+                            <x-keys::social.share
+                                :platforms="['facebook', 'twitter', 'linkedin']"
+                                layout="vertical"
+                                variant="outline"
+                                size="sm"
                             />
                         </div>
                     </div>
-                </section>
+                </div>
 
-                <!-- Calendar Component Testing Section -->
-                <section class="mb-20">
-                    <div class="text-center mb-12">
-                        <h2 class="text-3xl font-bold text-foreground mb-4">Calendar Component Testing</h2>
-                        <p class="text-lg text-muted-foreground">
-                            Testing standalone Calendar component with various quick selector configurations
-                        </p>
-                    </div>
+                {{-- Social Links Demos --}}
+                <div>
+                    <h3 class="text-xl font-semibold text-foreground mb-6">Social Links Component</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {{-- Profile Links --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">Profile Links</h4>
+                            <x-keys::social.links
+                                :links="[
+                                    'facebook' => 'https://facebook.com',
+                                    'instagram' => 'https://instagram.com',
+                                    'twitter' => 'https://twitter.com',
+                                    'youtube' => 'https://youtube.com',
+                                ]"
+                                variant="ghost"
+                                size="md"
+                            />
+                        </div>
 
-                    <div class="max-w-4xl mx-auto space-y-8">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <!-- Basic Calendar with Quick Selectors -->
-                            <div class="space-y-6">
-                                <h3 class="text-xl font-semibold mb-4">Calendar with Quick Selectors</h3>
+                        {{-- Developer Links --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">Developer Links</h4>
+                            <x-keys::social.links
+                                :links="[
+                                    'github' => 'https://github.com',
+                                    'figma' => 'https://figma.com',
+                                ]"
+                                variant="outline"
+                                size="lg"
+                                :show-labels="true"
+                            />
+                        </div>
 
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Calendar with Default Quick Selectors</label>
-                                        <x-keys::calendar
-                                            name="calendar_basic"
-                                            :quickSelectors="[
-                                                ['label' => 'Today', 'value' => 'today'],
-                                                ['label' => 'Yesterday', 'value' => 'yesterday'],
-                                                ['label' => 'Last 7 Days', 'value' => 'last7days', 'range' => true],
-                                                ['label' => 'Last 30 Days', 'value' => 'last30days', 'range' => true],
-                                            ]"
-                                        />
-                                    </div>
+                        {{-- Business Links --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">Business Links</h4>
+                            <x-keys::social.links
+                                :links="[
+                                    'linkedin' => 'https://linkedin.com',
+                                    'whatsapp' => 'https://wa.me',
+                                    'telegram' => 'https://t.me',
+                                ]"
+                                variant="brand"
+                                size="md"
+                                :attached="true"
+                            />
+                        </div>
 
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Calendar with Range Quick Selectors</label>
-                                        <x-keys::calendar
-                                            name="calendar_range"
-                                            :isRange="true"
-                                            :quickSelectors="[
-                                                ['label' => 'Last 7 Days', 'value' => 'last7days', 'range' => true],
-                                                ['label' => 'Last 30 Days', 'value' => 'last30days', 'range' => true],
-                                                ['label' => 'This Month', 'value' => 'thismonth', 'range' => true],
-                                                ['label' => 'Last Month', 'value' => 'lastmonth', 'range' => true],
-                                            ]"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                        {{-- Full Social Suite --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">Complete Suite</h4>
+                            <x-keys::social.links
+                                :links="[
+                                    'facebook' => '#',
+                                    'instagram' => '#',
+                                    'twitter' => '#',
+                                    'linkedin' => '#',
+                                    'youtube' => '#',
+                                    'tiktok' => '#',
+                                    'github' => '#',
+                                ]"
+                                variant="outline"
+                                size="sm"
+                            />
+                        </div>
 
-                            <!-- Calendar without Quick Selectors (Control) -->
-                            <div class="space-y-6">
-                                <h3 class="text-xl font-semibold mb-4">Control Tests</h3>
+                        {{-- Vertical with Labels --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">Vertical with Labels</h4>
+                            <x-keys::social.links
+                                :links="[
+                                    'github' => 'https://github.com',
+                                    'figma' => 'https://figma.com',
+                                    'google' => 'https://google.com',
+                                ]"
+                                layout="vertical"
+                                variant="outline"
+                                size="sm"
+                                :show-labels="true"
+                            />
+                        </div>
 
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Calendar without Quick Selectors</label>
-                                        <x-keys::calendar
-                                            name="calendar_no_selectors"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Calendar with Empty Quick Selectors</label>
-                                        <x-keys::calendar
-                                            name="calendar_empty_selectors"
-                                            :quickSelectors="[]"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium mb-2">Calendar with Boolean True</label>
-                                        <x-keys::calendar
-                                            name="calendar_bool_selectors"
-                                            :quickSelectors="true"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                        {{-- Minimalist Footer Style --}}
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-medium text-foreground">Footer Style</h4>
+                            <x-keys::social.links
+                                :links="[
+                                    'facebook' => '#',
+                                    'instagram' => '#',
+                                    'twitter' => '#',
+                                    'youtube' => '#',
+                                ]"
+                                variant="ghost"
+                                size="sm"
+                                class="justify-center"
+                            />
                         </div>
                     </div>
-                </section>
+                </div>
 
-
-
-                <!-- Badge Components -->
-                <section class="mb-20">
-                    <div class="text-center mb-12">
-                        <h2 class="text-3xl font-bold text-foreground mb-4">Badge Components</h2>
-                        <p class="text-lg text-muted-foreground">
-                            Flexible status indicators with auto icon-only detection and comprehensive variants
-                        </p>
-                    </div>
-
-                    <div class="max-w-6xl mx-auto space-y-12">
-                        <!-- Basic Badges -->
-                        <div class="space-y-8">
-                            <h3 class="text-xl font-semibold mb-6">Basic Badge Variants</h3>
-
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                <!-- Simple Badges -->
-                                <div class="space-y-6">
-                                    <h4 class="text-lg font-medium mb-4">Simple Badges</h4>
-                                    <div class="flex flex-wrap gap-3">
-                                        <x-keys::badge color="brand">Brand</x-keys::badge>
-                                        <x-keys::badge color="success">Success</x-keys::badge>
-                                        <x-keys::badge color="warning">Warning</x-keys::badge>
-                                        <x-keys::badge color="danger">Danger</x-keys::badge>
-                                        <x-keys::badge color="neutral">Neutral</x-keys::badge>
-                                    </div>
-
-                                    <div class="flex flex-wrap gap-3">
-                                        <x-keys::badge color="blue">Blue</x-keys::badge>
-                                        <x-keys::badge color="green">Green</x-keys::badge>
-                                        <x-keys::badge color="purple">Purple</x-keys::badge>
-                                        <x-keys::badge color="pink">Pink</x-keys::badge>
-                                        <x-keys::badge color="indigo">Indigo</x-keys::badge>
-                                    </div>
-                                </div>
-
-                                <!-- Chip Badges -->
-                                <div class="space-y-6">
-                                    <h4 class="text-lg font-medium mb-4">Chip Badges</h4>
-                                    <div class="flex flex-wrap gap-3">
-                                        <x-keys::badge variant="chip" color="brand">React</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="success">Vue.js</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="blue">TypeScript</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="purple">Laravel</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="yellow">Tailwind</x-keys::badge>
-                                    </div>
-
-                                    <div class="flex flex-wrap gap-3">
-                                        <x-keys::badge variant="chip" color="green" dismissible>PHP 8.3</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="blue" dismissible>JavaScript</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="red" dismissible>CSS3</x-keys::badge>
-                                        <x-keys::badge variant="chip" color="yellow" dismissible>HTML5</x-keys::badge>
-                                    </div>
-                                </div>
-                            </div>
+                {{-- Available Icons --}}
+                <div class="p-6 bg-surface border border-border rounded-lg">
+                    <h3 class="text-lg font-semibold text-foreground mb-4">13 Custom Social Media Icons</h3>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.facebook" size="md" />
+                            <span class="text-sm text-muted">Facebook</span>
                         </div>
-
-                        <!-- Badge with Icons -->
-                        <div class="space-y-8">
-                            <h3 class="text-xl font-semibold mb-6">Badges with Icons</h3>
-
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                <!-- Icons with Text -->
-                                <div class="space-y-6">
-                                    <h4 class="text-lg font-medium mb-4">Icons with Text</h4>
-                                    <div class="flex flex-wrap gap-3">
-                                        <x-keys::badge color="success" icon="heroicon-o-check-circle">Verified</x-keys::badge>
-                                        <x-keys::badge color="brand" icon="heroicon-o-star">Featured</x-keys::badge>
-                                        <x-keys::badge color="warning" icon="heroicon-o-exclamation-triangle">Warning</x-keys::badge>
-                                        <x-keys::badge color="danger" icon="heroicon-o-x-circle">Error</x-keys::badge>
-                                        <x-keys::badge color="blue" icon="heroicon-o-information-circle">Info</x-keys::badge>
-                                    </div>
-
-                                    <div class="flex flex-wrap gap-3">
-                                        <x-keys::badge color="purple" icon="heroicon-o-cpu-chip">Performance</x-keys::badge>
-                                        <x-keys::badge color="green" icon="heroicon-o-shield-check">Secure</x-keys::badge>
-                                        <x-keys::badge color="indigo" icon="heroicon-o-sparkles">Premium</x-keys::badge>
-                                        <x-keys::badge color="pink" icon="heroicon-o-heart">Favorite</x-keys::badge>
-                                    </div>
-                                </div>
-
-                                <!-- Auto Icon-Only (No text = icon-only) -->
-                                <div class="space-y-6">
-                                    <h4 class="text-lg font-medium mb-4">Auto Icon-Only Detection</h4>
-                                    <div class="flex flex-wrap gap-3">
-                                        <x-keys::badge color="success" icon="heroicon-o-check" />
-                                        <x-keys::badge color="danger" icon="heroicon-o-x-mark" />
-                                        <x-keys::badge color="warning" icon="heroicon-o-exclamation-triangle" />
-                                        <x-keys::badge color="blue" icon="heroicon-o-information-circle" />
-                                        <x-keys::badge color="brand" icon="heroicon-o-star" />
-                                    </div>
-
-                                    <div class="flex flex-wrap gap-3">
-                                        <x-keys::badge color="purple" icon="heroicon-o-heart" />
-                                        <x-keys::badge color="green" icon="heroicon-o-bolt" />
-                                        <x-keys::badge color="indigo" icon="heroicon-o-fire" />
-                                        <x-keys::badge color="pink" icon="heroicon-o-sparkles" />
-                                        <x-keys::badge color="yellow" icon="heroicon-o-sun" />
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.instagram" size="md" />
+                            <span class="text-sm text-muted">Instagram</span>
                         </div>
-
-                        <!-- Size Variants -->
-                        <div class="space-y-8">
-                            <h3 class="text-xl font-semibold mb-6">Size Variants</h3>
-
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                <!-- Extra Small -->
-                                <div class="space-y-4">
-                                    <h4 class="text-lg font-medium mb-4">Extra Small (xs)</h4>
-                                    <div class="flex flex-wrap gap-2">
-                                        <x-keys::badge size="xs" color="brand">Brand</x-keys::badge>
-                                        <x-keys::badge size="xs" color="success" icon="heroicon-o-check">Success</x-keys::badge>
-                                        <x-keys::badge size="xs" color="blue" icon="heroicon-o-star" />
-                                        <x-keys::badge size="xs" variant="chip" color="purple" dismissible>Chip</x-keys::badge>
-                                    </div>
-                                </div>
-
-                                <!-- Small (Default) -->
-                                <div class="space-y-4">
-                                    <h4 class="text-lg font-medium mb-4">Small - Default (sm)</h4>
-                                    <div class="flex flex-wrap gap-2">
-                                        <x-keys::badge size="sm" color="brand">Brand</x-keys::badge>
-                                        <x-keys::badge size="sm" color="success" icon="heroicon-o-check">Success</x-keys::badge>
-                                        <x-keys::badge size="sm" color="blue" icon="heroicon-o-star" />
-                                        <x-keys::badge size="sm" variant="chip" color="purple" dismissible>Chip</x-keys::badge>
-                                    </div>
-                                </div>
-
-                                <!-- Medium -->
-                                <div class="space-y-4">
-                                    <h4 class="text-lg font-medium mb-4">Medium (md)</h4>
-                                    <div class="flex flex-wrap gap-2">
-                                        <x-keys::badge size="md" color="brand">Brand</x-keys::badge>
-                                        <x-keys::badge size="md" color="success" icon="heroicon-o-check">Success</x-keys::badge>
-                                        <x-keys::badge size="md" color="blue" icon="heroicon-o-star" />
-                                        <x-keys::badge size="md" variant="chip" color="purple" dismissible>Chip</x-keys::badge>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.x" size="md" />
+                            <span class="text-sm text-muted">X/Twitter</span>
                         </div>
-
-                        <!-- Subtle Variant -->
-                        <div class="space-y-8">
-                            <h3 class="text-xl font-semibold mb-6">Subtle Variant with Status Dots</h3>
-
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                <!-- Subtle with Text -->
-                                <div class="space-y-6">
-                                    <h4 class="text-lg font-medium mb-4">Status Indicators</h4>
-                                    <div class="space-y-3">
-                                        <div><x-keys::badge variant="subtle" color="success">Online</x-keys::badge></div>
-                                        <div><x-keys::badge variant="subtle" color="warning">Away</x-keys::badge></div>
-                                        <div><x-keys::badge variant="subtle" color="danger">Offline</x-keys::badge></div>
-                                        <div><x-keys::badge variant="subtle" color="blue">Busy</x-keys::badge></div>
-                                        <div><x-keys::badge variant="subtle" color="neutral">Idle</x-keys::badge></div>
-                                    </div>
-                                </div>
-
-                                <!-- Subtle with Icons -->
-                                <div class="space-y-6">
-                                    <h4 class="text-lg font-medium mb-4">With Icons</h4>
-                                    <div class="space-y-3">
-                                        <div><x-keys::badge variant="subtle" color="success" icon="heroicon-o-check-circle">Completed</x-keys::badge></div>
-                                        <div><x-keys::badge variant="subtle" color="warning" icon="heroicon-o-clock">Pending</x-keys::badge></div>
-                                        <div><x-keys::badge variant="subtle" color="danger" icon="heroicon-o-x-circle">Failed</x-keys::badge></div>
-                                        <div><x-keys::badge variant="subtle" color="blue" icon="heroicon-o-play">In Progress</x-keys::badge></div>
-                                        <div><x-keys::badge variant="subtle" color="purple" icon="heroicon-o-pause">Paused</x-keys::badge></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.linkedin" size="md" />
+                            <span class="text-sm text-muted">LinkedIn</span>
                         </div>
-
-                        <!-- Real-World Examples -->
-                        <div class="space-y-8">
-                            <h3 class="text-xl font-semibold mb-6">Real-World Use Cases</h3>
-
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                <!-- User Profile -->
-                                <div class="p-6 border border-border rounded-lg">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <h4 class="text-lg font-medium">User Profile</h4>
-                                        <x-keys::badge variant="subtle" color="success">Online</x-keys::badge>
-                                    </div>
-                                    <div class="space-y-3">
-                                        <div class="flex items-center justify-between">
-                                            <span>John Doe</span>
-                                            <x-keys::badge color="brand" icon="heroicon-o-shield-check">Verified</x-keys::badge>
-                                        </div>
-                                        <div class="flex flex-wrap gap-2">
-                                            <x-keys::badge variant="chip" color="blue" dismissible>Admin</x-keys::badge>
-                                            <x-keys::badge variant="chip" color="green" dismissible>Premium</x-keys::badge>
-                                            <x-keys::badge variant="chip" color="purple" dismissible>Pro User</x-keys::badge>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- E-commerce Product -->
-                                <div class="p-6 border border-border rounded-lg">
-                                    <div class="flex items-center justify-between mb-4">
-                                        <h4 class="text-lg font-medium">MacBook Pro 14"</h4>
-                                        <x-keys::badge color="success" icon="heroicon-o-check">In Stock</x-keys::badge>
-                                    </div>
-                                    <div class="space-y-3">
-                                        <div class="flex flex-wrap gap-2">
-                                            <x-keys::badge color="yellow" icon="heroicon-o-star">Bestseller</x-keys::badge>
-                                            <x-keys::badge color="danger">Sale</x-keys::badge>
-                                            <x-keys::badge color="blue">Free Shipping</x-keys::badge>
-                                        </div>
-                                        <div class="flex flex-wrap gap-2">
-                                            <x-keys::badge variant="chip" color="neutral" dismissible>M3 Pro</x-keys::badge>
-                                            <x-keys::badge variant="chip" color="neutral" dismissible>16GB RAM</x-keys::badge>
-                                            <x-keys::badge variant="chip" color="neutral" dismissible>1TB SSD</x-keys::badge>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Project Status -->
-                                <div class="p-6 border border-border rounded-lg">
-                                    <h4 class="text-lg font-medium mb-4">Project Dashboard</h4>
-                                    <div class="space-y-4">
-                                        <div class="flex items-center justify-between">
-                                            <span>Frontend Development</span>
-                                            <x-keys::badge variant="subtle" color="blue" icon="heroicon-o-play">In Progress</x-keys::badge>
-                                        </div>
-                                        <div class="flex items-center justify-between">
-                                            <span>Backend API</span>
-                                            <x-keys::badge variant="subtle" color="success" icon="heroicon-o-check-circle">Completed</x-keys::badge>
-                                        </div>
-                                        <div class="flex items-center justify-between">
-                                            <span>Testing</span>
-                                            <x-keys::badge variant="subtle" color="warning" icon="heroicon-o-clock">Pending</x-keys::badge>
-                                        </div>
-                                        <div class="flex items-center justify-between">
-                                            <span>Deployment</span>
-                                            <x-keys::badge variant="subtle" color="neutral">Not Started</x-keys::badge>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Content Management -->
-                                <div class="p-6 border border-border rounded-lg">
-                                    <h4 class="text-lg font-medium mb-4">Blog Post</h4>
-                                    <div class="space-y-4">
-                                        <div class="flex items-center justify-between">
-                                            <span>Status</span>
-                                            <x-keys::badge color="success" icon="heroicon-o-check-circle">Published</x-keys::badge>
-                                        </div>
-                                        <div class="space-y-2">
-                                            <div class="text-sm text-muted-foreground">Categories</div>
-                                            <div class="flex flex-wrap gap-2">
-                                                <x-keys::badge variant="chip" color="blue" dismissible>Web Development</x-keys::badge>
-                                                <x-keys::badge variant="chip" color="purple" dismissible>Laravel</x-keys::badge>
-                                                <x-keys::badge variant="chip" color="green" dismissible>Tutorial</x-keys::badge>
-                                            </div>
-                                        </div>
-                                        <div class="flex flex-wrap gap-2">
-                                            <x-keys::badge color="yellow" icon="heroicon-o-star">Featured</x-keys::badge>
-                                            <x-keys::badge color="pink" icon="heroicon-o-heart">Popular</x-keys::badge>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.youtube" size="md" />
+                            <span class="text-sm text-muted">YouTube</span>
                         </div>
-                    </div>
-                </section>
-
-                <!-- Footer -->
-                <div class="text-center pt-12 border-t border-border">
-                    <div class="flex flex-wrap justify-center items-center gap-4 mb-6">
-                        <x-keys::badge color="brand" icon="heroicon-o-code-bracket">Modern Architecture</x-keys::badge>
-                        <x-keys::badge color="success" icon="heroicon-o-check-circle">Laravel 12 Ready</x-keys::badge>
-                        <x-keys::badge color="info" icon="heroicon-o-sparkles">Tailwind v4</x-keys::badge>
-                        <x-keys::badge color="purple" icon="heroicon-o-cpu-chip">High Performance</x-keys::badge>
-                        <x-keys::badge color="warning" icon="heroicon-o-shield-check">Accessible</x-keys::badge>
-                    </div>
-
-                    <p class="text-muted-foreground mb-4">
-                        Keys UI follows modern component development principles with direct Tailwind utilities,
-                        semantic design tokens, and progressive enhancement.
-                    </p>
-
-                    <div class="flex justify-center gap-4">
-                        <x-keys::button variant="brand" icon="heroicon-o-document-text">
-                            Documentation
-                        </x-keys::button>
-                        <x-keys::button variant="outline" icon="heroicon-o-code-bracket">
-                            View Source
-                        </x-keys::button>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.tiktok" size="md" />
+                            <span class="text-sm text-muted">TikTok</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.whatsapp" size="md" />
+                            <span class="text-sm text-muted">WhatsApp</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.pinterest" size="md" />
+                            <span class="text-sm text-muted">Pinterest</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.reddit" size="md" />
+                            <span class="text-sm text-muted">Reddit</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.telegram" size="md" />
+                            <span class="text-sm text-muted">Telegram</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.github" size="md" />
+                            <span class="text-sm text-muted">GitHub</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.figma" size="md" />
+                            <span class="text-sm text-muted">Figma</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <x-keys::icon name="icons.google" size="md" />
+                            <span class="text-sm text-muted">Google</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </body>
-</html>
+        </section>
+    </div>
+</x-layouts.sidebar>

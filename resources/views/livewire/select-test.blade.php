@@ -5,7 +5,7 @@
             Comprehensive testing of the Select component with Livewire integration across various scenarios.
         </p>
 
-        <!-- Validation Toggle & Status -->
+        
         <div class="flex items-center gap-4 p-4 bg-surface border border-border rounded-lg">
             <label class="flex items-center">
                 <input type="checkbox" wire:model.live="validationEnabled" class="mr-2">
@@ -26,7 +26,7 @@
 
     <form wire:submit="submitForm" class="space-y-12">
 
-        <!-- Single Select Components -->
+        
         <section class="space-y-6">
             <div>
                 <h2 class="text-2xl font-bold mb-4">Single Select Components</h2>
@@ -34,7 +34,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Basic Select -->
+                
                 <div>
                     <h3 class="text-lg font-semibold mb-3">Basic Select (wire:model)</h3>
                     <x-keys::select
@@ -53,7 +53,7 @@
                     <p class="text-xs text-muted mt-2">Current value: "{{ $basicSelect }}"</p>
                 </div>
 
-                <!-- Searchable Select -->
+                
                 <div>
                     <h3 class="text-lg font-semibold mb-3">Searchable Select</h3>
                     <x-keys::select
@@ -71,7 +71,7 @@
                     <p class="text-xs text-muted mt-2">Current value: "{{ $searchableSelect }}"</p>
                 </div>
 
-                <!-- Country Select with Icons -->
+                
                 <div>
                     <h3 class="text-lg font-semibold mb-3">Country Select (wire:model.live)</h3>
                     <x-keys::select
@@ -93,7 +93,7 @@
                     <p class="text-xs text-muted mt-2">Current value: "{{ $countrySelect }}" (real-time updates)</p>
                 </div>
 
-                <!-- Status Select -->
+                
                 <div>
                     <h3 class="text-lg font-semibold mb-3">Status Select</h3>
                     <x-keys::select
@@ -112,7 +112,7 @@
             </div>
         </section>
 
-        <!-- Multiple Select Components -->
+        
         <section class="space-y-6">
             <div>
                 <h2 class="text-2xl font-bold mb-4">Multiple Select Components</h2>
@@ -120,7 +120,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Skills Multiple Select -->
+                
                 <div>
                     <h3 class="text-lg font-semibold mb-3">Skills (Multiple, Required)</h3>
                     <x-keys::select
@@ -149,7 +149,7 @@
                         @endif
                     </p>
 
-                    <!-- Control buttons for testing -->
+                    
                     <div class="flex gap-2 mt-3">
                         <x-keys::button
                             size="sm"
@@ -171,7 +171,7 @@
                     </div>
                 </div>
 
-                <!-- Countries Multiple Select -->
+                
                 <div>
                     <h3 class="text-lg font-semibold mb-3">Multiple Countries</h3>
                     <x-keys::select
@@ -199,7 +199,7 @@
                     </p>
                 </div>
 
-                <!-- Tags Multiple Select -->
+                
                 <div>
                     <h3 class="text-lg font-semibold mb-3">Tags (wire:model.live)</h3>
                     <x-keys::select
@@ -227,7 +227,7 @@
                     </p>
                 </div>
 
-                <!-- Priorities Multiple Select -->
+                
                 <div>
                     <h3 class="text-lg font-semibold mb-3">Priorities</h3>
                     <x-keys::select
@@ -252,7 +252,7 @@
             </div>
         </section>
 
-        <!-- Dynamic Content Testing -->
+        
         <section class="space-y-6">
             <div>
                 <h2 class="text-2xl font-bold mb-4">Dynamic Content & Real-time Updates</h2>
@@ -299,7 +299,7 @@
             </div>
         </section>
 
-        <!-- Real-time Testing -->
+        
         <section class="space-y-6">
             <div>
                 <h2 class="text-2xl font-bold mb-4">Real-time Update Testing</h2>
@@ -334,7 +334,7 @@
             </div>
         </section>
 
-        <!-- Form Actions -->
+        
         <section class="space-y-6">
             <div class="flex flex-wrap gap-4">
                 <x-keys::button type="submit" size="lg">
@@ -363,7 +363,7 @@
 
     </form>
 
-    <!-- Submission Results -->
+    
     @if($formSubmitted && $lastSubmissionData)
         <section class="mt-12 p-6 bg-surface border border-border rounded-lg">
             <h2 class="text-xl font-bold mb-4">Last Form Submission Data</h2>
@@ -377,7 +377,7 @@
         </section>
     @endif
 
-    <!-- Debug Information -->
+    
     @if(app()->environment('local'))
         <section class="mt-12 p-6 bg-surface border border-border rounded-lg">
             <h2 class="text-xl font-bold mb-4">Debug Information</h2>

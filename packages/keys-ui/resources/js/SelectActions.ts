@@ -21,6 +21,7 @@ interface SelectOption {
     displayLabel: string;
     searchableText: string;
     disabled: boolean;
+    htmlContent: string;
 }
 
 interface SelectState {
@@ -28,6 +29,7 @@ interface SelectState {
     searchTerm: string;
     filteredOptions: SelectOption[];
 }
+
 
 /**
  * LivewireIntegration - Handles Livewire-specific functionality for Select components
@@ -107,8 +109,7 @@ export class SelectActions extends BaseActionClass<SelectState> {
 
     private readInitialValues(selectElement: HTMLElement, isMultiple: boolean): string[] {
         if (LivewireIntegration.isLivewireEnabled(selectElement)) {
-            // For Livewire, read from wire:model
-            return []; // Initial values will be synced from Livewire
+            return [];
         }
 
         if (isMultiple) {
@@ -129,7 +130,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
     }
 
     protected bindEventListeners(): void {
-        // Handle chip removal
         EventUtils.handleDelegatedEvent('click', '[data-chip-remove]', (element, event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -140,7 +140,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
             }
         });
 
-        // Handle clear button
         EventUtils.handleDelegatedEvent('click', '[data-select-clear]', (element, event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -150,7 +149,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
             }
         });
 
-        // Handle option selection
         EventUtils.handleDelegatedEvent('click', '[data-select-option]', (element, event) => {
             event.preventDefault();
             const select = DOMUtils.findClosest(element, '[data-select="true"]');
@@ -159,7 +157,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
             }
         });
 
-        // Handle search input
         EventUtils.handleDelegatedEvent('input', 'input[data-select-search]', (searchInput, event) => {
             const select = DOMUtils.findClosest(searchInput, '[data-select="true"]');
             if (select && select.dataset.searchable === 'true') {
@@ -167,29 +164,45 @@ export class SelectActions extends BaseActionClass<SelectState> {
             }
         });
 
-        // Handle popover events for cleanup
         EventUtils.addEventListener(document, 'toggle', (event) => {
             const popover = event.target as HTMLElement;
             if (popover.dataset.keysPopover === 'true' && popover.id.startsWith('select-dropdown-')) {
                 const popoverEvent = event as any;
-                if (popoverEvent.newState === 'closed') {
-                    this.handlePopoverClosed(popover);
+                const selectId = popover.id.replace('select-dropdown-', '');
+                const select = DOMUtils.querySelector(`[data-select="true"] button[id="${selectId}"]`)?.closest('[data-select="true"]') as HTMLElement;
+
+                if (popoverEvent.newState === 'open') {
+                    this.handlePopoverOpened(popover, select);
+                } else if (popoverEvent.newState === 'closed') {
+                    this.handlePopoverClosed(popover, select);
                 }
             }
         });
     }
 
-    private handlePopoverClosed(popover: HTMLElement): void {
-        const selectId = popover.id.replace('select-dropdown-', '');
-        const select = DOMUtils.querySelector(`[data-select="true"] button[id="${selectId}"]`)?.closest('[data-select="true"]') as HTMLElement;
+    private handlePopoverOpened(popover: HTMLElement, select: HTMLElement | null): void {
+        if (!select) return;
 
+        if (select.dataset.searchable === 'true') {
+            const searchInput = DOMUtils.querySelector('input[data-select-search]', popover) as HTMLInputElement;
+            if (searchInput) {
+                setTimeout(() => {
+                    searchInput.focus();
+                }, 0);
+            }
+        }
+
+    }
+
+    private handlePopoverClosed(popover: HTMLElement, select: HTMLElement | null): void {
         if (select) {
-            const searchInput = DOMUtils.querySelector('[data-select-search]', popover) as HTMLInputElement;
+            const searchInput = DOMUtils.querySelector('input[data-select-search]', popover) as HTMLInputElement;
             if (searchInput) {
                 searchInput.value = '';
                 this.handleSearch(select, '');
             }
         }
+
     }
 
     private selectOption(select: HTMLElement, option: HTMLElement): void {
@@ -211,7 +224,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
             }
         } else {
             state.selectedValues = [optionValue];
-            // Close popover for single select
             const popover = DOMUtils.querySelector(`#select-dropdown-${select.querySelector('button')?.id}`) as HTMLElement;
             if (popover && popover.hidePopover) {
                 popover.hidePopover();
@@ -372,7 +384,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
         if (state.selectedValues.length === 0) {
             existingChips.forEach(chip => chip.remove());
 
-            // Show placeholder, hide spacer
             if (placeholder) {
                 (placeholder as HTMLElement).style.display = 'inline';
             }
@@ -380,7 +391,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
                 (spacer as HTMLElement).style.display = 'none';
             }
         } else {
-            // Hide placeholder, show spacer (invisible but maintains height)
             if (placeholder) {
                 (placeholder as HTMLElement).style.display = 'none';
             }
@@ -392,7 +402,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
                 (chip as HTMLElement).dataset.chipValue
             ).filter(value => value);
 
-            // Remove chips that are no longer selected
             existingChips.forEach(chip => {
                 const chipValue = (chip as HTMLElement).dataset.chipValue;
                 if (chipValue && !state.selectedValues.includes(chipValue)) {
@@ -400,7 +409,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
                 }
             });
 
-            // Add new chips for newly selected values
             state.selectedValues.forEach(value => {
                 if (!currentChipValues.includes(value)) {
                     this.createChipElement(select, chipsContainer, value);
@@ -410,22 +418,22 @@ export class SelectActions extends BaseActionClass<SelectState> {
     }
 
     private createChipElement(select: HTMLElement, container: HTMLElement, value: string): void {
-        // Always use the proven JavaScript-only approach
         this.createChipElementFallback(select, container, value);
     }
 
     private createChipElementFallback(select: HTMLElement, container: HTMLElement, value: string): void {
         const option = this.findOptionByValue(select, value);
         const displayLabel = option ? option.displayLabel : value;
+        const richContent = option ? option.htmlContent : displayLabel;
 
         const chip = document.createElement('span');
-        chip.className = 'inline-flex items-center font-medium px-2 py-0.5 text-xs rounded-sm bg-brand text-brand-foreground';
+        chip.className = 'inline-flex items-center font-medium px-2 py-0.5 text-xs rounded-md bg-surface text-foreground border border-border gap-1.5';
         chip.setAttribute('data-select-chip', 'true');
         chip.setAttribute('data-chip-value', value);
 
         chip.innerHTML = `
-            <span class="chip-label">${displayLabel}</span>
-            <button type="button" class="ml-1.5 w-4 h-4 flex items-center justify-center rounded-sm hover:bg-white/20 transition-colors focus:outline-none focus:ring-1 focus:ring-white/30" data-chip-remove data-chip-value="${value}">
+            <span class="chip-content inline-flex items-center gap-1.5">${richContent}</span>
+            <button type="button" class="w-4 h-4 flex items-center justify-center rounded-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors focus:outline-none focus:ring-1 focus:ring-border" data-chip-remove data-chip-value="${value}">
                 <span class="text-xs leading-none" aria-hidden="true">×</span>
                 <span class="sr-only">Remove ${displayLabel}</span>
             </button>
@@ -447,8 +455,8 @@ export class SelectActions extends BaseActionClass<SelectState> {
         } else {
             const selectedValue = state.selectedValues[0];
             const option = this.findOptionByValue(select, selectedValue);
-            const label = option ? option.displayLabel : selectedValue;
-            valueDisplay.textContent = label;
+            const richContent = option ? option.htmlContent : selectedValue;
+            valueDisplay.innerHTML = richContent;
         }
     }
 
@@ -511,7 +519,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
             const value = option.dataset.value || '';
             const isSelected = state.selectedValues.includes(value);
 
-            // Only update ARIA attributes - visual styling is handled by Blade component
             option.setAttribute('aria-selected', isSelected ? 'true' : 'false');
         });
     }
@@ -531,13 +538,21 @@ export class SelectActions extends BaseActionClass<SelectState> {
             const optionEl = element as HTMLElement;
             const displayLabel = optionEl.dataset.displayLabel || optionEl.textContent?.trim() || '';
 
+            const contentClone = optionEl.cloneNode(true) as HTMLElement;
+            const checkmark = contentClone.querySelector('.flex-shrink-0.ml-2');
+            if (checkmark) {
+                checkmark.remove();
+            }
+            const htmlContent = contentClone.innerHTML.trim();
+
             return {
                 element: optionEl,
                 value: optionEl.dataset.value || '',
                 label: optionEl.textContent?.trim() || '',
                 displayLabel: displayLabel,
                 searchableText: optionEl.dataset.searchableText || displayLabel.toLowerCase(),
-                disabled: optionEl.getAttribute('aria-disabled') === 'true'
+                disabled: optionEl.getAttribute('aria-disabled') === 'true',
+                htmlContent: htmlContent
             };
         });
     }
@@ -557,7 +572,6 @@ export class SelectActions extends BaseActionClass<SelectState> {
         LivewireIntegration.updateLivewireProperty(select, formattedValue);
     }
 
-    // Public API methods
     public setSelectedValues(select: HTMLElement, values: string[]): void {
         const state = this.getState(select);
         if (!state) return;

@@ -18,20 +18,13 @@ class Icon extends Component
         }
     }
 
-    public function sizeClasses(): string
-    {
-        return match ($this->size) {
-            'xs' => 'w-3 h-3',
-            'sm' => 'w-4 h-4',
-            'md' => 'w-5 h-5',
-            'lg' => 'w-6 h-6',
-            'xl' => 'w-8 h-8',
-            default => 'w-5 h-5'
-        };
-    }
 
     public function iconName(): string
     {
+        if ($this->isBladeComponentIcon()) {
+            return 'keys::' . $this->name;
+        }
+
         if ($this->isCustomIcon()) {
             return $this->name;
         }
@@ -45,6 +38,10 @@ class Icon extends Component
 
     public function iconExists(): bool
     {
+        if ($this->isBladeComponentIcon()) {
+            return $this->bladeComponentIconExists();
+        }
+
         if ($this->isCustomIcon()) {
             return $this->customIconExists();
         }
@@ -56,14 +53,26 @@ class Icon extends Component
         return false;
     }
 
+    protected function isBladeComponentIcon(): bool
+    {
+        return str_starts_with($this->name, 'icons.');
+    }
+
     protected function isCustomIcon(): bool
     {
-        return !str_starts_with($this->name, 'heroicon-');
+        return !str_starts_with($this->name, 'heroicon-') && !str_starts_with($this->name, 'icons.');
     }
 
     protected function isHeroicon(): bool
     {
         return str_starts_with($this->name, 'heroicon-');
+    }
+
+    protected function bladeComponentIconExists(): bool
+    {
+        $iconName = str_replace('icons.', '', $this->name);
+        $iconPath = __DIR__ . "/../resources/views/components/icons/{$iconName}.blade.php";
+        return File::exists($iconPath);
     }
 
     protected function customIconExists(): bool
@@ -72,8 +81,42 @@ class Icon extends Component
         return File::exists($iconPath);
     }
 
+    public function getDataAttributes(): array
+    {
+        $iconType = 'custom';
+        if ($this->isHeroicon()) {
+            $iconType = 'heroicon';
+        } elseif ($this->isBladeComponentIcon()) {
+            $iconType = 'blade-component';
+        }
+
+        $attributes = [
+            'data-keys-icon' => 'true',
+            'data-size' => $this->size,
+            'data-icon-type' => $iconType,
+        ];
+
+        if ($this->isBladeComponentIcon()) {
+            $attributes['data-blade-component-icon'] = 'true';
+            $attributes['data-blade-component-name'] = $this->name;
+        } elseif ($this->isCustomIcon()) {
+            $attributes['data-custom-icon'] = 'true';
+            $attributes['data-custom-name'] = $this->name;
+        }
+
+        if (!$this->iconExists()) {
+            $attributes['data-fallback'] = 'true';
+        }
+
+        return $attributes;
+    }
+
     public function render()
     {
-        return view('keys::components.icon');
+        return view('keys::components.icon', [
+            'dataAttributes' => $this->getDataAttributes(),
+            'iconExists' => $this->iconExists(),
+            'iconName' => $this->iconName(),
+        ]);
     }
 }

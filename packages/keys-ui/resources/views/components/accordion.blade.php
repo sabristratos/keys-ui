@@ -24,10 +24,8 @@ details[data-keys-accordion] summary::-webkit-details-marker {
 @php
     $attributes = $attributes->except(['title', 'icon', 'collapsed', 'disabled', 'color', 'size', 'actions', 'actionVariant', 'actionSize', 'animated']);
 
-    // Base classes for details element
     $baseClasses = 'group overflow-hidden transition-all duration-200';
 
-    // Variant classes for container styling
     $variantClasses = match ($variant) {
         'default' => 'bg-surface border border-border',
         'flush' => 'bg-transparent border-0',
@@ -37,7 +35,6 @@ details[data-keys-accordion] summary::-webkit-details-marker {
         default => 'bg-surface border border-border'
     };
 
-    // Rounded classes
     $roundedClasses = match ($rounded) {
         'none' => '',
         'xs' => 'rounded-sm',
@@ -50,7 +47,6 @@ details[data-keys-accordion] summary::-webkit-details-marker {
         default => 'rounded-lg'
     };
 
-    // Size classes for padding/text
     $sizeClasses = match ($size) {
         'xs' => 'px-3 py-2 text-sm',
         'sm' => 'px-4 py-3 text-sm',
@@ -59,7 +55,6 @@ details[data-keys-accordion] summary::-webkit-details-marker {
         default => 'px-4 py-3 text-base'
     };
 
-    // Summary color classes
     $summaryColorClasses = $variant === 'flush'
         ? match ($color) {
             'brand' => 'hover:bg-brand/5 text-brand',
@@ -76,13 +71,10 @@ details[data-keys-accordion] summary::-webkit-details-marker {
             default => 'bg-surface hover:bg-neutral/5 text-foreground'
         };
 
-    // Content wrapper classes with CSS Grid animation using Tailwind
     $contentWrapperClasses = 'grid grid-rows-[0fr] opacity-0 transition-all duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-open:grid-rows-[1fr] group-open:opacity-100';
 
-    // Content inner classes
     $contentInnerClasses = 'overflow-hidden';
 
-    // Content color classes
     $contentColorClasses = $variant === 'flush'
         ? match ($color) {
             'brand' => 'text-brand',
@@ -99,7 +91,6 @@ details[data-keys-accordion] summary::-webkit-details-marker {
             default => 'bg-surface text-muted'
         };
 
-    // Content size classes
     $contentSizeClasses = match ($size) {
         'xs' => 'px-3 py-2',
         'sm' => 'px-4 py-3',
@@ -108,7 +99,6 @@ details[data-keys-accordion] summary::-webkit-details-marker {
         default => 'px-4 py-3'
     };
 
-    // Icon size
     $iconSize = match ($size) {
         'xs' => 'xs',
         'sm' => 'sm',
@@ -117,14 +107,11 @@ details[data-keys-accordion] summary::-webkit-details-marker {
         default => 'sm'
     };
 
-    // Disabled classes
     $disabledClasses = $disabled ? 'opacity-50 cursor-not-allowed' : '';
     $summaryDisabledClasses = $disabled ? 'cursor-not-allowed' : 'cursor-pointer';
 
-    // Border for content (not for flush variant)
     $contentBorderClass = $variant === 'flush' ? '' : 'border-t border-border';
 
-    // Prepare action data to avoid Blade directives inside component attributes
     $preparedActionData = [];
     foreach ($computedActionData as $action) {
         $preparedActionData[] = [
@@ -139,7 +126,6 @@ details[data-keys-accordion] summary::-webkit-details-marker {
         ];
     }
 
-    // Combine all classes
     $detailsClasses = trim("{$baseClasses} {$variantClasses} {$roundedClasses} {$disabledClasses}");
     $summaryClasses = trim("list-none flex items-center justify-between w-full select-none transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 disabled:pointer-events-none {$sizeClasses} {$summaryColorClasses} {$summaryDisabledClasses}");
     $contentClasses = trim("{$contentBorderClass} {$contentSizeClasses} {$contentColorClasses}");

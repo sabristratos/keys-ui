@@ -66,7 +66,11 @@
       "WebFetch(domain:flowbite.com)",
       "WebFetch(domain:localhost)",
       "Bash(del:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "WebFetch(domain:benfrain.com)",
+      "WebFetch(domain:markus.oberlehner.net)",
+      "WebFetch(domain:frontendmasters.com)",
+      "WebFetch(domain:cdn.jsdelivr.net)"
     ]
   },
   "enableAllProjectMcpServers": true,

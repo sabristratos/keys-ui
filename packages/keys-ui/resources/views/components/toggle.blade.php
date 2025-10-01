@@ -2,12 +2,10 @@
     $toggleAttributes = $attributes->whereStartsWith('wire:model');
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:model');
 
-    // Direct styling logic in template following modern patterns
     $flexDirection = $labelPosition === 'left' ? 'flex-row-reverse' : 'flex-row';
     $gap = $hasContent() ? 'gap-3' : 'gap-0';
     $baseWrapperClasses = "inline-flex items-center {$flexDirection} {$gap} cursor-pointer";
 
-    // Computed action size logic moved from PHP class
     $computedActionSize = match ($actionSize) {
         'xs' => 'xs',
         'sm' => 'sm',
@@ -23,10 +21,8 @@
         $baseWrapperClasses .= ' text-danger';
     }
 
-    // Toggle input classes
     $toggleClasses = 'sr-only peer';
 
-    // Track classes with all styling logic
     $sizeClasses = match ($size) {
         'xs' => 'w-7 h-4',
         'sm' => 'w-9 h-5',
@@ -92,7 +88,6 @@
 
     $trackClasses = trim("{$baseTrackClasses} {$focusClasses} {$checkedColor} {$thumbClasses} {$disabledClasses}");
 
-    // Label classes
     $labelSizeClasses = match ($size) {
         'sm' => 'text-sm',
         'md' => 'text-sm',

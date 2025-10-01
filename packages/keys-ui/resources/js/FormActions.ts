@@ -51,21 +51,17 @@ export class FormActions extends BaseActionClass {
      * Initialize form elements - required by BaseActionClass
      */
     protected initializeElements(): void {
-        // FormActions doesn't need to initialize specific elements on load
-        // Actions are handled via event delegation
     }
 
     /**
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        // Handle input action button clicks - target buttons inside data-action containers
         EventUtils.handleDelegatedClick('[data-action] button', (button, event) => {
             event.preventDefault();
             this.handleActionClick(button as HTMLButtonElement);
         });
 
-        // Handle input action button keyboard activation
         EventUtils.handleDelegatedKeydown('[data-action] button', (button, event) => {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
@@ -85,7 +81,6 @@ export class FormActions extends BaseActionClass {
         const element = DOMUtils.findFormElementForAction(button);
         if (!element) return;
 
-        // Normalize action names for consistency
         const normalizedAction = action === 'password_toggle' ? 'toggle-password' : action;
 
         switch (normalizedAction) {
@@ -208,7 +203,7 @@ export class FormActions extends BaseActionClass {
 
         element.select();
         if (element instanceof HTMLInputElement) {
-            element.setSelectionRange(0, 99999); // For mobile devices
+            element.setSelectionRange(0, 99999);
         }
 
         try {
@@ -359,8 +354,6 @@ export class FormActions extends BaseActionClass {
      * Clean up FormActions - extends BaseActionClass destroy
      */
     protected onDestroy(): void {
-        // FormActions doesn't have additional cleanup beyond base class
-        // Event listeners are automatically cleaned up by browser
     }
 }
 

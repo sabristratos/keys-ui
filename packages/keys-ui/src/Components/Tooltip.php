@@ -6,21 +6,18 @@ use Illuminate\View\Component;
 use Keys\UI\Constants\ComponentConstants;
 
 /**
- * Tooltip Component
+ * Tooltip Component - Pure Popover API Implementation
  *
- * Provides contextual information through floating tooltips with positioning,
- * theming, and trigger customization. Features intelligent positioning,
- * customizable appearance, and comprehensive accessibility support.
+ * Provides contextual information through floating tooltips using the native
+ * HTML Popover API with CSS anchor positioning. Zero JavaScript required.
  *
  * Features:
+ * - Native browser positioning via CSS anchor positioning
  * - Multiple placement options (top, bottom, left, right with variants)
  * - Dark and light color themes
  * - Configurable size variants (sm, md, lg)
- * - Multiple trigger types (hover, click, focus)
- * - Customizable delay and arrow display
- * - Auto-generated unique IDs for accessibility
- * - Comprehensive data attributes for JavaScript integration
- * - Disable functionality for conditional display
+ * - Rich content support via template slot
+ * - Full accessibility with ARIA attributes
  */
 class Tooltip extends Component
 {
@@ -30,22 +27,14 @@ class Tooltip extends Component
      * @param  string  $placement  Tooltip placement position relative to trigger element
      * @param  string  $color  Color theme for tooltip appearance (dark, light)
      * @param  string  $size  Size variant affecting tooltip dimensions and typography
-     * @param  bool  $arrow  Whether to display positioning arrow pointing to trigger
-     * @param  string  $trigger  Interaction type that shows the tooltip
-     * @param  int  $delay  Delay in milliseconds before tooltip appears
      * @param  string|null  $id  Unique identifier for tooltip element
-     * @param  bool  $disabled  Whether tooltip functionality is disabled
-     * @param  string|null  $content  Tooltip text content for direct content mode
+     * @param  string|null  $content  Tooltip text content for simple tooltips
      */
     public function __construct(
         public string $placement = 'top',
         public string $color = 'dark',
         public string $size = 'md',
-        public bool $arrow = true,
-        public string $trigger = 'hover',
-        public int $delay = 100,
         public ?string $id = null,
-        public bool $disabled = false,
         public ?string $content = null
     ) {
         $this->id = $this->id ?? 'tooltip-'.uniqid();
@@ -61,16 +50,10 @@ class Tooltip extends Component
         if (! in_array($this->size, ComponentConstants::TOOLTIP_SIZES)) {
             $this->size = 'md';
         }
-
-        if (! in_array($this->trigger, ComponentConstants::TOOLTIP_TRIGGERS)) {
-            $this->trigger = 'hover';
-        }
     }
 
     /**
      * Check if tooltip has direct content set.
-     *
-     * @return bool True if content property contains text
      */
     public function hasContent(): bool
     {
@@ -78,46 +61,44 @@ class Tooltip extends Component
     }
 
     /**
-     * Generate comprehensive data attributes for tooltip functionality.
-     *
-     * Provides all necessary data attributes for JavaScript tooltip initialization,
-     * positioning, theming, and interaction handling.
-     *
-     * @return array Complete set of data attributes for tooltip element
+     * Get base tooltip classes using Tailwind utilities.
      */
-    public function getTooltipDataAttributes(): array
+    public function getTooltipClasses(): string
     {
-        $attributes = [
-            'data-tooltip' => $this->hasContent() ? $this->content : 'true',
-            'data-tooltip-placement' => $this->placement,
-            'data-tooltip-trigger' => $this->trigger,
-            'data-tooltip-delay' => (string) $this->delay,
-            'data-tooltip-color' => $this->color,
-            'data-tooltip-size' => $this->size,
-            'data-tooltip-id' => $this->id,
-            'data-keys-tooltip' => 'true',
-        ];
+        $baseClasses = 'rounded-md font-medium pointer-events-none shadow-lg';
 
-        if ($this->arrow) {
-            $attributes['data-tooltip-arrow'] = 'true';
-        }
+        $sizeClasses = match ($this->size) {
+            'sm' => 'px-2 py-1 text-xs',
+            'md' => 'px-3 py-2 text-sm',
+            'lg' => 'px-4 py-3 text-base',
+            default => 'px-3 py-2 text-sm'
+        };
 
-        if ($this->disabled) {
-            $attributes['data-tooltip-disabled'] = 'true';
-        }
+        $colorClasses = match ($this->color) {
+            'dark' => 'bg-neutral-900 text-white border border-neutral-700 dark:bg-neutral-800 dark:border-neutral-600',
+            'light' => 'bg-surface text-foreground border border-border',
+            default => 'bg-neutral-900 text-white border border-neutral-700 dark:bg-neutral-800 dark:border-neutral-600'
+        };
 
-        return $attributes;
+        return "{$baseClasses} {$sizeClasses} {$colorClasses}";
+    }
+
+    /**
+     * Get anchor name for CSS positioning.
+     */
+    public function getAnchorName(): string
+    {
+        return "--tooltip-{$this->id}";
     }
 
     /**
      * Render the tooltip component.
-     *
-     * @return \Illuminate\Contracts\View\View
      */
     public function render()
     {
         return view('keys::components.tooltip', [
-            'tooltipDataAttributes' => $this->getTooltipDataAttributes(),
+            'tooltipClasses' => $this->getTooltipClasses(),
+            'anchorName' => $this->getAnchorName(),
         ]);
     }
 }
