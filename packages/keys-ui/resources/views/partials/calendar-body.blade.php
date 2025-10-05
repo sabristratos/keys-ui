@@ -1,16 +1,14 @@
 
 
-
-<div class="calendar-header flex items-center justify-between {{ $headerClasses }} border-b border-border">
+<div class="calendar-header flex items-center justify-between px-4 py-3 border-b border-border">
     <x-keys::button
         variant="ghost"
         size="sm"
         data-calendar-nav="prev"
         :disabled="$disabled"
-        class="calendar-nav-btn hover:bg-neutral-hover"
         icon-left="heroicon-o-chevron-left"
     >
-        <span class="sr-only">Previous month</span>
+        <span class="sr-only">{{ __('keys-ui::keys-ui.calendar.previous_month') }}</span>
     </x-keys::button>
 
     <div class="calendar-month-year-container relative">
@@ -19,7 +17,6 @@
             size="sm"
             data-calendar-month-year-btn
             :disabled="$disabled"
-            class="calendar-month-year-btn font-semibold"
         >
             <span class="calendar-month-year-display">{{ $monthYearDisplay }}</span>
         </x-keys::button>
@@ -30,25 +27,22 @@
         size="sm"
         data-calendar-nav="next"
         :disabled="$disabled"
-        class="calendar-nav-btn hover:bg-neutral-hover"
         icon-left="heroicon-o-chevron-right"
     >
-        <span class="sr-only">Next month</span>
+        <span class="sr-only">{{ __('keys-ui::keys-ui.calendar.next_month') }}</span>
     </x-keys::button>
 </div>
 
-
 <div class="calendar-main-content flex flex-col md:flex-row gap-4" data-calendar-main-content>
-    
+
     @if(isset($quickSelectors) && is_array($quickSelectors) && count($quickSelectors) > 0)
         <div class="calendar-quick-selectors md:w-max flex-shrink-0 order-first p-2" data-view-mode-show="calendar">
-            <div class="text-xs font-medium text-muted mb-2">Quick select:</div>
+            <div class="text-xs font-medium text-muted mb-2">{{ __('keys-ui::keys-ui.datepicker.quick_select_label') }}</div>
             <div class="flex flex-wrap md:flex-col gap-1">
                 @foreach($quickSelectors as $selector)
                     <x-keys::button
                         variant="ghost"
                         size="xs"
-                        class="transition-all duration-200 hover:scale-105 md:justify-start md:w-full"
                         data-quick-selector="{{ $selector['value'] }}"
                         :title="$selector['description'] ?? $selector['label']"
                         aria-label="{{ $selector['description'] ?? $selector['label'] }}"
@@ -60,56 +54,54 @@
         </div>
     @endif
 
-    
-    <div class="calendar-grid-wrapper flex-1 p-2" data-calendar-grid-wrapper>
+
+    <div class="calendar-grid-wrapper flex-1 py-2" data-calendar-grid-wrapper>
         @if($monthsToShow > 1)
             <div class="calendar-multi-month-grid grid gap-8"
                  style="grid-template-columns: repeat({{ min($monthsToShow, 3) }}, 1fr);">
                 @for($i = 0; $i < $monthsToShow; $i++)
                     <div class="calendar-grid" data-calendar-grid-container data-month-index="{{ $i }}">
-                        
+
                     </div>
                 @endfor
             </div>
         @else
             <div class="calendar-grid" data-calendar-grid-container>
-                
+
             </div>
         @endif
     </div>
 </div>
 
-
-<div class="calendar-footer flex items-center justify-between p-3 border-t border-border bg-surface">
+<div class="calendar-footer flex items-center justify-between px-4 py-3 border-t border-border">
     <div class="flex items-center gap-2">
         <x-keys::button
             variant="ghost"
+            color="danger"
             size="sm"
             data-calendar-action="clear"
             :disabled="$disabled"
-            class="calendar-action-btn text-danger hover:bg-danger-50"
             title="Clear selected {{ $isRange ? 'date range' : 'date' }}"
             icon-left="heroicon-o-trash"
         >
-            Clear{{ $isRange ? ' Range' : '' }}
+{{ $isRange ? __('keys-ui::keys-ui.datepicker.clear_range') : __('keys-ui::keys-ui.datepicker.clear') }}
         </x-keys::button>
     </div>
 
     <div class="flex items-center gap-2">
         <x-keys::button
             variant="ghost"
+            color="primary"
             size="sm"
             data-calendar-action="today"
             :disabled="$disabled"
-            class="calendar-action-btn text-brand hover:bg-brand-50"
             title="Select today's date"
             icon-left="heroicon-o-map-pin"
         >
-            Go to Today
+{{ __('keys-ui::keys-ui.datepicker.go_to_today') }}
         </x-keys::button>
     </div>
 </div>
-
 
 @if($name)
     @if($isRange)

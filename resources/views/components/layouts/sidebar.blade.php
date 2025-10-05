@@ -15,10 +15,7 @@
     {{-- Keys UI Scripts (CSS + JS) --}}
     <x-keys::scripts />
 
-    {{-- Livewire Styles (if Livewire is installed) --}}
-    @if(class_exists(\Livewire\Livewire::class))
         @livewireStyles
-    @endif
 </head>
 <body class="h-full overflow-hidden bg-body text-foreground font-sans antialiased">
     {{-- Full-height Layout Container --}}
@@ -97,10 +94,6 @@
 
     {{-- Custom Scripts Stack --}}
     @stack('scripts')
-
-    {{-- Livewire Scripts (if Livewire is installed) --}}
-    @if(class_exists(\Livewire\Livewire::class))
         @livewireScripts
-    @endif
 </body>
 </html>

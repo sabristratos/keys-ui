@@ -63,7 +63,7 @@ Keys UI leverages Tailwind v4's modern features for dialog animations **without 
 ```blade
 {{-- Pure Tailwind dialog with smooth animations --}}
 <dialog class="
-    fixed inset-0 m-auto bg-surface rounded-lg
+    fixed inset-0 m-auto bg-elevation-1 rounded-lg
     transition-transform transition-opacity duration-300 ease-out
     starting:scale-95 starting:opacity-0
     backdrop:bg-black/50 backdrop:backdrop-blur-sm
@@ -272,9 +272,35 @@ public function render() {
 
 ### Semantic Design System
 Components use CSS custom properties for theming:
-- `--color-brand`, `--color-surface`, `--color-border` etc.
-- Supports light/dark mode via Tailwind v4 dark mode features
-- Consistent spacing, typography, and transition scales
+
+#### Elevation System
+Keys UI uses an explicit elevation scale for layered UI depth hierarchy:
+- **Base Layer** (`--color-base`): Body background
+- **Elevation 1** (`--color-elevation-1`): Cards, modals, alerts, sidebar sections
+- **Elevation 2** (`--color-elevation-2`): Inputs, textareas, selects, secondary buttons
+- **Elevation 3** (`--color-elevation-3`): Dropdowns, popovers, tooltips (overlays)
+- **Elevation 4** (`--color-elevation-4`): Items inside elevation-3 (resets to elevation-1 styling for visual distinction)
+
+**Semantic Aliases:**
+- `--color-card`: Alias for `--color-elevation-1`
+- `--color-dropdown`: Alias for `--color-elevation-3`
+- `--color-input`: Uses `--color-elevation-2`
+
+**Legacy Tokens (deprecated):**
+- `--color-body` → Use `--color-base`
+- `--color-surface` → Use `--color-elevation-1`
+- `--color-foreground` → Use `--color-elevation-2`
+
+#### Other Color Tokens
+- **Typography Tokens**: `--color-heading` (primary headings), `--color-text` (body text), `--color-muted` (secondary/muted text)
+- **Contextual Colors**: `--color-success`, `--color-warning`, `--color-danger`, `--color-info`, `--color-accent`
+- **Border System**: `--color-border`, `--color-border-subtle`
+- **Auto-generated Utilities**: Tailwind v4 automatically generates utilities from design tokens:
+  - `bg-elevation-1`, `bg-elevation-2`, `bg-elevation-3`, `bg-elevation-4`, `bg-base`
+  - `text-heading`, `text-text`, `text-muted` for semantic typography colors
+  - `border-border`, `text-text` for UI elements
+  - All tokens support light/dark mode via `light-dark()` CSS function
+- Consistent spacing, typography scales, and transition timings
 
 ### Data Attributes System for Enhanced Customization
 
@@ -425,3 +451,129 @@ public function getAllActions(): array {
 - **Improved performance** - no method call overhead for utilities
 - **Consistent patterns** - all components follow same structure
 - **Easier debugging** - all styling logic in one place
+
+## Typography Components
+
+Keys UI provides two dedicated typography components that leverage the semantic design token system for consistent, accessible, and flexible text rendering.
+
+### Text Component (`<x-keys::text>`)
+
+**Purpose**: Flexible component for all body text, labels, and inline text elements.
+
+**Key Features:**
+- **Element Types**: `p`, `span`, `div`, `label`, `small` (default: `p`)
+- **Sizes**: `xs`, `sm`, `md`, `lg`, `xl`, `2xl` (default: `md`)
+- **Colors**: Semantic colors (`heading`, `text`, `muted`) + contextual colors (`brand`, `success`, `warning`, `danger`, `info`)
+- **Weights**: `light`, `normal`, `medium`, `semibold`, `bold` (default: `normal`)
+- **Alignment**: `left`, `center`, `right`, `justify`
+- **Line Height**: `tight`, `normal`, `relaxed`, `loose`
+- **Line Clamp**: Truncate text to 1-6 lines with `line-clamp` prop
+- **Modifiers**: `italic`, `underline`, `uppercase`, `lowercase`, `capitalize`
+
+**Usage Examples:**
+```blade
+{{-- Basic body text --}}
+<x-keys::text>
+    This is standard body text using the text color token.
+</x-keys::text>
+
+{{-- Muted secondary text --}}
+<x-keys::text color="muted" size="sm">
+    Secondary information in smaller, muted text.
+</x-keys::text>
+
+{{-- Line clamping for truncation --}}
+<x-keys::text line-clamp="3">
+    Long content that will be truncated to 3 lines with ellipsis...
+</x-keys::text>
+
+{{-- Inline label element --}}
+<x-keys::text element="label" weight="medium" size="sm">
+    Form Field Label
+</x-keys::text>
+```
+
+### Heading Component (`<x-keys::heading>`)
+
+**Purpose**: Semantic heading component with visual size decoupled from HTML level for flexible typography hierarchy.
+
+**Key Features:**
+- **Semantic Levels**: `h1`, `h2`, `h3`, `h4`, `h5`, `h6` (default: `h2`) - proper HTML semantics
+- **Visual Sizes**: `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` - decoupled from level for design flexibility
+- **Auto-sizing**: If size is omitted, automatically maps from level (h1→4xl, h2→3xl, h3→2xl, h4→xl, h5→lg, h6→md)
+- **Colors**: Same as Text component (semantic + contextual)
+- **Weights**: `normal`, `medium`, `semibold`, `bold`, `extrabold` (default: `semibold`)
+- **Tracking**: Letter-spacing control (`tighter`, `tight`, `normal`, `wide`, `wider`)
+- **Gradient**: Brand color gradient effect for hero headings
+- **Underline**: Decorative underline with proper spacing
+
+**Usage Examples:**
+```blade
+{{-- Semantic h1 with automatic 4xl sizing --}}
+<x-keys::heading level="h1">
+    Page Title
+</x-keys::heading>
+
+{{-- h2 with custom size override --}}
+<x-keys::heading level="h2" size="xl" color="brand">
+    Section Title
+</x-keys::heading>
+
+{{-- Gradient hero heading --}}
+<x-keys::heading level="h1" gradient>
+    Beautiful Gradient Heading
+</x-keys::heading>
+
+{{-- Semantic h3 with muted color --}}
+<x-keys::heading level="h3" color="muted" weight="medium">
+    Subsection Title
+</x-keys::heading>
+```
+
+### Design Philosophy
+
+**Semantic HTML + Visual Flexibility:**
+The Heading component separates semantic meaning from visual appearance:
+- Use `level` prop for proper document structure (accessibility/SEO)
+- Use `size` prop for visual hierarchy (design requirements)
+- Example: `<x-keys::heading level="h3" size="4xl">` - semantically h3, visually large
+
+**Design Token Integration:**
+Both components leverage semantic color tokens:
+- `color="heading"` → `--color-heading` (dark, high contrast)
+- `color="text"` → `--color-text` (standard body text)
+- `color="muted"` → `--color-muted` (secondary, lower contrast)
+- `color="brand"` → `--color-accent` (brand accent color)
+
+**Typography Hierarchy Best Practices:**
+```blade
+{{-- Article structure with proper hierarchy --}}
+<x-keys::heading level="h1" size="4xl">Article Title</x-keys::heading>
+<x-keys::text color="muted" size="lg">Article subtitle or excerpt</x-keys::text>
+
+<x-keys::heading level="h2" size="2xl">Section Heading</x-keys::heading>
+<x-keys::text>Body content goes here...</x-keys::text>
+
+<x-keys::heading level="h3" size="xl">Subsection</x-keys::heading>
+<x-keys::text size="sm" color="muted">Additional details...</x-keys::text>
+```
+
+### Component Implementation Details
+
+**PHP Class Structure:**
+- Constructor validates all props against `ComponentConstants`
+- Generates comprehensive data attributes for targeting
+- Heading component includes `getDefaultSizeForLevel()` method for auto-sizing
+- Simple `render()` method passes all properties to Blade template
+
+**Blade Template Pattern:**
+- Uses `@php` blocks with `match` statements for class mapping
+- Direct Tailwind utility application (no separate CSS files)
+- Gradient support using `bg-gradient-to-r bg-clip-text text-transparent`
+- Dynamic element rendering with `<{{ $level }}>` and `<{{ $element }}>`
+
+**Data Attributes:**
+Both components include tracking attributes:
+- `data-keys-heading="true"` / `data-keys-text="true"` for component identification
+- `data-level`, `data-size`, `data-color`, `data-weight` for state tracking
+- Conditional attributes (`data-gradient`, `data-underline`) for feature flags

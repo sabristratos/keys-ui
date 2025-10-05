@@ -342,12 +342,12 @@ export class ToastActions extends BaseActionClass<ToastState> {
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h3 id="${toastId}-title" class="hidden font-semibold text-sm leading-5 mb-1"></h3>
-                        <div id="${toastId}-message" class="text-sm opacity-90 leading-5"></div>
+                        <h3 id="${toastId}-title" class="hidden text-sm text-heading font-semibold tracking-tight mb-1"></h3>
+                        <div id="${toastId}-message" class="text-sm text-text font-normal text-left leading-tight opacity-90"></div>
                     </div>
                     <div class="flex-shrink-0">
                         <button type="button"
-                                class="inline-flex items-center justify-center rounded-md bg-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-6 w-6 text-xs hover:bg-surface active:bg-muted focus:ring-brand text-current opacity-60 hover:opacity-100 -m-1"
+                                class="inline-flex items-center justify-center rounded-md bg-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-6 w-6 text-xs hover:bg-surface active:bg-muted focus:ring-accent text-current opacity-60 hover:opacity-100 -m-1"
                                 data-keys-button="true"
                                 data-variant="ghost"
                                 data-size="xs"
@@ -376,7 +376,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
      * Get popover classes for toast styling - matches Blade template exactly
      */
     private getPopoverClasses(position: string, variant: string): string {
-        let classes = 'max-w-sm w-fit h-fit rounded-lg shadow-lg text-foreground z-[9999] p-0 overflow-visible opacity-100';
+        let classes = 'max-w-sm w-fit h-fit rounded-lg shadow-lg text-text z-[9999] p-0 overflow-visible opacity-100';
 
         classes += ' ' + this.getVariantClasses(variant);
 
@@ -761,11 +761,6 @@ const toastActionsInstance = ToastActions.getInstance();
 declare global {
     interface Window {
         ToastActions: ToastActions;
-        Livewire?: {
-            on: (event: string, callback: (data: any) => void) => void;
-            dispatch: (event: string, data?: any) => void;
-            find: (id: string) => any;
-        };
     }
 }
 

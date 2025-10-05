@@ -189,6 +189,15 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             }
         });
 
+        EventUtils.handleDelegatedClick('[data-timepicker-preset]', (presetButton, event) => {
+            event.preventDefault();
+            const timepicker = DOMUtils.findClosest(presetButton, '[data-keys-timepicker]') as HTMLElement;
+            const presetTime = presetButton.dataset.timepickerPreset;
+            if (timepicker && presetTime) {
+                this.setPresetTime(timepicker, presetTime);
+            }
+        });
+
         EventUtils.addEventListener(document, 'click', (event) => {
             const target = event.target as Node;
 
@@ -461,6 +470,45 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
     }
 
     /**
+     * Set preset time
+     */
+    private setPresetTime(timepicker: HTMLElement, presetTime: string): void {
+        const state = this.getState(timepicker);
+        if (!state) return;
+
+        const parsedTime = this.parseTime(presetTime);
+        if (!parsedTime) return;
+
+        if (state.format === '12') {
+            if (parsedTime.period) {
+                state.hour = parsedTime.hour;
+                state.period = parsedTime.period;
+            } else {
+                // Convert 24h to 12h if preset is in 24h format
+                const conversion = this.convertHourBetweenFormats(parsedTime.hour, '24', '12');
+                state.hour = conversion.hour;
+                state.period = conversion.period!;
+            }
+        } else {
+            if (parsedTime.period) {
+                // Convert 12h to 24h if preset is in 12h format
+                const conversion = this.convertHourBetweenFormats(parsedTime.hour, '12', '24', parsedTime.period);
+                state.hour = conversion.hour;
+            } else {
+                state.hour = parsedTime.hour;
+            }
+        }
+
+        state.minute = parsedTime.minute;
+        state.second = parsedTime.second;
+
+        this.setState(timepicker, state);
+        this.updateSelectedStates(timepicker);
+        this.scrollToSelectedOptions(timepicker);
+        this.updatePreview(timepicker);
+    }
+
+    /**
      * Apply time selection
      */
     private applyTime(timepicker: HTMLElement): void {
@@ -643,6 +691,18 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
 
         if (hiddenInput) {
             hiddenInput.value = value;
+
+            // Dispatch events for Livewire and native form integration
+            const inputEvent = new Event('input', { bubbles: true });
+            const changeEvent = new Event('change', { bubbles: true });
+
+            hiddenInput.dispatchEvent(inputEvent);
+            hiddenInput.dispatchEvent(changeEvent);
+
+            // Livewire integration
+            if ((window as any).Livewire && hiddenInput.hasAttribute('wire:model')) {
+                (window as any).Livewire.hook('message.processed', () => {});
+            }
         }
 
         if (display) {
@@ -679,12 +739,10 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
 
         if (clearButton) {
             if (value && !timepicker.dataset.disabled) {
-                clearButton.classList.remove('opacity-0', 'pointer-events-none');
-                clearButton.classList.add('pointer-events-auto');
+                clearButton.classList.remove('invisible');
                 console.log('🕒 Clear button shown');
             } else {
-                clearButton.classList.add('opacity-0', 'pointer-events-none');
-                clearButton.classList.remove('pointer-events-auto');
+                clearButton.classList.add('invisible');
                 console.log('🕒 Clear button hidden');
             }
         }
@@ -697,22 +755,47 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const state = this.getState(timepicker);
         if (!state) return;
 
-        DOMUtils.querySelectorAll('.selected', timepicker).forEach(el => el.classList.remove('selected'));
+        // Remove all selected states and ARIA attributes
+        DOMUtils.querySelectorAll('.selected', timepicker).forEach(el => {
+            el.classList.remove('selected');
+            if (el.hasAttribute('aria-selected')) {
+                el.setAttribute('aria-selected', 'false');
+            }
+            if (el.hasAttribute('aria-checked')) {
+                el.setAttribute('aria-checked', 'false');
+            }
+        });
 
+        // Update hour selection
         const hourButton = DOMUtils.querySelector(`[data-timepicker-hour="${state.hour}"]`, timepicker);
-        if (hourButton) hourButton.classList.add('selected');
-
-        const minuteButton = DOMUtils.querySelector(`[data-timepicker-minute="${state.minute}"]`, timepicker);
-        if (minuteButton) minuteButton.classList.add('selected');
-
-        if (state.showSeconds) {
-            const secondButton = timepicker.querySelector(`[data-timepicker-second="${state.second}"]`);
-            if (secondButton) secondButton.classList.add('selected');
+        if (hourButton) {
+            hourButton.classList.add('selected');
+            hourButton.setAttribute('aria-selected', 'true');
         }
 
+        // Update minute selection
+        const minuteButton = DOMUtils.querySelector(`[data-timepicker-minute="${state.minute}"]`, timepicker);
+        if (minuteButton) {
+            minuteButton.classList.add('selected');
+            minuteButton.setAttribute('aria-selected', 'true');
+        }
+
+        // Update second selection
+        if (state.showSeconds) {
+            const secondButton = timepicker.querySelector(`[data-timepicker-second="${state.second}"]`);
+            if (secondButton) {
+                secondButton.classList.add('selected');
+                secondButton.setAttribute('aria-selected', 'true');
+            }
+        }
+
+        // Update period selection
         if (state.format === '12') {
             const periodButton = timepicker.querySelector(`[data-timepicker-period="${state.period}"]`);
-            if (periodButton) periodButton.classList.add('selected');
+            if (periodButton) {
+                periodButton.classList.add('selected');
+                periodButton.setAttribute('aria-checked', 'true');
+            }
         }
     }
 
@@ -726,12 +809,14 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const formatButtons = DOMUtils.querySelectorAll('[data-timepicker-format]', timepicker);
         formatButtons.forEach(button => {
             const buttonFormat = (button as HTMLElement).dataset.timepickerFormat;
-            if (buttonFormat === state.format) {
-                button.classList.add('bg-brand', 'text-foreground-brand');
-                button.classList.remove('bg-surface', 'text-muted');
+            const isSelected = buttonFormat === state.format;
+
+            if (isSelected) {
+                (button as HTMLElement).dataset.selected = 'true';
+                (button as HTMLElement).setAttribute('aria-pressed', 'true');
             } else {
-                button.classList.remove('bg-brand', 'text-foreground-brand');
-                button.classList.add('bg-surface', 'text-muted');
+                delete (button as HTMLElement).dataset.selected;
+                (button as HTMLElement).setAttribute('aria-pressed', 'false');
             }
         });
     }
@@ -756,7 +841,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             const button = document.createElement('button');
             button.type = 'button';
             button.dataset.timepickerHour = hour.toString();
-            button.className = 'w-full px-3 py-2 text-sm text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 focus:bg-brand focus:text-foreground-brand [&.selected]:bg-brand [&.selected]:text-foreground-brand transition-colors';
+            button.className = 'w-full px-3 py-2 text-sm text-text text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-accent [&.selected]:text-accent-foreground transition-colors';
             button.textContent = hour.toString().padStart(2, '0');
             hourContainer.appendChild(button);
         });
@@ -783,12 +868,20 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
 
         const periodSection = DOMUtils.querySelector('[data-timepicker-period-section]', timepicker) as HTMLElement;
         if (periodSection) {
-            periodSection.style.display = state.format === '12' ? 'block' : 'none';
+            // Use Tailwind classes instead of inline styles
+            if (state.format === '12') {
+                periodSection.classList.remove('hidden');
+                periodSection.classList.add('flex', 'flex-col');
+            } else {
+                periodSection.classList.add('hidden');
+                periodSection.classList.remove('flex', 'flex-col');
+            }
         }
     }
 
     /**
      * Update grid layout based on current format and settings
+     * Note: Grid columns are now calculated in Blade, this method updates the classes dynamically
      */
     private updateGridLayout(timepicker: HTMLElement): void {
         const state = this.getState(timepicker);
@@ -797,11 +890,16 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
         const gridContainer = DOMUtils.querySelector('[data-timepicker-grid]', timepicker) as HTMLElement;
         if (!gridContainer) return;
 
-        let columns = 2;
+        // Remove old grid column classes
+        gridContainer.classList.remove('grid-cols-2', 'grid-cols-3', 'grid-cols-4');
+
+        // Calculate new columns
+        let columns = 2; // Default: hours + minutes
         if (state.showSeconds) columns++;
         if (state.format === '12') columns++;
 
-        gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+        // Add new grid column class
+        gridContainer.classList.add(`grid-cols-${columns}`);
     }
 
     /**

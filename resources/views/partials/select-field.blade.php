@@ -6,7 +6,6 @@
     border-color: var(--color-border);
 }
 
-
 [data-select="true"] [data-select-option] {
     transition: background-color 150ms ease-in-out;
 }
@@ -101,7 +100,6 @@
 }
 </style>
 
-
 @if($multiple)
     @foreach($getSelectedValues() as $selectedValue)
         <input type="hidden" name="{{ $name }}[]" value="{{ $selectedValue }}" class="select-hidden-input" {{ $livewireAttributes ?? '' }}>
@@ -109,7 +107,6 @@
 @else
     <input type="hidden" name="{{ $name }}" value="{{ is_array($value) ? '' : $value }}" class="select-hidden-input" {{ $livewireAttributes ?? '' }}>
 @endif
-
 
 <div
     role="button"
@@ -143,7 +140,6 @@
             </div>
         </div>
 
-
         <div class="flex items-center gap-1 ml-2">
             @if($clearable && !empty($getSelectedValues()) && !$disabled)
                 <button type="button" class="p-1 hover:text-danger-500" data-select-clear>
@@ -159,7 +155,6 @@
     </div>
 </div>
 
-
 <div class="{{ $computedDropdownClasses }} hidden" data-select-dropdown>
 
     @if($searchable)
@@ -174,11 +169,9 @@
         </div>
     @endif
 
-
     <div class="max-h-48 overflow-y-auto overflow-x-hidden" data-select-options>
         {{ $slot }}
     </div>
-
 
     <div class="px-3 py-2 text-sm text-neutral-500 text-left hidden" data-select-no-results>
         No options found

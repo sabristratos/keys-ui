@@ -23,7 +23,6 @@ class HeadingDecorator extends Component
             $this->color = 'brand';
         }
 
-
         
         if ($this->animation === null) {
             $this->animation = match ($this->variant) {

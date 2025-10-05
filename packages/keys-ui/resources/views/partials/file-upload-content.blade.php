@@ -10,7 +10,6 @@
     {{ $attributes->merge($computedWireAttributes) }}
 />
 
-
 <div class="upload-empty-state text-center transition-all duration-300 ease-in-out">
     <x-keys::icon
         name="heroicon-o-cloud-arrow-up"
@@ -19,12 +18,12 @@
     />
 
     <div class="space-y-1">
-        <p class="text-sm font-medium text-foreground">
+        <x-keys::text element="p" size="sm" weight="medium" color="text">
             {{ $placeholder }}
-        </p>
+        </x-keys::text>
 
         @if($accept !== '*' || $maxSize)
-            <p class="text-xs text-muted">
+            <x-keys::text element="p" size="xs" color="muted">
                 @if($accept !== '*')
                     @php
                         $acceptedTypes = explode(',', $accept);
@@ -36,7 +35,7 @@
                 @if($maxSize)
                     Max {{ $maxSize }}
                 @endif
-            </p>
+            </x-keys::text>
         @endif
     </div>
 
@@ -57,7 +56,6 @@
     </div>
 </div>
 
-
 <div class="upload-file-state hidden transition-all duration-300 ease-in-out p-4">
     <div class="flex items-center justify-center">
         <div class="flex items-center space-x-4">
@@ -69,9 +67,9 @@
                 </div>
             </div>
 
-            
+
             <div class="flex-1 min-w-0">
-                <div class="file-name text-sm font-medium text-foreground truncate"></div>
+                <div class="file-name text-sm font-medium text-text truncate"></div>
                 <div class="file-size text-xs text-muted mt-1"></div>
 
                 
@@ -99,6 +97,5 @@
         <div class="upload-progress-bar bg-brand h-full transition-all duration-300 ease-out" style="width: 0%"></div>
     </div>
 </div>
-
 
 <div class="error-message hidden mt-4 text-sm text-danger"></div>

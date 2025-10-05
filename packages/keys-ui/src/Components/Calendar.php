@@ -5,10 +5,11 @@ namespace Keys\UI\Components;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 class Calendar extends Component
 {
+    private const VALID_SIZES = ['sm', 'md', 'lg'];
+
     public function __construct(
         public ?string $name = null,
         public ?string $id = null,
@@ -155,8 +156,8 @@ class Calendar extends Component
     private function validateProperties(): void
     {
         
-        if (! in_array($this->size, ComponentConstants::CALENDAR_SIZES)) {
-            $this->size = ComponentConstants::getDefaultSize();
+        if (! in_array($this->size, self::VALID_SIZES)) {
+            $this->size = 'md';
         }
     }
 
@@ -463,13 +464,13 @@ class Calendar extends Component
     public function getDefaultQuickSelectors(): array
     {
         return [
-            ['label' => 'Today', 'value' => 'today', 'description' => 'Select today\'s date'],
-            ['label' => 'Yesterday', 'value' => 'yesterday', 'description' => 'Select yesterday\'s date'],
-            ['label' => 'Last 7 Days', 'value' => 'last7days', 'range' => true, 'description' => 'Select past week range'],
-            ['label' => 'Last 30 Days', 'value' => 'last30days', 'range' => true, 'description' => 'Select past month range'],
-            ['label' => 'This Month', 'value' => 'thismonth', 'range' => true, 'description' => 'Select current month range'],
-            ['label' => 'Last Month', 'value' => 'lastmonth', 'range' => true, 'description' => 'Select previous month range'],
-            ['label' => 'This Year', 'value' => 'thisyear', 'range' => true, 'description' => 'Select current year range'],
+            ['label' => __('keys-ui::keys-ui.datepicker.today'), 'value' => 'today', 'description' => __('keys-ui::keys-ui.datepicker.today')],
+            ['label' => __('keys-ui::keys-ui.datepicker.yesterday'), 'value' => 'yesterday', 'description' => __('keys-ui::keys-ui.datepicker.yesterday')],
+            ['label' => __('keys-ui::keys-ui.datepicker.last_7_days'), 'value' => 'last7days', 'range' => true, 'description' => __('keys-ui::keys-ui.datepicker.last_7_days')],
+            ['label' => __('keys-ui::keys-ui.datepicker.last_30_days'), 'value' => 'last30days', 'range' => true, 'description' => __('keys-ui::keys-ui.datepicker.last_30_days')],
+            ['label' => __('keys-ui::keys-ui.datepicker.this_month'), 'value' => 'thismonth', 'range' => true, 'description' => __('keys-ui::keys-ui.datepicker.this_month')],
+            ['label' => __('keys-ui::keys-ui.datepicker.last_month'), 'value' => 'lastmonth', 'range' => true, 'description' => __('keys-ui::keys-ui.datepicker.last_month')],
+            ['label' => __('keys-ui::keys-ui.datepicker.this_year'), 'value' => 'thisyear', 'range' => true, 'description' => __('keys-ui::keys-ui.datepicker.this_year')],
         ];
     }
 

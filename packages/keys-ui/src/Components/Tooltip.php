@@ -3,7 +3,6 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Tooltip Component - Pure Popover API Implementation
@@ -21,6 +20,14 @@ use Keys\UI\Constants\ComponentConstants;
  */
 class Tooltip extends Component
 {
+    private const VALID_PLACEMENTS = [
+        'top', 'top-start', 'top-end',
+        'bottom', 'bottom-start', 'bottom-end',
+        'left', 'left-start', 'left-end',
+        'right', 'right-start', 'right-end'
+    ];
+    private const VALID_SIZES = ['sm', 'md', 'lg'];
+
     /**
      * Create a new Tooltip component instance.
      *
@@ -39,7 +46,7 @@ class Tooltip extends Component
     ) {
         $this->id = $this->id ?? 'tooltip-'.uniqid();
 
-        if (! in_array($this->placement, ComponentConstants::POPOVER_PLACEMENTS)) {
+        if (! in_array($this->placement, self::VALID_PLACEMENTS)) {
             $this->placement = 'top';
         }
 
@@ -47,7 +54,7 @@ class Tooltip extends Component
             $this->color = 'dark';
         }
 
-        if (! in_array($this->size, ComponentConstants::TOOLTIP_SIZES)) {
+        if (! in_array($this->size, self::VALID_SIZES)) {
             $this->size = 'md';
         }
     }

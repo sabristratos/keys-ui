@@ -7,12 +7,11 @@
         default => ' py-12'
     };
 
-    $textClasses = 'mt-4 text-muted';
-    $textClasses .= match ($size) {
-        'sm' => ' text-xs',
-        'md' => ' text-sm',
-        'lg' => ' text-base',
-        default => ' text-sm'
+    $textSize = match ($size) {
+        'sm' => 'xs',
+        'md' => 'sm',
+        'lg' => 'md',
+        default => 'sm'
     };
 @endphp
 
@@ -22,14 +21,14 @@
             <div class="flex flex-col items-center">
                 <x-keys::loading
                     animation="{{ $animation }}"
-                    size="{{ $getLoadingIconSize() }}"
-                    class="text-brand"
+                    size="{{ $loadingIconSize }}"
+                    class="text-accent"
                 />
 
                 @if($text)
-                    <p class="{{ $textClasses }}">
+                    <x-keys::text color="muted" :size="$textSize" class="mt-4">
                         {{ $text }}
-                    </p>
+                    </x-keys::text>
                 @endif
 
                 {{ $slot }}

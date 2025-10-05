@@ -2,7 +2,7 @@
     $textareaAttributes = $attributes->whereStartsWith('wire:');
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:');
 
-    $baseClasses = 'input-base block';
+    $baseClasses = 'block shadow-xs w-full bg-input border border-border rounded-md transition-colors duration-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 placeholder:text-muted';
 
     $sizeClasses = match ($size) {
         'xs' => 'px-2.5 py-1 text-xs',
@@ -22,11 +22,11 @@
     };
 
     if ($disabled) {
-        $stateClasses = 'input-disabled text-muted';
+        $stateClasses = 'opacity-50 cursor-not-allowed bg-surface text-muted';
     } elseif ($hasError()) {
-        $stateClasses = 'input-error text-foreground';
+        $stateClasses = 'border-danger focus:border-danger focus:ring-danger/20 text-text';
     } else {
-        $stateClasses = 'input-default text-foreground';
+        $stateClasses = 'text-text';
     }
 
     $leftPadding = '';
@@ -167,13 +167,12 @@
         </div>
 
         @if($hint)
-            <p class="mt-1 text-xs text-muted">{{ $hint }}</p>
+            <x-keys::text size="xs" color="muted" class="mt-1">{{ $hint }}</x-keys::text>
         @endif
 
         @if($showCharacterCount)
-            <div class="mt-1 flex justify-between items-center text-xs">
-                <div></div>
-                <div class="text-muted"
+            <div class="mt-1 flex justify-end">
+                <x-keys::text size="xs" color="muted"
                      data-character-count
                      data-max-length="{{ $maxLength }}"
                      data-target-id="{{ $id }}">
@@ -182,7 +181,7 @@
                     @else
                         <span data-current-count>{{ $value ? strlen($value) : 0 }}</span> characters
                     @endif
-                </div>
+                </x-keys::text>
             </div>
         @endif
 
@@ -240,7 +239,7 @@
 
     @if($showCharacterCount)
         <div class="mt-1 flex justify-end">
-            <div class="text-xs text-muted"
+            <x-keys::text size="xs" color="muted"
                  data-character-count
                  data-max-length="{{ $maxLength }}"
                  data-target-id="{{ $id }}">
@@ -249,7 +248,7 @@
                 @else
                     <span data-current-count>{{ $value ? strlen($value) : 0 }}</span> characters
                 @endif
-            </div>
+            </x-keys::text>
         </div>
     @endif
 @endif

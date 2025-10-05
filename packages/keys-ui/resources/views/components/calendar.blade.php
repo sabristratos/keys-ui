@@ -2,7 +2,7 @@
     $wireAttributes = $attributes->whereStartsWith('wire:');
 
     $baseWidth = $monthsToShow > 1 ? 'min-w-[560px] w-full' : 'min-w-[280px] w-max';
-    $baseClasses = 'user-select-none text-foreground';
+    $baseClasses = 'user-select-none text-text';
 
     $sizeClasses = match ($size) {
         'sm' => 'text-sm',
@@ -19,13 +19,6 @@
     } else {
         $stateClasses = 'border-border hover:border-neutral-300 dark:hover:border-neutral-600';
     }
-
-    $headerClasses = match ($size) {
-        'sm' => 'px-3 py-2 text-sm font-medium',
-        'md' => 'px-4 py-3 text-sm font-semibold',
-        'lg' => 'px-5 py-4 text-base font-semibold',
-        default => 'px-4 py-3 text-sm font-semibold'
-    };
 
     $cellClasses = match ($size) {
         'sm' => 'w-8 h-8 text-xs',
@@ -52,9 +45,7 @@
     </div>
 @endif
 
-
 <style>
-
 
     /* === ONLY ESSENTIAL CALENDAR STYLES - Most moved to Tailwind === */
     /* Basic calendar structure - cannot be replaced by utilities */

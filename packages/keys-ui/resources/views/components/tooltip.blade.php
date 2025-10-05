@@ -5,11 +5,9 @@
     $hasRichContent = !$hasContent() && isset($template) && !empty(trim($template ?? ''));
 @endphp
 
-
 <span style="anchor-name: {{ $anchorName }};" class="flex" data-tooltip-trigger="{{ $id }}">
     {{ $slot }}
 </span>
-
 
 <div
     id="{{ $id }}"
@@ -42,7 +40,6 @@
 
     let hideTimeout;
     const show = () => {
-        // For sidebar tooltips, only show when sidebar is collapsed
         if (isSidebarTooltip) {
             const sidebar = trigger.closest('[data-keys-sidebar="true"]');
             if (!sidebar || sidebar.dataset.collapsed !== 'true') {

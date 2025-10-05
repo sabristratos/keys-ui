@@ -3,7 +3,6 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Avatar Component
@@ -26,6 +25,14 @@ use Keys\UI\Constants\ComponentConstants;
  */
 class Avatar extends Component
 {
+    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
+    private const VALID_SHAPES = ['circle', 'square'];
+    private const VALID_COLORS = [
+        'brand', 'success', 'warning', 'danger', 'neutral',
+        'red', 'green', 'blue', 'purple', 'yellow', 'teal', 'orange'
+    ];
+    private const VALID_STATUS = ['online', 'offline', 'away', 'busy'];
+
     /**
      * Create a new Avatar component instance.
      *
@@ -54,19 +61,19 @@ class Avatar extends Component
             $this->alt = "Avatar for {$this->name}";
         }
 
-        if (! ComponentConstants::isValidSize($this->size)) {
-            $this->size = ComponentConstants::getDefaultSize();
+        if (! in_array($this->size, self::VALID_SIZES)) {
+            $this->size = 'md';
         }
 
-        if (! in_array($this->shape, ComponentConstants::AVATAR_SHAPES)) {
+        if (! in_array($this->shape, self::VALID_SHAPES)) {
             $this->shape = 'circle';
         }
 
-        if (! ComponentConstants::isValidColorForComponent($this->color, 'avatar')) {
+        if (! in_array($this->color, self::VALID_COLORS)) {
             $this->color = 'neutral';
         }
 
-        if ($this->status && ! in_array($this->status, ComponentConstants::AVATAR_STATUS)) {
+        if ($this->status && ! in_array($this->status, self::VALID_STATUS)) {
             $this->status = null;
         }
     }

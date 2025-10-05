@@ -38,7 +38,6 @@ const SELECTORS = {
     removeButton: '.file-remove',
     uploadProgress: '.upload-progress',
     progressBar: '.upload-progress-bar',
-    errorMessage: '.error-message',
     chooseButton: '[type="button"]:not(.file-change-btn)',
     singleFilePreview: '.single-file-preview',
     multipleFilesPreview: '.multiple-files-preview',
@@ -82,33 +81,21 @@ const isLivewireAvailable = (): boolean => typeof window.Livewire !== 'undefined
  * Initialize all file upload components on the page
  */
 function initializeFileUploads(): void {
-    console.log('[FileUpload] Initializing file upload components...');
 
     const containers = document.querySelectorAll(SELECTORS.container);
     const livewireAvailable = isLivewireAvailable();
-
-    console.log(`[FileUpload] Found ${containers.length} file upload component(s)`);
-    console.log(`[FileUpload] Livewire available: ${livewireAvailable}`);
 
     containers.forEach((container, index) => {
         const element = container as HTMLElement;
         const wrapper = element.closest('.file-upload-wrapper') as HTMLElement;
         if (!wrapper) {
-            console.warn(`[FileUpload] Component #${index + 1}: No wrapper found - skipping`);
+
             return;
         }
         const fileInput = element.querySelector(SELECTORS.fileInput) as HTMLInputElement;
 
-        console.log(`[FileUpload] Initializing component #${index + 1}:`, {
-            hasFileInput: !!fileInput,
-            hasWrapper: !!wrapper,
-            dataAttributes: element.dataset,
-            dragDropEnabled: element.getAttribute(DATA_ATTRS.dragDrop),
-            disabled: element.getAttribute(DATA_ATTRS.disabled)
-        });
-
         if (!fileInput) {
-            console.warn(`[FileUpload] Component #${index + 1}: No file input found - skipping`);
+
             return;
         }
 
@@ -126,17 +113,15 @@ function initializeFileUploads(): void {
         });
 
         element.setAttribute(DATA_ATTRS.initialized, 'true');
-        console.log(`[FileUpload] Component #${index + 1} initialized successfully`);
+
     });
 
-    console.log('[FileUpload] Initialization complete');
 }
 
 /**
  * Setup file input change handler
  */
 function setupFileHandling(container: HTMLElement, fileInput: HTMLInputElement, livewireAvailable: boolean): void {
-    console.log('[FileUpload] Setting up file handling');
 
     const isMultiple = container.getAttribute(DATA_ATTRS.multiple) === 'true';
 
@@ -144,18 +129,9 @@ function setupFileHandling(container: HTMLElement, fileInput: HTMLInputElement, 
         const isAddingMore = container.hasAttribute('data-adding-more');
         const existingFiles = filesStore.get(container) || [];
 
-        console.log('[FileUpload] File input change event:', {
-            filesCount: fileInput.files?.length || 0,
-            files: fileInput.files ? Array.from(fileInput.files).map(f => ({ name: f.name, size: f.size, type: f.type })) : [],
-            isMultiple,
-            isAddingMore,
-            existingFilesCount: existingFiles.length
-        });
-
         if (fileInput.files && fileInput.files.length > 0) {
             if (isMultiple) {
                 const shouldAppend = isAddingMore && existingFiles.length > 0;
-                console.log('[FileUpload] Should append:', shouldAppend);
 
                 handleMultipleFiles(container, fileInput, Array.from(fileInput.files), livewireAvailable, shouldAppend);
 
@@ -164,7 +140,7 @@ function setupFileHandling(container: HTMLElement, fileInput: HTMLInputElement, 
                 handleFile(container, fileInput, fileInput.files[0], livewireAvailable);
             }
         } else {
-            console.log('[FileUpload] No files - showing empty state');
+
             showEmptyState(container);
         }
     });
@@ -177,13 +153,7 @@ function setupDragDrop(container: HTMLElement, fileInput: HTMLInputElement): voi
     const dragDropEnabled = container.getAttribute(DATA_ATTRS.dragDrop) === 'true';
     const isDisabled = container.getAttribute(DATA_ATTRS.disabled) === 'true';
 
-    console.log('[FileUpload] Setting up drag and drop:', {
-        dragDropEnabled,
-        isDisabled
-    });
-
     if (!dragDropEnabled || isDisabled) {
-        console.log('[FileUpload] Drag and drop skipped (disabled or not enabled)');
         return;
     }
 
@@ -192,14 +162,14 @@ function setupDragDrop(container: HTMLElement, fileInput: HTMLInputElement): voi
 
     ['dragenter', 'dragover'].forEach(event => {
         container.addEventListener(event, () => {
-            console.log(`[FileUpload] Drag event: ${event}`);
+
             container.classList.add('dragover');
         });
     });
 
     ['dragleave', 'drop'].forEach(event => {
         container.addEventListener(event, () => {
-            console.log(`[FileUpload] Drag event: ${event}`);
+
             container.classList.remove('dragover');
         });
     });
@@ -207,12 +177,6 @@ function setupDragDrop(container: HTMLElement, fileInput: HTMLInputElement): voi
     container.addEventListener('drop', (e) => {
         const files = e.dataTransfer?.files;
         const isMultiple = container.getAttribute(DATA_ATTRS.multiple) === 'true';
-
-        console.log('[FileUpload] Drop event:', {
-            filesCount: files?.length || 0,
-            files: files ? Array.from(files).map(f => ({ name: f.name, size: f.size, type: f.type })) : [],
-            isMultiple
-        });
 
         if (files && files.length > 0) {
             if (isMultiple) {
@@ -223,21 +187,18 @@ function setupDragDrop(container: HTMLElement, fileInput: HTMLInputElement): voi
         }
     });
 
-    console.log('[FileUpload] Drag and drop setup complete');
 }
 
 /**
  * Setup click handlers for buttons and container
  */
 function setupClickHandlers(container: HTMLElement, fileInput: HTMLInputElement): void {
-    console.log('[FileUpload] Setting up click handlers');
 
     const changeButton = container.querySelector(SELECTORS.changeButton);
-    console.log('[FileUpload] Change button found:', !!changeButton);
 
     if (changeButton) {
         changeButton.addEventListener('click', (e) => {
-            console.log('[FileUpload] Change button clicked');
+
             e.preventDefault();
             e.stopPropagation();
             if (!fileInput.disabled) {
@@ -247,46 +208,38 @@ function setupClickHandlers(container: HTMLElement, fileInput: HTMLInputElement)
     }
 
     const emptyState = container.querySelector(SELECTORS.emptyState);
-    console.log('[FileUpload] Empty state found:', !!emptyState);
 
     if (emptyState) {
         emptyState.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
 
-            console.log('[FileUpload] Dropzone clicked:', {
-                target: target.tagName,
-                disabled: fileInput.disabled,
-                isRemoving: container.hasAttribute('data-is-removing')
-            });
-
             if (target.closest(SELECTORS.fileInput)) {
-                console.log('[FileUpload] Click on file input - ignoring');
+
                 return;
             }
 
             if (container.hasAttribute('data-is-removing')) {
-                console.log('[FileUpload] File was just removed - ignoring click');
+
                 return;
             }
 
             if (!fileInput.disabled) {
-                console.log('[FileUpload] Triggering file input');
+
                 fileInput.click();
             }
         });
     }
 
     const addMoreBtn = container.querySelector(SELECTORS.addMoreFilesBtn);
-    console.log('[FileUpload] Add more files button found:', !!addMoreBtn);
 
     if (addMoreBtn) {
         addMoreBtn.addEventListener('click', (e) => {
-            console.log('[FileUpload] Add more files button clicked');
+
             e.preventDefault();
             e.stopPropagation();
             if (!fileInput.disabled) {
                 container.setAttribute('data-adding-more', 'true');
-                console.log('[FileUpload] Set adding-more flag');
+
                 fileInput.click();
             }
         });
@@ -301,13 +254,11 @@ function setupClickHandlers(container: HTMLElement, fileInput: HTMLInputElement)
             e.stopPropagation();
 
             const fileIndex = parseInt(removeBtn.getAttribute('data-remove-file') || '0');
-            console.log('[FileUpload] Remove individual file clicked:', fileIndex);
 
             removeFileAtIndex(container, fileInput, fileIndex);
         }
     });
 
-    console.log('[FileUpload] Click handlers setup complete');
 }
 
 /**
@@ -320,8 +271,6 @@ function setupRemoveHandler(container: HTMLElement, fileInput: HTMLInputElement)
             e.preventDefault();
             e.stopPropagation();
 
-            console.log('[FileUpload] Remove button clicked - setting removal flag');
-
             container.setAttribute('data-is-removing', 'true');
 
             fileInput.value = '';
@@ -331,7 +280,7 @@ function setupRemoveHandler(container: HTMLElement, fileInput: HTMLInputElement)
 
             setTimeout(() => {
                 container.removeAttribute('data-is-removing');
-                console.log('[FileUpload] Removal flag cleared - dropzone clickable again');
+
             }, 150);
 
             const isLivewire = container.getAttribute(DATA_ATTRS.livewire) === 'true';
@@ -346,12 +295,11 @@ function setupRemoveHandler(container: HTMLElement, fileInput: HTMLInputElement)
  * Remove file at specific index from multiple files list
  */
 function removeFileAtIndex(container: HTMLElement, fileInput: HTMLInputElement, index: number): void {
-    console.log('[FileUpload] Removing file at index:', index);
 
     const files = filesStore.get(container) || [];
 
     if (index < 0 || index >= files.length) {
-        console.error('[FileUpload] Invalid file index:', index);
+
         return;
     }
 
@@ -379,7 +327,6 @@ function removeFileAtIndex(container: HTMLElement, fileInput: HTMLInputElement, 
         announceChange(container, `File removed. ${files.length} file(s) remaining`);
     }
 
-    console.log('[FileUpload] File removed. Remaining files:', files.length);
 }
 
 /**
@@ -393,7 +340,7 @@ function setupLivewireIntegration(container: HTMLElement, fileInput: HTMLInputEl
     }
 
     fileInput.addEventListener('livewire-upload-start', () => {
-        console.log('[FileUpload] Livewire upload started');
+
         fileInput.setAttribute('data-livewire-upload-started', 'true');
         showUploadProgress(container, true);
         setProgressWidth(container, 0);
@@ -407,7 +354,7 @@ function setupLivewireIntegration(container: HTMLElement, fileInput: HTMLInputEl
     });
 
     fileInput.addEventListener('livewire-upload-finish', () => {
-        console.log('[FileUpload] Livewire upload finished');
+
         fileInput.removeAttribute('data-livewire-upload-started');
         showUploadProgress(container, false);
         if (fileInput.files && fileInput.files.length > 0) {
@@ -431,17 +378,11 @@ function setupLivewireIntegration(container: HTMLElement, fileInput: HTMLInputEl
  * Handle file selection - validates and displays the file
  */
 function handleFile(container: HTMLElement, fileInput: HTMLInputElement, file: File, livewireAvailable: boolean): void {
-    console.log('[FileUpload] Handling file:', {
-        name: file.name,
-        size: file.size,
-        type: file.type
-    });
 
     const validation = validateFile(container, file);
-    console.log('[FileUpload] Validation result:', validation);
 
     if (!validation.valid) {
-        console.error('[FileUpload] Validation failed:', validation.error);
+
         showError(container, validation.error || MESSAGES.invalidFile);
         return;
     }
@@ -451,28 +392,18 @@ function handleFile(container: HTMLElement, fileInput: HTMLInputElement, file: F
     const isLivewire = container.getAttribute(DATA_ATTRS.livewire) === 'true';
     const actualLivewireAvailable = livewireAvailable && typeof window.Livewire !== 'undefined';
 
-    console.log('[FileUpload] Livewire mode:', {
-        dataAttribute: isLivewire,
-        actuallyAvailable: actualLivewireAvailable
-    });
-
     if (isLivewire && actualLivewireAvailable) {
-        console.log('[FileUpload] Showing upload progress (Livewire mode)');
         showUploadProgress(container, true);
         setProgressWidth(container, 0);
 
         setTimeout(() => {
             if (!fileInput.hasAttribute('data-livewire-upload-started')) {
-                console.warn('[FileUpload] Livewire upload not started - falling back to standard mode');
+
                 showUploadProgress(container, false);
                 showFileState(container, file);
             }
         }, 500);
     } else {
-        if (isLivewire && !actualLivewireAvailable) {
-            console.warn('[FileUpload] Livewire mode set but Livewire not available - using standard mode');
-        }
-        console.log('[FileUpload] Showing file state (standard mode)');
         showFileState(container, file);
     }
 }
@@ -481,10 +412,6 @@ function handleFile(container: HTMLElement, fileInput: HTMLInputElement, file: F
  * Handle multiple files upload
  */
 function handleMultipleFiles(container: HTMLElement, fileInput: HTMLInputElement, newFiles: File[], livewireAvailable: boolean, append: boolean = false): void {
-    console.log('[FileUpload] Handling multiple files:', {
-        newFilesCount: newFiles.length,
-        append
-    });
 
     const maxFiles = container.getAttribute(DATA_ATTRS.maxFiles);
     const currentFiles = filesStore.get(container) || [];
@@ -495,7 +422,7 @@ function handleMultipleFiles(container: HTMLElement, fileInput: HTMLInputElement
         const validation = validateFile(container, file);
 
         if (!validation.valid) {
-            console.error('[FileUpload] Validation failed for file:', file.name, validation.error);
+
             showError(container, validation.error || MESSAGES.invalidFile);
             continue;
         }
@@ -509,7 +436,7 @@ function handleMultipleFiles(container: HTMLElement, fileInput: HTMLInputElement
     }
 
     if (files.length === 0) {
-        console.log('[FileUpload] No valid files - showing empty state');
+
         showEmptyState(container);
         return;
     }
@@ -522,10 +449,6 @@ function handleMultipleFiles(container: HTMLElement, fileInput: HTMLInputElement
 
     showMultipleFilesState(container, files);
 
-    console.log('[FileUpload] Multiple files handled:', {
-        totalFiles: files.length,
-        fileNames: files.map(f => f.name)
-    });
 }
 
 /**
@@ -587,29 +510,22 @@ function validateFile(container: HTMLElement, file: File): ValidationResult {
  * Show empty upload state
  */
 function showEmptyState(container: HTMLElement): void {
-    console.log('[FileUpload] Showing empty state');
 
     const emptyState = container.querySelector(SELECTORS.emptyState) as HTMLElement;
     const fileState = container.querySelector(SELECTORS.fileState) as HTMLElement;
-
-    console.log('[FileUpload] Empty state elements:', {
-        emptyState: !!emptyState,
-        fileState: !!fileState
-    });
 
     toggleElement(emptyState, true);
     toggleElement(fileState, false);
     showUploadProgress(container, false);
 
     container.classList.remove('dragover');
-    console.log('[FileUpload] Empty state shown');
+
 }
 
 /**
  * Show file selected state with preview
  */
 function showFileState(container: HTMLElement, file: File): void {
-    console.log('[FileUpload] Showing file state for:', file.name);
 
     const emptyState = container.querySelector(SELECTORS.emptyState) as HTMLElement;
     const fileState = container.querySelector(SELECTORS.fileState) as HTMLElement;
@@ -617,11 +533,6 @@ function showFileState(container: HTMLElement, file: File): void {
     const multiplePreview = container.querySelector(SELECTORS.multipleFilesPreview) as HTMLElement;
     const fileSummary = container.querySelector(SELECTORS.fileSummary) as HTMLElement;
     const addMoreContainer = container.querySelector(SELECTORS.addMoreFilesContainer) as HTMLElement;
-
-    console.log('[FileUpload] File state elements:', {
-        emptyState: !!emptyState,
-        fileState: !!fileState
-    });
 
     toggleElement(emptyState, false);
     toggleElement(fileState, true);
@@ -632,14 +543,13 @@ function showFileState(container: HTMLElement, file: File): void {
 
     updateFileInfo(container, file);
     announceChange(container, `File selected: ${file.name}`);
-    console.log('[FileUpload] File state shown');
+
 }
 
 /**
  * Show multiple files state with grid layout
  */
 function showMultipleFilesState(container: HTMLElement, files: File[]): void {
-    console.log('[FileUpload] Showing multiple files state:', files.length);
 
     const emptyState = container.querySelector(SELECTORS.emptyState) as HTMLElement;
     const fileState = container.querySelector(SELECTORS.fileState) as HTMLElement;
@@ -672,7 +582,7 @@ function showMultipleFilesState(container: HTMLElement, files: File[]): void {
     }
 
     announceChange(container, `${files.length} file(s) selected`);
-    console.log('[FileUpload] Multiple files state shown');
+
 }
 
 /**
@@ -718,7 +628,6 @@ function createFileCard(container: HTMLElement, file: File, index: number): HTML
                 img.setAttribute('tabindex', '0');
                 img.setAttribute('aria-label', `View ${file.name} in lightbox`);
 
-                console.log('[FileUpload] Registering card image with lightbox:', imageId);
                 lightboxActions.addImage(container, {
                     id: imageId,
                     src: imageUrl,
@@ -736,7 +645,7 @@ function createFileCard(container: HTMLElement, file: File, index: number): HTML
     info.className = 'space-y-1';
 
     const name = document.createElement('div');
-    name.className = 'text-sm font-medium text-foreground truncate';
+    name.className = 'text-sm font-medium text-text truncate';
     name.textContent = file.name;
     name.title = file.name;
 
@@ -766,29 +675,19 @@ function createFileCard(container: HTMLElement, file: File, index: number): HTML
  * Update file info display (name, size, preview)
  */
 function updateFileInfo(container: HTMLElement, file: File): void {
-    console.log('[FileUpload] Updating file info:', file.name);
 
     const fileName = container.querySelector(SELECTORS.fileName);
     const fileSize = container.querySelector(SELECTORS.fileSize);
     const previewImage = container.querySelector(SELECTORS.previewImage) as HTMLImageElement;
     const fileIcon = container.querySelector(SELECTORS.fileIcon);
 
-    console.log('[FileUpload] Info elements found:', {
-        fileName: !!fileName,
-        fileSize: !!fileSize,
-        previewImage: !!previewImage,
-        fileIcon: !!fileIcon
-    });
-
     if (fileName) fileName.textContent = file.name;
     if (fileSize) fileSize.textContent = formatFileSize(file.size);
 
     if (file.type.startsWith('image/')) {
-        console.log('[FileUpload] Reading image preview');
         const reader = new FileReader();
         reader.onload = (e) => {
             if (previewImage && e.target?.result) {
-                console.log('[FileUpload] Image preview loaded');
                 const imageUrl = e.target.result as string;
                 previewImage.src = imageUrl;
 
@@ -804,7 +703,6 @@ function updateFileInfo(container: HTMLElement, file: File): void {
 
                 const imageContainer = previewImage.closest('.file-upload-wrapper') as HTMLElement;
                 if (imageContainer) {
-                    console.log('[FileUpload] Registering image with lightbox:', imageId, imageContainer);
                     lightboxActions.addImage(imageContainer, {
                         id: imageId,
                         src: imageUrl,
@@ -813,25 +711,18 @@ function updateFileInfo(container: HTMLElement, file: File): void {
                         fileSize: formatFileSize(file.size),
                         fileType: file.type
                     });
-                } else {
-                    console.warn('[FileUpload] Could not find wrapper for lightbox registration');
                 }
 
                 toggleElement(previewImage, true);
                 toggleElement(fileIcon as HTMLElement, false);
             }
         };
-        reader.onerror = (e) => {
-            console.error('[FileUpload] Error reading image:', e);
-        };
         reader.readAsDataURL(file);
     } else {
-        console.log('[FileUpload] Showing file icon (non-image file)');
         toggleElement(previewImage, false);
         toggleElement(fileIcon as HTMLElement, true);
     }
 
-    console.log('[FileUpload] File info updated');
 }
 
 /**
@@ -846,15 +737,6 @@ function showUploadProgress(container: HTMLElement, show: boolean): void {
  * Display error message
  */
 function showError(container: HTMLElement, message: string): void {
-    console.log('[FileUpload] Showing error:', message);
-
-    const errorElement = container.querySelector(SELECTORS.errorMessage) as HTMLElement;
-    if (errorElement) {
-        errorElement.textContent = message;
-        toggleElement(errorElement, true);
-    } else {
-        console.warn('[FileUpload] Error message element not found');
-    }
     container.setAttribute(DATA_ATTRS.invalid, 'true');
 }
 
@@ -862,12 +744,6 @@ function showError(container: HTMLElement, message: string): void {
  * Clear error message
  */
 function clearError(container: HTMLElement): void {
-    console.log('[FileUpload] Clearing error');
-
-    const errorElement = container.querySelector(SELECTORS.errorMessage) as HTMLElement;
-    if (errorElement) {
-        toggleElement(errorElement, false);
-    }
     container.removeAttribute(DATA_ATTRS.invalid);
 }
 
@@ -886,16 +762,7 @@ function formatFileSize(bytes: number): string {
  * Toggle element visibility using hidden class
  */
 function toggleElement(element: HTMLElement | null, show: boolean): void {
-    if (!element) {
-        console.warn('[FileUpload] toggleElement: element is null');
-        return;
-    }
-    console.log('[FileUpload] Toggling element:', {
-        element: element.className,
-        show,
-        wasHidden: element.classList.contains('hidden'),
-        willBeHidden: !show
-    });
+    if (!element) return;
     element.classList.toggle('hidden', !show);
 }
 

@@ -5,8 +5,8 @@ import { DOMUtils } from './utils/DOMUtils';
  * ColorPicker state interface
  */
 interface ColorPickerState {
-    colorInput: HTMLInputElement | null;
-    textInput: HTMLInputElement | null;
+    colorInput: HTMLInputElement;
+    textInput: HTMLInputElement;
     isUpdating: boolean;
 }
 
@@ -17,86 +17,114 @@ interface ColorPickerState {
  * Provides real-time updates and hex color validation.
  */
 export default class ColorPickerActions extends BaseActionClass<ColorPickerState> {
-    private colorInput: HTMLInputElement | null = null;
-    private textInput: HTMLInputElement | null = null;
-    private isUpdating = false;
+    /**
+     * Bind event listeners using event delegation - required by BaseActionClass
+     */
+    protected bindEventListeners(): void {
+        // Use event delegation for all color picker interactions
+        document.addEventListener('input', (e) => {
+            const target = e.target as HTMLElement;
 
-    // Store bound function references for proper cleanup
-    private boundHandleColorInput: ((e: Event) => void) | null = null;
-    private boundHandleTextInput: ((e: Event) => void) | null = null;
-    private boundHandleTextBlur: ((e: Event) => void) | null = null;
-    private boundHandleKeydown: ((e: KeyboardEvent) => void) | null = null;
+            // Handle color input changes
+            if (target.matches('[data-color-input]')) {
+                this.handleColorInput(e);
+            }
 
-    constructor(element: HTMLElement) {
-        super(element);
-        this.initializeInputs();
-        this.setupEventListeners();
+            // Handle text input changes
+            if (target.matches('[data-text-input]')) {
+                this.handleTextInput(e);
+            }
+        });
+
+        document.addEventListener('blur', (e) => {
+            const target = e.target as HTMLElement;
+
+            if (target.matches('[data-text-input]')) {
+                this.handleTextBlur(e);
+            }
+        }, true); // Use capture phase for blur events
+
+        document.addEventListener('keydown', (e) => {
+            const target = e.target as HTMLElement;
+
+            if (target.matches('[data-text-input]')) {
+                this.handleKeydown(e as KeyboardEvent);
+            }
+        });
     }
 
     /**
-     * Initialize color and text input elements
+     * Initialize color picker elements - required by BaseActionClass
      */
-    private initializeInputs(): void {
-        this.colorInput = DOMUtils.querySelector('[data-color-input]', this.element) as HTMLInputElement;
-        this.textInput = DOMUtils.querySelector('[data-text-input]', this.element) as HTMLInputElement;
+    protected initializeElements(): void {
+        const colorPickers = DOMUtils.querySelectorAll('[data-keys-color-picker="true"]') as HTMLElement[];
 
-        if (!this.colorInput || !this.textInput) {
+        colorPickers.forEach(picker => {
+            this.initializeColorPicker(picker);
+        });
+    }
+
+    /**
+     * Initialize a single color picker element
+     */
+    private initializeColorPicker(picker: HTMLElement): void {
+        const colorInput = DOMUtils.querySelector('[data-color-input]', picker) as HTMLInputElement;
+        const textInput = DOMUtils.querySelector('[data-text-input]', picker) as HTMLInputElement;
+
+        if (!colorInput || !textInput) {
             console.warn('ColorPicker: Required input elements not found');
             return;
         }
-    }
 
-    /**
-     * Setup event listeners for both inputs
-     */
-    private setupEventListeners(): void {
-        if (!this.colorInput || !this.textInput) return;
+        const state: ColorPickerState = {
+            colorInput,
+            textInput,
+            isUpdating: false
+        };
 
-        // Create and store bound function references
-        this.boundHandleColorInput = this.handleColorInput.bind(this);
-        this.boundHandleTextInput = this.handleTextInput.bind(this);
-        this.boundHandleTextBlur = this.handleTextBlur.bind(this);
-        this.boundHandleKeydown = this.handleKeydown.bind(this);
-
-        // Attach event listeners using stored references
-        this.colorInput.addEventListener('input', this.boundHandleColorInput);
-        this.textInput.addEventListener('input', this.boundHandleTextInput);
-        this.textInput.addEventListener('blur', this.boundHandleTextBlur);
-        this.textInput.addEventListener('keydown', this.boundHandleKeydown);
+        this.setState(picker, state);
     }
 
     /**
      * Handle color picker input changes
      */
     private handleColorInput(event: Event): void {
-        if (this.isUpdating || !this.colorInput || !this.textInput) return;
-
         const target = event.target as HTMLInputElement;
+        const picker = target.closest('[data-keys-color-picker="true"]') as HTMLElement;
+        if (!picker) return;
+
+        const state = this.getState(picker);
+        if (!state || state.isUpdating) return;
+
         const hexColor = target.value.toUpperCase();
 
-        this.isUpdating = true;
-        this.textInput.value = hexColor;
+        state.isUpdating = true;
+        state.textInput.value = hexColor;
 
         // Dispatch change event for Livewire/Alpine integration
-        this.dispatchChangeEvent(this.colorInput);
+        this.dispatchChangeEvent(state.colorInput);
 
-        this.isUpdating = false; // Reset AFTER dispatch
+        state.isUpdating = false; // Reset AFTER dispatch
     }
 
     /**
      * Handle text input changes
      */
     private handleTextInput(event: Event): void {
-        if (this.isUpdating || !this.colorInput || !this.textInput) return;
-
         const target = event.target as HTMLInputElement;
+        const picker = target.closest('[data-keys-color-picker="true"]') as HTMLElement;
+        if (!picker) return;
+
+        const state = this.getState(picker);
+        if (!state || state.isUpdating) return;
+
         const value = target.value;
 
         // Only update if it's a valid hex color
         if (this.isValidHexColor(value)) {
-            this.isUpdating = true;
-            this.colorInput.value = value.toUpperCase();
-            this.isUpdating = false;
+            state.isUpdating = true;
+            state.colorInput.value = value.toUpperCase();
+            state.isUpdating = false;
         }
     }
 
@@ -104,9 +132,13 @@ export default class ColorPickerActions extends BaseActionClass<ColorPickerState
      * Handle text input blur - validate and correct format
      */
     private handleTextBlur(event: Event): void {
-        if (!this.colorInput || !this.textInput) return;
-
         const target = event.target as HTMLInputElement;
+        const picker = target.closest('[data-keys-color-picker="true"]') as HTMLElement;
+        if (!picker) return;
+
+        const state = this.getState(picker);
+        if (!state) return;
+
         let value = target.value.trim();
 
         // Add # if missing
@@ -118,18 +150,18 @@ export default class ColorPickerActions extends BaseActionClass<ColorPickerState
         if (this.isValidHexColor(value)) {
             value = value.toUpperCase();
 
-            this.isUpdating = true; // Protect from recursion
-            this.textInput.value = value;
-            this.colorInput.value = value;
+            state.isUpdating = true; // Protect from recursion
+            state.textInput.value = value;
+            state.colorInput.value = value;
 
             // Dispatch change event
-            this.dispatchChangeEvent(this.colorInput);
-            this.isUpdating = false;
+            this.dispatchChangeEvent(state.colorInput);
+            state.isUpdating = false;
         } else if (value !== '') {
             // Reset to color input value if invalid
-            this.isUpdating = true;
-            this.textInput.value = this.colorInput.value;
-            this.isUpdating = false;
+            state.isUpdating = true;
+            state.textInput.value = state.colorInput.value;
+            state.isUpdating = false;
         }
     }
 
@@ -137,13 +169,18 @@ export default class ColorPickerActions extends BaseActionClass<ColorPickerState
      * Handle keyboard events
      */
     private handleKeydown(event: KeyboardEvent): void {
-        if (!this.colorInput) return;
+        const target = event.target as HTMLElement;
+        const picker = target.closest('[data-keys-color-picker="true"]') as HTMLElement;
+        if (!picker) return;
+
+        const state = this.getState(picker);
+        if (!state) return;
 
         // Enter key opens color picker
         if (event.key === 'Enter') {
             event.preventDefault();
-            this.colorInput.focus();
-            this.colorInput.click();
+            state.colorInput.focus();
+            state.colorInput.click();
         }
     }
 
@@ -167,32 +204,10 @@ export default class ColorPickerActions extends BaseActionClass<ColorPickerState
     }
 
     /**
-     * Cleanup method - properly removes event listeners using stored references
+     * Clean up ColorPickerActions - extends BaseActionClass destroy
      */
-    public destroy(): void {
-        // Remove event listeners using the same bound references
-        if (this.colorInput && this.boundHandleColorInput) {
-            this.colorInput.removeEventListener('input', this.boundHandleColorInput);
-        }
-
-        if (this.textInput) {
-            if (this.boundHandleTextInput) {
-                this.textInput.removeEventListener('input', this.boundHandleTextInput);
-            }
-            if (this.boundHandleTextBlur) {
-                this.textInput.removeEventListener('blur', this.boundHandleTextBlur);
-            }
-            if (this.boundHandleKeydown) {
-                this.textInput.removeEventListener('keydown', this.boundHandleKeydown);
-            }
-        }
-
-        // Clean up all references to prevent memory leaks
-        this.boundHandleColorInput = null;
-        this.boundHandleTextInput = null;
-        this.boundHandleTextBlur = null;
-        this.boundHandleKeydown = null;
-        this.colorInput = null;
-        this.textInput = null;
+    protected onDestroy(): void {
+        // State cleanup is handled by BaseActionClass
+        // Event listeners use delegation so no cleanup needed
     }
 }

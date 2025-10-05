@@ -21,6 +21,7 @@ class Head extends Component
     public function render()
     {
         return view('keys::components.table.head', [
+            'variant' => $this->variant,
             'dataAttributes' => $this->getDataAttributes(),
         ]);
     }

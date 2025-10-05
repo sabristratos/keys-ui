@@ -210,6 +210,18 @@ export class DatePickerActions extends BaseActionClass<DatePickerState> {
         const hiddenInput = DOMUtils.querySelector('[data-date-picker-value]', datePicker) as HTMLInputElement;
         if (hiddenInput) {
             hiddenInput.value = value;
+
+            // Dispatch events for Livewire and native form integration
+            const inputEvent = new Event('input', { bubbles: true });
+            const changeEvent = new Event('change', { bubbles: true });
+
+            hiddenInput.dispatchEvent(inputEvent);
+            hiddenInput.dispatchEvent(changeEvent);
+
+            // Livewire integration
+            if ((window as any).Livewire && hiddenInput.hasAttribute('wire:model')) {
+                (window as any).Livewire.hook('message.processed', () => {});
+            }
         }
     }
 

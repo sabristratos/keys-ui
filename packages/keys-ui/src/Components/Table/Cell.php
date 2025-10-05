@@ -37,6 +37,11 @@ class Cell extends Component
     public function render()
     {
         return view('keys::components.table.cell', [
+            'size' => $this->size,
+            'align' => $this->align,
+            'variant' => $this->variant,
+            'wrap' => $this->wrap,
+            'truncate' => $this->truncate,
             'dataAttributes' => $this->getDataAttributes(),
         ]);
     }

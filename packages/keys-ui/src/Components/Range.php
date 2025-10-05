@@ -61,7 +61,6 @@ class Range extends Component
             $this->step = 1;
         }
 
-
         if (! $this->hasError && $this->hasErrors()) {
             $this->hasError = true;
         }
@@ -114,7 +113,6 @@ class Range extends Component
 
         return false;
     }
-
 
     public function getComputedValue(): mixed
     {
@@ -169,7 +167,6 @@ class Range extends Component
 
         return $computedTicks;
     }
-
 
     public function getUniqueId(): string
     {

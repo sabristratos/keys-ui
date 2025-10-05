@@ -290,10 +290,8 @@ export class TableActions extends BaseActionClass<TableState> {
 
             if (isSelected) {
                 row.setAttribute('data-selected', 'true');
-                row.classList.add('table-row-selected');
             } else {
                 row.setAttribute('data-selected', 'false');
-                row.classList.remove('table-row-selected');
             }
         });
     }
@@ -404,11 +402,6 @@ if (document.readyState === 'loading') {
 declare global {
     interface Window {
         TableActions: typeof TableActions;
-        Livewire?: {
-            on: (event: string, callback: (data: any) => void) => void;
-            dispatch: (event: string, data?: any) => void;
-            find: (id: string) => any;
-        };
     }
 }
 

@@ -33,7 +33,7 @@
     };
 
     $focusColor = match ($color) {
-        'brand' => 'peer-focus-visible:ring-brand/30',
+        'brand' => 'peer-focus-visible:ring-accent/30',
         'success' => 'peer-focus-visible:ring-success/30',
         'warning' => 'peer-focus-visible:ring-warning/30',
         'danger' => 'peer-focus-visible:ring-danger/30',
@@ -44,7 +44,7 @@
         'yellow' => 'peer-focus-visible:ring-yellow-300 dark:peer-focus-visible:ring-yellow-800',
         'teal' => 'peer-focus-visible:ring-teal-300 dark:peer-focus-visible:ring-teal-800',
         'orange' => 'peer-focus-visible:ring-orange-300 dark:peer-focus-visible:ring-orange-800',
-        default => 'peer-focus-visible:ring-brand/30'
+        default => 'peer-focus-visible:ring-accent/30'
     };
 
     $checkedColor = match ($color) {
@@ -88,14 +88,14 @@
 
     $trackClasses = trim("{$baseTrackClasses} {$focusClasses} {$checkedColor} {$thumbClasses} {$disabledClasses}");
 
-    $labelSizeClasses = match ($size) {
-        'sm' => 'text-sm',
-        'md' => 'text-sm',
-        'lg' => 'text-base',
-        default => 'text-sm'
+    $labelSize = match ($size) {
+        'sm' => 'sm',
+        'md' => 'sm',
+        'lg' => 'md',
+        default => 'sm'
     };
-    $labelColorClasses = $disabled ? 'text-neutral-500 dark:text-neutral-400' : 'text-foreground';
-    $labelClasses = trim($labelSizeClasses . ' ' . $labelColorClasses . ' font-medium');
+    $labelColor = $disabled ? 'muted' : 'text';
+    $labelWeight = 'medium';
 @endphp
 
 <label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $baseWrapperClasses])->merge($dataAttributes) }}>
@@ -114,7 +114,6 @@
         {{ $toggleAttributes }}
     />
 
-
     <div class="{{ $trackClasses }}" data-keys-track="true" data-toggle-target="{{ $id }}"></div>
 
     
@@ -123,18 +122,18 @@
             <div class="flex items-start justify-between">
                 <div class="flex-1 min-w-0">
                     @if($label)
-                        <span class="{{ $labelClasses }}">
+                        <x-keys::text element="span" :size="$labelSize" :color="$labelColor" :weight="$labelWeight">
                             {{ $label }}
                             @if($required)
                                 <span class="text-danger ml-1">*</span>
                             @endif
-                        </span>
+                        </x-keys::text>
                     @endif
                     @if($description)
-                        <p class="text-sm text-muted mt-1">{{ $description }}</p>
+                        <x-keys::text size="sm" color="muted" class="mt-1">{{ $description }}</x-keys::text>
                     @endif
                     @if($hint)
-                        <p class="text-xs text-muted mt-1">{{ $hint }}</p>
+                        <x-keys::text size="xs" color="muted" class="mt-1">{{ $hint }}</x-keys::text>
                     @endif
                 </div>
 

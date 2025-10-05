@@ -48,7 +48,6 @@
     @endif
 </span>
 
-
 <style>
     [data-keys-heading-decorator][data-variant="underline"] {
         position: relative;

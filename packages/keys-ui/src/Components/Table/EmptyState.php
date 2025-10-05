@@ -49,6 +49,15 @@ class EmptyState extends Component
     public function render()
     {
         return view('keys::components.table.empty', [
+            'size' => $this->size,
+            'variant' => $this->variant,
+            'icon' => $this->icon,
+            'title' => $this->title,
+            'description' => $this->description,
+            'actionText' => $this->actionText,
+            'actionUrl' => $this->actionUrl,
+            'iconSize' => $this->getIconSize(),
+            'hasAction' => $this->hasAction(),
             'dataAttributes' => $this->getDataAttributes(),
         ]);
     }

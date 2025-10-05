@@ -4,6 +4,7 @@
  */
 
 import { BaseActionClass } from './utils/BaseActionClass';
+import { DOMUtils } from './utils/DOMUtils';
 
 interface SidebarElements {
     sidebar: HTMLElement;
@@ -14,18 +15,11 @@ interface SidebarElements {
 export class SidebarActions extends BaseActionClass {
     private sidebars: Map<string, SidebarElements> = new Map();
 
-    constructor() {
-        super('SidebarActions');
-    }
-
-    public init(): void {
-        console.log('[SidebarActions] Initializing sidebar actions');
-        this.setupSidebars();
-        this.setupEventListeners();
-    }
-
-    private setupSidebars(): void {
-        const sidebars = document.querySelectorAll<HTMLElement>('[data-keys-sidebar="true"]');
+    /**
+     * Initialize sidebar elements - required by BaseActionClass
+     */
+    protected initializeElements(): void {
+        const sidebars = DOMUtils.querySelectorAll('[data-keys-sidebar="true"]') as HTMLElement[];
 
         sidebars.forEach((sidebar) => {
             const id = sidebar.id;
@@ -46,25 +40,36 @@ export class SidebarActions extends BaseActionClass {
                 overlay,
                 toggleButtons,
             });
-
-            console.log(`[SidebarActions] Registered sidebar: ${id}`, { hasOverlay: !!overlay, toggleCount: toggleButtons.length });
         });
+
+        // Initial icon update after all sidebars are registered
+        this.updateAllToggleIcons();
     }
 
-    private setupEventListeners(): void {
-        // Listen for toggle button clicks
-        this.sidebars.forEach(({ sidebar, overlay, toggleButtons }, id) => {
-            // Attach listeners to ALL toggle buttons for this sidebar
-            toggleButtons.forEach((toggleButton) => {
-                toggleButton.addEventListener('click', () => {
-                    this.toggleSidebar(id);
-                });
-            });
+    /**
+     * Bind event listeners - required by BaseActionClass
+     */
+    protected bindEventListeners(): void {
+        // Use event delegation for toggle buttons
+        document.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const toggleButton = target.closest('[data-sidebar-toggle]') as HTMLButtonElement;
+            if (toggleButton) {
+                const sidebarId = toggleButton.dataset.sidebarToggle;
+                if (sidebarId) {
+                    this.toggleSidebar(sidebarId);
+                }
+            }
+        });
 
-            if (overlay) {
-                overlay.addEventListener('click', () => {
-                    this.closeSidebar(id);
-                });
+        // Use event delegation for overlay clicks
+        document.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            if (target.matches('[data-sidebar-overlay]')) {
+                const sidebarId = target.dataset.sidebarTarget;
+                if (sidebarId) {
+                    this.closeSidebar(sidebarId);
+                }
             }
         });
 
@@ -101,9 +106,6 @@ export class SidebarActions extends BaseActionClass {
                 this.closeSidebar(sidebarId);
             }
         }) as EventListener);
-
-        // Initial icon update
-        this.updateAllToggleIcons();
     }
 
     private toggleSidebar(id: string): void {
@@ -258,10 +260,12 @@ export class SidebarActions extends BaseActionClass {
         svgElement.appendChild(pathElement);
     }
 
-    public destroy(): void {
-        console.log('[SidebarActions] Destroying sidebar actions');
+    /**
+     * Clean up SidebarActions - extends BaseActionClass destroy
+     */
+    protected onDestroy(): void {
         this.sidebars.clear();
     }
 }
 
-export default SidebarActions;
+export default SidebarActions.getInstance();

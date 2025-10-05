@@ -44,7 +44,7 @@
     } elseif ($hasError()) {
         $handleStateClasses = 'bg-white ring-danger shadow-sm hover:shadow-md focus-visible:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-danger focus-visible:outline-offset-2 cursor-grab active:cursor-grabbing';
     } else {
-        $handleStateClasses = 'bg-white ring-brand shadow-sm hover:shadow-md focus-visible:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2 cursor-grab active:cursor-grabbing';
+        $handleStateClasses = 'bg-white ring-accent shadow-sm hover:shadow-md focus-visible:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 cursor-grab active:cursor-grabbing';
     }
     $handleClasses = "$handleBaseClasses $handleStateClasses $touchTargetClasses";
 
@@ -455,7 +455,6 @@
         }
     </style>
 @endonce
-
 
 @if($dual)
     <input type="hidden"

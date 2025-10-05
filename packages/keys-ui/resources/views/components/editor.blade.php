@@ -8,7 +8,7 @@
     $editorAttributes = $attributes->whereStartsWith('wire:');
     $isLivewireEnabled = $editorAttributes->isNotEmpty();
 
-    $editorBaseClasses = 'quill-editor has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand has-[:focus-visible]:ring-offset-2 transition-all duration-200 overflow-hidden';
+    $editorBaseClasses = 'quill-editor has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent has-[:focus-visible]:ring-offset-2 transition-all duration-200 overflow-hidden';
 
     $editorSizeClasses = match ($size) {
         'xs' => 'rounded-sm',

@@ -3,7 +3,6 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Image Component

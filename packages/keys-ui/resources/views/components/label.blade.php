@@ -1,16 +1,13 @@
 @php
 
-    $baseClasses = 'block font-medium text-foreground mb-1.5';
-    $sizeClasses = match ($size) {
-        'sm' => 'text-xs',
-        'md' => 'text-sm',
-        'lg' => 'text-base',
-        default => 'text-sm'
+    $textSize = match ($size) {
+        'sm' => 'xs',
+        'md' => 'sm',
+        'lg' => 'md',
+        default => 'sm'
     };
 
-    $labelAttributes = $attributes->merge([
-        'class' => trim("$baseClasses $sizeClasses")
-    ])->merge($dataAttributes);
+    $labelAttributes = $attributes->merge(['class' => 'block mb-1.5'])->merge($dataAttributes);
 
     if ($for) {
         $labelAttributes = $labelAttributes->merge(['for' => $for]);
@@ -33,8 +30,7 @@
             />
         @endif
 
-
-        <span>{{ $slot }}</span>
+        <x-keys::text element="span" :size="$textSize" weight="medium">{{ $slot }}</x-keys::text>
 
         @if($slot->isNotEmpty())
 
@@ -54,11 +50,9 @@
                 </x-keys::tooltip>
             @endif
 
-
             @if($required)
-                <span class="text-danger ml-0.5" aria-label="{{ __('keys-ui::keys-ui.aria.required_field') }}">*</span>
+                <span class="text-{{ $textSize }} text-danger ml-0.5" aria-label="{{ __('keys-ui::keys-ui.aria.required_field') }}">*</span>
             @endif
-
 
             @if($optional && !$required)
                 <span class="text-neutral ml-0.5 text-xs">{{ __('keys-ui::keys-ui.labels.optional') }}</span>

@@ -5,7 +5,6 @@ namespace Keys\UI\Components;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 /**
  * DatePicker Component
@@ -27,29 +26,32 @@ use Keys\UI\Constants\ComponentConstants;
  */
 class DatePicker extends Component
 {
+    private const VALID_SIZES = ['sm', 'md', 'lg'];
+
     public function __construct(
-        
+
         public ?string $name = null,
         public ?string $id = null,
         public mixed $value = null,
         public ?string $placeholder = null,
 
-        
+
         public string $format = 'Y-m-d',
         public ?string $displayFormat = null,
         public bool $isRange = false,
         public mixed $startDate = null,
         public mixed $endDate = null,
 
-        
+
         public string|Carbon|null $minDate = null,
         public string|Carbon|null $maxDate = null,
         public array $disabledDates = [],
         public int $monthsToShow = 1,
         public bool|array $quickSelectors = false,
 
-        
+
         public string $size = 'md',
+        public string $width = 'full',
         public bool $inline = false,
         public bool $disabled = false,
         public bool $readonly = false,
@@ -60,7 +62,7 @@ class DatePicker extends Component
         public ?string $iconRight = null,
         public ?string $customTrigger = null,
 
-        
+
         public bool $required = false,
         public ?string $label = null,
         public bool $optional = false,
@@ -101,8 +103,8 @@ class DatePicker extends Component
         $this->maxDate = $this->parseDate($this->maxDate);
 
         
-        if (!in_array($this->size, ComponentConstants::DATEPICKER_SIZES)) {
-            $this->size = ComponentConstants::getDefaultSize();
+        if (!in_array($this->size, self::VALID_SIZES)) {
+            $this->size = 'md';
         }
         if ($this->monthsToShow < 1 || $this->monthsToShow > 12) {
             $this->monthsToShow = 1;
@@ -287,23 +289,23 @@ class DatePicker extends Component
         ];
     }
 
-
     /**
      * Generate comprehensive data attributes following Keys UI standards
      */
     public function getDataAttributes(): array
     {
         $attributes = [
-            
+
             'data-keys-date-picker' => 'true',
 
-            
+
             'data-size' => $this->size,
+            'data-width' => $this->width,
             'data-format' => $this->format,
             'data-display-format' => $this->displayFormat,
             'data-inline' => $this->inline ? 'true' : 'false',
 
-            
+
             'data-range' => $this->isRange ? 'true' : 'false',
             'data-clearable' => $this->clearable ? 'true' : 'false',
             'data-has-calendar-icon' => $this->showCalendarIcon ? 'true' : 'false',
@@ -366,12 +368,12 @@ class DatePicker extends Component
     {
         
         $defaultQuickSelectors = [
-            ['label' => 'Today', 'value' => 'today'],
-            ['label' => 'Yesterday', 'value' => 'yesterday'],
-            ['label' => 'Last 7 Days', 'value' => 'last7days', 'range' => true],
-            ['label' => 'Last 30 Days', 'value' => 'last30days', 'range' => true],
-            ['label' => 'This Month', 'value' => 'thismonth', 'range' => true],
-            ['label' => 'Last Month', 'value' => 'lastmonth', 'range' => true],
+            ['label' => __('keys-ui::keys-ui.datepicker.today'), 'value' => 'today'],
+            ['label' => __('keys-ui::keys-ui.datepicker.yesterday'), 'value' => 'yesterday'],
+            ['label' => __('keys-ui::keys-ui.datepicker.last_7_days'), 'value' => 'last7days', 'range' => true],
+            ['label' => __('keys-ui::keys-ui.datepicker.last_30_days'), 'value' => 'last30days', 'range' => true],
+            ['label' => __('keys-ui::keys-ui.datepicker.this_month'), 'value' => 'thismonth', 'range' => true],
+            ['label' => __('keys-ui::keys-ui.datepicker.last_month'), 'value' => 'lastmonth', 'range' => true],
         ];
 
         $quickSelectors = $this->quickSelectors === false

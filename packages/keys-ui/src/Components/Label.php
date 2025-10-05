@@ -3,7 +3,6 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Label Component
@@ -21,6 +20,12 @@ use Keys\UI\Constants\ComponentConstants;
  */
 class Label extends Component
 {
+    private const VALID_TOOLTIP_PLACEMENTS = [
+        'top', 'bottom', 'left', 'right', 'top-start', 'top-end',
+        'bottom-start', 'bottom-end', 'left-start', 'left-end',
+        'right-start', 'right-end'
+    ];
+
     /**
      * Create a new Label component instance.
      *
@@ -55,20 +60,15 @@ class Label extends Component
             $this->size = 'md';
         }
 
-        
-        $validPlacements = defined('Keys\UI\Constants\ComponentConstants::POPOVER_PLACEMENTS')
-            ? ComponentConstants::POPOVER_PLACEMENTS
-            : ['top', 'bottom', 'left', 'right', 'top-start', 'top-end', 'bottom-start', 'bottom-end', 'left-start', 'left-end', 'right-start', 'right-end'];
 
-        if (!in_array($this->tooltipPlacement, $validPlacements)) {
+
+        if (!in_array($this->tooltipPlacement, self::VALID_TOOLTIP_PLACEMENTS)) {
             $this->tooltipPlacement = 'top';
         }
-
 
         if (!in_array($this->tooltipColor, ['dark', 'light'])) {
             $this->tooltipColor = 'dark';
         }
-
 
         if (!in_array($this->iconSize, ['xs', 'sm', 'md', 'lg'])) {
             $this->iconSize = 'xs';

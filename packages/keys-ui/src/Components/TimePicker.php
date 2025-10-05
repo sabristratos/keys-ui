@@ -48,6 +48,7 @@ class TimePicker extends Component
         public ?string $minTime = null,
         public ?string $maxTime = null,
         public string $size = 'md',
+        public string $width = 'full',
         public bool $disabled = false,
         public bool $readonly = false,
         public bool $required = false,
@@ -172,6 +173,28 @@ class TimePicker extends Component
     }
 
     /**
+     * Get quick time presets based on format
+     */
+    public function getTimePresets(): array
+    {
+        if ($this->format === '12') {
+            return [
+                ['label' => __('keys-ui::keys-ui.timepicker.morning'), 'time' => '9:00 AM'],
+                ['label' => __('keys-ui::keys-ui.timepicker.noon'), 'time' => '12:00 PM'],
+                ['label' => __('keys-ui::keys-ui.timepicker.afternoon'), 'time' => '3:00 PM'],
+                ['label' => __('keys-ui::keys-ui.timepicker.evening'), 'time' => '6:00 PM'],
+            ];
+        } else {
+            return [
+                ['label' => __('keys-ui::keys-ui.timepicker.morning'), 'time' => '09:00'],
+                ['label' => __('keys-ui::keys-ui.timepicker.noon'), 'time' => '12:00'],
+                ['label' => __('keys-ui::keys-ui.timepicker.afternoon'), 'time' => '15:00'],
+                ['label' => __('keys-ui::keys-ui.timepicker.evening'), 'time' => '18:00'],
+            ];
+        }
+    }
+
+    /**
      * Format time value according to component settings.
      */
     public function formatTimeValue(?string $time): ?string
@@ -221,6 +244,7 @@ class TimePicker extends Component
             'data-format-mode' => $this->formatMode,
             'data-step' => $this->step,
             'data-size' => $this->size,
+            'data-width' => $this->width,
         ];
 
         if ($this->disabled) {
@@ -277,6 +301,7 @@ class TimePicker extends Component
             'minuteOptions' => $this->getMinuteOptions(),
             'secondOptions' => $this->getSecondOptions(),
             'periodOptions' => $this->getPeriodOptions(),
+            'timePresets' => $this->getTimePresets(),
         ]);
     }
 }

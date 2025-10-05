@@ -21,6 +21,7 @@ class Body extends Component
     public function render()
     {
         return view('keys::components.table.body', [
+            'variant' => $this->variant,
             'dataAttributes' => $this->getDataAttributes(),
         ]);
     }

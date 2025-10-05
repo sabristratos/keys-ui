@@ -9,9 +9,9 @@ class Card extends Component
     public function __construct(
         public string $variant = 'default',
         public string $colorVariant = 'neutral',
-        public string $padding = 'md',
-        public string $rounded = 'md',
-        public string $shadow = 'sm',
+        public string $padding = 'lg',
+        public string $rounded = 'lg',
+        public string $shadow = 'xs',
         public bool $selected = false,
         public bool $loading = false,
         public ?string $loadingText = null,

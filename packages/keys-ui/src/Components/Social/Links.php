@@ -41,7 +41,8 @@ class Links extends Component
         $this->showLabels = $showLabels;
         $this->target = $target;
 
-        // Compute arrays as properties
+        
+
         $this->platformLabels = $this->buildPlatformLabels();
         $this->platformIcons = $this->buildPlatformIcons();
     }

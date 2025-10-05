@@ -25,57 +25,56 @@
         <x-keys::label :for="$id" :required="$required" :optional="$optional">{{ $label }}</x-keys::label>
     @endif
 
-    
-    <div class="file-upload-wrapper">
-        <div class="relative" {{ $attributes->merge($dataAttributes) }} @if($isLivewireMode()) wire:ignore @endif>
-        
-        <input
-            type="file"
-            class="file-input"
-            @if($name) name="{{ $name }}{{ $multiple ? '[]' : '' }}" @endif
-            id="{{ $id }}"
-            accept="{{ $accept }}"
-            @if($required) required @endif
-            @if($disabled) disabled @endif
-            @if($multiple) multiple @endif
-            {{ $attributes->merge($computedWireAttributes) }}
-        />
 
-        
-        <div class="{{ $dropzoneClasses }} upload-empty-state text-center transition-all duration-300 ease-in-out">
-            <x-keys::icon
-                name="heroicon-o-cloud-arrow-up"
-                :size="$iconSize"
-                class="mx-auto text-muted mb-3"
+    <div class="file-upload-wrapper">
+        <div class="relative" {{ $attributes->merge($dataAttributes) }}>
+            <input
+                type="file"
+                class="file-input"
+                @if($name) name="{{ $name }}{{ $multiple ? '[]' : '' }}" @endif
+                id="{{ $id }}"
+                accept="{{ $accept }}"
+                @if($required) required @endif
+                @if($disabled) disabled @endif
+                @if($multiple) multiple @endif
+                {{ $attributes->merge($computedWireAttributes) }}
             />
 
-            <div class="space-y-1">
-                <p class="text-sm font-medium text-foreground">
-                    {{ $placeholder }}
-                </p>
+            {{-- Dropzone with wire:ignore to preserve drag/drop state --}}
+            <div class="{{ $dropzoneClasses }} upload-empty-state text-center transition-all duration-300 ease-in-out" @if($isLivewireMode()) wire:ignore @endif>
+                <x-keys::icon
+                    name="heroicon-o-cloud-arrow-up"
+                    :size="$iconSize"
+                    class="mx-auto text-muted mb-3"
+                />
 
-                @if($formattedAcceptedTypes || $maxSize)
-                    <p class="text-xs text-muted">
-                        @if($formattedAcceptedTypes)
-                            {{ $formattedAcceptedTypes }}
-                            @if($maxSize) • @endif
-                        @endif
-                        @if($maxSize)
-                            Max {{ $maxSize }}
-                        @endif
-                    </p>
-                @endif
+                <div class="space-y-1">
+                    <x-keys::text element="p" size="sm" weight="medium" color="text">
+                        {{ $placeholder }}
+                    </x-keys::text>
+
+                    @if($formattedAcceptedTypes || $maxSize)
+                        <x-keys::text element="p" size="xs" color="muted">
+                            @if($formattedAcceptedTypes)
+                                {{ $formattedAcceptedTypes }}
+                                @if($maxSize) • @endif
+                            @endif
+                            @if($maxSize)
+                                Max {{ $maxSize }}
+                            @endif
+                        </x-keys::text>
+                    @endif
+                </div>
             </div>
         </div>
-        </div>
 
-        
-        <div class="upload-file-state {{ $filePreviewClasses }} @container">
-            
+        {{-- File preview state - COMPLETELY SEPARATE from dropzone to avoid click interference --}}
+        <div class="upload-file-state {{ $filePreviewClasses }} @container" @if($isLivewireMode()) wire:ignore @endif>
+
             <div class="file-summary hidden mb-4 flex items-center justify-between">
-                <div class="text-sm font-medium text-foreground">
+                <x-keys::text element="div" size="sm" weight="medium" color="text">
                     <span class="file-count">0</span> file(s) selected
-                </div>
+                </x-keys::text>
                 <div class="file-total-size text-sm text-muted"></div>
             </div>
 
@@ -92,7 +91,7 @@
 
                     
                     <div class="flex-1 min-w-0">
-                        <div class="file-name text-sm font-medium text-foreground truncate"></div>
+                        <div class="file-name text-sm font-medium text-text truncate"></div>
                         <div class="file-size text-xs text-muted mt-1"></div>
 
                         
@@ -138,9 +137,6 @@
                 </x-keys::button>
             </div>
         </div>
-
-        
-        <div class="error-message hidden mt-4 text-sm text-danger"></div>
     </div>
 
     @if($isShorthand() && $showErrors)

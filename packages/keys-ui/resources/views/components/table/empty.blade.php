@@ -1,5 +1,5 @@
 @php
-    $emptyContainerClasses = 'text-center';
+    $emptyContainerClasses = 'text-center inline-flex flex-col justify-center';
     $emptyContainerClasses .= match ($size) {
         'sm' => ' py-8',
         'md' => ' py-12',
@@ -9,61 +9,61 @@
 
     $iconClasses = 'mx-auto mb-4';
     $iconClasses .= match ($variant) {
-        'success' => ' text-success-400',
-        'warning' => ' text-warning-400',
-        'danger' => ' text-danger-400',
-        'brand' => ' text-brand-400',
-        default => ' text-neutral-400'
+        'success' => ' text-success',
+        'warning' => ' text-warning',
+        'danger' => ' text-danger',
+        'brand' => ' text-accent',
+        default => ' text-muted'
     };
 
-    $titleClasses = 'font-medium text-foreground mb-2';
-    $titleClasses .= match ($size) {
-        'sm' => ' text-sm',
-        'md' => ' text-base',
-        'lg' => ' text-lg',
-        default => ' text-base'
+    $headingSize = match ($size) {
+        'sm' => 'sm',
+        'md' => 'md',
+        'lg' => 'lg',
+        default => 'md'
     };
 
-    $descriptionClasses = 'text-muted mb-4';
-    $descriptionClasses .= match ($size) {
-        'sm' => ' text-xs',
-        'md' => ' text-sm',
-        'lg' => ' text-base',
-        default => ' text-sm'
+    $textSize = match ($size) {
+        'sm' => 'xs',
+        'md' => 'sm',
+        'lg' => 'md',
+        default => 'sm'
     };
 @endphp
 
 <tr {{ $attributes->merge($dataAttributes) }}>
-    <td colspan="100" class="px-6 py-4 bg-surface border-t border-border">
+    <td colspan="100" class="px-6 py-4 bg-surface text-center border-t border-border">
         <div class="{{ $emptyContainerClasses }}">
             @if($icon)
                 <x-keys::icon
                     :name="$icon"
-                    size="{{ $getIconSize() }}"
+                    size="{{ $iconSize }}"
                     class="{{ $iconClasses }}"
                 />
             @endif
 
             @if($title)
-                <h3 class="{{ $titleClasses }}">
+                <x-keys::heading level="h3" :size="$headingSize" weight="medium" class="mb-2">
                     {{ $title }}
-                </h3>
+                </x-keys::heading>
             @endif
 
             @if($description)
-                <p class="{{ $descriptionClasses }}">
+                <x-keys::text color="muted" :size="$textSize" class="mb-4">
                     {{ $description }}
-                </p>
+                </x-keys::text>
             @endif
 
-            @if($hasAction())
+            @if($hasAction)
+                <div>
                 <x-keys::button
                     :href="$actionUrl"
-                    variant="brand"
+                    color="primary"
                     size="sm"
                 >
                     {{ $actionText }}
                 </x-keys::button>
+                </div>
             @endif
 
             {{ $slot }}

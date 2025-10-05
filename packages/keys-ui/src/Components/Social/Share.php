@@ -51,7 +51,8 @@ class Share extends Component
         $this->attached = $attached;
         $this->showLabels = $showLabels;
 
-        // Compute arrays as properties
+        
+
         $this->shareUrls = $this->buildShareUrls();
         $this->platformLabels = $this->buildPlatformLabels();
         $this->platformIcons = $this->buildPlatformIcons();

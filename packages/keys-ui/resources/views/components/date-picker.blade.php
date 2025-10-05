@@ -3,9 +3,15 @@
     $isLivewireEnabled = $wireOnlyAttributes->isNotEmpty();
 
     if ($isLivewireEnabled) {
-        $dataAttributes = array_merge($dataAttributes, ['data-livewire-enabled' => 'true']);
+        $dataAttributes = array_merge($dataAttributes, [
+            'data-livewire-enabled' => 'true',
+            'data-livewire-mode' => 'true',
+        ]);
         $wireModel = $wireOnlyAttributes->whereStartsWith('wire:model')->first();
-        if ($wireModel) $dataAttributes['data-wire-model'] = $wireModel;
+        if ($wireModel) {
+            $dataAttributes['data-wire-model'] = $wireModel;
+            $dataAttributes['data-livewire-property'] = $wireModel;
+        }
     }
 
     $datePickerAttributes = $attributes->whereDoesntStartWith('wire:')
@@ -13,27 +19,48 @@
         ->merge($dataAttributes)
         ->merge(['data-keys-date-picker-config' => json_encode($calendarData)]);
 
-    $baseClasses = 'input-trigger-base';
+    $baseClasses = 'flex items-center shadow-xs justify-between gap-2.5 bg-input border border-border rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
 
     $sizeClasses = match ($size) {
-        'sm' => 'min-h-[32px] px-3 py-1.5 text-sm',
-        'lg' => 'min-h-[42px] px-4 py-2.5 text-base',
-        default => 'min-h-[38px] px-3 py-2 text-sm'
+        'sm' => 'min-h-[32px] text-sm',
+        'lg' => 'min-h-[42px] text-base',
+        default => 'min-h-[38px] text-sm'
+    };
+
+    $paddingClasses = match ($size) {
+        'sm' => 'px-3 py-1.5',
+        'md' => 'px-3 py-2',
+        'lg' => 'px-4 py-2.5',
+        default => 'px-3 py-2'
+    };
+
+    $widthClasses = match ($width) {
+        'auto' => 'w-auto',
+        'xs' => 'w-20',
+        'sm' => 'w-32',
+        'md' => 'w-48',
+        'lg' => 'w-64',
+        'xl' => 'w-80',
+        '2xl' => 'w-96',
+        'fit' => 'w-fit',
+        'full' => 'w-full',
+        default => 'w-full'
     };
 
     $hasErrorBool = $hasError();
 
     if ($disabled) {
-        $stateClasses = 'input-disabled text-muted';
+        $stateClasses = 'opacity-50 cursor-not-allowed bg-surface text-muted';
     } elseif ($hasErrorBool) {
-        $stateClasses = 'input-error';
+        $stateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20 text-text';
     } else {
-        $stateClasses = 'input-default cursor-pointer';
+        $stateClasses = 'text-text';
     }
     $iconSize = match ($size) { 'sm' => 'xs', 'lg' => 'md', default => 'sm' };
 
-    $triggerClasses = "$baseClasses $sizeClasses $stateClasses";
-    $inputClasses = "block w-full rounded-md transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-1 $sizeClasses $stateClasses";
+    $triggerClasses = trim("$baseClasses $widthClasses $stateClasses");
+    $overlayClasses = trim("$sizeClasses $paddingClasses");
+    $inputClasses = "block w-full rounded-md transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-1 px-3 py-2 $sizeClasses $stateClasses";
 @endphp
 
 @if($isShorthand)
@@ -43,10 +70,11 @@
         </x-keys::label>
 
         <div class="relative mt-1" {{ $datePickerAttributes }}>
-            
+            @include('keys::partials.date-picker-inputs')
+
             @if(!$inline)
-                
-                <x-keys::popover
+                <div wire:ignore>
+                    <x-keys::popover
                     class="w-full"
                     :id="'date-picker-dropdown-' . $id"
                     placement="bottom-start"
@@ -54,22 +82,18 @@
                 >
                     <x-slot name="trigger">
                         <div class="relative">
-                            
+
                             @if($customTrigger)
                                 <div class="cursor-pointer" data-date-picker-trigger>
                                     {!! $customTrigger !!}
                                 </div>
-                                <input type="hidden"
-                                       name="{{ $name }}"
-                                       value="{{ $submitValue }}"
-                                       @if($required) required @endif
-                                       {{ $wireOnlyAttributes }}>
                             @else
-                                
+
                                 <button
                                     type="button"
                                     id="{{ $id }}"
-                                    class="{{ $triggerClasses }}"
+                                    popovertarget="date-picker-dropdown-{{ $id }}"
+                                    class="absolute inset-0 {{ $triggerClasses }}"
                                     data-popover-trigger="date-picker-dropdown-{{ $id }}"
                                     data-date-picker-trigger
                                     role="combobox"
@@ -77,39 +101,38 @@
                                     aria-haspopup="dialog"
                                     {{ $disabled ? 'disabled aria-disabled=true' : '' }}
                                     {{ $required ? 'aria-required=true' : '' }}
-                                    {{ $wireOnlyAttributes }}
                                 >
                                     <span class="sr-only" data-date-picker-value>
                                         @if($formattedValue)
                                             {{ $formattedValue }}
                                         @else
-                                            {{ $placeholder ?: 'Select date...' }}
+                                            {{ $placeholder ?: __('keys-ui::keys-ui.datepicker.placeholder') }}
                                         @endif
                                     </span>
                                 </button>
 
-                                
-                                <div class="absolute inset-0 flex items-center justify-between pointer-events-none px-3 py-2">
-                                    
-                                    <div class="flex items-center gap-2 flex-1 min-w-0">
+
+                                <div class="relative flex items-center justify-between pointer-events-none {{ $overlayClasses }}">
+
+                                    <div class="flex items-center gap-2.5 flex-1 min-w-0">
                                         @if($iconLeft)
                                             <div class="text-muted pointer-events-none">
                                                 <x-keys::icon :name="$iconLeft" :size="$iconSize" />
                                             </div>
                                         @endif
 
-                                        
-                                        <span class="date-picker-value truncate pointer-events-none" data-date-picker-display>
+
+                                        <span class="date-picker-value truncate pointer-events-none text-text" data-date-picker-display>
                                             @if($formattedValue)
                                                 {{ $formattedValue }}
                                             @else
-                                                <span class="text-muted">{{ $placeholder ?: 'Select date...' }}</span>
+                                                <span class="text-muted">{{ $placeholder ?: __('keys-ui::keys-ui.datepicker.placeholder') }}</span>
                                             @endif
                                         </span>
                                     </div>
 
-                                    
-                                    <div class="flex items-center gap-2">
+
+                                    <div class="flex items-center gap-2.5">
                                         @if($clearable && !$disabled)
                                             <x-keys::button
                                                 type="button"
@@ -138,11 +161,6 @@
                                         @endif
                                     </div>
                                 </div>
-
-                                <input type="hidden"
-                                       name="{{ $name }}"
-                                       value="{{ $submitValue }}"
-                                       data-date-picker-value>
                             @endif
                         </div>
                     </x-slot>
@@ -164,8 +182,9 @@
                         />
                     </div>
                 </x-keys::popover>
+                </div>
             @else
-                
+
                 <div class="relative">
                     @if($iconLeft)
                         <x-keys::icon
@@ -217,11 +236,6 @@
                             </div>
                         @endif
                     </div>
-
-                    <input type="hidden"
-                           name="{{ $name }}"
-                           value="{{ $submitValue }}"
-                           data-date-picker-value>
                 </div>
 
                 <div class="mt-2">
@@ -249,10 +263,11 @@
     </div>
 @else
     <div {{ $attributes->only('class') }} {{ $datePickerAttributes }}>
-        
+        @include('keys::partials.date-picker-inputs')
+
         @if(!$inline)
-            
-            <x-keys::popover
+            <div wire:ignore>
+                <x-keys::popover
                 class="w-full"
                 :id="'date-picker-dropdown-' . $id"
                 placement="bottom-start"
@@ -260,21 +275,17 @@
             >
                 <x-slot name="trigger">
                     <div class="relative">
-                        
+
                         @if($customTrigger)
                             <div class="cursor-pointer" data-date-picker-trigger>
                                 {!! $customTrigger !!}
                             </div>
-                            <input type="hidden"
-                                   name="{{ $name }}"
-                                   value="{{ $submitValue }}"
-                                   @if($required) required @endif
-                                   {{ $wireOnlyAttributes }}>
                         @else
                             <button
                                 type="button"
                                 id="{{ $id }}"
-                                class="{{ $triggerClasses }}"
+                                popovertarget="date-picker-dropdown-{{ $id }}"
+                                class="absolute inset-0 {{ $triggerClasses }}"
                                 data-popover-trigger="date-picker-dropdown-{{ $id }}"
                                 data-date-picker-trigger
                                 role="combobox"
@@ -282,62 +293,65 @@
                                 aria-haspopup="dialog"
                                 {{ $disabled ? 'disabled aria-disabled=true' : '' }}
                                 {{ $required ? 'aria-required=true' : '' }}
-                                {{ $wireOnlyAttributes }}
                             >
-                                <div class="flex items-center flex-1 min-w-0">
-                                    @if($iconLeft)
-                                        <x-keys::icon
-                                            :name="$iconLeft"
-                                            :size="$iconSize"
-                                            class="mr-2 text-muted"
-                                            data-icon
-                                        />
+                                <span class="sr-only" data-date-picker-value>
+                                    @if($formattedValue)
+                                        {{ $formattedValue }}
+                                    @else
+                                        {{ $placeholder ?: __('keys-ui::keys-ui.datepicker.placeholder') }}
                                     @endif
-
-                                    <div class="date-picker-display flex justify-start flex-1">
-                                        <span class="date-picker-value truncate" data-date-picker-display>
-                                            @if($formattedValue)
-                                                {{ $formattedValue }}
-                                            @else
-                                                <span class="text-muted date-picker-placeholder">{{ $placeholder ?: 'Select date...' }}</span>
-                                            @endif
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center">
-                                    @if($showCalendarIcon && !$iconRight)
-                                        <x-keys::icon
-                                            name="heroicon-o-calendar"
-                                            :size="$iconSize"
-                                            class="date-picker-icon transition-transform duration-200"
-                                        />
-                                    @elseif($iconRight)
-                                        <x-keys::icon :name="$iconRight" :size="$iconSize" data-icon />
-                                    @endif
-                                </div>
+                                </span>
                             </button>
 
-                            @if($clearable && !$disabled)
-                                <div class="absolute inset-0 flex justify-between items-center pointer-events-none px-3 py-2">
-                                    <div class="flex-1"></div>
-                                    <x-keys::button
-                                        type="button"
-                                        variant="ghost"
-                                        size="xs"
-                                        class="opacity-0 pointer-events-none transition-opacity duration-150 text-muted hover:text-danger ml-auto mr-6"
-                                        data-date-picker-clear
-                                        aria-label="Clear date"
-                                    >
-                                        <x-keys::icon name="heroicon-o-x-mark" size="xs" />
-                                    </x-keys::button>
-                                </div>
-                            @endif
+                            {{-- Visual overlay --}}
+                            <div class="relative flex items-center justify-between pointer-events-none {{ $overlayClasses }}">
+                                {{-- Left side: Icon + Value --}}
+                                <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                                    @if($iconLeft)
+                                        <div class="text-muted pointer-events-none">
+                                            <x-keys::icon :name="$iconLeft" :size="$iconSize" />
+                                        </div>
+                                    @endif
 
-                            <input type="hidden"
-                                   name="{{ $name }}"
-                                   value="{{ $submitValue }}"
-                                   data-date-picker-value>
+                                    <span class="date-picker-value truncate pointer-events-none text-text" data-date-picker-display>
+                                        @if($formattedValue)
+                                            {{ $formattedValue }}
+                                        @else
+                                            <span class="text-muted">{{ $placeholder ?: __('keys-ui::keys-ui.datepicker.placeholder') }}</span>
+                                        @endif
+                                    </span>
+                                </div>
+
+                                {{-- Right side: Clear + Calendar Icon --}}
+                                <div class="flex items-center gap-2.5">
+                                    @if($clearable && !$disabled)
+                                        <x-keys::button
+                                            type="button"
+                                            variant="ghost"
+                                            size="xs"
+                                            class="opacity-0 pointer-events-auto transition-opacity duration-150"
+                                            data-date-picker-clear
+                                            aria-label="Clear date"
+                                        >
+                                            <x-keys::icon name="heroicon-o-x-mark" size="xs" />
+                                        </x-keys::button>
+                                    @endif
+
+                                    @if($showCalendarIcon && !$iconRight)
+                                        <div class="text-muted pointer-events-none">
+                                            <x-keys::icon
+                                                name="heroicon-o-calendar"
+                                                :size="$iconSize"
+                                                class="date-picker-icon transition-transform duration-200"
+                                            />
+                                        </div>
+                                    @elseif($iconRight)
+                                        <div class="text-muted pointer-events-none">
+                                            <x-keys::icon :name="$iconRight" :size="$iconSize" />
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         @endif
                     </div>
                 </x-slot>
@@ -359,8 +373,9 @@
                     />
                 </div>
             </x-keys::popover>
+            </div>
         @else
-            
+
             <div class="relative">
                 @if($iconLeft)
                     <x-keys::icon
@@ -412,11 +427,6 @@
                         </div>
                     @endif
                 </div>
-
-                <input type="hidden"
-                       name="{{ $name }}"
-                       value="{{ $submitValue }}"
-                       data-date-picker-value>
             </div>
 
             <div class="mt-2">

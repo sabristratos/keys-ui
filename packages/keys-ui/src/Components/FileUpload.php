@@ -56,10 +56,9 @@ class FileUpload extends Component
     /**
      * Check if Livewire is available and should be used for this component.
      *
-     * Conservative check to prevent false positives:
+     * Simple check:
      * - Livewire class must exist
      * - Component must have a name (required for wire:model)
-     * - Must be in a Livewire request context (has Livewire headers)
      */
     public function isLivewireMode(): bool
     {
@@ -67,14 +66,12 @@ class FileUpload extends Component
             return false;
         }
 
-        
+
         if (empty($this->name)) {
             return false;
         }
 
-        
-        $request = request();
-        return $request->hasHeader('X-Livewire') || $request->hasHeader('X-Livewire-Request');
+        return true;
     }
 
     /**
@@ -127,7 +124,6 @@ class FileUpload extends Component
     {
         return $this->size === 'sm' ? 'lg' : 'xl';
     }
-
 
     public function getDataAttributes(): array
     {

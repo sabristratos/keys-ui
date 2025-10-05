@@ -17,7 +17,7 @@
         }
     }
 
-    $baseClasses = 'input-trigger-base';
+    $baseClasses = 'flex shadow-xs items-center justify-between gap-2.5 bg-input border border-border rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
 
     $sizeClasses = match ($size) {
         'sm' => 'min-h-[32px] text-sm',
@@ -47,11 +47,11 @@
     };
 
     if ($disabled) {
-        $stateClasses = 'input-disabled text-muted';
+        $stateClasses = 'opacity-50 cursor-not-allowed bg-surface text-muted';
     } elseif ($hasError) {
-        $stateClasses = 'input-error text-foreground';
+        $stateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20 text-text';
     } else {
-        $stateClasses = 'input-default text-foreground';
+        $stateClasses = 'text-text';
     }
 
     $triggerClasses = trim("$baseClasses $widthClasses $stateClasses");
@@ -80,11 +80,12 @@
         </x-keys::label>
 
         <div class="relative mt-1" {{ $selectAttributes }}>
-            
+
             @include('keys::partials.select-inputs')
 
-            
-            <x-keys::popover
+
+            <div wire:ignore>
+                <x-keys::popover
                 class="w-full"
                 :id="'select-dropdown-' . $id"
                 placement="bottom-start"
@@ -92,17 +93,18 @@
             >
                 <x-slot name="trigger">
                     <div class="relative">
-                        
+
                         <button
                             type="button"
                             id="{{ $id }}"
+                            popovertarget="select-dropdown-{{ $id }}"
                             class="absolute inset-0 {{ $triggerClasses }}"
                             data-select-trigger
                             @if($disabled) disabled @endif
                             @if($ariaLabel) aria-label="{{ $ariaLabel }}" @endif
                             @if($ariaDescribedby) aria-describedby="{{ $ariaDescribedby }}" @endif
                         >
-                            
+
                             <span class="sr-only" data-select-value>
                                 @if($multiple)
                                     {{ $placeholder ?? 'Select options...' }}
@@ -116,23 +118,23 @@
                             </span>
                         </button>
 
-                        
+
                         <div class="relative flex items-center justify-between pointer-events-none {{ $overlayClasses }}">
-                            
-                            <div class="flex items-center gap-2 flex-1 min-w-0">
+
+                            <div class="flex items-center gap-2.5 flex-1 min-w-0">
                                 @if($multiple)
-                                    
+
                                     <div class="flex flex-wrap gap-1 pointer-events-auto" data-select-chips>
-                                        
+
                                     </div>
 
-                                    
-                                    <span class="text-muted select-placeholder pointer-events-none" data-select-placeholder>
+
+                                    <span class="text-muted select-placeholder pointer-events-none hidden" data-select-placeholder>
                                         {{ $placeholder ?? 'Select options...' }}
                                     </span>
                                 @else
-                                    
-                                    <div class="flex items-center gap-2 select-value truncate pointer-events-none" data-select-display>
+
+                                    <div class="flex items-center gap-2.5 select-value truncate pointer-events-none text-text" data-select-display>
                                         @if($value)
                                             {{ $value }}
                                         @else
@@ -142,8 +144,8 @@
                                 @endif
                             </div>
 
-                            
-                            <div class="flex items-center gap-2">
+
+                            <div class="flex items-center gap-2.5">
                                 @if($clearable && !$disabled)
                                     <x-keys::button
                                         type="button"
@@ -156,7 +158,7 @@
                                     />
                                 @endif
 
-                                
+
                                 <div class="text-muted pointer-events-none">
                                     <x-keys::icon
                                         name="heroicon-o-chevron-down"
@@ -169,33 +171,32 @@
                     </div>
                 </x-slot>
 
-                
-                <div class="{{ $dropdownWidthClasses }}" data-select-dropdown>
-                    @if($searchable)
-                        <div class="mb-2">
-                            <x-keys::input
-                                type="text"
-                                placeholder="Search options..."
-                                size="sm"
-                                icon-left="heroicon-o-magnifying-glass"
-                                data-select-search="true"
-                            />
-                        </div>
-                    @endif
 
-                    <div class="max-h-48 overflow-y-auto overflow-x-hidden"
-                         data-select-options
-                         role="listbox"
-                         aria-labelledby="{{ $id }}"
-                         aria-multiselectable="{{ $multiple ? 'true' : 'false' }}">
-                        {{ $slot }}
+                @if($searchable)
+                    <div class="mb-2 {{ $dropdownWidthClasses }}">
+                        <x-keys::input
+                            type="text"
+                            placeholder="Search options..."
+                            size="sm"
+                            icon-left="heroicon-o-magnifying-glass"
+                            data-select-search="true"
+                        />
                     </div>
+                @endif
 
-                    <div class="px-3 py-2 text-sm text-muted text-left hidden" data-select-no-results>
-                        No options found
-                    </div>
+                <div class="max-h-60 overflow-y-auto overflow-x-hidden {{ $dropdownWidthClasses }}"
+                     data-select-options
+                     role="listbox"
+                     aria-labelledby="{{ $id }}"
+                     aria-multiselectable="{{ $multiple ? 'true' : 'false' }}">
+                    {{ $slot }}
+                </div>
+
+                <div class="px-3 py-2 text-sm text-muted text-left hidden {{ $dropdownWidthClasses }}" data-select-no-results>
+                    No options found
                 </div>
             </x-keys::popover>
+            </div>
         </div>
 
         @if($showErrors && !is_null($errors))
@@ -204,11 +205,12 @@
     </div>
 @else
     <div {{ $attributes->only('class') }} {{ $selectAttributes }}>
-        
+
         @include('keys::partials.select-inputs')
 
-        
-        <x-keys::popover
+
+        <div wire:ignore>
+            <x-keys::popover
             class="w-full"
             :id="'select-dropdown-' . $id"
             placement="bottom-start"
@@ -216,17 +218,18 @@
         >
             <x-slot name="trigger">
                 <div class="relative">
-                    
+
                     <button
                         type="button"
                         id="{{ $id }}"
+                        popovertarget="select-dropdown-{{ $id }}"
                         class="absolute inset-0 {{ $triggerClasses }}"
                         data-select-trigger
                         @if($disabled) disabled @endif
                         @if($ariaLabel) aria-label="{{ $ariaLabel }}" @endif
                         @if($ariaDescribedby) aria-describedby="{{ $ariaDescribedby }}" @endif
                     >
-                        
+
                         <span class="sr-only" data-select-value>
                             @if($multiple)
                                 {{ $placeholder ?? 'Select options...' }}
@@ -240,23 +243,23 @@
                         </span>
                     </button>
 
-                    
+
                     <div class="relative flex items-center justify-between pointer-events-none {{ $overlayClasses }}">
-                        
+
                         <div class="flex items-center gap-2 flex-1 min-w-0">
                             @if($multiple)
-                                
+
                                 <div class="flex flex-wrap gap-1 pointer-events-auto" data-select-chips>
-                                    
+
                                 </div>
 
-                                
-                                <span class="text-muted select-placeholder pointer-events-none" data-select-placeholder>
+
+                                <span class="text-muted select-placeholder pointer-events-none hidden" data-select-placeholder>
                                     {{ $placeholder ?? 'Select options...' }}
                                 </span>
                             @else
-                                
-                                <div class="flex items-center gap-2 select-value truncate pointer-events-none" data-select-display>
+
+                                <div class="flex items-center gap-2 select-value truncate pointer-events-none text-text" data-select-display>
                                     @if($value)
                                         {{ $value }}
                                     @else
@@ -266,7 +269,7 @@
                             @endif
                         </div>
 
-                        
+
                         <div class="flex items-center gap-2">
                             @if($clearable && !$disabled)
                                 <x-keys::button
@@ -280,7 +283,7 @@
                                 />
                             @endif
 
-                            
+
                             <div class="text-muted pointer-events-none">
                                 <x-keys::icon
                                     name="heroicon-o-chevron-down"
@@ -293,32 +296,31 @@
                 </div>
             </x-slot>
 
-            
-            <div class="{{ $dropdownWidthClasses }}" data-select-dropdown>
-                @if($searchable)
-                    <div class="mb-2">
-                        <x-keys::input
-                            type="text"
-                            placeholder="Search options..."
-                            size="sm"
-                            icon-left="heroicon-o-magnifying-glass"
-                            data-select-search="true"
-                        />
-                    </div>
-                @endif
 
-                <div class="max-h-48 overflow-y-auto overflow-x-hidden"
-                     data-select-options
-                     role="listbox"
-                     aria-labelledby="{{ $id }}"
-                     aria-multiselectable="{{ $multiple ? 'true' : 'false' }}">
-                    {{ $slot }}
+            @if($searchable)
+                <div class="mb-2 {{ $dropdownWidthClasses }}">
+                    <x-keys::input
+                        type="text"
+                        placeholder="Search options..."
+                        size="sm"
+                        icon-left="heroicon-o-magnifying-glass"
+                        data-select-search="true"
+                    />
                 </div>
+            @endif
 
-                <div class="px-3 py-2 text-sm text-muted text-left hidden" data-select-no-results>
-                    No options found
-                </div>
+            <div class="max-h-48 overflow-y-auto overflow-x-hidden {{ $dropdownWidthClasses }}"
+                 data-select-options
+                 role="listbox"
+                 aria-labelledby="{{ $id }}"
+                 aria-multiselectable="{{ $multiple ? 'true' : 'false' }}">
+                {{ $slot }}
+            </div>
+
+            <div class="px-3 py-2 text-sm text-muted text-left hidden {{ $dropdownWidthClasses }}" data-select-no-results>
+                No options found
             </div>
         </x-keys::popover>
+        </div>
     </div>
 @endif

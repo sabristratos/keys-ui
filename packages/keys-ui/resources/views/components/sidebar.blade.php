@@ -1,9 +1,7 @@
 
 @php
-    // Base structure classes
     $baseClasses = 'flex flex-col h-screen transition-all duration-300 ease-in-out';
 
-    // Visual variant styling
     $variantClasses = match ($variant) {
         'bordered' => 'bg-surface border-r border-border',
         'elevated' => 'bg-surface shadow-lg',
@@ -11,13 +9,11 @@
         default => 'bg-surface'
     };
 
-    // Position in layout
     $positionClasses = match ($position) {
         'right' => 'order-last',
         default => ''
     };
 
-    // Sticky positioning
     $stickyClasses = $sticky ? 'sticky top-0' : '';
 
     $sidebarClasses = trim("{$baseClasses} {$variantClasses} {$positionClasses} {$stickyClasses}");

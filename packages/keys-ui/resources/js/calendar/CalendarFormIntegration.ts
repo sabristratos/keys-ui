@@ -353,13 +353,14 @@ export class CalendarFormIntegration {
             }
         });
 
-        calendar.querySelectorAll('[data-calendar-action]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const action = (e.target as HTMLElement).dataset.calendarAction;
+        calendar.addEventListener('click', (e) => {
+            const actionButton = (e.target as HTMLElement).closest('[data-calendar-action]') as HTMLElement;
+            if (actionButton) {
+                const action = actionButton.dataset.calendarAction;
                 if (action) {
                     this.handleFooterAction(calendar, action, state, setState, onRender);
                 }
-            });
+            }
         });
     }
 

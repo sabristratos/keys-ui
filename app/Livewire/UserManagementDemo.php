@@ -69,7 +69,6 @@ class UserManagementDemo extends Component
     public $showDeleteConfirm = false;
     public $userToDelete = null;
 
-
     public function mount()
     {
         $this->loadUsers();

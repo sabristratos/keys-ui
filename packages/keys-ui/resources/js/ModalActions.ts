@@ -350,14 +350,4 @@ export class ModalActions extends BaseActionClass<ModalState> {
     }
 }
 
-declare global {
-    interface Window {
-        Livewire?: {
-            on: (event: string, callback: (data: any) => void) => void;
-            dispatch: (event: string, data?: any) => void;
-            find: (id: string) => any;
-        };
-    }
-}
-
 export default ModalActions.getInstance();

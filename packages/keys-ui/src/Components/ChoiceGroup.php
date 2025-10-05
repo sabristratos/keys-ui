@@ -25,11 +25,9 @@ class ChoiceGroup extends Component
             $this->hasError = true;
         }
 
-
         if (!in_array($this->type, ['checkbox', 'radio'])) {
             $this->type = 'checkbox';
         }
-
 
         if (!in_array($this->layout, ['stacked', 'grid', 'inline'])) {
             $this->layout = 'stacked';

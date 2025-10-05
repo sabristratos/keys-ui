@@ -153,7 +153,6 @@ class Group extends Component
         return $this->clearable;
     }
 
-
     /**
      * Check if the group has max badge limiting enabled.
      *

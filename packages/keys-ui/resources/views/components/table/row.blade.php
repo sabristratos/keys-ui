@@ -3,19 +3,19 @@
 
     $rowVariantClasses = '';
     if ($selected) {
-        $rowVariantClasses = 'bg-brand/10 border-brand';
+        $rowVariantClasses = 'bg-brand/10 border-l-2 border-brand';
     } else {
         $rowVariantClasses = match ($variant) {
-            'danger' => 'bg-danger/10',
-            'warning' => 'bg-warning/10',
-            'success' => 'bg-success/10',
+            'danger' => 'bg-danger-subtle',
+            'warning' => 'bg-warning-subtle',
+            'success' => 'bg-success-subtle',
             default => ''
         };
     }
 
     $rowInteractionClasses = '';
     if ($clickable || $href) {
-        $rowInteractionClasses = 'cursor-pointer hover:bg-body';
+        $rowInteractionClasses = $selected ? 'cursor-pointer' : 'cursor-pointer hover:bg-neutral-hover';
     }
 
     $rowClasses = trim("$rowBaseClasses $rowVariantClasses $rowInteractionClasses");
@@ -33,7 +33,7 @@
                     data-table-row-select="true"
                     :data-row-id="$rowId"
                     size="md"
-                    color="brand"
+                    color="accent"
                 />
             </td>
         @endif
@@ -51,7 +51,7 @@
                     data-table-row-select="true"
                     :data-row-id="$rowId"
                     size="md"
-                    color="brand"
+                    color="accent"
                 />
             </td>
         @endif

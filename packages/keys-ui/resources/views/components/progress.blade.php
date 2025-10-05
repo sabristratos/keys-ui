@@ -94,7 +94,6 @@
     @endif
 </div>
 
-
 <style>
     .progress-animated .progress-bar {
         background-image: linear-gradient(

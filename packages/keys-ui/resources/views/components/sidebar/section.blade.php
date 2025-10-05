@@ -5,7 +5,7 @@
         default => 'py-2'
     };
 
-    $headingClasses = 'px-4 py-2 text-xs font-semibold text-muted uppercase tracking-wider';
+    $headingClasses = 'px-4 py-2';
 @endphp
 
 @if($collapsible)
@@ -17,8 +17,8 @@
         {{ $attributes->merge($dataAttributes) }}
     >
         @if($heading)
-            <summary class="{{ $headingClasses }} flex items-center justify-between cursor-pointer list-none select-none transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 lg:[.sidebar-collapsed_&]:hidden">
-                <span>{{ $heading }}</span>
+            <summary class="{{ $headingClasses }} flex items-center justify-between cursor-pointer list-none select-none transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 lg:[.sidebar-collapsed_&]:hidden">
+                <x-keys::text element="span" size="xs" weight="semibold" color="muted" uppercase class="tracking-wider">{{ $heading }}</x-keys::text>
 
                 @if($icon && $collapsible)
                     <x-keys::icon
@@ -43,7 +43,7 @@
     >
         @if($heading)
             <div class="{{ $headingClasses }} lg:[.sidebar-collapsed_&]:hidden">
-                {{ $heading }}
+                <x-keys::text element="span" size="xs" weight="semibold" color="muted" uppercase class="tracking-wider">{{ $heading }}</x-keys::text>
             </div>
         @endif
 

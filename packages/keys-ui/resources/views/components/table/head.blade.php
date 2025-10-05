@@ -1,5 +1,5 @@
 @php
-    $headBaseClasses = 'bg-neutral-50 dark:bg-neutral-900/50';
+    $headBaseClasses = 'bg-foreground';
     $headVariantClasses = match ($variant) {
         'bordered' => 'border-b border-border',
         'elevated' => 'shadow-sm',

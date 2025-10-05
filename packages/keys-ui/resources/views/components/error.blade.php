@@ -2,7 +2,7 @@
     @php
 
         $messages = $getMessages();
-        $baseClasses = 'text-danger text-sm mt-1';
+        $baseClasses = 'mt-1';
 
         $errorAttributes = $attributes->merge([
             'class' => $baseClasses
@@ -27,11 +27,11 @@
                     size="xs"
                     class="text-danger mt-0.5 shrink-0"
                 />
-                <span>{{ $messages[0] }}</span>
+                <x-keys::text element="span" size="sm" color="danger">{{ $messages[0] }}</x-keys::text>
             </div>
         @elseif(count($messages) === 1)
-            
-            <span>{{ $messages[0] }}</span>
+
+            <x-keys::text element="span" size="sm" color="danger">{{ $messages[0] }}</x-keys::text>
         @else
             
             <ul class="list-disc list-inside space-y-1">
@@ -44,7 +44,7 @@
                                 class="text-danger mt-0.5 shrink-0"
                             />
                         @endif
-                        <span>{{ $message }}</span>
+                        <x-keys::text element="span" size="sm" color="danger">{{ $message }}</x-keys::text>
                     </li>
                 @endforeach
             </ul>

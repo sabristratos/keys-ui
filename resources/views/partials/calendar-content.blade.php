@@ -1,6 +1,6 @@
 
 <div {{ $containerAttributes }}>
-    
+
     <div class="calendar-header flex items-center justify-between {{ $computedHeaderClasses }} border-b border-border">
         <x-keys::button
             variant="ghost"
@@ -24,19 +24,19 @@
                 <span class="calendar-month-year-display">{{ $monthYearDisplay }}</span>
             </x-keys::button>
 
-            
+
             <div class="calendar-month-dropdown absolute top-full left-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-50 hidden"
                  data-calendar-month-dropdown>
                 <div class="p-2 grid grid-cols-3 gap-1">
-                    
+
                 </div>
             </div>
 
-            
+
             <div class="calendar-year-dropdown absolute top-full left-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-50 hidden max-h-64 overflow-y-auto"
                  data-calendar-year-dropdown>
                 <div class="p-2 space-y-1">
-                    
+
                 </div>
             </div>
         </div>
@@ -53,26 +53,26 @@
         </x-keys::button>
     </div>
 
-    
+
     <div class="calendar-grid-wrapper p-2" data-calendar-grid-wrapper>
         @if($monthsToShow > 1)
             <div class="calendar-multi-month-grid grid gap-2"
                  style="grid-template-columns: repeat({{ min($monthsToShow, 3) }}, 1fr);">
                 @for($i = 0; $i < $monthsToShow; $i++)
                     <div class="calendar-grid" data-calendar-grid-container data-month-index="{{ $i }}">
-                        
+
                     </div>
                 @endfor
             </div>
         @else
             <div class="calendar-grid" data-calendar-grid-container>
-                
+
             </div>
         @endif
     </div>
 
-    
-    <div class="calendar-footer flex items-center justify-between p-2 border-t border-border">
+
+    <div class="calendar-footer flex items-center justify-between pt-2 border-t border-border">
         <x-keys::button
             variant="ghost"
             size="sm"
@@ -94,7 +94,7 @@
         </x-keys::button>
     </div>
 
-    
+
     @if($name)
         @if($isRange)
             <input type="hidden"

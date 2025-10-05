@@ -335,11 +335,17 @@ export class ChartActions extends BaseActionClass {
         state.element.dispatchEvent(customEvent);
 
         if ('Livewire' in window) {
-            EventUtils.dispatchLivewireEvent(state.element, 'chart-item-clicked', {
-                index: itemData.index,
-                value: itemData.value,
-                label: itemData.label
-            });
+            const livewireEl = state.element.closest('[wire\\:id]');
+            if (livewireEl) {
+                const componentId = livewireEl.getAttribute('wire:id');
+                if (componentId) {
+                    (window as any).Livewire.find(componentId)?.$dispatch('chart-item-clicked', {
+                        index: itemData.index,
+                        value: itemData.value,
+                        label: itemData.label
+                    });
+                }
+            }
         }
     }
 

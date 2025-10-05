@@ -49,17 +49,17 @@
     };
 
     $titleSize = match ($parentSize) {
-        'sm' => 'text-xs',
-        'md' => 'text-sm',
-        'lg' => 'text-base',
-        default => 'text-sm'
+        'sm' => 'xs',
+        'md' => 'sm',
+        'lg' => 'md',
+        default => 'sm'
     };
 
     $descriptionSize = match ($parentSize) {
-        'sm' => 'text-xs',
-        'md' => 'text-sm',
-        'lg' => 'text-sm',
-        default => 'text-sm'
+        'sm' => 'xs',
+        'md' => 'sm',
+        'lg' => 'sm',
+        default => 'sm'
     };
 
     $indicatorClasses = '';
@@ -67,7 +67,7 @@
         if ($isComplete) {
             $indicatorClasses = "flex items-center justify-center rounded-full bg-success text-foreground-success {$indicatorSize}";
         } elseif ($isCurrent) {
-            $indicatorClasses = "flex items-center justify-center rounded-full bg-brand ring-2 ring-brand ring-offset-background ring-offset-2 text-foreground-brand {$indicatorSize}";
+            $indicatorClasses = "flex items-center justify-center rounded-full bg-brand ring-2 ring-accent ring-offset-background ring-offset-2 text-foreground-brand {$indicatorSize}";
         } else {
             $indicatorClasses = "flex items-center justify-center rounded-full bg-surface ring-1 ring-inset ring-border text-muted {$indicatorSize}";
         }
@@ -81,7 +81,7 @@
         if ($isComplete) {
             $indicatorClasses = "relative flex shrink-0 items-center justify-center *:data-icon:size-6 bg-surface shadow-xs-skeumorphic ring-1 ring-inset ring-success {$iconBoxSize} rounded-[10px] text-success";
         } elseif ($isCurrent) {
-            $indicatorClasses = "relative flex shrink-0 items-center justify-center *:data-icon:size-6 bg-surface shadow-xs-skeumorphic ring-1 ring-inset ring-brand {$iconBoxSize} rounded-[10px] text-brand";
+            $indicatorClasses = "relative flex shrink-0 items-center justify-center *:data-icon:size-6 bg-surface shadow-xs-skeumorphic ring-1 ring-inset ring-accent {$iconBoxSize} rounded-[10px] text-brand";
         } else {
             $indicatorClasses = "relative flex shrink-0 items-center justify-center *:data-icon:size-6 bg-surface shadow-xs-skeumorphic ring-1 ring-inset ring-border {$iconBoxSize} rounded-[10px] text-muted";
         }
@@ -89,7 +89,7 @@
         if ($isComplete) {
             $indicatorClasses = "flex items-center justify-center rounded-full bg-success {$indicatorSize}";
         } elseif ($isCurrent) {
-            $indicatorClasses = "flex items-center justify-center rounded-full bg-brand ring-2 ring-brand ring-offset-background ring-offset-2 {$indicatorSize}";
+            $indicatorClasses = "flex items-center justify-center rounded-full bg-brand ring-2 ring-accent ring-offset-background ring-offset-2 {$indicatorSize}";
         } else {
             $indicatorClasses = "flex items-center justify-center rounded-full bg-border {$indicatorSize}";
         }
@@ -111,9 +111,7 @@
         ? 'text-left md:text-center'
         : 'text-left';
 
-    $titleColorClasses = $isPending ? 'text-muted' : 'text-foreground';
-
-    $descriptionColorClasses = 'text-muted';
+    $titleColor = $isPending ? 'muted' : 'text';
 
     $contentMargin = match ($parentSize) {
         'sm' => 'mb-2 md:mb-0',
@@ -196,15 +194,15 @@
             @endif
         </div>
 
-        
+
         <div class="{{ $contentWrapperClasses }} {{ $opacityClasses }}">
-            <p class="w-full {{ $textAlignment }} {{ $titleColorClasses }} {{ $titleSize }} font-semibold">
+            <x-keys::text :size="$titleSize" :color="$titleColor" weight="semibold" :class="'w-full ' . $textAlignment">
                 {{ $title }}
-            </p>
+            </x-keys::text>
             @if($description)
-                <p class="w-full {{ $textAlignment }} {{ $descriptionColorClasses }} {{ $descriptionSize }}">
+                <x-keys::text :size="$descriptionSize" color="muted" :class="'w-full ' . $textAlignment">
                     {{ $description }}
-                </p>
+                </x-keys::text>
             @endif
         </div>
     </div>
@@ -258,15 +256,15 @@
             @endif
         </div>
 
-        
+
         <div class="flex flex-col items-start pt-0.5 {{ $contentPaddingClasses }}">
-            <p class="{{ $titleColorClasses }} {{ $titleSize }} font-semibold">
+            <x-keys::text :size="$titleSize" :color="$titleColor" weight="semibold">
                 {{ $title }}
-            </p>
+            </x-keys::text>
             @if($description)
-                <p class="{{ $descriptionColorClasses }} {{ $descriptionSize }}">
+                <x-keys::text :size="$descriptionSize" color="muted">
                     {{ $description }}
-                </p>
+                </x-keys::text>
             @endif
         </div>
     </div>

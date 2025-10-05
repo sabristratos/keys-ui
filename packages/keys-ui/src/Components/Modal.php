@@ -3,7 +3,6 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Modal Component
@@ -15,6 +14,8 @@ use Keys\UI\Constants\ComponentConstants;
  */
 class Modal extends Component
 {
+    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl', 'full'];
+
     /**
      * Create a new Modal component instance.
      *
@@ -43,17 +44,18 @@ class Modal extends Component
         public bool $trapFocus = true,
         public ?string $wireModel = null
     ) {
-        
-        if (!in_array($this->size, ComponentConstants::MODAL_SIZES)) {
-            $this->size = ComponentConstants::getDefaultSize();
+
+
+        if (!in_array($this->size, self::VALID_SIZES)) {
+            $this->size = 'md';
         }
 
-        
+
         if (!in_array($this->closedby, ['any', 'closerequest', 'none'])) {
             $this->closedby = 'any';
         }
 
-        
+
         if (!in_array($this->backdrop, ['blur', 'dark', 'none'])) {
             $this->backdrop = 'blur';
         }

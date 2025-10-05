@@ -63,7 +63,6 @@ class ToastManager
         }
     }
 
-
     /**
      * Create a success toast
      */

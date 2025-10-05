@@ -41,12 +41,12 @@ use Keys\UI\Components\Kbd;
 use Keys\UI\Components\Label;
 use Keys\UI\Components\Loading;
 use Keys\UI\Components\Main;
-use Keys\UI\Components\Menu;
-use Keys\UI\Components\Menu\Checkbox as MenuCheckbox;
-use Keys\UI\Components\Menu\Item as MenuItem;
-use Keys\UI\Components\Menu\Radio as MenuRadio;
-use Keys\UI\Components\Menu\Separator as MenuSeparator;
-use Keys\UI\Components\Menu\Submenu as MenuSubmenu;
+use Keys\UI\Components\Dropdown\Menu as DropdownMenu;
+use Keys\UI\Components\Dropdown\Checkbox as DropdownCheckbox;
+use Keys\UI\Components\Dropdown\Item as DropdownItem;
+use Keys\UI\Components\Dropdown\Radio as DropdownRadio;
+use Keys\UI\Components\Dropdown\Separator as DropdownSeparator;
+use Keys\UI\Components\Dropdown\Submenu as DropdownSubmenu;
 use Keys\UI\Components\Modal;
 use Keys\UI\Components\Popover;
 use Keys\UI\Components\Progress;
@@ -79,7 +79,9 @@ use Keys\UI\Components\Table\Row;
 use Keys\UI\Components\Tabs;
 use Keys\UI\Components\Tabs\Panel;
 use Keys\UI\Components\Tabs\Tab;
+use Keys\UI\Components\Text;
 use Keys\UI\Components\Textarea;
+use Keys\UI\Components\Heading;
 use Keys\UI\Components\TimePicker;
 use Keys\UI\Components\Toast;
 use Keys\UI\Components\Toggle;
@@ -142,6 +144,13 @@ class KeysUiServiceProvider extends ServiceProvider
             __DIR__.'/../resources/views/layouts' => resource_path('views/components/layouts'),
         ], 'keys-ui-layouts');
 
+        $this->publishes([
+            __DIR__.'/../dist/keys-ui.umd.js' => public_path('vendor/keys-ui/keys-ui.js'),
+            __DIR__.'/../dist/keys-ui.umd.js' => public_path('vendor/keys-ui/keys-ui.min.js'),
+            __DIR__.'/../dist/keys-ui.es.js' => public_path('vendor/keys-ui/keys-ui.es.js'),
+            __DIR__.'/../dist/style.css' => public_path('vendor/keys-ui/keys-ui.css'),
+        ], 'keys-ui-assets');
+
         Blade::component('keys::accordion', Accordion::class);
         Blade::component('keys::icon', Icon::class);
         Blade::component('keys::loading', Loading::class);
@@ -158,6 +167,8 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::error', Error::class);
         Blade::component('keys::input', Input::class);
         Blade::component('keys::textarea', Textarea::class);
+        Blade::component('keys::text', Text::class);
+        Blade::component('keys::heading', Heading::class);
         Blade::component('keys::checkbox', Checkbox::class);
         Blade::component('keys::kbd', Kbd::class);
         Blade::component('keys::chart', Chart::class);
@@ -187,20 +198,20 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::dropdown', Dropdown::class);
         Blade::component('keys::editor', Editor::class);
         Blade::component('keys::empty-state', EmptyState::class);
-        Blade::component('keys::menu', Menu::class);
-        Blade::component('keys::menu.item', MenuItem::class);
-        Blade::component('keys::menu.checkbox', MenuCheckbox::class);
-        Blade::component('keys::menu.radio', MenuRadio::class);
-        Blade::component('keys::menu.separator', MenuSeparator::class);
-        Blade::component('keys::menu.submenu', MenuSubmenu::class);
+        Blade::component('keys::dropdown.menu', DropdownMenu::class);
+        Blade::component('keys::dropdown.item', DropdownItem::class);
+        Blade::component('keys::dropdown.checkbox', DropdownCheckbox::class);
+        Blade::component('keys::dropdown.radio', DropdownRadio::class);
+        Blade::component('keys::dropdown.separator', DropdownSeparator::class);
+        Blade::component('keys::dropdown.submenu', DropdownSubmenu::class);
         Blade::component('keys::table', Table::class);
         Blade::component('keys::table.head', Head::class);
         Blade::component('keys::table.body', Body::class);
         Blade::component('keys::table.row', Row::class);
         Blade::component('keys::table.cell', Cell::class);
         Blade::component('keys::table.header', Header::class);
-        Blade::component('keys::table.empty-state', TableEmpty::class);
-        Blade::component('keys::table.loading-state', TableLoading::class);
+        Blade::component('keys::table.empty', TableEmpty::class);
+        Blade::component('keys::table.loading', TableLoading::class);
         Blade::component('keys::tooltip', Tooltip::class);
         Blade::component('keys::heading-decorator', HeadingDecorator::class);
         Blade::component('keys::gallery', Gallery::class);
@@ -223,7 +234,8 @@ class KeysUiServiceProvider extends ServiceProvider
         Blade::component('keys::social.share', SocialShare::class);
         Blade::component('keys::social.links', SocialLinks::class);
 
-        // Register anonymous layout components
+        
+
         Blade::anonymousComponentPath(__DIR__.'/../resources/views/layouts', 'keys-layouts');
 
         $this->app->alias(KeysManager::class, 'keys');

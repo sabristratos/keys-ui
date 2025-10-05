@@ -32,7 +32,6 @@
         };
     }
 
-
     $allDialogClasses = "$dialogClasses $positionClasses $sizeClasses $backdropClasses";
 
     $headerClasses = 'flex items-center justify-between p-6 border-b border-border';
@@ -90,7 +89,6 @@
             </footer>
         @endisset
     </div>
-
 
     
     @if($isLivewireEnabled)
@@ -162,7 +160,6 @@
         </script>
     @endif
 </dialog>
-
 
 @once
 <style>

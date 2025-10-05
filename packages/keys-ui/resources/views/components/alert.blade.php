@@ -1,15 +1,15 @@
 @php
 
-    $baseClasses = 'rounded-lg border bg-surface';
+    $baseClasses = 'rounded-lg border';
 
     $variantClasses = match ($variant) {
-        'info' => 'border-blue-600',
-        'success' => 'border-green-600',
-        'warning' => 'border-yellow-600',
-        'danger' => 'border-red-600',
-        'neutral' => 'border-border',
-        'brand' => 'border-brand',
-        default => 'border-blue-600'
+        'info' => 'border-info bg-info-subtle',
+        'success' => 'border-success bg-success-subtle',
+        'warning' => 'border-warning bg-warning-subtle',
+        'danger' => 'border-danger bg-danger-subtle',
+        'neutral' => 'border-border bg-surface',
+        'brand' => 'border-accent bg-accent-subtle',
+        default => 'border-info bg-info-subtle'
     };
 
     $sizeClasses = match ($size) {
@@ -20,13 +20,13 @@
     };
 
     $iconColor = match ($variant) {
-        'info' => 'text-blue-600',
-        'success' => 'text-green-600',
-        'warning' => 'text-yellow-600',
-        'danger' => 'text-red-600',
-        'neutral' => 'text-neutral',
-        'brand' => 'text-brand',
-        default => 'text-blue-600'
+        'info' => 'text-info',
+        'success' => 'text-success',
+        'warning' => 'text-warning',
+        'danger' => 'text-danger',
+        'neutral' => 'text-muted',
+        'brand' => 'text-accent',
+        default => 'text-info'
     };
 
     $iconSize = match ($size) {
@@ -36,18 +36,25 @@
         default => 'md'
     };
 
-    $titleClasses = match ($size) {
-        'sm' => 'text-sm font-medium text-foreground',
-        'md' => 'text-base font-medium text-foreground',
-        'lg' => 'text-lg font-semibold text-foreground',
-        default => 'text-base font-medium text-foreground'
+    $headingSize = match ($size) {
+        'sm' => 'sm',
+        'md' => 'md',
+        'lg' => 'lg',
+        default => 'md'
     };
 
-    $contentClasses = match ($size) {
-        'sm' => 'text-xs text-muted',
-        'md' => 'text-sm text-muted',
-        'lg' => 'text-base text-muted',
-        default => 'text-sm text-muted'
+    $headingWeight = match ($size) {
+        'sm' => 'medium',
+        'md' => 'medium',
+        'lg' => 'semibold',
+        default => 'medium'
+    };
+
+    $textSize = match ($size) {
+        'sm' => 'xs',
+        'md' => 'sm',
+        'lg' => 'md',
+        default => 'sm'
     };
 
     $elementAttributes = $attributes->merge([
@@ -74,14 +81,14 @@
 
         <div class="{{ $hasIcon ? 'ml-3' : '' }} flex-1">
             @if($hasTitle)
-                <div class="{{ $titleClasses }}">
+                <x-keys::heading :size="$headingSize" :weight="$headingWeight">
                     {{ $title }}
-                </div>
+                </x-keys::heading>
             @endif
 
-            <div class="{{ $contentClasses }}{{ $hasTitle ? ' mt-1' : '' }}">
+            <x-keys::text color="muted" :size="$textSize" :class="$hasTitle ? 'mt-1' : ''">
                 {{ $slot }}
-            </div>
+            </x-keys::text>
 
             @isset($actions)
                 <div class="flex space-x-2 [&:not(:has(.hidden))]:mt-3" data-alert-actions="true">

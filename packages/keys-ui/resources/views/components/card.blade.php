@@ -4,7 +4,7 @@
 
     $colorClasses = match ($colorVariant) {
         'neutral' => '',
-        'brand' => $variant === 'outlined' ? 'border-brand/20 bg-brand/5' : 'border-brand/10',
+        'brand' => $variant === 'outlined' ? 'border-accent/20 bg-accent/5' : 'border-accent/10',
         'success' => $variant === 'outlined' ? 'border-success/20 bg-success/5' : 'border-success/10',
         'warning' => $variant === 'outlined' ? 'border-warning/20 bg-warning/5' : 'border-warning/10',
         'danger' => $variant === 'outlined' ? 'border-danger/20 bg-danger/5' : 'border-danger/10',
@@ -13,11 +13,11 @@
     };
 
     $variantClasses = match ($variant) {
-        'default' => 'bg-surface border border-border',
+        'default' => 'bg-surface bg-gradient-to-b from-white/1 to-transparent',
         'elevated' => 'bg-surface border border-border',
         'outlined' => 'bg-transparent border-2 border-border',
         'filled' => 'bg-body border border-transparent',
-        default => 'bg-surface border border-border'
+        default => 'bg-surface bg-gradient-to-b from-white/1 to-transparent'
     };
 
     if ($colorVariant !== 'neutral') {
@@ -59,11 +59,13 @@
         'xl' => 'rounded-xl',
         '2xl' => 'rounded-2xl',
         '3xl' => 'rounded-3xl',
-        default => 'rounded-md'
+        default => 'rounded-lg'
     };
 
     $shadowClasses = '';
-    if ($variant === 'elevated') {
+    if ($variant === 'filled') {
+        $shadowClasses = '';
+    } elseif ($variant === 'elevated') {
         $shadowClasses = match ($shadow) {
             'none' => '',
             'xs' => 'shadow-xs',
@@ -86,19 +88,19 @@
     }
 
     $interactiveClasses = '';
-    $interactive = !is_null($href); // Card is interactive if it has an href
+    $interactive = !is_null($href);
     if ($interactive && !$disabled && !$loading) {
         $hoverClasses = match ($variant) {
-            'default' => 'hover:shadow-md hover:border-neutral hover:-translate-y-1',
+            'default' => 'hover:shadow-md hover:border-border hover:-translate-y-1',
             'elevated' => 'hover:shadow-lg hover:-translate-y-1 hover:scale-[1.02]',
-            'outlined' => 'hover:bg-surface hover:border-neutral hover:shadow-sm',
+            'outlined' => 'hover:bg-surface hover:border-border hover:shadow-sm',
             'filled' => 'hover:bg-surface hover:shadow-sm',
-            default => 'hover:shadow-md hover:border-neutral hover:-translate-y-1'
+            default => 'hover:shadow-md hover:border-border hover:-translate-y-1'
         };
 
         if ($colorVariant !== 'neutral') {
             $colorHover = match ($colorVariant) {
-                'brand' => 'hover:border-brand/40 hover:bg-brand/10',
+                'brand' => 'hover:border-accent/40 hover:bg-accent/10',
                 'success' => 'hover:border-success/40 hover:bg-success/10',
                 'warning' => 'hover:border-warning/40 hover:bg-warning/10',
                 'danger' => 'hover:border-danger/40 hover:bg-danger/10',
@@ -108,7 +110,7 @@
             $hoverClasses = "$hoverClasses $colorHover";
         }
 
-        $focusClasses = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2';
+        $focusClasses = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2';
         $activeClasses = 'active:scale-[0.97] active:translate-y-0';
 
         $interactiveClasses = trim("$hoverClasses $focusClasses $activeClasses");
@@ -118,7 +120,7 @@
 
     $loadingClasses = $loading ? 'cursor-wait pointer-events-none' : '';
 
-    $selectedClasses = $selected ? 'ring-2 ring-brand ring-offset-1 shadow-lg' : '';
+    $selectedClasses = $selected ? 'ring-2 ring-accent ring-offset-1 shadow-lg' : '';
 
     $touchClasses = $interactive ? 'min-h-[44px] touch-manipulation' : '';
 
@@ -137,7 +139,6 @@
         ]);
     }
 
-
 @endphp
 
 <{{ $elementType() }} {{ $elementAttributes }}>
@@ -153,7 +154,7 @@
     @endif
 
     @if($shouldShowSkeleton())
-        
+
         <div class="animate-pulse space-y-3" role="status" aria-live="polite">
             <div class="h-4 bg-surface rounded w-3/4"></div>
             <div class="space-y-2">
@@ -169,7 +170,7 @@
             @endif
         </div>
     @else
-        
+
         @php
 
             $contentContainerClasses = '';

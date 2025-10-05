@@ -8,9 +8,10 @@
         'aria-label' => __('keys-ui::keys-ui.actions.remove_badge')
     ] : [];
 
+    // Base classes
     $baseClasses = $variant === 'subtle'
         ? 'inline-flex items-center gap-1.5 font-medium'
-        : 'inline-flex items-center font-medium';
+        : 'inline-flex items-center font-medium rounded-full';
 
     if ($variant !== 'subtle') {
         if ($isIconOnly) {
@@ -20,6 +21,7 @@
         }
     }
 
+    // Size classes
     if ($variant === 'subtle') {
         $sizeClasses = match ($size) {
             'xs' => 'text-xs',
@@ -43,68 +45,62 @@
             };
     }
 
-    $shapeClasses = match ($variant) {
-        'simple' => 'rounded-full',
-        'chip' => 'rounded-sm',
-        'subtle' => '',
-        default => 'rounded-full'
+    // Color classes by variant
+    $colorClasses = match ($variant) {
+        'filled' => match ($color) {
+            'brand' => 'bg-accent text-white',
+            'success' => 'bg-success text-white',
+            'warning' => 'bg-warning text-warning-foreground',
+            'danger' => 'bg-danger text-white',
+            'info' => 'bg-info text-white',
+            'neutral' => 'bg-muted text-white',
+            default => 'bg-info text-white'
+        },
+        'outlined' => match ($color) {
+            'brand' => 'bg-accent-subtle border border-accent text-accent',
+            'success' => 'bg-success-subtle border border-success text-success',
+            'warning' => 'bg-warning-subtle border border-warning text-warning',
+            'danger' => 'bg-danger-subtle border border-danger text-danger',
+            'info' => 'bg-info-subtle border border-info text-info',
+            'neutral' => 'bg-surface border border-border text-muted',
+            default => 'bg-info-subtle border border-info text-info'
+        },
+        'subtle' => 'text-text',
+        default => 'bg-info text-white'
     };
 
-    $colorClasses = $variant === 'subtle'
-        ? 'text-foreground'
-        : match ($color) {
-            'brand' => 'bg-brand text-white',
-            'success' => 'bg-success text-white',
-            'warning' => 'bg-warning text-white',
-            'danger' => 'bg-danger text-white',
-            'neutral' => 'bg-neutral text-white',
-            'blue' => 'bg-blue-600 text-white',
-            'gray' => 'bg-neutral-600 text-white',
-            'red' => 'bg-red-600 text-white',
-            'green' => 'bg-green-600 text-white',
-            'yellow' => 'bg-yellow-600 text-white',
-            'indigo' => 'bg-indigo-600 text-white',
-            'purple' => 'bg-purple-600 text-white',
-            'pink' => 'bg-pink-600 text-white',
-            'dark' => 'bg-neutral-900 text-white',
-            default => 'bg-blue-600 text-white'
-        };
-
-    $hoverClasses = ($dismissible && $variant !== 'subtle')
+    // Hover classes (only for dismissible filled/outlined badges)
+    $hoverClasses = ($dismissible && $variant === 'filled')
         ? match ($color) {
-            'brand' => 'hover:bg-brand-hover',
+            'brand' => 'hover:bg-accent-hover',
             'success' => 'hover:bg-success-hover',
             'warning' => 'hover:bg-warning-hover',
             'danger' => 'hover:bg-danger-hover',
-            'neutral' => 'hover:bg-neutral-hover',
-            'blue' => 'hover:bg-blue-700',
-            'gray' => 'hover:bg-neutral-700',
-            'red' => 'hover:bg-red-700',
-            'green' => 'hover:bg-green-700',
-            'yellow' => 'hover:bg-yellow-700',
-            'indigo' => 'hover:bg-indigo-700',
-            'purple' => 'hover:bg-purple-700',
-            'pink' => 'hover:bg-pink-700',
-            'dark' => 'hover:bg-neutral-800',
-            default => 'hover:bg-blue-700'
+            'info' => 'hover:bg-info-hover',
+            'neutral' => 'hover:bg-hover',
+            default => 'hover:bg-info-hover'
         }
-        : '';
+        : (($dismissible && $variant === 'outlined')
+            ? match ($color) {
+                'brand' => 'hover:bg-brand-100',
+                'success' => 'hover:bg-success-100',
+                'warning' => 'hover:bg-warning-100',
+                'danger' => 'hover:bg-danger-100',
+                'info' => 'hover:bg-info-100',
+                'neutral' => 'hover:bg-neutral-hover',
+                default => 'hover:bg-info-100'
+            }
+            : '');
 
+    // Dot color for subtle variant
     $dotColorClasses = match ($color) {
-        'brand' => 'text-brand',
+        'brand' => 'text-accent',
         'success' => 'text-success',
         'warning' => 'text-warning',
         'danger' => 'text-danger',
-        'neutral' => 'text-neutral',
-        'blue' => 'text-blue-600',
-        'gray' => 'text-neutral-600',
-        'red' => 'text-red-600',
-        'green' => 'text-green-600',
-        'yellow' => 'text-yellow-600',
-        'indigo' => 'text-indigo-600',
-        'purple' => 'text-purple-600',
-        'pink' => 'text-pink-600',
-        default => 'text-blue-600'
+        'info' => 'text-info',
+        'neutral' => 'text-muted',
+        default => 'text-info'
     };
 
     $iconSize = match ($size) {
@@ -114,7 +110,7 @@
         default => 'sm'
     };
 
-    $badgeClasses = trim("$baseClasses $sizeClasses $shapeClasses $colorClasses $hoverClasses");
+    $badgeClasses = trim("$baseClasses $sizeClasses $colorClasses $hoverClasses");
 @endphp
 
 <{{ $elementTag }} {{ $attributes->merge(array_merge([
@@ -122,6 +118,7 @@
     'id' => $id
 ], $elementAttributes))->merge($dataAttributes)->merge(['data-icon-only' => $isIconOnly ? 'true' : 'false']) }}>
     @if($variant === 'subtle')
+        {{-- Subtle variant: dot + icon + text --}}
         @if(!$isIconOnly)
             <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 relative {{ $dotColorClasses }}">
                 <span class="absolute inset-0 bg-current rounded-full"></span>
@@ -139,6 +136,7 @@
             {{ $slot }}
         @endif
     @else
+        {{-- Filled & Outlined variants: icon + text + dismiss button --}}
         @if($icon && !$isIconOnly)
             <x-keys::icon :name="$icon" :size="$iconSize" class="mr-1" />
         @endif

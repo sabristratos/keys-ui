@@ -117,7 +117,6 @@
     @endif
 </div>
 
-
 <style>
     [data-add-to-cart="true"] {
         transition: all 200ms ease;

@@ -76,6 +76,13 @@ class Header extends Component
     public function render()
     {
         return view('keys::components.table.header', [
+            'size' => $this->size,
+            'align' => $this->align,
+            'sortable' => $this->sortable,
+            'sorted' => $this->sorted,
+            'selectAll' => $this->selectAll,
+            'wrap' => $this->wrap,
+            'sortIcon' => $this->getSortIcon(),
             'dataAttributes' => $this->getDataAttributes(),
         ]);
     }

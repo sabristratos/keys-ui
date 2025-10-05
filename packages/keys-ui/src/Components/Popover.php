@@ -3,10 +3,17 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 class Popover extends Component
 {
+    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
+    private const VALID_PLACEMENTS = [
+        'top', 'top-start', 'top-end',
+        'bottom', 'bottom-start', 'bottom-end',
+        'left', 'left-start', 'left-end',
+        'right', 'right-start', 'right-end'
+    ];
+
     public string $id;
 
     public string $variant;
@@ -30,14 +37,14 @@ class Popover extends Component
         $this->id = $id ?? 'popover-'.uniqid();
         $this->variant = $variant;
 
-        
-        if (! in_array($size, ComponentConstants::SIZES)) {
-            $size = ComponentConstants::getDefaultSize();
+
+        if (! in_array($size, self::VALID_SIZES)) {
+            $size = 'md';
         }
         $this->size = $size;
 
-        
-        if (! in_array($placement, ComponentConstants::POPOVER_PLACEMENTS)) {
+
+        if (! in_array($placement, self::VALID_PLACEMENTS)) {
             $placement = 'bottom';
         }
         $this->placement = $placement;
@@ -46,53 +53,30 @@ class Popover extends Component
         $this->manual = $manual;
     }
 
-    public function getBaseClasses(): string
+    public function getDataAttributes(): array
     {
-        return 'keys-popover z-[2000] m-0 p-0 border-0 bg-transparent text-inherit';
-    }
+        $attributes = [
+            'data-keys-popover' => 'true',
+            'data-variant' => $this->variant,
+            'data-size' => $this->size,
+            'data-placement' => $this->placement,
+        ];
 
-    public function getContentClasses(): string
-    {
-        $base = 'bg-surface border border-border space-y-1 rounded-lg shadow-lg text-foreground my-2 max-w-[90vw] w-max';
-
-        $sizeClasses = match ($this->size) {
-            'sm' => 'p-1 text-xs min-w-40 sm:min-w-46 leading-5',
-            'md' => 'p-2 text-sm min-w-48 sm:min-w-60 leading-6',
-            'lg' => 'p-4 text-base min-w-56 sm:min-w-80 leading-7',
-            default => 'p-2 text-sm min-w-48 sm:min-w-60 leading-6'
-        };
-
-        $variantClasses = match ($this->variant) {
-            'tooltip' => 'bg-neutral-900 dark:bg-neutral-800 text-white border-0 text-xs px-2.5 py-1.5',
-            'menu' => 'p-2 min-w-40',
-            default => ''
-        };
-
-        return trim($base.' '.$sizeClasses.' '.$variantClasses);
-    }
-
-    public function getArrowClasses(): string
-    {
-        if (! $this->arrow) {
-            return '';
+        if ($this->arrow) {
+            $attributes['data-arrow'] = 'true';
         }
 
-        $base = 'keys-popover__arrow absolute w-2 h-2 rotate-45 -z-10';
+        if ($this->manual) {
+            $attributes['data-manual'] = 'true';
+        }
 
-        $variantClasses = match ($this->variant) {
-            'tooltip' => 'bg-neutral-900 dark:bg-neutral-800 border-0',
-            default => 'bg-surface border border-border'
-        };
-
-        return trim($base.' '.$variantClasses);
+        return $attributes;
     }
 
     public function render()
     {
         return view('keys::components.popover', [
-            'baseClasses' => $this->getBaseClasses(),
-            'contentClasses' => $this->getContentClasses(),
-            'arrowClasses' => $this->getArrowClasses(),
+            'dataAttributes' => $this->getDataAttributes(),
         ]);
     }
 }

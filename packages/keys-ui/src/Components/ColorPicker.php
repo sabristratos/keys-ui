@@ -49,7 +49,8 @@ class ColorPicker extends Component
     ) {
         $this->id = $this->id ?? $this->name ?? 'color-picker-'.uniqid();
 
-        // Ensure value is in hex format with #
+        
+
         if ($this->value && ! str_starts_with($this->value, '#')) {
             $this->value = '#'.$this->value;
         }

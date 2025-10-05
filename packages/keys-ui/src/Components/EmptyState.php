@@ -3,7 +3,6 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 /**
  * EmptyState Component
@@ -14,6 +13,9 @@ use Keys\UI\Constants\ComponentConstants;
  */
 class EmptyState extends Component
 {
+    private const VALID_VARIANTS = ['brand', 'success', 'warning', 'danger', 'neutral', 'info'];
+    private const VALID_SIZES = ['sm', 'md', 'lg'];
+
     /**
      * Create a new EmptyState component instance.
      *
@@ -36,15 +38,16 @@ class EmptyState extends Component
         public ?string $actionUrl = null,
         public ?string $actionIcon = null
     ) {
-        if (! in_array($this->variant, ComponentConstants::SEMANTIC_COLORS)) {
+        if (! in_array($this->variant, self::VALID_VARIANTS)) {
             $this->variant = 'neutral';
         }
 
-        if (! in_array($this->size, ['sm', 'md', 'lg'])) {
+        if (! in_array($this->size, self::VALID_SIZES)) {
             $this->size = 'md';
         }
 
-        // Clean up empty icon strings
+        
+
         if ($this->icon && ! str_starts_with($this->icon, 'heroicon-')) {
             if (empty(trim($this->icon))) {
                 $this->icon = null;

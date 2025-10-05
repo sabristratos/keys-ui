@@ -17,7 +17,7 @@
 
     $headerInteractionClasses = '';
     if ($sortable) {
-        $headerInteractionClasses = 'cursor-pointer hover:text-foreground select-none group transition-colors duration-150';
+        $headerInteractionClasses = 'cursor-pointer hover:text-heading select-none group transition-colors duration-150';
     } elseif ($selectAll) {
         $headerInteractionClasses = 'w-12';
     }
@@ -41,15 +41,15 @@
             :id="'table-select-all-' . uniqid()"
             data-table-select-all="true"
             size="md"
-            color="brand"
+            color="accent"
         />
     @else
         <div class="flex items-center">
             {{ $slot }}
 
-            @if($sortable && $getSortIcon())
+            @if($sortable && $sortIcon)
                 <x-keys::icon
-                    :name="$getSortIcon()"
+                    :name="$sortIcon"
                     size="xs"
                     :class="$sortIconClasses . ' table-sort-icon'"
                 />

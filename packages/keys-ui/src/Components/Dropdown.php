@@ -3,10 +3,11 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 class Dropdown extends Component
 {
+    private const VALID_SIZES = ['sm', 'md', 'lg'];
+
     public function __construct(
         public ?string $id = null,
         public string $position = 'bottom',
@@ -19,21 +20,18 @@ class Dropdown extends Component
 
         $this->id = $this->id ?? 'dropdown-' . uniqid();
 
-
         
         $basePlacements = ['top', 'bottom', 'left', 'right'];
         if (!in_array($this->position, $basePlacements)) {
             $this->position = 'bottom';
         }
 
-
         if (!in_array($this->align, ['start', 'center', 'end'])) {
             $this->align = 'start';
         }
 
-
-        if (!in_array($this->size, ComponentConstants::DROPDOWN_SIZES)) {
-            $this->size = ComponentConstants::getDefaultSize();
+        if (!in_array($this->size, self::VALID_SIZES)) {
+            $this->size = 'md';
         }
     }
 

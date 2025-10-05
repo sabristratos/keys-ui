@@ -3,7 +3,6 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Button Component
@@ -14,10 +13,16 @@ use Keys\UI\Constants\ComponentConstants;
  */
 class Button extends Component
 {
+    private const VALID_COLORS = ['primary', 'secondary', 'danger', 'warning', 'success', 'info'];
+    private const VALID_VARIANTS = ['solid', 'outlined', 'ghost', 'subtle'];
+    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
+    private const VALID_LOADING_ANIMATIONS = ['spinner', 'dots', 'pulse'];
+
     /**
      * Create a new Button component instance.
      *
-     * @param  string  $variant  Button variant (brand, ghost, outline, danger, etc.)
+     * @param  string  $color  Button color (primary, secondary, danger, warning, success, info)
+     * @param  string  $variant  Button variant (solid, outlined, ghost, subtle)
      * @param  string  $size  Size variant (xs, sm, md, lg, xl)
      * @param  string|null  $type  Button type attribute (button, submit, reset)
      * @param  string|null  $href  URL for link buttons
@@ -34,7 +39,8 @@ class Button extends Component
      * @param  string|null  $popovertarget  ID of popover element to control
      */
     public function __construct(
-        public string $variant = 'brand',
+        public string $color = 'secondary',
+        public string $variant = 'solid',
         public string $size = 'md',
         public string $type = 'button',
         public ?string $href = null,
@@ -54,15 +60,19 @@ class Button extends Component
             $this->iconLeft = $this->icon;
         }
 
-        if (! in_array($this->variant, ComponentConstants::BUTTON_VARIANTS)) {
-            $this->variant = ComponentConstants::getDefaultColor();
+        if (! in_array($this->color, self::VALID_COLORS)) {
+            $this->color = 'primary';
         }
 
-        if (! ComponentConstants::isValidSize($this->size)) {
-            $this->size = ComponentConstants::getDefaultSize();
+        if (! in_array($this->variant, self::VALID_VARIANTS)) {
+            $this->variant = 'solid';
         }
 
-        if (! in_array($this->loadingAnimation, ComponentConstants::BUTTON_LOADING_ANIMATIONS)) {
+        if (! in_array($this->size, self::VALID_SIZES)) {
+            $this->size = 'md';
+        }
+
+        if (! in_array($this->loadingAnimation, self::VALID_LOADING_ANIMATIONS)) {
             $this->loadingAnimation = 'spinner';
         }
     }
@@ -94,11 +104,7 @@ class Button extends Component
      */
     public function buttonType(): ?string
     {
-        if ($this->isLink()) {
-            return null;
-        }
-
-        return $this->type ?? 'button';
+        return $this->isLink() ? null : $this->type;
     }
 
     /**
@@ -130,6 +136,7 @@ class Button extends Component
     {
         $attributes = [
             'data-keys-button' => 'true',
+            'data-color' => $this->color,
             'data-variant' => $this->variant,
             'data-size' => $this->size,
             'data-element-type' => $this->elementType(),
@@ -194,15 +201,6 @@ class Button extends Component
      */
     public function render()
     {
-        return view('keys::components.button', [
-            'elementType' => $this->elementType(),
-            'buttonType' => $this->buttonType(),
-            'isLink' => $this->isLink(),
-            'isMultiState' => $this->isMultiState(),
-            'dataAttributes' => $this->getDataAttributes(),
-            'getDataAttributesForSlot' => function($slotContent) {
-                return $this->getDataAttributesForSlot($slotContent);
-            },
-        ]);
+        return view('keys::components.button');
     }
 }

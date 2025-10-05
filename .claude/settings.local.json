@@ -70,7 +70,8 @@
       "WebFetch(domain:benfrain.com)",
       "WebFetch(domain:markus.oberlehner.net)",
       "WebFetch(domain:frontendmasters.com)",
-      "WebFetch(domain:cdn.jsdelivr.net)"
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:sinnbeck.dev)"
     ]
   },
   "enableAllProjectMcpServers": true,

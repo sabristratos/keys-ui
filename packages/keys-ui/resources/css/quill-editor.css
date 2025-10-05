@@ -1,6 +1,6 @@
 @layer components {
   .quill-editor {
-    @apply focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2 transition-all duration-200 overflow-hidden;
+    @apply focus-within:ring-2 focus-within:ring-accent focus-within:ring-offset-2 transition-all duration-200 overflow-hidden;
   }
 
   .quill-container {
@@ -136,7 +136,7 @@
 
   .ql-toolbar.ql-snow button {
     @apply inline-flex items-center justify-center rounded-sm bg-transparent text-foreground transition-all duration-200;
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1;
     padding: 0;
     border: none;
     margin: 0;
@@ -599,7 +599,7 @@
   }
 
   .ql-snow .ql-tooltip input[type=text]:focus {
-    @apply border-brand ring-1 ring-brand;
+    @apply border-brand ring-1 ring-accent;
   }
 
   .ql-snow .ql-tooltip a.ql-preview {
@@ -653,11 +653,11 @@
   }
 
   .quill-editor .ql-toolbar button:focus-visible {
-    @apply outline-none ring-2 ring-brand ring-offset-1 ring-offset-surface;
+    @apply outline-none ring-2 ring-accent ring-offset-1 ring-offset-surface;
   }
 
   .quill-editor .ql-toolbar .ql-picker-label:focus-visible {
-    @apply outline-none ring-2 ring-brand ring-offset-1 ring-offset-surface;
+    @apply outline-none ring-2 ring-accent ring-offset-1 ring-offset-surface;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -691,7 +691,7 @@
   }
 
   .quill-editor .ql-editor:focus-visible {
-    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-surface;
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-surface;
   }
 
   @media (prefers-contrast: high) {
@@ -723,11 +723,11 @@
   }
 
   .quill-editor .ql-toolbar:has(:focus-visible) {
-    @apply ring-2 ring-brand ring-offset-1 ring-offset-surface;
+    @apply ring-2 ring-accent ring-offset-1 ring-offset-surface;
   }
 
   .quill-editor .ql-toolbar button:focus-visible {
-    @apply ring-2 ring-brand ring-offset-1 ring-offset-surface;
+    @apply ring-2 ring-accent ring-offset-1 ring-offset-surface;
     z-index: 1;
   }
 
@@ -756,7 +756,7 @@
   .quill-editor .ql-bubble .ql-tooltip button {
     @apply inline-flex items-center justify-center text-foreground transition-all duration-200;
     @apply hover:bg-border active:bg-border/80;
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1;
     background: transparent;
     border: none;
     padding: 0;
@@ -787,7 +787,7 @@
   }
 
   .quill-editor .ql-bubble .ql-tooltip input[type=text]:focus {
-    @apply border-brand ring-1 ring-brand outline-none;
+    @apply border-brand ring-1 ring-accent outline-none;
   }
 
   .quill-editor .ql-bubble .ql-tooltip a.ql-preview {

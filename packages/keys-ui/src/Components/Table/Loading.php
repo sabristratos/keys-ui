@@ -36,6 +36,11 @@ class Loading extends Component
     public function render()
     {
         return view('keys::components.table.loading', [
+            'size' => $this->size,
+            'animation' => $this->animation,
+            'text' => $this->text,
+            'colspan' => $this->colspan,
+            'loadingIconSize' => $this->getLoadingIconSize(),
             'dataAttributes' => $this->getDataAttributes(),
         ]);
     }

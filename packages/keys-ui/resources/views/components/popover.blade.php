@@ -1,9 +1,41 @@
-
-{{-- Trigger wrapper with anchor-name for CSS positioning and data attribute for JavaScript --}}
 @php
+    // Trigger styles for CSS anchor positioning
     $triggerStyles = "anchor-name: --trigger-{$id};";
+
+    // Base popover classes
+    $baseClasses = 'keys-popover z-[2000] m-0 p-0 border-0 bg-transparent text-inherit';
+
+    // Content base classes
+    $contentBase = 'bg-foreground border border-border space-y-1 rounded-lg shadow-lg text-foreground my-2 max-w-[90vw] w-max';
+
+    // Size-based classes
+    $sizeClasses = match ($size) {
+        'sm' => 'p-1 text-xs min-w-40 sm:min-w-46 leading-5',
+        'md' => 'p-3 text-sm min-w-48 sm:min-w-60 leading-6',
+        'lg' => 'p-4 text-base min-w-56 sm:min-w-80 leading-7',
+        default => 'p-2 text-sm min-w-48 sm:min-w-60 leading-6'
+    };
+
+    // Variant-based classes
+    $variantClasses = match ($variant) {
+        'tooltip' => 'bg-neutral-900 dark:bg-neutral-800 text-white border-0 text-xs px-2.5 py-1.5',
+        'menu' => 'p-2 min-w-40',
+        default => ''
+    };
+
+    // Combine content classes
+    $contentClasses = trim("$contentBase $sizeClasses $variantClasses");
+
+    // Arrow classes (only if arrow is enabled)
+    $arrowBase = 'keys-popover__arrow absolute w-2 h-2 rotate-45 -z-10';
+    $arrowVariant = match ($variant) {
+        'tooltip' => 'bg-neutral-900 dark:bg-neutral-800 border-0',
+        default => 'bg-surface border border-border'
+    };
+    $arrowClasses = trim("$arrowBase $arrowVariant");
 @endphp
 
+{{-- Trigger wrapper with anchor-name for CSS positioning --}}
 <div style="{{ $triggerStyles }}" data-popover-trigger="{{ $id }}">
     {{ $trigger }}
 </div>
@@ -12,18 +44,15 @@
 <div
     id="{{ $id }}"
     popover="{{ $manual ? 'manual' : 'auto' }}"
-    data-keys-popover="true"
-    data-variant="{{ $variant }}"
-    data-size="{{ $size }}"
-    data-placement="{{ $placement }}"
+    @foreach($dataAttributes as $key => $value)
+        {{ $key }}="{{ $value }}"
+    @endforeach
     class="{{ $baseClasses }}"
     style="--popover-anchor: --trigger-{{ $id }};"
 >
-
     @if($arrow)
         <div class="{{ $arrowClasses }}"></div>
     @endif
-
 
     <div class="{{ $contentClasses }}">
         {{ $slot }}

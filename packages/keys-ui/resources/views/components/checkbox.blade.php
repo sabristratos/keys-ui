@@ -23,12 +23,12 @@
         $checkboxStateClasses = 'bg-input border-danger text-danger focus-visible:border-danger focus-visible:ring-danger';
     } else {
         $colorClasses = match ($color) {
-            'brand' => 'text-brand focus-visible:ring-brand',
+            'brand' => 'text-brand focus-visible:ring-accent',
             'success' => 'text-success focus-visible:ring-success',
             'warning' => 'text-warning focus-visible:ring-warning',
             'danger' => 'text-danger focus-visible:ring-danger',
             'neutral' => 'text-neutral-600 focus-visible:ring-neutral-500',
-            default => 'text-brand focus-visible:ring-brand'
+            default => 'text-brand focus-visible:ring-accent'
         };
 
         if ($variant === 'colored') {
@@ -86,16 +86,15 @@
         $wrapperBaseClasses .= ' border-danger';
     }
 
-    $labelSizeClasses = match ($size) {
-        'sm' => 'text-sm',
-        'md' => 'text-sm',
-        'lg' => 'text-base',
-        default => 'text-sm'
+    $labelSize = match ($size) {
+        'sm' => 'sm',
+        'md' => 'sm',
+        'lg' => 'md',
+        default => 'sm'
     };
 
-    $labelColorClasses = $disabled ? 'text-neutral-500 dark:text-neutral-400' : 'text-foreground';
-    $labelWeightClasses = $variant === 'card' ? 'font-medium' : 'font-normal';
-    $labelClasses = "$labelSizeClasses $labelColorClasses $labelWeightClasses";
+    $labelColor = $disabled ? 'muted' : 'text';
+    $labelWeight = $variant === 'card' ? 'medium' : 'normal';
 @endphp
 
 <label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $wrapperBaseClasses])->merge($dataAttributes) }}>
@@ -134,41 +133,41 @@
                     @if($isCard())
                         
                         @if($icon)
-                            <div class="flex items-center gap-2 mb-1">
+                            <div class="flex items-center gap-2 mb-1 text-muted">
                                 <x-keys::icon :name="$icon" :size="$iconSize()" class="shrink-0" />
                                 @if($title)
-                                    <span class="{{ $labelClasses }}">
+                                    <x-keys::text element="span" :size="$labelSize" :color="$labelColor" :weight="$labelWeight">
                                         {{ $title }}
                                         @if($required)
                                             <span class="text-danger ml-1">*</span>
                                         @endif
-                                    </span>
+                                    </x-keys::text>
                                 @endif
                             </div>
                         @elseif($title)
-                            <span class="{{ $labelClasses }} block mb-1">
+                            <x-keys::text element="span" :size="$labelSize" :color="$labelColor" :weight="$labelWeight" class="block mb-1">
                                 {{ $title }}
                                 @if($required)
                                     <span class="text-danger ml-1">*</span>
                                 @endif
-                            </span>
+                            </x-keys::text>
                         @endif
 
                         @if($description)
-                            <p class="text-sm text-muted">{{ $description }}</p>
+                            <x-keys::text size="sm" color="muted">{{ $description }}</x-keys::text>
                         @endif
                     @else
                         
                         @if($label)
-                            <span class="{{ $labelClasses }}">
+                            <x-keys::text element="span" :size="$labelSize" :color="$labelColor" :weight="$labelWeight">
                                 {{ $label }}
                                 @if($required)
                                     <span class="text-danger ml-1">*</span>
                                 @endif
-                            </span>
+                            </x-keys::text>
                         @endif
                         @if($description)
-                            <p class="text-sm text-muted mt-1">{{ $description }}</p>
+                            <x-keys::text size="sm" color="muted" class="mt-1">{{ $description }}</x-keys::text>
                         @endif
                     @endif
                 </div>

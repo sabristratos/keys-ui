@@ -113,16 +113,13 @@ export function initializeKeysUI(): void {
 
     ChartActions.getInstance().init();
 
-    new PopoverActions();
+    PopoverActions.getInstance().init();
 
-    console.log('[Keys UI] Initializing ColorPickerActions...');
-    document.querySelectorAll('[data-keys-color-picker]').forEach((element) => {
-        new ColorPickerActions(element as HTMLElement);
-    });
+    ColorPickerActions.getInstance().init();
 
-    console.log('[Keys UI] Initializing SidebarActions...');
-    const sidebarActions = new SidebarActions();
-    sidebarActions.init();
+    SidebarActions.getInstance().init();
+
+    RatingActions.getInstance().init();
 
     console.log('[Keys UI] Initialization complete!');
 }
@@ -155,8 +152,8 @@ const KeysUI = {
     ImageActions: ImageActions.getInstance(),
     LightboxActions: LightboxActions.getInstance(),
     ChartActions: ChartActions.getInstance(),
-    PopoverActions: new PopoverActions(),
-    SidebarActions: SidebarActions,
+    PopoverActions: PopoverActions.getInstance(),
+    SidebarActions: SidebarActions.getInstance(),
     Quill: Quill,
     init: initializeKeysUI,
     initialize: initializeKeysUI

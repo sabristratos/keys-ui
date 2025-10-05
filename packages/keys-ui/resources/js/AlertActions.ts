@@ -64,22 +64,16 @@ export class AlertActions extends BaseActionClass {
     public dismissAlert(alert: HTMLElement): void {
         alert.classList.add('alert-dismissing');
 
-        const slideAnimation = AnimationUtils.slideOut(alert, 'right', {
-            duration: 300,
-            easing: 'ease-out',
-            distance: 100
-        });
+        // Simple fade out and remove
+        alert.style.transition = 'opacity 300ms ease-out, transform 300ms ease-out';
+        alert.style.opacity = '0';
+        alert.style.transform = 'translateX(100px)';
 
-        const collapseAnimation = AnimationUtils.collapseHeight(alert, {
-            toHeight: 0,
-            duration: 300,
-            easing: 'ease-out',
-            onComplete: () => {
-                if (alert.parentNode) {
-                    alert.parentNode.removeChild(alert);
-                }
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
             }
-        });
+        }, 300);
     }
 
     /**
@@ -88,14 +82,14 @@ export class AlertActions extends BaseActionClass {
     public showAlert(alert: HTMLElement): void {
         alert.style.display = 'block';
 
-        AnimationUtils.slideIn(alert, 'right', {
-            duration: 300,
-            easing: 'ease-out',
-            distance: 100,
-            onComplete: () => {
-                this.dispatchAlertEvent(alert, 'show');
-            }
-        });
+        // Simple slide in animation
+        alert.style.transition = 'opacity 300ms ease-out, transform 300ms ease-out';
+        alert.style.opacity = '1';
+        alert.style.transform = 'translateX(0)';
+
+        setTimeout(() => {
+            this.dispatchAlertEvent(alert, 'show');
+        }, 300);
     }
 
     /**
@@ -139,7 +133,7 @@ export class AlertActions extends BaseActionClass {
         }, 10);
 
         if (duration && duration > 0) {
-            AnimationUtils.createTimer(() => {
+            setTimeout(() => {
                 this.dismissAlert(alert);
             }, duration);
         }

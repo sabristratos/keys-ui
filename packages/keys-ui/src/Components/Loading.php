@@ -3,7 +3,6 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Loading Component
@@ -20,6 +19,9 @@ use Keys\UI\Constants\ComponentConstants;
  */
 class Loading extends Component
 {
+    private const VALID_ANIMATIONS = ['spinner', 'dots', 'bars', 'pulse', 'wave', 'bounce'];
+    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
+
     /**
      * Create a new Loading component instance.
      *
@@ -34,28 +36,20 @@ class Loading extends Component
         public ?string $label = null,
         public ?string $id = null
     ) {
-        
+
         $this->id = $this->id ?? 'loading-' . uniqid();
 
-        
-        $validAnimations = defined('Keys\UI\Constants\ComponentConstants::LOADING_ANIMATIONS')
-            ? ComponentConstants::LOADING_ANIMATIONS
-            : ['spinner', 'dots', 'bars', 'pulse', 'wave', 'bounce'];
 
-        if (!in_array($this->animation, $validAnimations)) {
+        if (!in_array($this->animation, self::VALID_ANIMATIONS)) {
             $this->animation = 'spinner';
         }
 
-        
-        $validSizes = defined('Keys\UI\Constants\ComponentConstants::ICON_SIZES')
-            ? ComponentConstants::ICON_SIZES
-            : ['xs', 'sm', 'md', 'lg', 'xl'];
 
-        if (!in_array($this->size, $validSizes)) {
+        if (!in_array($this->size, self::VALID_SIZES)) {
             $this->size = 'md';
         }
 
-        
+
         if (!$this->label) {
             $this->label = 'Loading...';
         }

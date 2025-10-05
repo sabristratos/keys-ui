@@ -5,9 +5,7 @@
     </div>
 @endif
 
-
 <textarea {{ $textareaAttributes }} data-input-actions="{{ $hasActions() ? 'true' : 'false' }}" @if($autoResize) data-auto-resize="true" @endif>{{ $value }}</textarea>
-
 
 @if($hasActions())
     <div class="absolute {{ $computedIconPosition }} right-2 flex gap-1">
@@ -40,7 +38,6 @@
         @endforeach
     </div>
 @endif
-
 
 @if($iconRight && !$hasActions())
     <div class="absolute {{ $computedIconPosition }} {{ $computedIconOffsets['right'] }} pointer-events-none">

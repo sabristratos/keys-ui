@@ -4,20 +4,20 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 class Icon extends Component
 {
+    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
+
     public function __construct(
         public string $name,
         public string $size = 'md',
         public ?string $fallback = 'heroicon-o-question-mark-circle'
     ) {
-        if (!ComponentConstants::isValidSize($this->size)) {
-            $this->size = ComponentConstants::getDefaultSize();
+        if (!in_array($this->size, self::VALID_SIZES)) {
+            $this->size = 'md';
         }
     }
-
 
     public function iconName(): string
     {

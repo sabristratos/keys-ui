@@ -1,7 +1,6 @@
 
 <input type="hidden" name="{{ $name }}" value="{{ $value }}" class="timepicker-hidden-input">
 
-
 <div class="relative">
     <input
         type="text"
@@ -37,7 +36,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="{{ $computedDropdownClasses }} hidden" data-timepicker-dropdown>
     <div class="p-3">

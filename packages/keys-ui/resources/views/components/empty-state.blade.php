@@ -1,5 +1,4 @@
 @php
-    // Container styling with size-based padding
     $containerClasses = 'text-center';
     $containerClasses .= match ($size) {
         'sm' => ' py-8 px-4',
@@ -8,7 +7,6 @@
         default => ' py-12 px-6'
     };
 
-    // Icon styling with variant-based colors
     $iconClasses = 'mx-auto mb-4';
     $iconClasses .= match ($variant) {
         'brand' => ' text-brand',
@@ -19,25 +17,27 @@
         default => ' text-muted'
     };
 
-    // Title styling with size variants
-    $titleClasses = 'font-semibold text-foreground mb-2';
-    $titleClasses .= match ($size) {
-        'sm' => ' text-base',
-        'md' => ' text-lg',
-        'lg' => ' text-xl',
-        default => ' text-lg'
+    $headingSize = match ($size) {
+        'sm' => 'md',
+        'md' => 'lg',
+        'lg' => 'xl',
+        default => 'lg'
     };
 
-    // Description styling with size variants
-    $descriptionClasses = 'text-muted max-w-md mx-auto';
-    $descriptionClasses .= match ($size) {
-        'sm' => ' text-sm mb-4',
-        'md' => ' text-base mb-6',
-        'lg' => ' text-lg mb-6',
-        default => ' text-base mb-6'
+    $textSize = match ($size) {
+        'sm' => 'sm',
+        'md' => 'md',
+        'lg' => 'lg',
+        default => 'md'
     };
 
-    // Action container spacing and centering
+    $textMargin = match ($size) {
+        'sm' => ' mb-4',
+        'md' => ' mb-6',
+        'lg' => ' mb-6',
+        default => ' mb-6'
+    };
+
     $actionContainerClasses = 'flex justify-center';
     $actionContainerClasses .= match ($size) {
         'sm' => ' mt-4',
@@ -56,13 +56,13 @@
         />
     @endif
 
-    <h3 class="{{ $titleClasses }}">
+    <x-keys::heading level="h3" :size="$headingSize" weight="semibold" class="mb-2">
         {{ $title }}
-    </h3>
+    </x-keys::heading>
 
-    <p class="{{ $descriptionClasses }}">
+    <x-keys::text color="muted" :size="$textSize" :class="'max-w-md mx-auto' . $textMargin">
         {{ $description }}
-    </p>
+    </x-keys::text>
 
     @if($hasAction())
         <div class="{{ $actionContainerClasses }}">

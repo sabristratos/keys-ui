@@ -71,7 +71,7 @@ export class BadgeGroupActions extends BaseActionClass {
         const max = parseInt(maxAttr, 10);
         if (isNaN(max) || max < 1) return;
 
-        const badgeContainer = group.querySelector('[data-badge-container="true"]') || group;
+        const badgeContainer = (group.querySelector('[data-badge-container="true"]') as HTMLElement) || group;
         const badges = Array.from(badgeContainer.children).filter(child =>
             child.hasAttribute('data-keys-badge') || child.classList.contains('badge')
         ) as HTMLElement[];
@@ -231,7 +231,7 @@ export class BadgeGroupActions extends BaseActionClass {
         const badge = BadgeActions.createBadge({
             ...badgeOptions,
             size: badgeSize,
-            container: group.querySelector('[data-badge-container="true"]') || group
+            container: (group.querySelector('[data-badge-container="true"]') as HTMLElement) || group
         });
 
         this.applyMaxBadgeLogic(group);

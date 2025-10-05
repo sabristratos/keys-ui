@@ -75,11 +75,9 @@
                 </header>
             @endisset
 
-
             <main class="{{ $bodyClasses }}">
                 {{ $slot }}
             </main>
-
 
             @isset($footer)
                 <footer class="{{ $footerClasses }}">
@@ -88,7 +86,6 @@
             @endisset
         </div>
     </div>
-
 
     
     @if($isLivewireEnabled)
@@ -160,7 +157,6 @@
         </script>
     @endif
 </dialog>
-
 
 @once
 <style>

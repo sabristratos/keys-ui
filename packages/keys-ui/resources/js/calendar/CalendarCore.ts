@@ -119,7 +119,8 @@ export class CalendarCore extends BaseActionClass<CalendarState> {
 
             if (target.dataset.calendarDayBtn !== undefined) {
                 const dateString = target.dataset.date;
-                if (dateString && !target.disabled) {
+                const isDisabled = target.hasAttribute('disabled') || target.getAttribute('aria-disabled') === 'true';
+                if (dateString && !isDisabled) {
                     this.selectDate(calendar, dateString);
                 }
             }

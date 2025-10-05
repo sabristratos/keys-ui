@@ -1,14 +1,14 @@
 
 @php
 
-    $baseClasses = 'max-w-sm w-fit h-fit rounded-lg shadow-lg text-foreground z-[9999] p-0 overflow-visible opacity-100';
+    $baseClasses = 'max-w-sm w-fit h-fit rounded-lg shadow-lg text-text z-[9999] p-0 overflow-visible opacity-100';
 
     $variantClasses = match ($variant) {
         'success' => 'border border-success bg-success-subtle',
         'warning' => 'border border-warning bg-warning-subtle',
         'danger' => 'border border-danger bg-danger-subtle',
         'info' => 'border border-info bg-info-subtle',
-        'neutral' => 'border border-neutral bg-neutral-subtle',
+        'neutral' => 'border border-border bg-surface',
         default => 'border border-info bg-info-subtle'
     };
 
@@ -17,13 +17,12 @@
         'warning' => 'bg-warning text-black',
         'danger' => 'bg-danger text-white',
         'info' => 'bg-info text-white',
-        'neutral' => 'bg-neutral text-white',
+        'neutral' => 'bg-muted text-white',
         default => 'bg-info text-white'
     };
 
     $ariaLive = in_array($variant, ['danger', 'warning']) ? 'assertive' : 'polite';
 @endphp
-
 
 <div {{ $attributes->merge(['class' => "$baseClasses $variantClasses"])->merge($dataAttributes) }}
      id="{{ $id }}"
@@ -48,19 +47,19 @@
             <div class="flex-1 min-w-0">
                 
                 @if(!empty($title))
-                    <h3 id="{{ $id }}-title" class="font-semibold text-sm leading-5 mb-1">
+                    <x-keys::heading level="h3" size="sm" color="heading" weight="semibold" tracking="tight" id="{{ $id }}-title" class="mb-1">
                         {{ $title }}
-                    </h3>
+                    </x-keys::heading>
                 @endif
 
-                
-                <div id="{{ $id }}-message" class="text-sm opacity-90 leading-5">
+
+                <x-keys::text element="div" size="sm" color="text" leading="tight" id="{{ $id }}-message" class="opacity-90">
                     @if(!empty($message))
                         {{ $message }}
                     @else
                         {{ $slot }}
                     @endif
-                </div>
+                </x-keys::text>
             </div>
 
             

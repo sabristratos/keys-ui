@@ -1,21 +1,21 @@
 @php
-    $wrapperClasses = 'input-wrapper-base';
+    $wrapperClasses = 'relative shadow-xs flex items-center gap-2.5 bg-input border border-border transition-colors duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
 
     $wrapperSizeClasses = match ($size) {
-        'xs' => 'min-h-[28px] rounded-sm',
-        'sm' => 'min-h-[32px] rounded-md',
-        'md' => 'min-h-[38px] rounded-md',
-        'lg' => 'min-h-[42px] rounded-lg',
-        'xl' => 'min-h-[48px] rounded-lg',
-        default => 'min-h-[38px] rounded-md'
+        'xs' => 'px-2 rounded-sm',
+        'sm' => 'px-2.5 rounded-md',
+        'md' => 'px-3 rounded-md',
+        'lg' => 'px-3 rounded-lg',
+        'xl' => 'px-3.5 rounded-lg',
+        default => 'px-3 rounded-md'
     };
 
     if ($disabled) {
-        $wrapperStateClasses = 'input-disabled';
+        $wrapperStateClasses = 'opacity-50 cursor-not-allowed bg-surface';
     } elseif ($hasError()) {
-        $wrapperStateClasses = 'input-wrapper-error';
+        $wrapperStateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20';
     } else {
-        $wrapperStateClasses = 'input-wrapper-default';
+        $wrapperStateClasses = '';
     }
 
     $wrapperAttributes = $attributes
@@ -36,16 +36,7 @@
         default => 'text-sm py-2'
     };
 
-    $inputPadding = match ($size) {
-        'xs' => 'px-2',
-        'sm' => 'px-2.5',
-        'md' => 'px-3',
-        'lg' => 'px-3',
-        'xl' => 'px-3.5',
-        default => 'px-3'
-    };
-
-    $inputColorClasses = $disabled ? 'text-muted' : 'text-foreground';
+    $inputColorClasses = $disabled ? 'text-muted' : 'text-text';
 
     $wireAndAlpineAttributes = $attributes->filter(fn($value, $key) => str_starts_with($key, 'wire:') || str_starts_with($key, 'x-'))->getAttributes();
     $dataOnlyAttributes = $attributes->filter(fn($value, $key) => str_starts_with($key, 'data-'))->getAttributes();
@@ -66,28 +57,21 @@
             $wireAndAlpineAttributes,
             $dataOnlyAttributes,
             [
-                'class' => trim("$inputClasses $inputTextClasses $inputPadding $inputColorClasses"),
+                'class' => trim("$inputClasses $inputTextClasses $inputColorClasses"),
                 'data-input-element' => 'true',
             ]
         ));
 
-    $leftSlotPadding = match ($size) {
-        'xs' => 'pl-2.5',
-        'sm' => 'pl-3',
-        'md' => 'pl-3',
-        'lg' => 'pl-3.5',
-        'xl' => 'pl-4',
-        default => 'pl-3'
+    $iconSize = match ($size) {
+        'xs' => 'xs',
+        'sm' => 'xs',
+        'md' => 'sm',
+        'lg' => 'md',
+        'xl' => 'md',
+        default => 'sm'
     };
 
-    $rightSlotPadding = match ($size) {
-        'xs' => 'pr-2',
-        'sm' => 'pr-2',
-        'md' => 'pr-2',
-        'lg' => 'pr-2.5',
-        'xl' => 'pr-3',
-        default => 'pr-2'
-    };
+    $computedActionSize = $actionSize;
 
     $outerWrapperAttributes = $attributes->filter(fn($value, $key) => !in_array($key, ['type', 'name', 'id', 'value', 'placeholder', 'disabled', 'readonly', 'required', 'class']) && !str_starts_with($key, 'wire:') && !str_starts_with($key, 'x-') && !str_starts_with($key, 'data-'));
 @endphp
@@ -103,7 +87,7 @@
         </div>
 
         @if($hint)
-            <p class="mt-1 text-xs text-muted">{{ $hint }}</p>
+            <x-keys::text size="xs" color="muted" class="mt-1">{{ $hint }}</x-keys::text>
         @endif
 
         @if($showErrors && !is_null($errors))

@@ -12,7 +12,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --radius-base: 0.5rem;
+    --radius-base: 1.5rem;
     --radius-sm: calc(var(--radius-base) * 0.25);
     --radius-md: calc(var(--radius-base) * 0.75);
     --radius-lg: var(--radius-base);
@@ -39,30 +39,43 @@
     --width-scrollbar-thin: 4px;
     --width-scrollbar: 6px;
 
-    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.025);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
-    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
+    /* Shadow Primitives for Multi-Layer System - Ultra Subtle */
+    --shadow-highlight: light-dark(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2));
+    --shadow-dark: light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.1));
+    --shadow-soft: light-dark(rgba(0, 0, 0, 0.015), rgba(0, 0, 0, 0.05));
 
-    --shadow-button-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    /* Multi-Layer Shadow System */
+    --shadow-xs:
+        inset 0 1px 1px var(--shadow-highlight),
+        0 1px 1px var(--shadow-soft),
+        0 1px 4px var(--shadow-dark);
 
-    --shadow-skeumorphic: 0px 0px 0px 1px light-dark(rgba(10, 13, 18, 0.12), rgba(255, 255, 255, 0.15)) inset, 0px -2px 0px 0px light-dark(rgba(10, 13, 18, 0.05), rgba(255, 255, 255, 0.05)) inset;
 
-    --shadow-skeumorphic-hover: 0px 0px 0px 1px light-dark(rgba(10, 13, 18, 0.20), rgba(255, 255, 255, 0.25)) inset, 0px -2px 0px 0px light-dark(rgba(10, 13, 18, 0.05), rgba(255, 255, 255, 0.05)) inset;
+    --shadow-sm:
+        inset 0 1px 2px var(--shadow-highlight),
+        0 1px 2px var(--shadow-dark),
+        0 2px 4px var(--shadow-soft);
 
-    --shadow-skeumorphic-danger: 0px 0px 0px 1px light-dark(rgba(220, 38, 38, 0.5), rgba(239, 68, 68, 0.5)) inset, 0px -2px 0px 0px light-dark(rgba(10, 13, 18, 0.05), rgba(255, 255, 255, 0.05)) inset;
+    --shadow-md:
+        inset 0 1px 2px var(--shadow-highlight),
+        0 2px 4px var(--shadow-dark),
+        0 4px 8px var(--shadow-soft);
 
-    --shadow-skeumorphic-brand: 0px 0px 0px 1px light-dark(var(--color-brand-400), var(--color-brand-600)) inset, 0px -2px 0px 0px light-dark(rgba(10, 13, 18, 0.05), rgba(255, 255, 255, 0.05)) inset;
+    --shadow-lg:
+        inset 0 1px 2px var(--shadow-highlight),
+        0 4px 6px var(--shadow-dark),
+        0 6px 10px var(--shadow-soft);
 
-    --shadow-xs-skeumorphic: var(--shadow-skeumorphic), var(--shadow-xs);
-    --shadow-sm-skeumorphic: var(--shadow-skeumorphic), var(--shadow-sm);
-    --shadow-md-skeumorphic: var(--shadow-skeumorphic), var(--shadow-md);
-    --shadow-xs-skeumorphic-hover: var(--shadow-skeumorphic-hover), var(--shadow-xs);
-    --shadow-xs-skeumorphic-danger: var(--shadow-skeumorphic-danger), var(--shadow-xs);
-    --shadow-xs-skeumorphic-brand: var(--shadow-skeumorphic-brand), var(--shadow-xs);
+    --shadow-xl:
+        inset 0 1px 2px var(--shadow-highlight),
+        0 8px 10px var(--shadow-dark),
+        0 10px 15px var(--shadow-soft);
+
+    --shadow-2xl:
+        inset 0 1px 3px var(--shadow-highlight),
+        0 12px 15px var(--shadow-dark),
+        0 15px 25px var(--shadow-soft);
+
     --color-brand-50: oklch(0.957 0.062 154.97);
     --color-brand-100: oklch(0.926 0.116 155.05);
     --color-brand-200: oklch(0.849 0.2 154.52);
@@ -136,119 +149,76 @@
     --color-info-950: oklch(0.203 0.052 240.75);
 
     --color-brand: var(--color-brand-500);
-    --color-brand-hover: var(--color-brand-600);
-    --color-brand-active: var(--color-brand-700);
-    --color-foreground-brand: white;
+    --color-foreground-brand: var(--color-brand-500);
+    --color-brand-hover: var(--color-brand-500);
 
-    --color-danger: var(--color-danger-500);
-    --color-danger-hover: var(--color-danger-600);
-    --color-danger-active: var(--color-danger-700);
-    --color-foreground-danger: white;
+    /* Layering System - lighter = more elevated */
+    --color-body: light-dark(var(--color-neutral-100), var(--color-neutral-950));
+    --color-surface: light-dark(var(--color-neutral-50), var(--color-neutral-900));
+    --color-foreground: light-dark(white, var(--color-neutral-800));
 
-    --color-warning: var(--color-warning-500);
-    --color-warning-hover: var(--color-warning-600);
-    --color-warning-active: var(--color-warning-700);
-    --color-foreground-warning: light-dark(var(--color-neutral-900), white);
+    /* Inverted Surface - for dark cards/buttons */
+    --color-surface-dark: light-dark(var(--color-neutral-900), var(--color-neutral-50));
+    --color-surface-dark-foreground: light-dark(var(--color-neutral-50), var(--color-neutral-900));
 
-    --color-success: var(--color-success-500);
+    /* Typography Hierarchy */
+    --color-heading: light-dark(var(--color-neutral-950), var(--color-neutral-50));
+    --color-text: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+    --color-muted: light-dark(var(--color-neutral-600), var(--color-neutral-500));
+
+    /* Interactive States */
+    --color-hover: light-dark(var(--color-neutral-200), var(--color-neutral-700));
+
+    /* Neutral Color System */
+    --color-neutral: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+    --color-neutral-hover: light-dark(var(--color-neutral-200), var(--color-neutral-700));
+    --color-neutral-active: light-dark(var(--color-neutral-300), var(--color-neutral-600));
+    --color-neutral-active-light: light-dark(var(--color-neutral-100), var(--color-neutral-800));
+
+    /* Border System */
+    --color-border: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+    --color-border-subtle: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+
+    /* Input - uses foreground layer */
+    --color-input: var(--color-foreground);
+
+    /* Accent/Brand */
+    --color-accent: var(--color-brand-500);
+    --color-accent-foreground: white;
+    --color-accent-hover: var(--color-brand-600);
+    --color-accent-active: var(--color-brand-700);
+
+    /* Semantic Colors */
+    --color-success: light-dark(var(--color-success-500), var(--color-success-600));
+    --color-success-foreground: white;
     --color-success-hover: var(--color-success-600);
     --color-success-active: var(--color-success-700);
-    --color-foreground-success: white;
 
-    --color-info: var(--color-info-500);
+    --color-warning: light-dark(var(--color-warning-500), var(--color-warning-600));
+    --color-warning-foreground: light-dark(var(--color-neutral-900), white);
+    --color-warning-hover: var(--color-warning-600);
+    --color-warning-active: var(--color-warning-700);
+
+    --color-danger: light-dark(var(--color-danger-500), var(--color-danger-600));
+    --color-danger-foreground: white;
+    --color-danger-hover: var(--color-danger-600);
+    --color-danger-active: var(--color-danger-700);
+
+    --color-info: light-dark(var(--color-info-500), var(--color-info-600));
+    --color-info-foreground: white;
     --color-info-hover: var(--color-info-600);
     --color-info-active: var(--color-info-700);
-    --color-foreground-info: white;
 
-    --color-surface: light-dark(white, var(--color-neutral-900));
-    --color-surface-secondary: light-dark(var(--color-neutral-50), var(--color-neutral-800));
-    --color-body: light-dark(var(--color-neutral-100), var(--color-neutral-950));
-    --color-foreground: light-dark(var(--color-neutral-800), var(--color-neutral-200));
-    --color-border: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --color-input: light-dark(white, var(--color-neutral-950));
-    --color-muted: light-dark(var(--color-neutral-600), var(--color-neutral-400));
-
-    --color-neutral: light-dark(var(--color-neutral-100), var(--color-neutral-700));
-    --color-neutral-hover: light-dark(var(--color-neutral-200), var(--color-neutral-800));
-    --color-neutral-active: light-dark(var(--color-neutral-200), var(--color-neutral-700));
-    --color-neutral-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --color-foreground-neutral: light-dark(var(--color-neutral-900), var(--color-neutral-100));
-
-    --color-brand-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --color-danger-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --color-warning-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --color-success-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --color-info-disabled: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-
+    /* Subtle backgrounds for alerts, badges, etc. */
+    --color-accent-subtle: light-dark(var(--color-brand-50), var(--color-brand-950));
     --color-success-subtle: light-dark(var(--color-success-50), var(--color-success-950));
     --color-warning-subtle: light-dark(var(--color-warning-50), var(--color-warning-950));
     --color-danger-subtle: light-dark(var(--color-danger-50), var(--color-danger-950));
     --color-info-subtle: light-dark(var(--color-info-50), var(--color-info-950));
-    --color-neutral-subtle: light-dark(var(--color-neutral-50), var(--color-neutral-950));
-
-    --color-surface-inverse: light-dark(var(--color-neutral-900), white);
-    --color-border-inverse: light-dark(var(--color-neutral-700), var(--color-neutral-200));
-    --tooltip-dark-bg: light-dark(var(--color-neutral-900), var(--color-neutral-800));
-
-    --color-button-brand-icon: light-dark(rgba(255, 255, 255, 0.9), var(--color-brand-200));
-    --color-button-brand-icon-hover: light-dark(rgba(255, 255, 255, 1), var(--color-brand-100));
-    --color-button-danger-icon: light-dark(rgba(255, 255, 255, 0.9), var(--color-danger-200));
-    --color-button-danger-icon-hover: light-dark(rgba(255, 255, 255, 1), var(--color-danger-100));
-    --color-button-success-icon: light-dark(rgba(255, 255, 255, 0.9), var(--color-success-200));
-    --color-button-success-icon-hover: light-dark(rgba(255, 255, 255, 1), var(--color-success-100));
-    --color-button-warning-icon: light-dark(rgba(255, 255, 255, 0.9), var(--color-warning-200));
-    --color-button-warning-icon-hover: light-dark(rgba(255, 255, 255, 1), var(--color-warning-100));
-    --color-button-info-icon: light-dark(rgba(255, 255, 255, 0.9), var(--color-info-200));
-    --color-button-info-icon-hover: light-dark(rgba(255, 255, 255, 1), var(--color-info-100));
 }
 
 :root {
     color-scheme: light dark;
 }
-
-@layer components {
-    .input-base {
-        @apply w-full rounded-md transition-colors duration-200
-               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
-    }
-
-    .input-wrapper-base {
-        @apply flex items-center w-full rounded-md transition-all duration-200
-               focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2;
-    }
-
-    .input-trigger-base {
-        @apply flex items-center justify-between w-full rounded-md transition-colors duration-200
-               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
-    }
-
-    .input-default {
-        @apply bg-input shadow-xs-skeumorphic
-               focus-visible:shadow-xs-skeumorphic-brand focus-visible:ring-brand
-               hover:shadow-xs-skeumorphic-hover;
-    }
-
-    .input-wrapper-default {
-        @apply bg-input shadow-xs-skeumorphic
-               focus-within:shadow-xs-skeumorphic-brand focus-within:ring-brand
-               hover:shadow-xs-skeumorphic-hover;
-    }
-
-    .input-error {
-        @apply bg-input shadow-xs-skeumorphic-danger
-               focus-visible:shadow-xs-skeumorphic-danger focus-visible:ring-danger;
-    }
-
-    .input-wrapper-error {
-        @apply bg-input shadow-xs-skeumorphic-danger
-               focus-within:shadow-xs-skeumorphic-danger focus-within:ring-danger;
-    }
-
-    .input-disabled {
-        @apply bg-surface shadow-xs cursor-not-allowed opacity-50;
-    }
-}
-
-
 
 

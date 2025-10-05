@@ -51,6 +51,13 @@ class Row extends Component
     public function render()
     {
         return view('keys::components.table.row', [
+            'selected' => $this->selected,
+            'clickable' => $this->clickable,
+            'variant' => $this->variant,
+            'href' => $this->href,
+            'rowId' => $this->rowId,
+            'selectable' => $this->selectable,
+            'selectionName' => $this->selectionName,
             'dataAttributes' => $this->getDataAttributes(),
         ]);
     }

@@ -3,7 +3,7 @@
 
     $itemClasses = 'flex items-center';
 
-    $baseClasses = 'inline-flex items-center transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 rounded-sm min-w-0 whitespace-nowrap';
+    $baseClasses = 'inline-flex items-center transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded-sm min-w-0 whitespace-nowrap';
 
     $truncateClasses = $truncate ? 'max-w-32 sm:max-w-48 md:max-w-64' : '';
     $maxWidthClasses = $maxWidth ?? '';

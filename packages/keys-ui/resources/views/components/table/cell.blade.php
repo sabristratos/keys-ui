@@ -16,12 +16,12 @@
     };
 
     $cellVariantClasses = match ($variant) {
-        'strong' => 'font-semibold text-foreground',
+        'strong' => 'font-semibold text-text',
         'muted' => 'text-muted',
         'success' => 'text-success',
         'danger' => 'text-danger',
         'warning' => 'text-warning',
-        default => 'text-foreground'
+        default => 'text-muted'
     };
 
     $cellTextClasses = '';

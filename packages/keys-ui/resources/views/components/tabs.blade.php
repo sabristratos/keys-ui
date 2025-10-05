@@ -50,7 +50,6 @@
     </div>
 </div>
 
-
 <style>
 [data-tabs="true"] {
     position: relative;

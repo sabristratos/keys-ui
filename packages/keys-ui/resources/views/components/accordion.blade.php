@@ -127,7 +127,7 @@ details[data-keys-accordion] summary::-webkit-details-marker {
     }
 
     $detailsClasses = trim("{$baseClasses} {$variantClasses} {$roundedClasses} {$disabledClasses}");
-    $summaryClasses = trim("list-none flex items-center justify-between w-full select-none transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 disabled:pointer-events-none {$sizeClasses} {$summaryColorClasses} {$summaryDisabledClasses}");
+    $summaryClasses = trim("list-none flex items-center justify-between w-full select-none transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 disabled:pointer-events-none {$sizeClasses} {$summaryColorClasses} {$summaryDisabledClasses}");
     $contentClasses = trim("{$contentBorderClass} {$contentSizeClasses} {$contentColorClasses}");
 @endphp
 

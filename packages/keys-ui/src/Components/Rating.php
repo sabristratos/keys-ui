@@ -4,10 +4,11 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 class Rating extends Component
 {
+    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
+
     public string $uniqueId;
 
     public function __construct(
@@ -44,12 +45,13 @@ class Rating extends Component
             $this->iconOutlined = $this->getOutlinedIcon();
         }
 
-        
-        if (! ComponentConstants::isValidSize($this->size)) {
-            $this->size = ComponentConstants::getDefaultSize();
+
+
+        if (! in_array($this->size, self::VALID_SIZES)) {
+            $this->size = 'md';
         }
 
-        
+
         $this->value = max(0, min($this->max, $this->value));
     }
 

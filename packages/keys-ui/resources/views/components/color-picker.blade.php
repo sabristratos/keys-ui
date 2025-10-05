@@ -24,7 +24,6 @@
             'class' => trim("$wrapperClasses $wrapperSizeClasses $wrapperStateClasses"),
         ], $dataAttributes));
 
-    // Color input (native color picker) styling
     $colorInputClasses = 'cursor-pointer border-0 bg-transparent';
 
     $colorInputSize = match ($size) {
@@ -35,7 +34,6 @@
         default => 'w-8 h-8'
     };
 
-    // Text input styling
     $textInputClasses = 'flex-1 bg-transparent border-0 outline-none focus:outline-none placeholder:text-muted font-mono';
 
     $textInputSize = match ($size) {

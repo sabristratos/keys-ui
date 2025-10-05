@@ -108,7 +108,6 @@
     @endif
 </div>
 
-
 <style>
     .file-preview-item {
         position: relative;
@@ -138,7 +137,7 @@
 
     /* Focus states for accessibility */
     .file-preview-item:focus-within {
-        @apply ring-2 ring-brand ring-offset-2;
+        @apply ring-2 ring-accent ring-offset-2;
     }
 
     /* Progress bar animation */

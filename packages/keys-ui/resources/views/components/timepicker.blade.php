@@ -10,10 +10,10 @@
             'data-livewire-mode' => 'true',
         ]);
 
-        $wireModelName = $wireOnlyAttributes->whereStartsWith('wire:model')->first();
-        if ($wireModelName) {
-            $dataAttributes['data-wire-model'] = $wireModelName;
-            $dataAttributes['data-livewire-property'] = $wireModelName;
+        $wireModel = $wireOnlyAttributes->whereStartsWith('wire:model')->first();
+        if ($wireModel) {
+            $dataAttributes['data-wire-model'] = $wireModel;
+            $dataAttributes['data-livewire-property'] = $wireModel;
         }
     }
 
@@ -21,21 +21,41 @@
         ->except(['class'])
         ->merge($dataAttributes);
 
-    $baseClasses = 'input-trigger-base cursor-pointer';
+    $baseClasses = 'flex items-center shadow-xs justify-between gap-2.5 bg-input border border-border rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
 
     $sizeClasses = match ($size) {
-        'sm' => 'min-h-[32px] px-3 py-1.5 text-sm',
-        'md' => 'min-h-[38px] px-3 py-2 text-sm',
-        'lg' => 'min-h-[42px] px-4 py-2.5 text-base',
-        default => 'min-h-[38px] px-3 py-2 text-sm'
+        'sm' => 'min-h-[32px] text-sm',
+        'md' => 'min-h-[38px] text-sm',
+        'lg' => 'min-h-[42px] text-base',
+        default => 'min-h-[38px] text-sm'
+    };
+
+    $paddingClasses = match ($size) {
+        'sm' => 'px-3 py-1.5',
+        'md' => 'px-3 py-2',
+        'lg' => 'px-4 py-2.5',
+        default => 'px-3 py-2'
+    };
+
+    $widthClasses = match ($width) {
+        'auto' => 'w-auto',
+        'xs' => 'w-20',
+        'sm' => 'w-32',
+        'md' => 'w-48',
+        'lg' => 'w-64',
+        'xl' => 'w-80',
+        '2xl' => 'w-96',
+        'fit' => 'w-fit',
+        'full' => 'w-full',
+        default => 'w-full'
     };
 
     if ($disabled) {
-        $stateClasses = 'input-disabled text-muted';
+        $stateClasses = 'opacity-50 cursor-not-allowed bg-surface text-muted';
     } elseif ($hasError()) {
-        $stateClasses = 'input-error text-foreground';
+        $stateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20 text-text';
     } else {
-        $stateClasses = 'input-default text-foreground';
+        $stateClasses = 'text-text';
     }
 
     $iconSize = match ($size) {
@@ -45,16 +65,19 @@
         default => 'sm'
     };
 
-    $rightPadding = match ($size) {
-        'sm' => 'pr-3',
-        'md' => 'pr-4',
-        'lg' => 'pr-5',
-        default => 'pr-4'
-    };
-
-    $triggerClasses = "$baseClasses $sizeClasses $stateClasses $rightPadding";
+    $triggerClasses = trim("$baseClasses $widthClasses $stateClasses");
+    $overlayClasses = trim("$sizeClasses $paddingClasses");
 
     $dropdownWidthClasses = 'w-auto min-w-full max-w-md';
+
+    // Calculate grid columns in Blade instead of JS
+    $gridColumns = 2; // Default: hours + minutes
+    if ($showSeconds) $gridColumns++;
+    if ($format === '12') $gridColumns++;
+    $gridClasses = "grid gap-3 grid-cols-{$gridColumns}";
+
+    // Period section visibility classes
+    $periodSectionClasses = $format === '12' ? 'flex flex-col' : 'hidden';
 @endphp
 
 <div {{ $attributes->only('class') }} @if(!$isShorthand()) {{ $timePickerAttributes }} @endif>
@@ -66,11 +89,12 @@
         <div class="relative mt-1" {{ $timePickerAttributes }}>
     @endif
 
-    
-    <input type="hidden" name="{{ $name }}" value="{{ $value }}" data-timepicker-hidden-input>
 
-    
-    <x-keys::popover
+    <input type="hidden" name="{{ $name }}" value="{{ $value }}" data-timepicker-hidden-input {{ $wireOnlyAttributes }}>
+
+
+    <div wire:ignore>
+        <x-keys::popover
         class="w-full"
         :id="'timepicker-dropdown-' . $id"
         placement="bottom-start"
@@ -78,11 +102,12 @@
     >
         <x-slot name="trigger">
             <div class="relative">
-                
+
                 <button
                     type="button"
                     id="{{ $id }}"
-                    class="{{ $triggerClasses }}"
+                    popovertarget="timepicker-dropdown-{{ $id }}"
+                    class="absolute inset-0 {{ $triggerClasses }}"
                     data-popover-trigger="timepicker-dropdown-{{ $id }}"
                     data-timepicker-trigger
                     role="combobox"
@@ -90,41 +115,40 @@
                     aria-haspopup="dialog"
                     {{ $disabled ? 'disabled aria-disabled=true' : '' }}
                     {{ $required ? 'aria-required=true' : '' }}
-                    {{ $wireOnlyAttributes }}
                 >
                     <span class="sr-only" data-timepicker-value>
                         @if($value)
                             {{ $value }}
                         @else
-                            {{ $placeholder ?: 'Select time...' }}
+                            {{ $placeholder ?: __('keys-ui::keys-ui.timepicker.placeholder') }}
                         @endif
                     </span>
                 </button>
 
-                
-                <div class="absolute inset-0 flex items-center justify-between pointer-events-none px-3 py-2">
-                    
-                    <div class="flex items-center gap-2 flex-1 min-w-0">
-                        
 
-                        
-                        <span class="timepicker-value truncate pointer-events-none" data-timepicker-display>
+                <div class="relative flex items-center justify-between pointer-events-none {{ $overlayClasses }}">
+
+                    <div class="flex items-center gap-2.5 flex-1 min-w-0">
+
+
+                        <span class="timepicker-value truncate pointer-events-none text-text" data-timepicker-display>
                             @if($value)
                                 {{ $value }}
                             @else
-                                <span class="text-muted">{{ $placeholder ?: 'Select time...' }}</span>
+                                <span class="text-muted">{{ $placeholder ?: __('keys-ui::keys-ui.timepicker.placeholder') }}</span>
                             @endif
                         </span>
                     </div>
 
-                    
-                    <div class="flex items-center gap-2">
+
+                    <div class="flex items-center gap-2.5">
                         @if($clearable && !$disabled)
                             <x-keys::button
                                 type="button"
                                 variant="ghost"
                                 size="xs"
-                                class="opacity-0 pointer-events-auto transition-opacity duration-150"
+                                class="transition-opacity duration-150"
+                                :class="$value ? '' : 'invisible'"
                                 data-timepicker-clear
                                 aria-label="Clear time"
                             >
@@ -132,7 +156,7 @@
                             </x-keys::button>
                         @endif
 
-                        
+
                         <div class="text-muted pointer-events-none">
                             <x-keys::icon
                                 name="heroicon-o-clock"
@@ -145,43 +169,69 @@
             </div>
         </x-slot>
 
-        
+
         <div class="{{ $dropdownWidthClasses }}">
-            
+
             @if($formatMode === 'flexible')
-                <div class="flex items-center justify-between mb-3 pb-2 border-b border-border">
-                    <span class="text-sm font-medium text-foreground">Time Format</span>
-                    <div class="flex items-center space-x-2">
+                <div class="flex items-center justify-between px-4 py-3 mb-3 border-b border-border">
+                    <span class="text-sm font-medium text-text">{{ __('keys-ui::keys-ui.timepicker.time_format') }}</span>
+                    <x-keys::button.group :attached="true">
                         <x-keys::button
-                            variant="{{ $format === '24' ? 'brand' : 'outline' }}"
                             size="xs"
+                            :variant="$format === '24' ? 'brand' : 'outline'"
                             data-timepicker-format="24"
+                            :data-selected="$format === '24' ? 'true' : 'false'"
+                            aria-pressed="{{ $format === '24' ? 'true' : 'false' }}"
                         >
-                            24h
+{{ __('keys-ui::keys-ui.timepicker.format_24h') }}
                         </x-keys::button>
                         <x-keys::button
-                            variant="{{ $format === '12' ? 'brand' : 'outline' }}"
                             size="xs"
+                            :variant="$format === '12' ? 'brand' : 'outline'"
                             data-timepicker-format="12"
+                            :data-selected="$format === '12' ? 'true' : 'false'"
+                            aria-pressed="{{ $format === '12' ? 'true' : 'false' }}"
                         >
-                            12h
+{{ __('keys-ui::keys-ui.timepicker.format_12h') }}
                         </x-keys::button>
-                    </div>
+                    </x-keys::button.group>
                 </div>
             @endif
 
-            
-            <div class="grid gap-3" data-timepicker-grid
-                 style="grid-template-columns: repeat({{ $showSeconds ? ($format === '12' ? '4' : '3') : ($format === '12' ? '3' : '2') }}, 1fr);">
-                
+            {{-- Quick Time Presets --}}
+            <div class="mb-3">
+                <label class="text-xs font-medium text-muted mb-2 block">{{ __('keys-ui::keys-ui.timepicker.quick_select') }}</label>
+                <div class="flex flex-wrap gap-2">
+                    @foreach($timePresets as $preset)
+                        <x-keys::button
+                            type="button"
+                            variant="outline"
+                            size="xs"
+                            data-timepicker-preset="{{ $preset['time'] }}"
+                        >
+                            {{ $preset['label'] }}
+                        </x-keys::button>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="{{ $gridClasses }}" data-timepicker-grid>
+
                 <div class="flex flex-col">
-                    <label class="text-xs font-medium text-muted mb-2">{{ $format === '12' ? 'Hour' : 'Hours' }}</label>
-                    <div class="h-32 overflow-y-auto border border-border rounded bg-input scrollbar-thin" data-timepicker-hours>
+                    <label class="text-xs font-medium text-muted mb-2">{{ $format === '12' ? __('keys-ui::keys-ui.timepicker.hour') : __('keys-ui::keys-ui.timepicker.hours') }}</label>
+                    <div
+                        class="h-32 overflow-y-auto border border-border rounded bg-surface scrollbar-thin py-1"
+                        data-timepicker-hours
+                        role="listbox"
+                        aria-label="Select hour"
+                    >
                         @foreach($hourOptions as $hour)
                             <button
                                 type="button"
                                 data-timepicker-hour="{{ $hour }}"
-                                class="w-full px-3 py-2 text-sm text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 focus-visible:bg-brand focus-visible:text-foreground-brand [&.selected]:bg-brand [&.selected]:text-foreground-brand transition-colors"
+                                class="w-full px-3 py-2 text-sm text-text text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-brand [&.selected]:text-white [&.selected]:font-medium transition-colors"
+                                role="option"
+                                aria-selected="false"
                             >
                                 {{ sprintf('%02d', $hour) }}
                             </button>
@@ -189,15 +239,26 @@
                     </div>
                 </div>
 
-                
+
                 <div class="flex flex-col">
-                    <label class="text-xs font-medium text-muted mb-2">Minutes</label>
-                    <div class="h-32 overflow-y-auto border border-border rounded bg-input scrollbar-thin">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-medium text-muted">{{ __('keys-ui::keys-ui.timepicker.minutes') }}</label>
+                        @if($step > 1)
+                            <span class="text-xs text-muted">{{ $step }} min</span>
+                        @endif
+                    </div>
+                    <div
+                        class="h-32 overflow-y-auto border border-border rounded bg-input scrollbar-thin py-1"
+                        role="listbox"
+                        aria-label="Select minutes"
+                    >
                         @foreach($minuteOptions as $minute)
                             <button
                                 type="button"
                                 data-timepicker-minute="{{ $minute }}"
-                                class="w-full px-3 py-2 text-sm text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 focus-visible:bg-brand focus-visible:text-foreground-brand [&.selected]:bg-brand [&.selected]:text-foreground-brand transition-colors"
+                                class="w-full px-3 py-2 text-sm text-text text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-brand [&.selected]:text-white [&.selected]:font-medium transition-colors"
+                                role="option"
+                                aria-selected="false"
                             >
                                 {{ sprintf('%02d', $minute) }}
                             </button>
@@ -205,16 +266,22 @@
                     </div>
                 </div>
 
-                
+
                 @if($showSeconds)
                     <div class="flex flex-col">
-                        <label class="text-xs font-medium text-muted mb-2">Seconds</label>
-                        <div class="h-32 overflow-y-auto border border-border rounded bg-input scrollbar-thin">
+                        <label class="text-xs font-medium text-muted mb-2">{{ __('keys-ui::keys-ui.timepicker.seconds') }}</label>
+                        <div
+                            class="h-32 overflow-y-auto border border-border rounded bg-input scrollbar-thin py-1"
+                            role="listbox"
+                            aria-label="Select seconds"
+                        >
                             @foreach($secondOptions as $second)
                                 <button
                                     type="button"
                                     data-timepicker-second="{{ $second }}"
-                                    class="w-full px-3 py-2 text-sm text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 focus-visible:bg-brand focus-visible:text-foreground-brand [&.selected]:bg-brand [&.selected]:text-foreground-brand transition-colors"
+                                    class="w-full px-3 py-2 text-sm text-text text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-brand [&.selected]:text-white [&.selected]:font-medium transition-colors"
+                                    role="option"
+                                    aria-selected="false"
                                 >
                                     {{ sprintf('%02d', $second) }}
                                 </button>
@@ -223,31 +290,35 @@
                     </div>
                 @endif
 
-                
-                <div class="flex flex-col" data-timepicker-period-section style="display: {{ $format === '12' ? 'block' : 'none' }}">
-                    <label class="text-xs font-medium text-muted mb-2">Period</label>
-                    <div class="space-y-1">
+
+                <div class="{{ $periodSectionClasses }}" data-timepicker-period-section>
+                    <label class="text-xs font-medium text-muted mb-2">{{ __('keys-ui::keys-ui.timepicker.period') }}</label>
+                    <div class="space-y-1" role="radiogroup" aria-label="Select AM or PM">
                         @foreach($periodOptions as $period)
-                            <button
+                            <x-keys::button
                                 type="button"
+                                variant="outline"
+                                size="sm"
+                                class="w-full justify-start [&.selected]:bg-brand [&.selected]:text-white [&.selected]:border-brand"
                                 data-timepicker-period="{{ $period }}"
-                                class="w-full px-3 py-2 text-sm text-left border border-border rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 focus-visible:bg-brand focus-visible:text-foreground-brand [&.selected]:bg-brand [&.selected]:text-foreground-brand [&.selected]:border-brand transition-colors"
+                                role="radio"
+                                aria-checked="false"
                             >
                                 {{ $period }}
-                            </button>
+                            </x-keys::button>
                         @endforeach
                     </div>
                 </div>
             </div>
 
-            
-            <div class="flex items-center justify-between mt-4 pt-3 border-t border-border">
+
+            <div class="flex items-center justify-between px-4 py-3 mt-3 border-t border-border">
                 <x-keys::button
                     variant="outline"
                     size="sm"
                     data-timepicker-now
                 >
-                    Now
+{{ __('keys-ui::keys-ui.timepicker.now') }}
                 </x-keys::button>
                 <div class="flex items-center space-x-2">
                     <x-keys::button
@@ -255,19 +326,20 @@
                         size="sm"
                         data-timepicker-cancel
                     >
-                        Cancel
+{{ __('keys-ui::keys-ui.timepicker.cancel') }}
                     </x-keys::button>
                     <x-keys::button
                         variant="brand"
                         size="sm"
                         data-timepicker-apply
                     >
-                        Apply
+{{ __('keys-ui::keys-ui.timepicker.apply') }}
                     </x-keys::button>
                 </div>
             </div>
         </div>
     </x-keys::popover>
+    </div>
 
     @if($isShorthand())
         </div>

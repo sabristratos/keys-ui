@@ -71,6 +71,13 @@
             <p class="text-xs text-muted">{{ $hint }}</p>
         @endif
 
+        @php
+            // Auto-detect errors from view error bag if not explicitly provided
+            if (is_null($errors) && $name && View::hasShared('errors') && View::shared('errors')->has($name)) {
+                $errors = View::shared('errors')->get($name);
+            }
+        @endphp
+
         @if($showErrors && $hasError())
             <x-keys::error :messages="$errors" />
         @endif

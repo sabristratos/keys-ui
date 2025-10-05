@@ -198,22 +198,22 @@ export class CalendarRenderer {
      * Get responsive cell classes based on calendar size
      */
     private static getCellClasses(calendar: HTMLElement): string {
-        const size = calendar.dataset.size || 'md';
+        const size = calendar.dataset.size || 'sm';
 
         return {
             'sm': 'w-8 h-8 text-xs',
             'md': 'w-10 h-10 text-sm',
             'lg': 'w-12 h-12 text-base'
-        }[size] || 'w-10 h-10 text-sm';
+        }[size] || 'w-8 h-8 text-xs';
     }
 
     /**
      * Get day button classes with proper state styling
      */
     private static getDayButtonClasses(day: CalendarDay, calendar: HTMLElement, state: CalendarState): string {
-        const size = calendar.dataset.size || 'md';
+        const size = calendar.dataset.size || 'sm';
 
-        const baseClasses = 'w-full h-full rounded-md border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-1';
+        const baseClasses = 'w-full h-full rounded-md border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1';
 
         const sizeClasses = {
             'sm': 'text-xs',
@@ -232,7 +232,7 @@ export class CalendarRenderer {
         } else if (!day.isCurrentMonth) {
             stateClasses = 'text-muted border-transparent hover:bg-neutral-hover hover:border-border';
         } else {
-            stateClasses = 'text-foreground border-transparent hover:bg-neutral-hover hover:border-border';
+            stateClasses = 'text-text border-transparent hover:bg-neutral-hover hover:border-border';
         }
 
         return `${baseClasses} ${sizeClasses} ${stateClasses}`.trim();

@@ -1,50 +1,36 @@
+import { BaseActionClass } from './utils/BaseActionClass';
+import { DOMUtils } from './utils/DOMUtils';
 
-class PopoverActions {
-    constructor() {
-        console.log('PopoverActions: Using native HTML Popover API');
-        this.init();
+/**
+ * PopoverActions - Handles basic popover trigger functionality
+ *
+ * Uses native HTML Popover API for positioning and rendering.
+ * Provides click handling for popover triggers.
+ */
+export class PopoverActions extends BaseActionClass {
+
+    /**
+     * Initialize popover elements - required by BaseActionClass
+     */
+    protected initializeElements(): void {
+        // Popovers are wired up via event delegation
+        // No per-element initialization needed
     }
 
-    init() {
-        // Wire up popover triggers on DOM ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.wirePopovers());
-        } else {
-            this.wirePopovers();
-        }
+    /**
+     * Bind event listeners using event delegation - required by BaseActionClass
+     */
+    protected bindEventListeners(): void {
+        // Native popovertarget attribute handles all popover toggling
+        // No JavaScript event handling needed
     }
 
-    wirePopovers() {
-        // Find all popover trigger wrappers
-        const triggers = document.querySelectorAll('[data-popover-trigger]');
-
-        triggers.forEach(triggerWrapper => {
-            const popoverId = triggerWrapper.getAttribute('data-popover-trigger');
-            if (!popoverId) return;
-
-            const popover = document.getElementById(popoverId);
-            if (!popover) return;
-
-            // Find the button/element inside the trigger wrapper
-            const button = triggerWrapper.querySelector('button, a, [role="button"]');
-            if (!button) return;
-
-            // Add click listener to toggle the popover using the Popover API
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                if (popover.matches(':popover-open')) {
-                    popover.hidePopover();
-                } else {
-                    popover.showPopover();
-                }
-            });
-
-            console.log(`[PopoverActions] Wired click listener for popover: ${popoverId}`);
-        });
+    /**
+     * Clean up PopoverActions - extends BaseActionClass destroy
+     */
+    protected onDestroy(): void {
+        // Event listeners use delegation so no cleanup needed
     }
 }
 
-const popoverActions = new PopoverActions();
-
-export { PopoverActions, popoverActions };
+export default PopoverActions.getInstance();

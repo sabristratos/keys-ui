@@ -1,109 +1,177 @@
 import { BaseActionClass } from './utils/BaseActionClass';
+import { DOMUtils } from './utils/DOMUtils';
 
-export class RatingActions extends BaseActionClass {
-    private container: HTMLElement;
-    private stars: NodeListOf<HTMLButtonElement>;
-    private hiddenInput: HTMLInputElement | null;
-    private currentValue: number;
-    private maxValue: number;
-    private readonly: boolean;
-    private disabled: boolean;
-    private allowHalf: boolean;
-    private hoverValue: number = 0;
+interface RatingState {
+    stars: HTMLButtonElement[];
+    hiddenInput: HTMLInputElement | null;
+    currentValue: number;
+    maxValue: number;
+    readonly: boolean;
+    disabled: boolean;
+    allowHalf: boolean;
+    hoverValue: number;
+}
 
-    constructor(container: HTMLElement) {
-        super();
-        this.container = container;
-        this.stars = container.querySelectorAll('.rating-star');
-        this.hiddenInput = container.querySelector('[data-rating-input="true"]') ||
-                          document.querySelector(`#${container.dataset.ratingId}`);
+export class RatingActions extends BaseActionClass<RatingState> {
+    /**
+     * Bind event listeners using event delegation - required by BaseActionClass
+     */
+    protected bindEventListeners(): void {
+        // Use event delegation for all rating interactions
+        document.addEventListener('click', (e) => {
+            const target = e.target;
+            if (!(target instanceof HTMLElement)) return;
 
-        this.currentValue = parseFloat(container.dataset.value || '0');
-        this.maxValue = parseInt(container.dataset.max || '5');
-        this.readonly = container.dataset.readonly === 'true';
-        this.disabled = container.dataset.disabled === 'true';
-        this.allowHalf = container.dataset.allowHalf === 'true';
-
-        if (!this.readonly && !this.disabled) {
-            this.initializeInteractive();
-        }
-    }
-
-    private initializeInteractive(): void {
-        this.stars.forEach((star, index) => {
-            star.addEventListener('click', (e) => this.handleClick(e, index + 1));
-            star.addEventListener('mouseenter', () => this.handleHover(index + 1));
-            star.addEventListener('mouseleave', () => this.handleHoverEnd());
+            const star = target.closest('.rating-star') as HTMLButtonElement;
+            if (star) {
+                this.handleClick(e, star);
+            }
         });
 
-        this.container.addEventListener('keydown', (e) => this.handleKeyDown(e));
+        // Use mouseover (bubbling) instead of mouseenter (non-bubbling)
+        document.addEventListener('mouseover', (e) => {
+            const target = e.target;
+            if (!(target instanceof HTMLElement)) return;
 
-        this.container.addEventListener('mouseleave', () => this.handleHoverEnd());
+            const star = target.closest('.rating-star') as HTMLButtonElement;
+            if (star) {
+                // Check if we're entering the star from outside (not from a child element)
+                const relatedTarget = e.relatedTarget;
+                if (!relatedTarget || !(relatedTarget instanceof Node) || !star.contains(relatedTarget as Node)) {
+                    this.handleHover(star);
+                }
+            }
+        });
 
-        console.log(`[Rating] Initialized interactive rating with value: ${this.currentValue}/${this.maxValue}`);
+        // Use mouseout (bubbling) instead of mouseleave (non-bubbling)
+        document.addEventListener('mouseout', (e) => {
+            const target = e.target;
+            if (!(target instanceof HTMLElement)) return;
+
+            const star = target.closest('.rating-star') as HTMLButtonElement;
+            if (star) {
+                // Check if we're leaving the star to outside (not to a child element)
+                const relatedTarget = e.relatedTarget;
+                if (!relatedTarget || !(relatedTarget instanceof Node) || !star.contains(relatedTarget as Node)) {
+                    const container = star.closest('[data-keys-rating="true"]') as HTMLElement;
+                    if (container) {
+                        this.handleHoverEnd(container);
+                    }
+                }
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            const target = e.target;
+            if (!(target instanceof HTMLElement)) return;
+
+            const container = target.closest('[data-keys-rating="true"]') as HTMLElement;
+            if (container) {
+                this.handleKeyDown(e as KeyboardEvent, container);
+            }
+        });
     }
 
-    private handleClick(event: Event, value: number): void {
+    /**
+     * Initialize rating elements - required by BaseActionClass
+     */
+    protected initializeElements(): void {
+        const ratings = DOMUtils.querySelectorAll('[data-keys-rating="true"]') as HTMLElement[];
+
+        ratings.forEach(rating => {
+            this.initializeRating(rating);
+        });
+    }
+
+    /**
+     * Initialize a single rating element
+     */
+    private initializeRating(container: HTMLElement): void {
+        const stars = Array.from(container.querySelectorAll('.rating-star')) as HTMLButtonElement[];
+        const hiddenInput = container.querySelector('[data-rating-input="true"]') as HTMLInputElement ||
+                           document.querySelector(`#${container.dataset.ratingId}`) as HTMLInputElement;
+
+        const state: RatingState = {
+            stars,
+            hiddenInput,
+            currentValue: parseFloat(container.dataset.value || '0'),
+            maxValue: parseInt(container.dataset.max || '5'),
+            readonly: container.dataset.readonly === 'true',
+            disabled: container.dataset.disabled === 'true',
+            allowHalf: container.dataset.allowHalf === 'true',
+            hoverValue: 0
+        };
+
+        this.setState(container, state);
+        this.updateStars(container, state.currentValue);
+    }
+
+    private handleClick(event: Event, star: HTMLButtonElement): void {
         event.preventDefault();
 
-        if (this.readonly || this.disabled) {
-            return;
-        }
+        const container = star.closest('[data-keys-rating="true"]') as HTMLElement;
+        if (!container) return;
 
-        if (this.allowHalf) {
-            const star = event.currentTarget as HTMLButtonElement;
+        const state = this.getState(container);
+        if (!state || state.readonly || state.disabled) return;
+
+        const starIndex = state.stars.indexOf(star);
+        let value = starIndex + 1;
+
+        if (state.allowHalf) {
             const rect = star.getBoundingClientRect();
             const clickX = (event as MouseEvent).clientX - rect.left;
             const isLeftHalf = clickX < rect.width / 2;
-
             value = isLeftHalf ? value - 0.5 : value;
         }
 
-        this.setRating(value);
-        console.log(`[Rating] Rating set to: ${value}`);
+        this.setRating(container, value);
 
-        this.container.dispatchEvent(new CustomEvent('rating-change', {
+        container.dispatchEvent(new CustomEvent('rating-change', {
             detail: { value },
             bubbles: true
         }));
     }
 
-    private handleHover(value: number): void {
-        if (this.readonly || this.disabled) {
-            return;
-        }
+    private handleHover(star: HTMLButtonElement): void {
+        const container = star.closest('[data-keys-rating="true"]') as HTMLElement;
+        if (!container) return;
 
-        this.hoverValue = value;
-        this.updateStars(value);
+        const state = this.getState(container);
+        if (!state || state.readonly || state.disabled) return;
+
+        const starIndex = state.stars.indexOf(star);
+        const value = starIndex + 1;
+
+        state.hoverValue = value;
+        this.updateStars(container, value);
     }
 
-    private handleHoverEnd(): void {
-        if (this.readonly || this.disabled) {
-            return;
-        }
+    private handleHoverEnd(container: HTMLElement): void {
+        const state = this.getState(container);
+        if (!state || state.readonly || state.disabled) return;
 
-        this.hoverValue = 0;
-        this.updateStars(this.currentValue);
+        state.hoverValue = 0;
+        this.updateStars(container, state.currentValue);
     }
 
-    private handleKeyDown(event: KeyboardEvent): void {
-        if (this.readonly || this.disabled) {
-            return;
-        }
+    private handleKeyDown(event: KeyboardEvent, container: HTMLElement): void {
+        const state = this.getState(container);
+        if (!state || state.readonly || state.disabled) return;
 
-        let newValue = this.currentValue;
+        let newValue = state.currentValue;
 
         switch (event.key) {
             case 'ArrowRight':
             case 'ArrowUp':
                 event.preventDefault();
-                newValue = Math.min(this.maxValue, this.currentValue + 1);
+                newValue = Math.min(state.maxValue, state.currentValue + 1);
                 break;
 
             case 'ArrowLeft':
             case 'ArrowDown':
                 event.preventDefault();
-                newValue = Math.max(0, this.currentValue - 1);
+                newValue = Math.max(0, state.currentValue - 1);
                 break;
 
             case '0':
@@ -118,7 +186,7 @@ export class RatingActions extends BaseActionClass {
             case '9':
                 event.preventDefault();
                 const numValue = parseInt(event.key);
-                if (numValue <= this.maxValue) {
+                if (numValue <= state.maxValue) {
                     newValue = numValue;
                 }
                 break;
@@ -130,29 +198,35 @@ export class RatingActions extends BaseActionClass {
 
             case 'End':
                 event.preventDefault();
-                newValue = this.maxValue;
+                newValue = state.maxValue;
                 break;
 
             default:
                 return;
         }
 
-        if (newValue !== this.currentValue) {
-            this.setRating(newValue);
+        if (newValue !== state.currentValue) {
+            this.setRating(container, newValue);
         }
     }
 
-    private setRating(value: number): void {
-        this.currentValue = value;
-        this.updateStars(value);
-        this.updateHiddenInput(value);
-        this.updateLivewire(value);
+    private setRating(container: HTMLElement, value: number): void {
+        const state = this.getState(container);
+        if (!state) return;
+
+        state.currentValue = value;
+        this.updateStars(container, value);
+        this.updateHiddenInput(container, value);
+        this.updateLivewire(container, value);
     }
 
-    private updateStars(value: number): void {
-        const displayValue = this.hoverValue || value;
+    private updateStars(container: HTMLElement, value: number): void {
+        const state = this.getState(container);
+        if (!state) return;
 
-        this.stars.forEach((star, index) => {
+        const displayValue = state.hoverValue || value;
+
+        state.stars.forEach((star, index) => {
             const starValue = index + 1;
             const icon = star.querySelector('[data-keys-icon]');
 
@@ -160,7 +234,7 @@ export class RatingActions extends BaseActionClass {
 
             const shouldFill = starValue <= displayValue;
 
-            const color = this.container.dataset.color || 'warning';
+            const color = container.dataset.color || 'warning';
             const colorClass = `text-${color}`;
             const inactiveClasses = ['opacity-30', 'text-neutral-400', 'dark:text-neutral-500'];
             const activeClasses = ['text-brand', 'text-warning', 'text-success', 'text-danger', 'text-neutral-500'];
@@ -180,75 +254,69 @@ export class RatingActions extends BaseActionClass {
             star.setAttribute('aria-pressed', shouldFill ? 'true' : 'false');
         });
 
-        this.container.dataset.value = value.toString();
+        container.dataset.value = value.toString();
     }
 
-    private updateHiddenInput(value: number): void {
-        if (this.hiddenInput) {
-            this.hiddenInput.value = value.toString();
+    private updateHiddenInput(container: HTMLElement, value: number): void {
+        const state = this.getState(container);
+        if (!state || !state.hiddenInput) return;
 
-            this.hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
-            this.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
-        }
+        state.hiddenInput.value = value.toString();
+        state.hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+        state.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
-    private updateLivewire(value: number): void {
-        const livewireComponent = (this.hiddenInput as any)?.__livewire;
-        if (livewireComponent && this.hiddenInput?.hasAttribute('wire:model')) {
-            const modelName = this.hiddenInput.getAttribute('wire:model');
+    private updateLivewire(container: HTMLElement, value: number): void {
+        const state = this.getState(container);
+        if (!state || !state.hiddenInput) return;
+
+        const livewireComponent = (state.hiddenInput as any)?.__livewire;
+        if (livewireComponent && state.hiddenInput.hasAttribute('wire:model')) {
+            const modelName = state.hiddenInput.getAttribute('wire:model');
             if (modelName) {
                 livewireComponent.set(modelName, value);
             }
         }
 
-        if (typeof (window as any).Livewire !== 'undefined' && this.hiddenInput?.name) {
+        if (typeof window.Livewire !== 'undefined' && state.hiddenInput.name) {
             try {
-                const component = (window as any).Livewire.find(
-                    this.container.closest('[wire\\:id]')?.getAttribute('wire:id')
+                const component = window.Livewire.find(
+                    container.closest('[wire\\:id]')?.getAttribute('wire:id')
                 );
                 if (component) {
-                    component.set(this.hiddenInput.name, value);
+                    component.set(state.hiddenInput.name, value);
                 }
             } catch (e) {
+                // Silently fail if Livewire component not found
             }
         }
     }
 
-    public getValue(): number {
-        return this.currentValue;
+    /**
+     * Public API: Get current value of a rating
+     */
+    public getValue(container: HTMLElement): number {
+        const state = this.getState(container);
+        return state?.currentValue || 0;
     }
 
-    public setValue(value: number): void {
-        if (!this.readonly && !this.disabled) {
-            this.setRating(value);
+    /**
+     * Public API: Set value of a rating
+     */
+    public setValue(container: HTMLElement, value: number): void {
+        const state = this.getState(container);
+        if (state && !state.readonly && !state.disabled) {
+            this.setRating(container, value);
         }
     }
 
-    public destroy(): void {
-        console.log('[Rating] Component destroyed');
+    /**
+     * Clean up RatingActions - extends BaseActionClass destroy
+     */
+    protected onDestroy(): void {
+        // State cleanup is handled by BaseActionClass
+        // Event listeners use delegation so no cleanup needed
     }
 }
 
-if (typeof window !== 'undefined') {
-    const initializeRatings = () => {
-        console.log('[Rating] Initializing rating components...');
-        const ratings = document.querySelectorAll('[data-keys-rating="true"]');
-        console.log(`[Rating] Found ${ratings.length} rating component(s)`);
-
-        ratings.forEach((rating) => {
-            if (!(rating as any).__ratingActions) {
-                (rating as any).__ratingActions = new RatingActions(rating as HTMLElement);
-            }
-        });
-    };
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeRatings);
-    } else {
-        initializeRatings();
-    }
-
-    document.addEventListener('livewire:navigated', initializeRatings);
-}
-
-export default RatingActions;
+export default RatingActions.getInstance();

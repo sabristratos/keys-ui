@@ -3,10 +3,16 @@
 namespace Keys\UI\Components\Select;
 
 use Illuminate\View\Component;
-use Keys\UI\Constants\ComponentConstants;
 
 class Chip extends Component
 {
+    private const VALID_SIZES = ['xs', 'sm', 'md'];
+    private const VALID_COLORS = [
+        'brand', 'success', 'warning', 'danger', 'neutral', 'info',
+        'red', 'green', 'blue', 'purple', 'yellow', 'indigo',
+        'pink', 'gray', 'teal', 'orange', 'dark'
+    ];
+
     public function __construct(
         public string $value = '',
         public string $label = '',
@@ -15,22 +21,22 @@ class Chip extends Component
         public bool $removable = true,
         public ?string $id = null
     ) {
-        
+
         if (! $this->id) {
             $this->id = 'select-chip-'.uniqid();
         }
 
-        
-        if (! in_array($this->size, ComponentConstants::BADGE_SIZES)) {
+
+        if (! in_array($this->size, self::VALID_SIZES)) {
             $this->size = 'sm';
         }
 
-        
-        if (! ComponentConstants::isValidColorForComponent($this->color, 'badge')) {
+
+        if (! in_array($this->color, self::VALID_COLORS)) {
             $this->color = 'blue';
         }
 
-        
+
         if (empty($this->label) && ! empty($this->value)) {
             $this->label = $this->value;
         }

@@ -41,7 +41,7 @@ class Item extends Component
 
     public function linkClasses(): string
     {
-        $base = 'inline-flex items-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 rounded-sm min-w-0 whitespace-nowrap';
+        $base = 'inline-flex items-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 rounded-sm min-w-0 whitespace-nowrap';
 
         if ($this->truncate) {
             $base .= ' max-w-32 sm:max-w-48 md:max-w-64';
