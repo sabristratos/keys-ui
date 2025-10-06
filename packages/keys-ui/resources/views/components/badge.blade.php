@@ -62,10 +62,10 @@
             'warning' => 'bg-warning-subtle border border-warning text-warning',
             'danger' => 'bg-danger-subtle border border-danger text-danger',
             'info' => 'bg-info-subtle border border-info text-info',
-            'neutral' => 'bg-surface border border-border text-muted',
+            'neutral' => 'bg-elevation-1 border border-line text-muted',
             default => 'bg-info-subtle border border-info text-info'
         },
-        'subtle' => 'text-text',
+        'subtle' => 'text-primary',
         default => 'bg-info text-white'
     };
 
@@ -82,7 +82,7 @@
         }
         : (($dismissible && $variant === 'outlined')
             ? match ($color) {
-                'brand' => 'hover:bg-brand-100',
+                'brand' => 'hover:bg-accent-100',
                 'success' => 'hover:bg-success-100',
                 'warning' => 'hover:bg-warning-100',
                 'danger' => 'hover:bg-danger-100',

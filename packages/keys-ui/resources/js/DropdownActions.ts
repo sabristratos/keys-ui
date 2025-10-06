@@ -53,9 +53,44 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
             state.parent = parentSubmenu as HTMLElement;
         }
 
+        // Auto-wire user's trigger button to popover
+        this.setupTriggerButton(dropdownElement);
+
         this.setState(dropdownElement, state);
         this.updateMenuItems(dropdownElement);
         this.initializeSubmenus(dropdownElement);
+    }
+
+    /**
+     * Automatically add popovertarget and data-dropdown-trigger to user's button
+     */
+    private setupTriggerButton(dropdownElement: HTMLElement): void {
+        // Find the popover trigger wrapper (created by popover component)
+        const triggerWrapper = dropdownElement.previousElementSibling;
+        if (!triggerWrapper || !triggerWrapper.hasAttribute('data-popover-trigger')) {
+            return;
+        }
+
+        // Get the popover ID
+        const popoverId = triggerWrapper.getAttribute('data-popover-trigger');
+        if (!popoverId) {
+            return;
+        }
+
+        // Find the first button inside the trigger wrapper
+        const triggerButton = triggerWrapper.querySelector('button');
+        if (!triggerButton) {
+            return;
+        }
+
+        // Add popovertarget to make it trigger the popover
+        triggerButton.setAttribute('popovertarget', popoverId);
+
+        // Add data-dropdown-trigger for our event binding
+        triggerButton.setAttribute('data-dropdown-trigger', '');
+
+        // Set aria-expanded for accessibility
+        triggerButton.setAttribute('aria-expanded', 'false');
     }
 
     /**
@@ -81,23 +116,41 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
      * Bind event listeners using event delegation - required by BaseActionClass
      */
     protected bindEventListeners(): void {
-        EventUtils.handleDelegatedClick('[data-submenu-trigger], [data-dropdown-trigger], [data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-dropdown-panel], [data-submenu-panel]', (element, event) => {
+        // Listen to the native popover toggle event instead of click events
+        // This allows the browser's native Popover API to handle opening/closing
+        EventUtils.addEventListener(document, 'toggle', (event) => {
+            const dropdown = event.target as HTMLElement;
+            if (dropdown && DOMUtils.hasDataAttribute(dropdown, 'dropdown', 'true')) {
+                const state = this.getState(dropdown);
+                if (!state) return;
+
+                const isOpen = dropdown.matches(':popover-open');
+                state.isOpen = isOpen;
+                this.setState(dropdown, state);
+
+                // Update aria-expanded on trigger
+                const triggerWrapper = dropdown.previousElementSibling as HTMLElement;
+                const trigger = triggerWrapper?.querySelector('[data-dropdown-trigger]') as HTMLElement;
+                if (trigger) {
+                    trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                }
+
+                if (isOpen) {
+                    this.updateMenuItems(dropdown);
+                    this.dispatchDropdownEvent(dropdown, 'dropdown:open');
+                } else {
+                    this.dispatchDropdownEvent(dropdown, 'dropdown:close');
+                }
+            }
+        }, true);
+
+        EventUtils.handleDelegatedClick('[data-submenu-trigger], [data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-dropdown-panel], [data-submenu-panel]', (element, event) => {
             if (element.matches('[data-submenu-trigger]')) {
                 event.preventDefault();
                 event.stopPropagation();
                 const submenu = DOMUtils.findClosest(element, '[data-submenu="true"]');
                 if (submenu && !this.isDisabled(submenu)) {
                     this.toggleSubmenu(submenu);
-                }
-                return;
-            }
-
-            if (element.matches('[data-dropdown-trigger]')) {
-                event.preventDefault();
-                event.stopPropagation();
-                const dropdown = DOMUtils.findClosest(element, '[data-dropdown="true"]');
-                if (dropdown && !this.isDisabled(dropdown)) {
-                    this.toggleDropdown(dropdown);
                 }
                 return;
             }
@@ -278,21 +331,20 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
     }
 
     /**
-     * Toggle dropdown open/closed state
+     * Toggle dropdown open/closed state using native popover API
      */
     private toggleDropdown(dropdown: HTMLElement): void {
         const state = this.getState(dropdown);
         if (!state) return;
 
-        if (state.isOpen) {
-            this.closeDropdown(dropdown);
-        } else {
-            this.openDropdown(dropdown);
+        // Use native popover toggle - the toggle event listener will update state
+        if ((dropdown as any).togglePopover) {
+            (dropdown as any).togglePopover();
         }
     }
 
     /**
-     * Open dropdown
+     * Open dropdown using native popover API
      */
     private openDropdown(dropdown: HTMLElement): void {
         const state = this.getState(dropdown);
@@ -300,24 +352,10 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
 
         this.closeSiblingDropdowns(dropdown);
 
-        state.isOpen = true;
-        state.focusedIndex = -1;
-        this.setState(dropdown, state);
-
-        const popover = DOMUtils.querySelector('[data-keys-popover]', dropdown) as HTMLElement;
-        const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
-
-        if (popover) {
-            (popover as any).showPopover?.();
+        // Use native popover API - the toggle event listener will handle state updates
+        if ((dropdown as any).showPopover) {
+            (dropdown as any).showPopover();
         }
-
-        if (trigger) {
-            trigger.setAttribute('aria-expanded', 'true');
-        }
-
-        this.updateMenuItems(dropdown);
-
-        this.dispatchDropdownEvent(dropdown, 'dropdown:open');
     }
 
     /**
@@ -334,12 +372,14 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         this.closeSiblingSubmenus(submenu);
         this.setState(submenu, state);
 
-        const popover = DOMUtils.querySelector('[data-keys-popover]', submenu) as HTMLElement;
-        const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
+        // The submenu element IS the popover element
+        const popover = submenu;
+        const triggerWrapper = submenu.previousElementSibling as HTMLElement;
+        const trigger = triggerWrapper?.querySelector('[data-submenu-trigger]') as HTMLElement;
 
-        if (popover) {
+        if (popover && (popover as any).showPopover) {
             try {
-                (popover as any).showPopover?.();
+                (popover as any).showPopover();
             } catch (error) {
             }
         }
@@ -354,7 +394,7 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
     }
 
     /**
-     * Close dropdown
+     * Close dropdown using native popover API
      */
     private closeDropdown(dropdown: HTMLElement): void {
         const state = this.getState(dropdown);
@@ -362,23 +402,10 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
 
         this.closeChildSubmenus(dropdown);
 
-
-        state.isOpen = false;
-        state.focusedIndex = -1;
-        this.setState(dropdown, state);
-
-        const popover = DOMUtils.querySelector('[data-keys-popover]', dropdown) as HTMLElement;
-        const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
-
-        if (popover) {
-            (popover as any).hidePopover?.();
+        // Use native popover API - the toggle event listener will handle state updates
+        if ((dropdown as any).hidePopover) {
+            (dropdown as any).hidePopover();
         }
-
-        if (trigger) {
-            trigger.setAttribute('aria-expanded', 'false');
-        }
-
-        this.dispatchDropdownEvent(dropdown, 'dropdown:close');
     }
 
     /**
@@ -394,11 +421,13 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
         state.focusedIndex = -1;
         this.setState(submenu, state);
 
-        const popover = DOMUtils.querySelector('[data-keys-popover]', submenu) as HTMLElement;
-        const trigger = DOMUtils.querySelector('[data-submenu-trigger]', submenu) as HTMLElement;
+        // The submenu element IS the popover element
+        const popover = submenu;
+        const triggerWrapper = submenu.previousElementSibling as HTMLElement;
+        const trigger = triggerWrapper?.querySelector('[data-submenu-trigger]') as HTMLElement;
 
-        if (popover) {
-            (popover as any).hidePopover?.();
+        if (popover && (popover as any).hidePopover) {
+            (popover as any).hidePopover();
         }
 
         if (trigger) {
@@ -516,7 +545,8 @@ export class DropdownActions extends BaseActionClass<DropdownState> {
                 if (state.isOpen) {
                     event.preventDefault();
                     this.closeDropdown(dropdown);
-                    const trigger = DOMUtils.querySelector('[data-dropdown-trigger]', dropdown) as HTMLElement;
+                    const triggerWrapper = dropdown.previousElementSibling as HTMLElement;
+                    const trigger = triggerWrapper?.querySelector('[data-dropdown-trigger]') as HTMLElement;
                     if (trigger) trigger.focus();
                 }
                 break;

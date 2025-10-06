@@ -3,23 +3,10 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Heading extends Component
 {
-    private const VALID_LEVELS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl'];
-    private const VALID_COLORS = [
-        'heading',   // --color-heading
-        'text',      // --color-text
-        'muted',     // --color-muted
-        'brand',
-        'success',
-        'warning',
-        'danger',
-        'info',
-    ];
-    private const VALID_WEIGHTS = ['normal', 'medium', 'semibold', 'bold', 'extrabold'];
-    private const VALID_TRACKING = ['tighter', 'tight', 'normal', 'wide', 'wider'];
 
     public function __construct(
         public string $level = 'h2',
@@ -30,35 +17,17 @@ class Heading extends Component
         public bool $underline = false,
         public bool $gradient = false
     ) {
-        // Validate level
-        if (!in_array($this->level, self::VALID_LEVELS)) {
-            $this->level = 'h2';
-        }
+        $this->level = ComponentConstants::validate($this->level, ComponentConstants::HEADING_LEVELS, 'h2');
 
         // If size is null, auto-map from level
         if ($this->size === null) {
             $this->size = $this->getDefaultSizeForLevel($this->level);
         }
 
-        // Validate size
-        if (!in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'lg';
-        }
-
-        // Validate color
-        if (!in_array($this->color, self::VALID_COLORS)) {
-            $this->color = 'heading';
-        }
-
-        // Validate weight
-        if (!in_array($this->weight, self::VALID_WEIGHTS)) {
-            $this->weight = 'semibold';
-        }
-
-        // Validate tracking
-        if (!in_array($this->tracking, self::VALID_TRACKING)) {
-            $this->tracking = 'normal';
-        }
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_TYPOGRAPHY_EXTENDED, 'lg');
+        $this->color = ComponentConstants::validate($this->color, ComponentConstants::TEXT_COLORS, 'heading');
+        $this->weight = ComponentConstants::validate($this->weight, ComponentConstants::FONT_WEIGHTS_EXTENDED, 'semibold');
+        $this->tracking = ComponentConstants::validate($this->tracking, ComponentConstants::LETTER_SPACING, 'normal');
     }
 
     /**

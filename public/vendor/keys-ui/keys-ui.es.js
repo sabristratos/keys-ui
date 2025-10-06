@@ -728,7 +728,7 @@ class pc extends J {
    */
   showFeedback(e, t, n = "success") {
     const i = document.createElement("div");
-    i.className = `absolute top-full left-0 mt-1 px-2 py-1 text-xs rounded shadow-lg z-10 pointer-events-none ${n === "success" ? "bg-success text-foreground-success" : "bg-danger text-foreground-danger"}`, i.textContent = t;
+    i.className = `absolute top-full left-0 mt-1 px-2 py-1 text-xs rounded shadow-lg z-10 pointer-events-none ${n === "success" ? "bg-success text-white" : "bg-danger text-white"}`, i.textContent = t;
     const s = b.findClosest(e, ".relative");
     s && (s.appendChild(i), setTimeout(() => {
       i.parentNode && i.parentNode.removeChild(i);
@@ -1350,7 +1350,7 @@ class bc extends J {
   getColorClasses(e, t) {
     if (e === "subtle") {
       const i = {
-        brand: "text-brand",
+        brand: "text-accent",
         success: "text-success",
         warning: "text-warning",
         danger: "text-danger",
@@ -1364,7 +1364,7 @@ class bc extends J {
       return i[t] || i.blue;
     }
     const n = {
-      brand: "bg-brand/10 text-brand",
+      brand: "bg-accent/10 text-accent",
       success: "bg-success/10 text-success",
       warning: "bg-warning/10 text-warning",
       danger: "bg-danger/10 text-danger",
@@ -2304,7 +2304,7 @@ class om {
       lg: "text-base font-medium"
     }[i] || "text-sm font-medium";
     let o = "";
-    return e.isDisabled ? o = "bg-surface text-muted border-transparent cursor-not-allowed opacity-40 hover:bg-surface hover:border-transparent" : e.isSelected && !n.isRange ? o = "bg-brand text-white border-brand-600 font-bold shadow-sm" : e.isToday ? o = "bg-neutral-50 text-brand border-brand font-semibold" : e.isCurrentMonth ? o = "text-text border-transparent hover:bg-neutral-hover hover:border-border" : o = "text-muted border-transparent hover:bg-neutral-hover hover:border-border", `${s} ${a} ${o}`.trim();
+    return e.isDisabled ? o = "bg-elevation-1 text-muted border-transparent cursor-not-allowed opacity-40 hover:bg-elevation-1 hover:border-transparent" : e.isSelected && !n.isRange ? o = "bg-accent text-white border-accent-600 font-bold shadow-sm" : e.isToday ? o = "bg-neutral-50 text-accent border-accent font-semibold" : e.isCurrentMonth ? o = "text-primary border-transparent hover:bg-neutral-hover hover:border-line" : o = "text-muted border-transparent hover:bg-neutral-hover hover:border-line", `${s} ${a} ${o}`.trim();
   }
   /**
    * Generate accessible aria-label for date buttons
@@ -2563,14 +2563,14 @@ class wn {
    */
   static getMonthButtonClasses(e, t) {
     const n = "w-full p-3 rounded-md text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent";
-    return t ? `${n} bg-surface text-muted cursor-not-allowed opacity-50` : e ? `${n} bg-brand text-white font-semibold shadow-sm` : `${n} text-text hover:bg-neutral-hover hover:scale-105`;
+    return t ? `${n} bg-elevation-1 text-muted cursor-not-allowed opacity-50` : e ? `${n} bg-accent text-white font-semibold shadow-sm` : `${n} text-primary hover:bg-neutral-hover hover:scale-105`;
   }
   /**
    * Get year button classes
    */
   static getYearButtonClasses(e, t, n) {
     const i = "w-full p-3 rounded-md text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent";
-    return t ? `${i} bg-surface text-muted cursor-not-allowed opacity-50` : e ? `${i} bg-brand text-white font-semibold shadow-sm` : n ? `${i} text-muted hover:bg-neutral-hover opacity-75` : `${i} text-text hover:bg-neutral-hover hover:scale-105`;
+    return t ? `${i} bg-elevation-1 text-muted cursor-not-allowed opacity-50` : e ? `${i} bg-accent text-white font-semibold shadow-sm` : n ? `${i} text-muted hover:bg-neutral-hover opacity-75` : `${i} text-primary hover:bg-neutral-hover hover:scale-105`;
   }
   /**
    * Format date as YYYY-MM string
@@ -3910,7 +3910,7 @@ class Hh extends J {
     n.stars.forEach((s, a) => {
       const o = a + 1, l = s.querySelector("[data-keys-icon]");
       if (!l) return;
-      const c = o <= i, f = `text-${e.dataset.color || "warning"}`, h = ["opacity-30", "text-neutral-400", "dark:text-neutral-500"], g = ["text-brand", "text-warning", "text-success", "text-danger", "text-neutral-500"];
+      const c = o <= i, f = `text-${e.dataset.color || "warning"}`, h = ["opacity-30", "text-neutral-400", "dark:text-neutral-500"], g = ["text-accent", "text-warning", "text-success", "text-danger", "text-neutral-500"];
       l.classList.remove(
         ...h,
         ...g,
@@ -4140,9 +4140,9 @@ class kc extends J {
   }
   createChipElementFallback(e, t, n) {
     const i = this.findOptionByValue(e, n), s = i ? i.displayLabel : n, a = i ? i.htmlContent : s, o = document.createElement("span");
-    o.className = "inline-flex items-center font-medium px-2 py-0.5 text-xs rounded-full bg-surface text-text border border-border gap-1.5", o.setAttribute("data-select-chip", "true"), o.setAttribute("data-chip-value", n), o.innerHTML = `
+    o.className = "inline-flex items-center font-medium px-2 py-0.5 text-xs rounded-full bg-elevation-1 text-primary border border-line gap-1.5", o.setAttribute("data-select-chip", "true"), o.setAttribute("data-chip-value", n), o.innerHTML = `
             <span class="chip-content inline-flex items-center gap-1.5">${a}</span>
-            <button type="button" class="w-4 h-4 flex items-center justify-center rounded-full hover:bg-hover transition-colors focus:outline-none focus:ring-1 focus:ring-border ml-0.5" data-chip-remove data-chip-value="${n}">
+            <button type="button" class="w-4 h-4 flex items-center justify-center rounded-full hover:bg-hover transition-colors focus:outline-none focus:ring-1 focus:ring-line ml-0.5" data-chip-remove data-chip-value="${n}">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
@@ -4825,11 +4825,11 @@ class $r extends J {
                     </div>
                     <div class="flex-1 min-w-0">
                         <h3 id="${e}-title" class="hidden text-sm text-heading font-semibold tracking-tight mb-1"></h3>
-                        <div id="${e}-message" class="text-sm text-text font-normal text-left leading-tight opacity-90"></div>
+                        <div id="${e}-message" class="text-sm text-primary font-normal text-left leading-tight opacity-90"></div>
                     </div>
                     <div class="flex-shrink-0">
                         <button type="button"
-                                class="inline-flex items-center justify-center rounded-md bg-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-6 w-6 text-xs hover:bg-surface active:bg-muted focus:ring-accent text-current opacity-60 hover:opacity-100 -m-1"
+                                class="inline-flex items-center justify-center rounded-md bg-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-6 w-6 text-xs hover:bg-elevation-1 active:bg-muted focus:ring-accent text-current opacity-60 hover:opacity-100 -m-1"
                                 data-keys-button="true"
                                 data-variant="ghost"
                                 data-size="xs"
@@ -4852,7 +4852,7 @@ class $r extends J {
    * Get popover classes for toast styling - matches Blade template exactly
    */
   getPopoverClasses(e, t) {
-    let n = "max-w-sm w-fit h-fit rounded-lg shadow-lg text-text z-[9999] p-0 overflow-visible opacity-100";
+    let n = "max-w-sm w-fit h-fit rounded-lg shadow-lg text-primary z-[9999] p-0 overflow-visible opacity-100";
     return n += " " + this.getVariantClasses(t), n;
   }
   /**
@@ -4864,7 +4864,7 @@ class $r extends J {
       success: "border border-success bg-success-subtle",
       warning: "border border-warning bg-warning-subtle",
       danger: "border border-danger bg-danger-subtle",
-      neutral: "border border-neutral bg-neutral-subtle"
+      neutral: "border border-line bg-elevation-1"
     };
     return t[e] || t.info;
   }
@@ -5108,7 +5108,20 @@ class Ac extends J {
       menuItems: [],
       children: []
     }, n = b.findClosest(e, '[data-submenu="true"]');
-    n && n !== e && (t.parent = n), this.setState(e, t), this.updateMenuItems(e), this.initializeSubmenus(e);
+    n && n !== e && (t.parent = n), this.setupTriggerButton(e), this.setState(e, t), this.updateMenuItems(e), this.initializeSubmenus(e);
+  }
+  /**
+   * Automatically add popovertarget and data-dropdown-trigger to user's button
+   */
+  setupTriggerButton(e) {
+    const t = e.previousElementSibling;
+    if (!t || !t.hasAttribute("data-popover-trigger"))
+      return;
+    const n = t.getAttribute("data-popover-trigger");
+    if (!n)
+      return;
+    const i = t.querySelector("button");
+    i && (i.setAttribute("popovertarget", n), i.setAttribute("data-dropdown-trigger", ""), i.setAttribute("aria-expanded", "false"));
   }
   /**
    * Initialize submenus within a dropdown
@@ -5123,17 +5136,21 @@ class Ac extends J {
    * Bind event listeners using event delegation - required by BaseActionClass
    */
   bindEventListeners() {
-    T.handleDelegatedClick("[data-submenu-trigger], [data-dropdown-trigger], [data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-dropdown-panel], [data-submenu-panel]", (t, n) => {
+    T.addEventListener(document, "toggle", (t) => {
+      const n = t.target;
+      if (n && b.hasDataAttribute(n, "dropdown", "true")) {
+        const i = this.getState(n);
+        if (!i) return;
+        const s = n.matches(":popover-open");
+        i.isOpen = s, this.setState(n, i);
+        const a = n.previousElementSibling, o = a == null ? void 0 : a.querySelector("[data-dropdown-trigger]");
+        o && o.setAttribute("aria-expanded", s ? "true" : "false"), s ? (this.updateMenuItems(n), this.dispatchDropdownEvent(n, "dropdown:open")) : this.dispatchDropdownEvent(n, "dropdown:close");
+      }
+    }, !0), T.handleDelegatedClick("[data-submenu-trigger], [data-menu-item], [data-menu-checkbox], [data-menu-radio], [data-dropdown-panel], [data-submenu-panel]", (t, n) => {
       if (t.matches("[data-submenu-trigger]")) {
         n.preventDefault(), n.stopPropagation();
         const i = b.findClosest(t, '[data-submenu="true"]');
         i && !this.isDisabled(i) && this.toggleSubmenu(i);
-        return;
-      }
-      if (t.matches("[data-dropdown-trigger]")) {
-        n.preventDefault(), n.stopPropagation();
-        const i = b.findClosest(t, '[data-dropdown="true"]');
-        i && !this.isDisabled(i) && this.toggleDropdown(i);
         return;
       }
       if (t.matches("[data-menu-item]")) {
@@ -5226,61 +5243,49 @@ class Ac extends J {
     });
   }
   /**
-   * Toggle dropdown open/closed state
+   * Toggle dropdown open/closed state using native popover API
    */
   toggleDropdown(e) {
-    const t = this.getState(e);
-    t && (t.isOpen ? this.closeDropdown(e) : this.openDropdown(e));
+    this.getState(e) && e.togglePopover && e.togglePopover();
   }
   /**
-   * Open dropdown
+   * Open dropdown using native popover API
    */
   openDropdown(e) {
-    var s;
-    const t = this.getState(e);
-    if (!t || this.isDisabled(e)) return;
-    this.closeSiblingDropdowns(e), t.isOpen = !0, t.focusedIndex = -1, this.setState(e, t);
-    const n = b.querySelector("[data-keys-popover]", e), i = b.querySelector("[data-dropdown-trigger]", e);
-    n && ((s = n.showPopover) == null || s.call(n)), i && i.setAttribute("aria-expanded", "true"), this.updateMenuItems(e), this.dispatchDropdownEvent(e, "dropdown:open");
+    !this.getState(e) || this.isDisabled(e) || (this.closeSiblingDropdowns(e), e.showPopover && e.showPopover());
   }
   /**
    * Open submenu using HTML Popover API
    */
   openSubmenu(e) {
-    var s;
     const t = this.getState(e);
     if (!t || this.isDisabled(e))
       return;
     t.isOpen = !0, t.focusedIndex = -1, this.closeSiblingSubmenus(e), this.setState(e, t);
-    const n = b.querySelector("[data-keys-popover]", e), i = b.querySelector("[data-submenu-trigger]", e);
-    if (n)
+    const n = e, i = e.previousElementSibling, s = i == null ? void 0 : i.querySelector("[data-submenu-trigger]");
+    if (n && n.showPopover)
       try {
-        (s = n.showPopover) == null || s.call(n);
+        n.showPopover();
       } catch {
       }
-    i && i.setAttribute("aria-expanded", "true"), this.updateMenuItems(e), this.dispatchDropdownEvent(e, "submenu:open");
+    s && s.setAttribute("aria-expanded", "true"), this.updateMenuItems(e), this.dispatchDropdownEvent(e, "submenu:open");
   }
   /**
-   * Close dropdown
+   * Close dropdown using native popover API
    */
   closeDropdown(e) {
-    var s;
     const t = this.getState(e);
-    if (!t || !t.isOpen) return;
-    this.closeChildSubmenus(e), t.isOpen = !1, t.focusedIndex = -1, this.setState(e, t);
-    const n = b.querySelector("[data-keys-popover]", e), i = b.querySelector("[data-dropdown-trigger]", e);
-    n && ((s = n.hidePopover) == null || s.call(n)), i && i.setAttribute("aria-expanded", "false"), this.dispatchDropdownEvent(e, "dropdown:close");
+    !t || !t.isOpen || (this.closeChildSubmenus(e), e.hidePopover && e.hidePopover());
   }
   /**
    * Close submenu using HTML Popover API
    */
   closeSubmenu(e) {
-    var s;
     const t = this.getState(e);
     if (!t || !t.isOpen) return;
     this.closeChildSubmenus(e), t.isOpen = !1, t.focusedIndex = -1, this.setState(e, t);
-    const n = b.querySelector("[data-keys-popover]", e), i = b.querySelector("[data-submenu-trigger]", e);
-    n && ((s = n.hidePopover) == null || s.call(n)), i && i.setAttribute("aria-expanded", "false"), this.dispatchDropdownEvent(e, "submenu:close");
+    const n = e, i = e.previousElementSibling, s = i == null ? void 0 : i.querySelector("[data-submenu-trigger]");
+    n && n.hidePopover && n.hidePopover(), s && s.setAttribute("aria-expanded", "false"), this.dispatchDropdownEvent(e, "submenu:close");
   }
   /**
    * Close all open dropdowns
@@ -5356,8 +5361,8 @@ class Ac extends J {
         case "Escape":
           if (n.isOpen) {
             t.preventDefault(), this.closeDropdown(e);
-            const i = b.querySelector("[data-dropdown-trigger]", e);
-            i && i.focus();
+            const i = e.previousElementSibling, s = i == null ? void 0 : i.querySelector("[data-dropdown-trigger]");
+            s && s.focus();
           }
           break;
         case "ArrowDown":
@@ -6055,7 +6060,7 @@ class jr extends J {
     const i = t.format === "12" ? Array.from({ length: 12 }, (s, a) => a + 1) : Array.from({ length: 24 }, (s, a) => a);
     n.innerHTML = "", i.forEach((s) => {
       const a = document.createElement("button");
-      a.type = "button", a.dataset.timepickerHour = s.toString(), a.className = "w-full px-3 py-2 text-sm text-text text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-accent [&.selected]:text-accent-foreground transition-colors", a.textContent = s.toString().padStart(2, "0"), n.appendChild(a);
+      a.type = "button", a.dataset.timepickerHour = s.toString(), a.className = "w-full px-3 py-2 text-sm text-primary text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-accent [&.selected]:text-accent-foreground transition-colors", a.textContent = s.toString().padStart(2, "0"), n.appendChild(a);
     }), t.format === "12" && (t.hour < 1 || t.hour > 12) ? (t.hour = Math.max(1, Math.min(12, t.hour)), this.setState(e, t), this.updateDisplay(e), this.updatePreview(e)) : t.format === "24" && (t.hour < 0 || t.hour > 23) && (t.hour = Math.max(0, Math.min(23, t.hour)), this.setState(e, t), this.updateDisplay(e), this.updatePreview(e));
   }
   /**
@@ -7600,7 +7605,7 @@ class Uh extends J {
   updateThumbnails(e, t) {
     e.querySelectorAll(".gallery-thumbnail").forEach((i, s) => {
       const a = i;
-      s === t ? (a.classList.add("active", "border-brand-500"), a.classList.remove("border-transparent"), a.setAttribute("aria-current", "true")) : (a.classList.remove("active", "border-brand-500"), a.classList.add("border-transparent"), a.removeAttribute("aria-current"));
+      s === t ? (a.classList.add("active", "border-accent-500"), a.classList.remove("border-transparent"), a.setAttribute("aria-current", "true")) : (a.classList.remove("active", "border-accent-500"), a.classList.add("border-transparent"), a.removeAttribute("aria-current"));
     });
   }
   /**
@@ -7770,7 +7775,7 @@ class Uh extends J {
    */
   createImageErrorPlaceholder(e) {
     const t = document.createElement("div");
-    t.className = "gallery-error-placeholder absolute inset-0 flex items-center justify-center bg-surface border border-border rounded-lg", t.innerHTML = `
+    t.className = "gallery-error-placeholder absolute inset-0 flex items-center justify-center bg-elevation-1 border border-line rounded-lg", t.innerHTML = `
             <div class="text-center">
                 <div class="w-16 h-16 mx-auto mb-3 text-muted opacity-50">
                     <svg xmlns="http:
@@ -7786,7 +7791,7 @@ class Uh extends J {
    */
   createThumbnailErrorPlaceholder(e) {
     const t = document.createElement("div");
-    t.className = "gallery-thumbnail-error-placeholder absolute inset-0 flex items-center justify-center bg-surface border border-border rounded text-muted", t.innerHTML = `
+    t.className = "gallery-thumbnail-error-placeholder absolute inset-0 flex items-center justify-center bg-elevation-1 border border-line rounded text-muted", t.innerHTML = `
             <svg xmlns="http:
                 <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
             </svg>
@@ -8764,13 +8769,13 @@ function Xh(r, e) {
 }
 function mm(r, e, t) {
   const n = document.createElement("div");
-  n.className = "file-card relative p-3 rounded-lg border-2 border-border bg-surface hover:border-brand transition-colors", n.setAttribute("data-file-index", t.toString());
+  n.className = "file-card relative p-3 rounded-lg border-2 border-line bg-elevation-1 hover:border-accent transition-colors", n.setAttribute("data-file-index", t.toString());
   const i = document.createElement("div");
   i.className = "mb-2 relative";
   const s = document.createElement("img");
   s.className = "hidden w-full h-24 object-cover rounded", s.alt = e.name;
   const a = document.createElement("div");
-  if (a.className = "flex items-center justify-center w-full h-24 bg-surface border border-border rounded", a.innerHTML = `<svg class="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  if (a.className = "flex items-center justify-center w-full h-24 bg-elevation-1 border border-line rounded", a.innerHTML = `<svg class="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
     </svg>`, i.appendChild(s), i.appendChild(a), e.type.startsWith("image/")) {
     const f = new FileReader();
@@ -8794,7 +8799,7 @@ function mm(r, e, t) {
   const o = document.createElement("div");
   o.className = "space-y-1";
   const l = document.createElement("div");
-  l.className = "text-sm font-medium text-text truncate", l.textContent = e.name, l.title = e.name;
+  l.className = "text-sm font-medium text-primary truncate", l.textContent = e.name, l.title = e.name;
   const c = document.createElement("div");
   c.className = "text-xs text-muted", c.textContent = Gn(e.size), o.appendChild(l), o.appendChild(c);
   const d = document.createElement("button");

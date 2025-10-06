@@ -32,7 +32,7 @@
 @endphp
 
 <tr {{ $attributes->merge($dataAttributes) }}>
-    <td colspan="100" class="px-6 py-4 bg-surface text-center border-t border-border">
+    <td colspan="100" class="px-6 py-4 bg-elevation-1 text-center border-t border-line">
         <div class="{{ $emptyContainerClasses }}">
             @if($icon)
                 <x-keys::icon

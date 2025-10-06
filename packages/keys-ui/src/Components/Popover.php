@@ -3,16 +3,10 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Popover extends Component
 {
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
-    private const VALID_PLACEMENTS = [
-        'top', 'top-start', 'top-end',
-        'bottom', 'bottom-start', 'bottom-end',
-        'left', 'left-start', 'left-end',
-        'right', 'right-start', 'right-end'
-    ];
 
     public string $id;
 
@@ -37,17 +31,8 @@ class Popover extends Component
         $this->id = $id ?? 'popover-'.uniqid();
         $this->variant = $variant;
 
-
-        if (! in_array($size, self::VALID_SIZES)) {
-            $size = 'md';
-        }
-        $this->size = $size;
-
-
-        if (! in_array($placement, self::VALID_PLACEMENTS)) {
-            $placement = 'bottom';
-        }
-        $this->placement = $placement;
+        $this->size = ComponentConstants::validate($size, ComponentConstants::SIZES_EXTENDED, 'md');
+        $this->placement = ComponentConstants::validate($placement, ComponentConstants::PLACEMENTS, 'bottom');
 
         $this->arrow = $arrow;
         $this->manual = $manual;

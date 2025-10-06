@@ -9,67 +9,71 @@
         $getDataAttributesForSlot($slotContent)
     );
 
-    $baseClasses = 'inline-flex items-center justify-center whitespace-nowrap font-medium cursor-pointer transition-all duration-150 ease-linear focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2  *:data-icon:pointer-events-none *:data-icon:shrink-0 *:data-icon:transition-all *:data-icon:duration-150';
+    // Base classes for all buttons
+    $baseClasses = 'inline-flex items-center justify-center whitespace-nowrap font-medium cursor-pointer';
+    $baseClasses .= ' transition-all duration-150 ease-linear';
+    $baseClasses .= ' focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-focus';
+    $baseClasses .= ' *:data-icon:pointer-events-none *:data-icon:shrink-0 *:data-icon:transition-all *:data-icon:duration-150';
 
     // Common classes shared by all button variants
-    $commonClasses = 'active:scale-[0.98] disabled:opacity-50';
+    $commonClasses = 'active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed';
 
     // Build color-specific variant classes
     $colorClasses = match ($color) {
         'primary' => match ($variant) {
-            'solid' => 'bg-accent shadow-xs text-accent-foreground hover:bg-accent-hover active:bg-accent-active focus-visible:ring-accent',
-            'outlined' => 'bg-transparent text-accent border  border-accent hover:bg-accent hover:text-white focus-visible:ring-accent',
-            'ghost' => 'bg-transparent text-accent  hover:bg-accent/10 active:bg-accent/20 focus-visible:ring-accent',
-            'subtle' => 'bg-accent-subtle text-accent  hover:bg-brand-100 active:bg-brand-200 focus-visible:ring-accent',
-            default => 'bg-accent text-accent-foreground hover:bg-accent-hover active:bg-accent-active focus-visible:ring-accent',
+            'solid' => 'bg-accent shadow-xs text-accent-contrast hover:bg-accent-hover active:bg-accent-active',
+            'outlined' => 'bg-transparent text-accent border border-accent hover:bg-accent hover:text-accent-contrast',
+            'ghost' => 'bg-transparent text-accent hover:bg-accent/10 active:bg-accent/20',
+            'subtle' => 'bg-accent-subtle text-accent hover:bg-accent-subtle-hover active:bg-accent-subtle-active',
+            default => 'bg-accent shadow-xs text-accent-contrast hover:bg-accent-hover active:bg-accent-active',
         },
 
         'secondary' => match ($variant) {
-            'solid' => 'bg-neutral text-text border  border-border hover:bg-neutral-hover active:bg-neutral-active focus-visible:ring-border',
-            'outlined' => 'bg-transparent text-text  border border-border hover:bg-neutral active:bg-neutral-active-light focus-visible:ring-border',
-            'ghost' => 'bg-transparent text-text  hover:bg-neutral active:bg-neutral-active-light focus-visible:ring-border',
-            'subtle' => 'bg-neutral text-text  hover:bg-neutral-hover active:bg-neutral-active focus-visible:ring-border',
-            default => 'bg-neutral text-text  border border-border hover:bg-neutral-hover active:bg-neutral-active focus-visible:ring-border',
+            'solid' => 'bg-neutral text-primary border border-line hover:bg-neutral-hover active:bg-neutral-active',
+            'outlined' => 'bg-transparent text-primary border border-line hover:bg-neutral active:bg-neutral-hover',
+            'ghost' => 'bg-transparent text-primary hover:bg-neutral active:bg-neutral-hover',
+            'subtle' => 'bg-neutral text-primary hover:bg-neutral-hover active:bg-neutral-active',
+            default => 'bg-neutral text-primary border border-line hover:bg-neutral-hover active:bg-neutral-active',
         },
 
         'danger' => match ($variant) {
-            'solid' => 'bg-danger shadow-xs text-white hover:bg-danger-hover active:bg-danger-active focus-visible:ring-danger',
-            'outlined' => 'bg-transparent text-danger border border-danger hover:bg-danger hover:text-white focus-visible:ring-danger',
-            'ghost' => 'bg-transparent text-danger  hover:bg-danger/10 active:bg-danger/20 focus-visible:ring-danger',
-            'subtle' => 'bg-danger-subtle text-danger hover:bg-danger-100 active:bg-danger-200 focus-visible:ring-danger',
-            default => 'bg-danger text-white hover:bg-danger-hover active:bg-danger-active focus-visible:ring-danger',
+            'solid' => 'bg-danger shadow-xs text-danger-contrast hover:bg-danger-hover active:bg-danger-active',
+            'outlined' => 'bg-transparent text-danger border border-danger hover:bg-danger hover:text-danger-contrast',
+            'ghost' => 'bg-transparent text-danger hover:bg-danger/10 active:bg-danger/20',
+            'subtle' => 'bg-danger-subtle text-danger hover:bg-danger-subtle-hover active:bg-danger-subtle-active',
+            default => 'bg-danger shadow-xs text-danger-contrast hover:bg-danger-hover active:bg-danger-active',
         },
 
         'warning' => match ($variant) {
-            'solid' => 'bg-warning shadow-xs text-white hover:bg-warning-hover active:bg-warning-active focus-visible:ring-warning',
-            'outlined' => 'bg-transparent text-warning border border-warning hover:bg-warning hover:text-white focus-visible:ring-warning',
-            'ghost' => 'bg-transparent text-warning  hover:bg-warning/10 active:bg-warning/20 focus-visible:ring-warning',
-            'subtle' => 'bg-warning-subtle text-warning hover:bg-warning-100 active:bg-warning-200 focus-visible:ring-warning',
-            default => 'bg-warning text-white hover:bg-warning-hover active:bg-warning-active focus-visible:ring-warning',
+            'solid' => 'bg-warning shadow-xs text-warning-contrast hover:bg-warning-hover active:bg-warning-active',
+            'outlined' => 'bg-transparent text-warning border border-warning hover:bg-warning hover:text-warning-contrast',
+            'ghost' => 'bg-transparent text-warning hover:bg-warning/10 active:bg-warning/20',
+            'subtle' => 'bg-warning-subtle text-warning hover:bg-warning-subtle-hover active:bg-warning-subtle-active',
+            default => 'bg-warning shadow-xs text-warning-contrast hover:bg-warning-hover active:bg-warning-active',
         },
 
         'success' => match ($variant) {
-            'solid' => 'bg-success shadow-xs text-white hover:bg-success-hover active:bg-success-active focus-visible:ring-success',
-            'outlined' => 'bg-transparent text-success  border border-success hover:bg-success hover:text-white focus-visible:ring-success',
-            'ghost' => 'bg-transparent text-success  hover:bg-success/10 active:bg-success/20 focus-visible:ring-success',
-            'subtle' => 'bg-success-subtle text-success hover:bg-success-100 active:bg-success-200 focus-visible:ring-success',
-            default => 'bg-success text-white hover:bg-success-hover active:bg-success-active focus-visible:ring-success',
+            'solid' => 'bg-success shadow-xs text-success-contrast hover:bg-success-hover active:bg-success-active',
+            'outlined' => 'bg-transparent text-success border border-success hover:bg-success hover:text-success-contrast',
+            'ghost' => 'bg-transparent text-success hover:bg-success/10 active:bg-success/20',
+            'subtle' => 'bg-success-subtle text-success hover:bg-success-subtle-hover active:bg-success-subtle-active',
+            default => 'bg-success shadow-xs text-success-contrast hover:bg-success-hover active:bg-success-active',
         },
 
         'info' => match ($variant) {
-            'solid' => 'bg-info shadow-xs text-white hover:bg-info-hover active:bg-info-active focus-visible:ring-info',
-            'outlined' => 'bg-transparent text-info  border border-info hover:bg-info hover:text-white focus-visible:ring-info',
-            'ghost' => 'bg-transparent text-info  hover:bg-info/10 active:bg-info/20 focus-visible:ring-info',
-            'subtle' => 'bg-info-subtle text-info hover:bg-info-100 active:bg-info-200 focus-visible:ring-info',
-            default => 'bg-info text-white hover:bg-info-hover active:bg-info-active focus-visible:ring-info',
+            'solid' => 'bg-info shadow-xs text-info-contrast hover:bg-info-hover active:bg-info-active',
+            'outlined' => 'bg-transparent text-info border border-info hover:bg-info hover:text-info-contrast',
+            'ghost' => 'bg-transparent text-info hover:bg-info/10 active:bg-info/20',
+            'subtle' => 'bg-info-subtle text-info hover:bg-info-subtle-hover active:bg-info-subtle-active',
+            default => 'bg-info shadow-xs text-info-contrast hover:bg-info-hover active:bg-info-active',
         },
 
         default => match ($variant) {
-            'solid' => 'bg-accent shadow-xs text-accent-foreground hover:bg-accent-hover active:bg-accent-active focus-visible:ring-accent',
-            'outlined' => 'bg-transparent text-accent  border border-accent hover:bg-accent hover:text-white focus-visible:ring-accent',
-            'ghost' => 'bg-transparent text-accent hover:bg-accent/10 active:bg-accent/20 focus-visible:ring-accent',
-            'subtle' => 'bg-accent-subtle text-accent hover:bg-brand-100 active:bg-brand-200 focus-visible:ring-accent',
-            default => 'bg-accent text-accent-foreground hover:bg-accent-hover active:bg-accent-active focus-visible:ring-accent',
+            'solid' => 'bg-accent shadow-xs text-accent-contrast hover:bg-accent-hover active:bg-accent-active',
+            'outlined' => 'bg-transparent text-accent border border-accent hover:bg-accent hover:text-accent-contrast',
+            'ghost' => 'bg-transparent text-accent hover:bg-accent/10 active:bg-accent/20',
+            'subtle' => 'bg-accent-subtle text-accent hover:bg-accent-subtle-hover active:bg-accent-subtle-active',
+            default => 'bg-accent shadow-xs text-accent-contrast hover:bg-accent-hover active:bg-accent-active',
         },
     };
 
@@ -93,17 +97,11 @@
             default => 'px-3.5 py-1.5 text-sm rounded-md'
         };
 
-    $disabledClasses = ($disabled || $loading) ? 'cursor-not-allowed' : '';
+    // Disabled classes moved to commonClasses (line 19) - this variable is now redundant but kept for compatibility
+    $disabledClasses = '';
 
-    $loadingClasses = $loading ? match ($color) {
-        'primary' => 'bg-brand-600',
-        'danger' => 'bg-danger-600',
-        'warning' => 'bg-warning-600',
-        'success' => 'bg-success-600',
-        'info' => 'bg-info-600',
-        'secondary' => 'bg-neutral-300 dark:bg-neutral-700',
-        default => 'bg-brand-600'
-    } : '';
+    // Loading state classes no longer needed - loading state handled by disabled classes
+    $loadingClasses = '';
 
     $iconSize = $isIconOnly
         ? match ($size) {

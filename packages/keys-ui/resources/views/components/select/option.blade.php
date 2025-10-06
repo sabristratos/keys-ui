@@ -3,8 +3,8 @@
     $baseClasses = 'flex items-center w-full px-3 py-2 mx-0.5 my-0.5 text-sm text-left cursor-pointer transition-colors duration-150 rounded-md';
 
     $stateClasses = match (true) {
-        $disabled => 'text-muted cursor-not-allowed bg-surface opacity-50',
-        default => 'text-text hover:bg-hover focus-visible:bg-hover aria-[selected=true]:bg-brand/10 dark:aria-[selected=true]:bg-brand/20'
+        $disabled => 'text-muted cursor-not-allowed bg-elevation-1 opacity-50',
+        default => 'text-primary hover:bg-hover focus-visible:bg-hover aria-[selected=true]:bg-accent/10 dark:aria-[selected=true]:bg-accent/20'
     };
 
     $optionAttributes = $attributes
@@ -46,7 +46,7 @@
         @endif
     </div>
 
-    <div class="flex-shrink-0 ml-2 text-brand transition-opacity duration-150 {{ $selected ? 'opacity-100' : 'opacity-0' }}">
+    <div class="flex-shrink-0 ml-2 text-accent transition-opacity duration-150 {{ $selected ? 'opacity-100' : 'opacity-0' }}">
         <x-keys::icon name="heroicon-o-check" size="sm" />
     </div>
 </div>

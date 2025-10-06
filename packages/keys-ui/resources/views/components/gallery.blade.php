@@ -45,7 +45,7 @@
                                 @endif
                             />
                             @if($image['caption'])
-                                <p class="mt-2 text-sm text-foreground/70">{{ $image['caption'] }}</p>
+                                <p class="mt-2 text-sm text-muted">{{ $image['caption'] }}</p>
                             @endif
                         </div>
                     @endforeach
@@ -89,7 +89,7 @@
                                 />
                             </div>
                             @if($image['caption'])
-                                <p class="mt-2 text-sm text-foreground/70 px-1 line-clamp-2">{{ $image['caption'] }}</p>
+                                <p class="mt-2 text-sm text-muted px-1 line-clamp-2">{{ $image['caption'] }}</p>
                             @endif
                         </div>
                     @endforeach
@@ -112,7 +112,7 @@
                     <div class="{{ $thumbnailContainerClasses }}">
                         @foreach($images as $index => $image)
                             <div
-                                class="{{ $thumbnailClasses }} {{ $thumbnailSizeClasses }} {{ $thumbnailRadius }} @if($index === 0) border-brand-500 @endif"
+                                class="{{ $thumbnailClasses }} {{ $thumbnailSizeClasses }} {{ $thumbnailRadius }} @if($index === 0) border-accent-500 @endif"
                                 data-gallery-thumbnail="{{ $index }}"
                                 data-gallery-target="{{ $id }}"
                                 role="button"
@@ -252,7 +252,7 @@
                     
                     @if($shouldShowThumbnails() && $thumbnailPosition === 'overlay')
                         @php
-                            $overlayThumbnailClasses = 'gallery-thumbnail relative cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-brand-500 overflow-hidden flex-shrink-0 drop-shadow-sm';
+                            $overlayThumbnailClasses = 'gallery-thumbnail relative cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-accent-500 overflow-hidden flex-shrink-0 drop-shadow-sm';
                             $overlayThumbnailSizeClasses = match ($thumbnailSize) {
                                 'xs' => 'w-12 h-12',
                                 'sm' => 'w-16 h-16',
@@ -275,7 +275,7 @@
                             <div class="flex items-center gap-2 p-2 bg-black/20 backdrop-blur-sm rounded-lg overflow-x-auto scrollbar-hide">
                                 @foreach($images as $index => $image)
                                     <div
-                                        class="{{ $overlayThumbnailClasses }} {{ $overlayThumbnailSizeClasses }} {{ $overlayThumbnailRadius }} @if($index === 0) border-brand-500 @endif"
+                                        class="{{ $overlayThumbnailClasses }} {{ $overlayThumbnailSizeClasses }} {{ $overlayThumbnailRadius }} @if($index === 0) border-accent-500 @endif"
                                         data-gallery-thumbnail="{{ $index }}"
                                         data-gallery-target="{{ $id }}"
                                         role="button"
@@ -298,7 +298,7 @@
                     
                     @if($shouldShowThumbnails() && $thumbnailPosition === 'overlay-top')
                         @php
-                            $overlayTopThumbnailClasses = 'gallery-thumbnail relative cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-brand-500 overflow-hidden flex-shrink-0 drop-shadow-sm';
+                            $overlayTopThumbnailClasses = 'gallery-thumbnail relative cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-accent-500 overflow-hidden flex-shrink-0 drop-shadow-sm';
                             $overlayTopThumbnailSizeClasses = match ($thumbnailSize) {
                                 'xs' => 'w-12 h-12',
                                 'sm' => 'w-16 h-16',
@@ -321,7 +321,7 @@
                             <div class="flex items-center gap-2 p-2 bg-black/20 backdrop-blur-sm rounded-lg overflow-x-auto scrollbar-hide">
                                 @foreach($images as $index => $image)
                                     <div
-                                        class="{{ $overlayTopThumbnailClasses }} {{ $overlayTopThumbnailSizeClasses }} {{ $overlayTopThumbnailRadius }} @if($index === 0) border-brand-500 @endif"
+                                        class="{{ $overlayTopThumbnailClasses }} {{ $overlayTopThumbnailSizeClasses }} {{ $overlayTopThumbnailRadius }} @if($index === 0) border-accent-500 @endif"
                                         data-gallery-thumbnail="{{ $index }}"
                                         data-gallery-target="{{ $id }}"
                                         role="button"
@@ -346,7 +346,7 @@
                 @if($shouldShowThumbnails() && $thumbnailPosition === 'bottom')
                     @php
                         $bottomThumbnailContainerClasses = 'gallery-thumbnails flex flex-wrap gap-2 mt-4 justify-center p-1';
-                        $bottomThumbnailClasses = 'gallery-thumbnail relative cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-brand-500 overflow-hidden drop-shadow-sm';
+                        $bottomThumbnailClasses = 'gallery-thumbnail relative cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-accent-500 overflow-hidden drop-shadow-sm';
                         $bottomThumbnailSizeClasses = match ($thumbnailSize) {
                             'xs' => 'w-12 h-12',
                             'sm' => 'w-16 h-16',
@@ -368,7 +368,7 @@
                     <div class="{{ $bottomThumbnailContainerClasses }}">
                         @foreach($images as $index => $image)
                             <div
-                                class="{{ $bottomThumbnailClasses }} {{ $bottomThumbnailSizeClasses }} {{ $bottomThumbnailRadius }} @if($index === 0) border-brand-500 @endif"
+                                class="{{ $bottomThumbnailClasses }} {{ $bottomThumbnailSizeClasses }} {{ $bottomThumbnailRadius }} @if($index === 0) border-accent-500 @endif"
                                 data-gallery-thumbnail="{{ $index }}"
                                 data-gallery-target="{{ $id }}"
                                 role="button"
@@ -392,7 +392,7 @@
             @if($shouldShowThumbnails() && $thumbnailPosition === 'side')
                 @php
                     $sideThumbnailContainerClasses = 'gallery-thumbnails flex flex-col gap-2 ml-4 p-1';
-                    $sideThumbnailClasses = 'gallery-thumbnail relative cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-brand-500 overflow-hidden drop-shadow-sm';
+                    $sideThumbnailClasses = 'gallery-thumbnail relative cursor-pointer border-2 border-transparent transition-all duration-200 hover:border-accent-500 overflow-hidden drop-shadow-sm';
                     $sideThumbnailSizeClasses = match ($thumbnailSize) {
                         'xs' => 'w-12 h-12',
                         'sm' => 'w-16 h-16',
@@ -414,7 +414,7 @@
                 <div class="gallery-thumbnails flex flex-col gap-2 ml-4 p-1 flex-shrink-0 max-h-full overflow-y-auto">
                     @foreach($images as $index => $image)
                         <div
-                            class="{{ $sideThumbnailClasses }} {{ $sideThumbnailSizeClasses }} {{ $sideThumbnailRadius }} @if($index === 0) border-brand-500 @endif"
+                            class="{{ $sideThumbnailClasses }} {{ $sideThumbnailSizeClasses }} {{ $sideThumbnailRadius }} @if($index === 0) border-accent-500 @endif"
                             data-gallery-thumbnail="{{ $index }}"
                             data-gallery-target="{{ $id }}"
                             role="button"
@@ -482,19 +482,19 @@
 
             /* Keyboard focus for scroll container */
             .gallery-scroll-container:focus {
-                outline: 2px solid var(--color-brand-500);
+                outline: 2px solid var(--color-accent-500);
                 outline-offset: 2px;
             }
 
             /* Thumbnail focus states that require CSS for proper accessibility */
             .gallery-thumbnail:focus {
-                outline: 2px solid var(--color-brand-500);
+                outline: 2px solid var(--color-accent-500);
                 outline-offset: 2px;
                 z-index: 5;
             }
 
             .gallery-thumbnail.active {
-                border-color: var(--color-brand-500);
+                border-color: var(--color-accent-500);
             }
 
             /* Webkit scrollbar hiding for thumbnail overlays */
@@ -533,14 +533,14 @@
         @if($type === 'ecommerce')
             @php $mainImage = $getMainImage(); @endphp
             @if($mainImage && ($mainImage['title'] || $mainImage['description']))
-                <div class="gallery-details mt-4 p-4 bg-surface border border-border rounded-lg">
+                <div class="gallery-details mt-4 p-4 bg-elevation-1 border border-line rounded-lg">
                     @if($mainImage['title'])
-                        <h3 class="text-lg font-semibold text-foreground mb-2" data-gallery-title="{{ $id }}">
+                        <h3 class="text-lg font-semibold text-primary mb-2" data-gallery-title="{{ $id }}">
                             {{ $mainImage['title'] }}
                         </h3>
                     @endif
                     @if($mainImage['description'])
-                        <p class="text-sm text-foreground/70" data-gallery-description="{{ $id }}">
+                        <p class="text-sm text-muted" data-gallery-description="{{ $id }}">
                             {{ $mainImage['description'] }}
                         </p>
                     @endif
@@ -551,8 +551,8 @@
     </div>
 
 @else
-    <div class="gallery-empty bg-surface border border-border rounded-lg p-8 text-center" data-keys-gallery="true" data-has-images="false">
+    <div class="gallery-empty bg-elevation-1 border border-line rounded-lg p-8 text-center" data-keys-gallery="true" data-has-images="false">
         <x-keys::icon name="heroicon-o-photo" size="lg" class="mx-auto mb-4" />
-        <p class="text-foreground/70">No images to display</p>
+        <p class="text-muted">No images to display</p>
     </div>
 @endif

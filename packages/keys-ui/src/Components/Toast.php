@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Toast Component
@@ -12,21 +13,6 @@ use Illuminate\View\Component;
  */
 class Toast extends Component
 {
-    /**
-     * Valid toast positions
-     */
-    private const VALID_POSITIONS = [
-        'top-left', 'top-right', 'top-center',
-        'bottom-left', 'bottom-right', 'bottom-center'
-    ];
-
-    /**
-     * Valid toast variants
-     */
-    private const VALID_VARIANTS = [
-        'info', 'success', 'warning', 'danger', 'neutral'
-    ];
-
     /**
      * Default timeout value in milliseconds (0 = no auto-hide)
      */
@@ -58,10 +44,9 @@ class Toast extends Component
         public bool $persistent = false,
         public string $id = ''
     ) {
-        
-        $this->position = in_array($position, self::VALID_POSITIONS) ? $position : 'top-right';
-        $this->variant = in_array($variant, self::VALID_VARIANTS) ? $variant : 'info';
-        $this->timeout = max(0, $timeout); 
+        $this->position = ComponentConstants::validate($position, ComponentConstants::TOAST_POSITIONS, 'top-right');
+        $this->variant = ComponentConstants::validate($variant, ComponentConstants::TOAST_VARIANTS, 'info');
+        $this->timeout = max(0, $timeout);
         $this->id = $this->id ?: 'toast-' . uniqid();
     }
 

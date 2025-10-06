@@ -2,7 +2,9 @@
 
 namespace Keys\UI\Components;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Avatar Component
@@ -25,13 +27,6 @@ use Illuminate\View\Component;
  */
 class Avatar extends Component
 {
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
-    private const VALID_SHAPES = ['circle', 'square'];
-    private const VALID_COLORS = [
-        'brand', 'success', 'warning', 'danger', 'neutral',
-        'red', 'green', 'blue', 'purple', 'yellow', 'teal', 'orange'
-    ];
-    private const VALID_STATUS = ['online', 'offline', 'away', 'busy'];
 
     /**
      * Create a new Avatar component instance.
@@ -61,20 +56,15 @@ class Avatar extends Component
             $this->alt = "Avatar for {$this->name}";
         }
 
-        if (! in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_XS_TO_XL, 'md');
+        $this->shape = ComponentConstants::validate($this->shape, ComponentConstants::AVATAR_SHAPES, 'circle');
+        $this->color = ComponentConstants::validate($this->color, ComponentConstants::COLORS_EXTENDED, 'neutral');
 
-        if (! in_array($this->shape, self::VALID_SHAPES)) {
-            $this->shape = 'circle';
-        }
-
-        if (! in_array($this->color, self::VALID_COLORS)) {
-            $this->color = 'neutral';
-        }
-
-        if ($this->status && ! in_array($this->status, self::VALID_STATUS)) {
-            $this->status = null;
+        if ($this->status) {
+            $this->status = ComponentConstants::validate($this->status, ComponentConstants::AVATAR_STATUS, '');
+            if ($this->status === '') {
+                $this->status = null;
+            }
         }
     }
 
@@ -193,7 +183,7 @@ class Avatar extends Component
     /**
      * Render the avatar component.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function render()
     {

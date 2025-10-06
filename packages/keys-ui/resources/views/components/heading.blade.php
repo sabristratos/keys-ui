@@ -15,9 +15,9 @@
     // Color classes using design tokens
     $colorClasses = match ($color) {
         'heading' => 'text-heading',
-        'text' => 'text-text',
+        'text' => 'text-primary',
         'muted' => 'text-muted',
-        'brand' => $gradient ? 'bg-gradient-to-r from-accent to-brand-600 bg-clip-text text-transparent' : 'text-accent',
+        'brand' => $gradient ? 'bg-gradient-to-r from-accent to-accent-600 bg-clip-text text-transparent' : 'text-accent',
         'success' => 'text-success',
         'warning' => 'text-warning',
         'danger' => 'text-danger',

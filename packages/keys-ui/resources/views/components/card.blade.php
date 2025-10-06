@@ -13,11 +13,11 @@
     };
 
     $variantClasses = match ($variant) {
-        'default' => 'bg-surface bg-gradient-to-b from-white/1 to-transparent',
-        'elevated' => 'bg-surface border border-border',
-        'outlined' => 'bg-transparent border-2 border-border',
-        'filled' => 'bg-body border border-transparent',
-        default => 'bg-surface bg-gradient-to-b from-white/1 to-transparent'
+        'default' => 'bg-elevation-1 bg-gradient-to-b from-white/1 to-transparent',
+        'elevated' => 'bg-elevation-1 border border-line',
+        'outlined' => 'bg-transparent border-2 border-line',
+        'filled' => 'bg-base border border-transparent',
+        default => 'bg-elevation-1 bg-gradient-to-b from-white/1 to-transparent'
     };
 
     if ($colorVariant !== 'neutral') {
@@ -91,11 +91,11 @@
     $interactive = !is_null($href);
     if ($interactive && !$disabled && !$loading) {
         $hoverClasses = match ($variant) {
-            'default' => 'hover:shadow-md hover:border-border hover:-translate-y-1',
+            'default' => 'hover:shadow-md hover:border-line hover:-translate-y-1',
             'elevated' => 'hover:shadow-lg hover:-translate-y-1 hover:scale-[1.02]',
-            'outlined' => 'hover:bg-surface hover:border-border hover:shadow-sm',
-            'filled' => 'hover:bg-surface hover:shadow-sm',
-            default => 'hover:shadow-md hover:border-border hover:-translate-y-1'
+            'outlined' => 'hover:bg-elevation-1 hover:border-line hover:shadow-sm',
+            'filled' => 'hover:bg-elevation-1 hover:shadow-sm',
+            default => 'hover:shadow-md hover:border-line hover:-translate-y-1'
         };
 
         if ($colorVariant !== 'neutral') {
@@ -147,7 +147,7 @@
             <img
                 src="{{ $imageUrl }}"
                 alt="{{ $imageAlt ?? '' }}"
-                class="w-full h-auto object-cover rounded-md @if($loading) animate-pulse bg-surface @endif"
+                class="w-full h-auto object-cover rounded-md @if($loading) animate-pulse bg-elevation-1 @endif"
                 @if(!$loading) loading="lazy" @endif
             />
         </div>
@@ -156,14 +156,14 @@
     @if($shouldShowSkeleton())
 
         <div class="animate-pulse space-y-3" role="status" aria-live="polite">
-            <div class="h-4 bg-surface rounded w-3/4"></div>
+            <div class="h-4 bg-elevation-1 rounded w-3/4"></div>
             <div class="space-y-2">
-                <div class="h-3 bg-surface rounded"></div>
-                <div class="h-3 bg-surface rounded w-5/6"></div>
+                <div class="h-3 bg-elevation-1 rounded"></div>
+                <div class="h-3 bg-elevation-1 rounded w-5/6"></div>
             </div>
             <div class="flex space-x-2">
-                <div class="h-8 bg-surface rounded w-16"></div>
-                <div class="h-8 bg-surface rounded w-20"></div>
+                <div class="h-8 bg-elevation-1 rounded w-16"></div>
+                <div class="h-8 bg-elevation-1 rounded w-20"></div>
             </div>
             @if($loadingText)
                 <span class="sr-only">{{ $loadingText }}</span>

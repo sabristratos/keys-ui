@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Loading Component
@@ -19,8 +20,6 @@ use Illuminate\View\Component;
  */
 class Loading extends Component
 {
-    private const VALID_ANIMATIONS = ['spinner', 'dots', 'bars', 'pulse', 'wave', 'bounce'];
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
 
     /**
      * Create a new Loading component instance.
@@ -39,15 +38,8 @@ class Loading extends Component
 
         $this->id = $this->id ?? 'loading-' . uniqid();
 
-
-        if (!in_array($this->animation, self::VALID_ANIMATIONS)) {
-            $this->animation = 'spinner';
-        }
-
-
-        if (!in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
+        $this->animation = ComponentConstants::validate($this->animation, ComponentConstants::LOADING_ANIMATIONS, 'spinner');
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_XS_TO_XL, 'md');
 
 
         if (!$this->label) {

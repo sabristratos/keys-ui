@@ -4,7 +4,7 @@
 
     $stateClasses = $disabled
         ? 'cursor-not-allowed opacity-50 text-muted'
-        : 'cursor-pointer text-muted hover:text-foreground';
+        : 'cursor-pointer text-muted hover:text-primary';
 
     $iconClasses = 'flex-shrink-0 mr-2';
 

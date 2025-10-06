@@ -26,10 +26,10 @@
 <div class="add-to-cart-wrapper {{ $showQuantity ? 'flex items-center gap-2' : '' }}">
     
     @if($showQuantity && !$isIconOnly)
-        <div class="quantity-selector flex items-center border border-border rounded-md overflow-hidden bg-surface">
+        <div class="quantity-selector flex items-center border border-line rounded-md overflow-hidden bg-elevation-1">
             <button
                 type="button"
-                class="qty-decrease px-3 py-2 text-sm font-medium bg-surface hover:bg-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="qty-decrease px-3 py-2 text-sm font-medium bg-elevation-1 hover:bg-line transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 data-action="decrease"
                 data-target="{{ $quantityInputId }}"
                 {{ $quantity <= 1 ? 'disabled' : '' }}
@@ -44,14 +44,14 @@
                 value="{{ $quantity }}"
                 min="1"
                 max="{{ $maxQuantity }}"
-                class="qty-input w-16 px-2 py-2 text-center text-sm border-0 bg-surface focus-visible:ring-0 focus-visible:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                class="qty-input w-16 px-2 py-2 text-center text-sm border-0 bg-elevation-1 focus-visible:ring-0 focus-visible:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 data-max="{{ $maxQuantity }}"
                 {{ $disabled ? 'disabled' : '' }}
             />
 
             <button
                 type="button"
-                class="qty-increase px-3 py-2 text-sm font-medium bg-surface hover:bg-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="qty-increase px-3 py-2 text-sm font-medium bg-elevation-1 hover:bg-line transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 data-action="increase"
                 data-target="{{ $quantityInputId }}"
                 {{ $quantity >= $maxQuantity ? 'disabled' : '' }}
@@ -146,7 +146,7 @@
 
     [data-add-to-cart="true"].added {
         background-color: rgb(var(--color-success) / 1);
-        color: rgb(var(--color-foreground-success) / 1);
+        color: white;
         border-color: rgb(var(--color-success) / 1);
     }
 
@@ -167,7 +167,7 @@
 
     .quantity-selector .qty-decrease:hover:not(:disabled),
     .quantity-selector .qty-increase:hover:not(:disabled) {
-        background-color: rgb(var(--color-border) / 1);
+        background-color: rgb(var(--color-line) / 1);
     }
 
     .stock-indicator {

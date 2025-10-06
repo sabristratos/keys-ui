@@ -118,8 +118,10 @@ All components automatically use these tokens through Tailwind's auto-generated 
   - Card (+ Header, Body, Footer, Actions), Separator, Accordion
 - [Data Display](#data-display)
   - Table (+ Head, Body, Row, Header, Cell, EmptyState, Loading), Badge (+ Group), Avatar (+ Stack), Rating, Kbd
+- [Typography](#typography)
+  - Text, Heading
 - [Media](#media)
-  - Image, Icon, Gallery, HeadingDecorator
+  - Image, Icon, Gallery
 - [Overlays](#overlays)
   - Tooltip, Popover
 - [Social](#social)
@@ -523,6 +525,7 @@ Date picker with single date and range selection support.
 | `monthsToShow` | int | `1` | Number of months to display (1-12) |
 | `quickSelectors` | bool\|array | `false` | Enable quick date selectors |
 | `size` | string | `'md'` | Size variant (sm, md, lg) |
+| `width` | string | `'full'` | Width variant (full, auto, etc.) |
 | `inline` | bool | `false` | Display inline calendar |
 | `disabled` | bool | `false` | Whether datepicker is disabled |
 | `readonly` | bool | `false` | Whether datepicker is readonly |
@@ -584,6 +587,7 @@ Time selection with 12/24 hour format support.
 | `minTime` | string\|null | `null` | Minimum time allowed |
 | `maxTime` | string\|null | `null` | Maximum time allowed |
 | `size` | string | `'md'` | Size variant (sm, md, lg) |
+| `width` | string | `'full'` | Width variant (full, auto, etc.) |
 | `disabled` | bool | `false` | Whether timepicker is disabled |
 | `readonly` | bool | `false` | Whether timepicker is readonly |
 | `required` | bool | `false` | Whether timepicker is required |
@@ -633,7 +637,7 @@ Color picker with hex color input.
 | `errors` | string\|array\|Collection\|null | `null` | Validation errors |
 | `showErrors` | bool | `true` | Display validation errors |
 | `hint` | string\|null | `null` | Hint text below input |
-| `hasError` | bool | `false` | Force error state |
+| `forceError` | bool | `false` | Force error state |
 | `placeholder` | string\|null | `'#000000'` | Placeholder text |
 
 ---
@@ -874,7 +878,7 @@ Versatile button with variants, sizes, icons, and multi-state support.
 ```blade
 {{-- Basic buttons --}}
 <x-keys::button>Click Me</x-keys::button>
-<x-keys::button variant="outline">Outline</x-keys::button>
+<x-keys::button variant="outlined">Outline</x-keys::button>
 <x-keys::button variant="ghost">Ghost</x-keys::button>
 
 {{-- With icons --}}
@@ -898,7 +902,7 @@ Versatile button with variants, sizes, icons, and multi-state support.
 </x-keys::button>
 
 {{-- Link button --}}
-<x-keys::button href="/dashboard" variant="brand">Dashboard</x-keys::button>
+<x-keys::button href="/dashboard" color="primary">Dashboard</x-keys::button>
 
 {{-- Loading state --}}
 <x-keys::button loading loading-animation="dots">Processing</x-keys::button>
@@ -915,7 +919,8 @@ Versatile button with variants, sizes, icons, and multi-state support.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `variant` | string | `'brand'` | Button variant (brand, ghost, outline, danger, etc.) |
+| `color` | string | `'secondary'` | Button color (primary, secondary, danger, warning, success, info) |
+| `variant` | string | `'solid'` | Button variant (solid, outlined, ghost, subtle) |
 | `size` | string | `'md'` | Size variant (xs, sm, md, lg, xl) |
 | `type` | string | `'button'` | Button type (button, submit, reset) |
 | `href` | string\|null | `null` | URL for link buttons |
@@ -1373,10 +1378,21 @@ Loading spinner or skeleton screen.
 ```blade
 <x-keys::loading />
 
-<x-keys::loading variant="dots" />
+<x-keys::loading animation="dots" />
 
-<x-keys::loading variant="skeleton" />
+<x-keys::loading animation="bars" size="lg" />
+
+<x-keys::loading animation="pulse" label="Loading content..." />
 ```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `animation` | string | `'spinner'` | Animation type (spinner, dots, bars, pulse, wave, bounce) |
+| `size` | string | `'md'` | Size variant (xs, sm, md, lg, xl) |
+| `label` | string\|null | `'Loading...'` | Accessibility label for screen readers |
+| `id` | string\|null | `null` | Custom ID for the loading element |
 
 ---
 
@@ -1393,7 +1409,32 @@ Empty state placeholder.
 >
     <x-keys::button icon-left="heroicon-o-plus">Create Item</x-keys::button>
 </x-keys::empty-state>
+
+{{-- With built-in action button --}}
+<x-keys::empty-state
+    icon="heroicon-o-folder"
+    title="No projects"
+    description="Create your first project to get started."
+    action-text="Create Project"
+    action-url="/projects/create"
+    action-icon="heroicon-o-plus"
+    variant="brand"
+    size="lg"
+/>
 ```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | string | `'No data found'` | Main heading for the empty state |
+| `description` | string | `'There are no items to display.'` | Descriptive text |
+| `icon` | string\|null | `'heroicon-o-document-text'` | Icon name (heroicon format) |
+| `variant` | string | `'neutral'` | Color variant (neutral, brand, success, warning, danger, info) |
+| `size` | string | `'md'` | Size variant (sm, md, lg) |
+| `actionText` | string\|null | `null` | Text for the action button |
+| `actionUrl` | string\|null | `null` | URL for the action button |
+| `actionIcon` | string\|null | `null` | Icon for the action button |
 
 ---
 
@@ -1441,9 +1482,9 @@ Card container with header, body, footer, and actions.
 |------|------|---------|-------------|
 | `variant` | string | `'default'` | Card variant |
 | `colorVariant` | string | `'neutral'` | Color variant |
-| `padding` | string | `'md'` | Padding size (none, sm, md, lg) |
-| `rounded` | string | `'md'` | Border radius (none, sm, md, lg) |
-| `shadow` | string | `'sm'` | Shadow size (none, sm, md, lg) |
+| `padding` | string | `'lg'` | Padding size (none, sm, md, lg) |
+| `rounded` | string | `'lg'` | Border radius (none, sm, md, lg) |
+| `shadow` | string | `'xs'` | Shadow size (none, sm, md, lg) |
 | `selected` | bool | `false` | Whether card is selected |
 | `loading` | bool | `false` | Show loading skeleton |
 | `loadingText` | string\|null | `null` | Loading text |
@@ -1458,7 +1499,7 @@ Card container with header, body, footer, and actions.
 
 ### Separator
 
-Visual separator line.
+Visual separator line with multiple variants.
 
 **Example:**
 ```blade
@@ -1466,8 +1507,26 @@ Visual separator line.
 
 <x-keys::separator orientation="vertical" />
 
-<x-keys::separator>OR</x-keys::separator>
+<x-keys::separator variant="text">OR</x-keys::separator>
+
+<x-keys::separator variant="dashed" />
+
+<x-keys::separator variant="gradient" color="brand" />
+
+<x-keys::separator variant="icon" icon="heroicon-o-star" />
 ```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | string | `'line'` | Separator variant (line, text, icon, gradient, dashed) |
+| `orientation` | string | `'horizontal'` | Orientation (horizontal, vertical) |
+| `color` | string | `'neutral'` | Color variant |
+| `size` | string | `'sm'` | Size variant (xs, sm, md, lg) |
+| `spacing` | string | `'md'` | Spacing around separator (none, xs, sm, md, lg, xl) |
+| `alignment` | string | `'center'` | Text/icon alignment (left, center, right) |
+| `icon` | string\|null | `null` | Icon name for icon variant |
 
 ---
 
@@ -1635,7 +1694,7 @@ Status badge with variants and colors.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `variant` | string | `'simple'` | Badge variant (simple, subtle, chip) |
+| `variant` | string | `'filled'` | Badge variant (filled, subtle, chip) |
 | `color` | string | `'blue'` | Color variant |
 | `size` | string | `'sm'` | Size variant (xs, sm, md) |
 | `icon` | string\|null | `null` | Icon name |
@@ -1698,8 +1757,36 @@ Star rating display and input.
 
 <x-keys::rating :value="3" :max="5" size="lg" />
 
-<x-keys::rating name="rating" interactive />
+<x-keys::rating name="rating" />
+
+<x-keys::rating :value="4" readonly />
+
+<x-keys::rating name="rating" allow-half show-count />
 ```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `name` | string\|null | `null` | Form field name |
+| `id` | string\|null | `null` | Rating ID (auto-generated if not provided) |
+| `value` | int\|float | `0` | Current rating value |
+| `max` | int | `5` | Maximum rating value |
+| `readonly` | bool | `false` | Whether rating is readonly (display only) |
+| `disabled` | bool | `false` | Whether rating is disabled |
+| `required` | bool | `false` | Whether rating is required |
+| `icon` | string | `'star'` | Icon name (without heroicon prefix) |
+| `iconFilled` | string\|null | `null` | Custom filled icon (auto-generated if not provided) |
+| `iconOutlined` | string\|null | `null` | Custom outlined icon (auto-generated if not provided) |
+| `color` | string | `'warning'` | Color variant |
+| `size` | string | `'md'` | Size variant (xs, sm, md, lg, xl) |
+| `label` | string\|null | `null` | Label text (shorthand mode) |
+| `hint` | string\|null | `null` | Hint text |
+| `optional` | bool | `false` | Show optional indicator |
+| `errors` | string\|array\|Collection\|null | `null` | Validation errors |
+| `showErrors` | bool | `true` | Display validation errors |
+| `allowHalf` | bool | `false` | Allow half-star ratings |
+| `showCount` | bool | `false` | Show rating count/value |
 
 ---
 
@@ -1716,11 +1803,96 @@ Press <x-keys::kbd>Ctrl</x-keys::kbd> + <x-keys::kbd>S</x-keys::kbd> to save
 
 ---
 
+## Typography
+
+### Text
+
+Flexible text component for body text, labels, and inline content.
+
+**Example:**
+```blade
+{{-- Basic text --}}
+<x-keys::text>Standard body text</x-keys::text>
+
+{{-- Muted secondary text --}}
+<x-keys::text color="muted" size="sm">
+    Secondary information
+</x-keys::text>
+
+{{-- Line clamping --}}
+<x-keys::text line-clamp="3">
+    Long content that will be truncated to 3 lines...
+</x-keys::text>
+
+{{-- Label element --}}
+<x-keys::text element="label" weight="medium" size="sm">
+    Form Field Label
+</x-keys::text>
+```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `element` | string | `'p'` | HTML element (p, span, div, label, small) |
+| `size` | string | `'md'` | Size variant (xs, sm, md, lg, xl, 2xl) |
+| `color` | string | `'primary'` | Color (heading, primary, secondary, muted, brand, success, warning, danger, info) |
+| `weight` | string | `'normal'` | Font weight (light, normal, medium, semibold, bold) |
+| `align` | string\|null | `null` | Text alignment (left, center, right, justify) |
+| `lineHeight` | string\|null | `null` | Line height (tight, normal, relaxed, loose) |
+| `lineClamp` | int\|null | `null` | Truncate to N lines (1-6) |
+| `italic` | bool | `false` | Italic text |
+| `underline` | bool | `false` | Underlined text |
+| `uppercase` | bool | `false` | Uppercase text |
+| `lowercase` | bool | `false` | Lowercase text |
+| `capitalize` | bool | `false` | Capitalize text |
+
+---
+
+### Heading
+
+Semantic heading component with visual size decoupled from HTML level.
+
+**Example:**
+```blade
+{{-- Semantic h1 with automatic 4xl sizing --}}
+<x-keys::heading level="h1">Page Title</x-keys::heading>
+
+{{-- h2 with custom size override --}}
+<x-keys::heading level="h2" size="xl" color="brand">
+    Section Title
+</x-keys::heading>
+
+{{-- Gradient hero heading --}}
+<x-keys::heading level="h1" gradient>
+    Beautiful Gradient Heading
+</x-keys::heading>
+
+{{-- With underline decoration --}}
+<x-keys::heading level="h3" underline>
+    Subsection Title
+</x-keys::heading>
+```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `level` | string | `'h2'` | HTML heading level (h1, h2, h3, h4, h5, h6) |
+| `size` | string\|null | `null` | Visual size (xs, sm, md, lg, xl, 2xl, 3xl, 4xl) - auto-maps from level if null |
+| `color` | string | `'heading'` | Color (heading, primary, muted, brand, success, warning, danger, info) |
+| `weight` | string | `'semibold'` | Font weight (normal, medium, semibold, bold, extrabold) |
+| `tracking` | string | `'normal'` | Letter spacing (tighter, tight, normal, wide, wider) |
+| `underline` | bool | `false` | Show decorative underline |
+| `gradient` | bool | `false` | Apply brand color gradient |
+
+---
+
 ## Media
 
 ### Image
 
-Responsive image with lazy loading and aspect ratios.
+Responsive image with lazy loading, fallback handling, and overlay support.
 
 **Example:**
 ```blade
@@ -1732,25 +1904,93 @@ Responsive image with lazy loading and aspect ratios.
 
 <x-keys::image
     src="/images/hero.jpg"
-    aspect-ratio="16/9"
+    aspect-ratio="video"
     object-fit="cover"
+    radius="lg"
+/>
+
+{{-- With overlay --}}
+<x-keys::image
+    src="/images/banner.jpg"
+    alt="Banner"
+    overlay="gradient-bottom"
+    overlay-color="black"
+    overlay-opacity="60"
+/>
+
+{{-- With caption and lightbox --}}
+<x-keys::image
+    src="/images/photo.jpg"
+    alt="Photo"
+    caption="Beautiful landscape"
+    lightbox
 />
 ```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `src` | string | required | Image URL for display |
+| `alt` | string | required | Alternative text for accessibility |
+| `size` | string | `'full'` | Size variant (xs, sm, md, lg, xl, full) |
+| `aspectRatio` | string | `'auto'` | Aspect ratio (auto, square, video, photo, wide) |
+| `objectFit` | string | `'cover'` | How image fits container (cover, contain, fill, scale-down, none) |
+| `radius` | string | `'none'` | Border radius (none, sm, md, lg, xl, full) |
+| `caption` | string\|null | `null` | Optional caption text below image |
+| `overlay` | string\|null | `null` | Overlay type (gradient-top, gradient-bottom, solid, none) |
+| `overlayColor` | string | `'black'` | Color for overlay (black, white, brand, etc.) |
+| `overlayOpacity` | string | `'50'` | Opacity level (10-90) |
+| `lazy` | bool | `true` | Enable lazy loading |
+| `placeholder` | string\|null | `null` | Background color while loading |
+| `lightbox` | bool | `false` | Enable lightbox functionality |
+| `fallbackIcon` | string | `'heroicon-o-photo'` | Icon for failed images |
+| `fallbackText` | string\|null | `null` | Custom fallback accessibility text |
+| `retryAttempts` | int | `2` | Retry attempts for failed images (0-5) |
 
 ---
 
 ### Icon
 
-Icon component supporting Heroicons.
+Intelligent icon component with automatic resolution supporting Heroicons, custom icons, and Blade components.
 
 **Example:**
 ```blade
+{{-- Simple name (auto-resolves to Heroicon outline) --}}
+<x-keys::icon name="heart" />
+
+{{-- Explicit variant --}}
+<x-keys::icon name="star" variant="solid" size="lg" />
+
+{{-- Shorthand prefix --}}
+<x-keys::icon name="s:heart" />
+<x-keys::icon name="o:star" />
+<x-keys::icon name="m:check" />
+
+{{-- Backward compatibility --}}
 <x-keys::icon name="heroicon-o-heart" />
+<x-keys::icon name="heroicon-s-star" />
 
-<x-keys::icon name="heroicon-s-star" size="lg" />
+{{-- Custom SVG icons (from resources/icons/) --}}
+<x-keys::icon name="custom:logo" />
 
-<x-keys::icon name="heroicon-o-check" class="text-success" />
+{{-- Blade component icons --}}
+<x-keys::icon name="blade:custom-icon" />
 ```
+
+**Icon Resolution Priority:**
+1. Custom SVG icons from `resources/icons/`
+2. Blade component icons from `resources/views/components/icons/`
+3. Heroicons (default)
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `name` | string | required | Icon name (supports simple names, prefixes, or full paths) |
+| `size` | string | `'md'` | Size variant (xs, sm, md, lg, xl) |
+| `variant` | string | `'outline'` | Heroicon variant (outline, solid, mini) |
+| `fallback` | string\|null | `'heroicon-o-question-mark-circle'` | Fallback icon if resolution fails |
 
 ---
 
@@ -1837,7 +2077,26 @@ Popover with rich content support.
         <p>Rich content here...</p>
     </div>
 </x-keys::popover>
+
+<x-keys::popover placement="top" arrow>
+    <x-slot:trigger>
+        <x-keys::button>Top Popover</x-keys::button>
+    </x-slot:trigger>
+
+    Content here...
+</x-keys::popover>
 ```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `id` | string\|null | `null` | Popover ID (auto-generated if not provided) |
+| `variant` | string | `'default'` | Style variant |
+| `size` | string | `'md'` | Size variant (xs, sm, md, lg, xl, full) |
+| `placement` | string | `'bottom'` | Popover placement (top, bottom, left, right) |
+| `arrow` | bool | `false` | Show arrow pointing to trigger |
+| `manual` | bool | `false` | Manual control mode |
 
 ---
 
@@ -1922,21 +2181,64 @@ Chart wrapper component.
 
 ### ChoiceGroup
 
-Grouped checkbox/radio choices.
+Grouped checkbox/radio choices with flexible layouts.
 
 **Example:**
 ```blade
+{{-- Checkbox group --}}
 <x-keys::choice-group
     name="features"
-    label="Select Features"
+    legend="Select Features"
     type="checkbox"
-    :options="[
-        ['value' => 'feature1', 'label' => 'Feature 1'],
-        ['value' => 'feature2', 'label' => 'Feature 2'],
-        ['value' => 'feature3', 'label' => 'Feature 3'],
-    ]"
-/>
+    layout="stacked"
+>
+    <x-keys::checkbox name="features[]" value="feature1" label="Feature 1" />
+    <x-keys::checkbox name="features[]" value="feature2" label="Feature 2" />
+    <x-keys::checkbox name="features[]" value="feature3" label="Feature 3" />
+</x-keys::choice-group>
+
+{{-- Radio group with grid layout --}}
+<x-keys::choice-group
+    name="plan"
+    legend="Choose Your Plan"
+    type="radio"
+    layout="grid"
+    description="Select the plan that works best for you"
+>
+    <x-keys::radio name="plan" value="basic" variant="card" title="Basic" />
+    <x-keys::radio name="plan" value="pro" variant="card" title="Pro" />
+    <x-keys::radio name="plan" value="enterprise" variant="card" title="Enterprise" />
+</x-keys::choice-group>
+
+{{-- Inline layout --}}
+<x-keys::choice-group
+    name="notification"
+    legend="Notification Preferences"
+    type="checkbox"
+    layout="inline"
+    size="sm"
+>
+    <x-keys::checkbox name="notification[]" value="email" label="Email" />
+    <x-keys::checkbox name="notification[]" value="sms" label="SMS" />
+    <x-keys::checkbox name="notification[]" value="push" label="Push" />
+</x-keys::choice-group>
 ```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `name` | string\|null | `null` | Form field name |
+| `legend` | string\|null | `null` | Group legend/label |
+| `description` | string\|null | `null` | Descriptive text for the group |
+| `type` | string | `'checkbox'` | Input type (checkbox, radio) |
+| `layout` | string | `'stacked'` | Layout variant (stacked, grid, inline) |
+| `size` | string | `'md'` | Size variant |
+| `required` | bool | `false` | Whether group is required |
+| `disabled` | bool | `false` | Whether group is disabled |
+| `errors` | string\|array\|Collection\|null | `null` | Validation errors |
+| `showErrors` | bool | `true` | Display validation errors |
+| `hasError` | bool | `false` | Force error state |
 
 ---
 

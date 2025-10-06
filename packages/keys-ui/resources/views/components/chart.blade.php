@@ -34,7 +34,7 @@
     <div class="{{ $aspectClasses }} w-full {{ $type === 'sparkline' ? 'h-full' : '' }}">
         @if(!$hasData)
             
-            <div class="flex items-center justify-center h-full border border-dashed border-border rounded-lg bg-surface/50">
+            <div class="flex items-center justify-center h-full border border-dashed border-line rounded-lg bg-elevation-1/50">
                 <div class="text-center text-muted-foreground">
                     <x-keys::icon name="heroicon-o-chart-bar-square" class="w-8 h-8 mx-auto mb-2 opacity-50" />
                     <p class="text-sm">No data available</p>

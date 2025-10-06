@@ -7,7 +7,7 @@
         'success' => 'border-success bg-success-subtle',
         'warning' => 'border-warning bg-warning-subtle',
         'danger' => 'border-danger bg-danger-subtle',
-        'neutral' => 'border-border bg-surface',
+        'neutral' => 'border-line bg-elevation-1',
         'brand' => 'border-accent bg-accent-subtle',
         default => 'border-info bg-info-subtle'
     };

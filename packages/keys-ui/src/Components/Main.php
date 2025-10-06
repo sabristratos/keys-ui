@@ -26,21 +26,8 @@ class Main extends Component
         }
     }
 
-    public function getPaddingClasses(): string
-    {
-        return match ($this->padding) {
-            'none' => '',
-            'sm' => 'p-4',
-            'md' => 'p-4 sm:p-6 lg:p-8',
-            'lg' => 'p-6 sm:p-8 lg:p-10',
-            default => 'p-4 sm:p-6 lg:p-8',
-        };
-    }
-
     public function render()
     {
-        return view('keys::components.main', [
-            'paddingClasses' => $this->getPaddingClasses(),
-        ]);
+        return view('keys::components.main');
     }
 }

@@ -15,8 +15,8 @@
         <div class="{{ $labelClasses }} lg:[.sidebar-collapsed_&]:hidden">
             {{ $label }}
         </div>
-        <div class="border-t border-border mx-4 hidden lg:[.sidebar-collapsed_&]:block"></div>
+        <div class="border-t border-line mx-4 hidden lg:[.sidebar-collapsed_&]:block"></div>
     @else
-        <div class="border-t border-border mx-4"></div>
+        <div class="border-t border-line mx-4"></div>
     @endif
 </div>

@@ -72,75 +72,6 @@ class Group extends Component
     }
 
     /**
-     * Get responsive spacing classes based on badge size inheritance.
-     *
-     * Provides adaptive spacing that scales appropriately with badge sizes
-     * to maintain visual consistency across different badge configurations.
-     *
-     * @return string CSS classes for badge spacing
-     */
-    public function getSpacingClasses(): string
-    {
-        return match ($this->spacing) {
-            'tight' => match ($this->size ?? 'sm') {
-                'xs' => 'gap-1',
-                'sm' => 'gap-1.5',
-                'md' => 'gap-2',
-                default => 'gap-1.5'
-            },
-            'default' => match ($this->size ?? 'sm') {
-                'xs' => 'gap-2',
-                'sm' => 'gap-2.5',
-                'md' => 'gap-3',
-                default => 'gap-2.5'
-            },
-            'loose' => match ($this->size ?? 'sm') {
-                'xs' => 'gap-3',
-                'sm' => 'gap-4',
-                'md' => 'gap-5',
-                default => 'gap-4'
-            },
-            default => 'gap-2.5'
-        };
-    }
-
-    /**
-     * Get layout classes for badge group container.
-     *
-     * Combines orientation and wrapping behavior to create flexible
-     * layout options for different badge group use cases.
-     *
-     * @return string CSS classes for layout configuration
-     */
-    public function getLayoutClasses(): string
-    {
-        return match ($this->orientation) {
-            'horizontal' => $this->wrap ? 'flex flex-row flex-wrap' : 'flex flex-row',
-            'vertical' => 'flex flex-col',
-            default => 'flex flex-row flex-wrap'
-        };
-    }
-
-    /**
-     * Get alignment classes for badge positioning.
-     *
-     * Provides flexible alignment options for different design requirements
-     * and layout contexts within the badge group container.
-     *
-     * @return string CSS classes for badge alignment
-     */
-    public function getAlignmentClasses(): string
-    {
-        return match ($this->align) {
-            'start' => $this->orientation === 'vertical' ? 'items-start' : 'justify-start items-center',
-            'center' => $this->orientation === 'vertical' ? 'items-center' : 'justify-center items-center',
-            'end' => $this->orientation === 'vertical' ? 'items-end' : 'justify-end items-center',
-            'justify' => $this->orientation === 'vertical' ? 'items-stretch' : 'justify-between items-center',
-            default => 'justify-start items-center'
-        };
-    }
-
-    /**
      * Check if the group should show additional actions.
      *
      * Determines whether group-level actions like "Clear All" should be
@@ -161,23 +92,6 @@ class Group extends Component
     public function hasMaxBadgeLimit(): bool
     {
         return $this->max !== null && $this->max > 0;
-    }
-
-    /**
-     * Get badge container classes for proper badge targeting.
-     *
-     * @return string CSS classes for badge container
-     */
-    public function getBadgeContainerClasses(): string
-    {
-        $classes = trim("{$this->getLayoutClasses()} {$this->getSpacingClasses()} {$this->getAlignmentClasses()}");
-
-        
-        if ($this->size) {
-            $classes .= " [&>[data-keys-badge]:not([data-size])]:badge-size-{$this->size}";
-        }
-
-        return $classes;
     }
 
     /**
@@ -222,12 +136,7 @@ class Group extends Component
     public function render()
     {
         return view('keys::components.badge.group', [
-            'spacingClasses' => $this->getSpacingClasses(),
-            'layoutClasses' => $this->getLayoutClasses(),
-            'alignmentClasses' => $this->getAlignmentClasses(),
-            'badgeContainerClasses' => $this->getBadgeContainerClasses(),
             'dataAttributes' => $this->getDataAttributes(),
-            'hasMaxLimit' => $this->hasMaxBadgeLimit(),
         ]);
     }
 }

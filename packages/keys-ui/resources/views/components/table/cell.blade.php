@@ -16,7 +16,7 @@
     };
 
     $cellVariantClasses = match ($variant) {
-        'strong' => 'font-semibold text-text',
+        'strong' => 'font-semibold text-primary',
         'muted' => 'text-muted',
         'success' => 'text-success',
         'danger' => 'text-danger',

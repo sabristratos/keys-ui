@@ -21,7 +21,7 @@
     };
 
     $colorClasses = match ($color) {
-        'brand' => 'text-brand',
+        'brand' => 'text-accent',
         'warning' => 'text-warning',
         'success' => 'text-success',
         'danger' => 'text-danger',

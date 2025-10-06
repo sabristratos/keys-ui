@@ -1,6 +1,6 @@
-
 <x-keys::popover
     :id="$id"
+    :size="$size"
     :placement="$computedPlacement"
     {{ $attributes->merge($computedDataAttributes) }}
 >
@@ -8,6 +8,5 @@
         {{ $trigger }}
     </x-slot:trigger>
 
-    
-    {{ $slot }}
+    {{ $panel }}
 </x-keys::popover>

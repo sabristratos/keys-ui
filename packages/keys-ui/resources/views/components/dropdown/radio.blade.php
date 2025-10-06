@@ -5,7 +5,7 @@
     // Item background state (with checked state)
     $itemStateClasses = $disabled
         ? 'text-muted cursor-not-allowed opacity-50'
-        : 'text-text hover:bg-neutral-hover';
+        : 'text-primary hover:bg-neutral-hover';
 
     $itemCheckedClasses = !$disabled ? match ($color) {
         'brand' => 'has-[:checked]:bg-accent-subtle has-[:checked]:text-accent',
@@ -13,15 +13,15 @@
         'warning' => 'has-[:checked]:bg-warning-subtle has-[:checked]:text-warning',
         'danger' => 'has-[:checked]:bg-danger-subtle has-[:checked]:text-danger',
         'info' => 'has-[:checked]:bg-info-subtle has-[:checked]:text-info',
-        'neutral' => 'has-[:checked]:bg-surface has-[:checked]:text-muted',
+        'neutral' => 'has-[:checked]:bg-elevation-1 has-[:checked]:text-muted',
         default => 'has-[:checked]:bg-accent-subtle has-[:checked]:text-accent'
     } : '';
 
     $radioBase = 'h-4 w-4 border transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded-full';
 
     $radioStateClasses = $disabled
-        ? 'bg-surface border-border text-muted cursor-not-allowed opacity-50'
-        : 'bg-input border-border';
+        ? 'bg-elevation-1 border-line text-muted cursor-not-allowed opacity-50'
+        : 'bg-input border-line';
 
     $radioColorClasses = $disabled ? '' : match ($color) {
         'brand' => 'text-accent focus-visible:ring-accent hover:border-accent',

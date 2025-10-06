@@ -4,7 +4,7 @@
 
     $triggerStateClasses = $disabled
         ? 'text-muted cursor-not-allowed opacity-50'
-        : 'text-text hover:bg-neutral-hover focus-visible:outline-none focus-visible:bg-neutral-hover cursor-pointer';
+        : 'text-primary hover:bg-neutral-hover focus-visible:outline-none focus-visible:bg-neutral-hover cursor-pointer';
 
     $iconClasses = 'flex-shrink-0 mr-3';
 @endphp

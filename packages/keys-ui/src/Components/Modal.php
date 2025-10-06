@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Modal Component
@@ -14,7 +15,6 @@ use Illuminate\View\Component;
  */
 class Modal extends Component
 {
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl', 'full'];
 
     /**
      * Create a new Modal component instance.
@@ -46,9 +46,7 @@ class Modal extends Component
     ) {
 
 
-        if (!in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_EXTENDED, 'md');
 
 
         if (!in_array($this->closedby, ['any', 'closerequest', 'none'])) {

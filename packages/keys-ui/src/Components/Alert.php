@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Alert Component
@@ -13,8 +14,6 @@ use Illuminate\View\Component;
  */
 class Alert extends Component
 {
-    private const VALID_VARIANTS = ['brand', 'success', 'warning', 'danger', 'neutral', 'info'];
-    private const VALID_SIZES = ['sm', 'md', 'lg'];
 
     /**
      * Create a new Alert component instance.
@@ -34,13 +33,8 @@ class Alert extends Component
         public bool $dismissible = false,
         public ?string $id = null
     ) {
-        if (! in_array($this->variant, self::VALID_VARIANTS)) {
-            $this->variant = 'info';
-        }
-
-        if (! in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
+        $this->variant = ComponentConstants::validate($this->variant, ComponentConstants::CONTEXTUAL_VARIANTS, 'info');
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_SM_TO_LG, 'md');
 
         if ($this->icon && ! str_starts_with($this->icon, 'heroicon-')) {
             if (empty(trim($this->icon))) {

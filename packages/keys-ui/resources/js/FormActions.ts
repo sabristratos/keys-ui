@@ -321,8 +321,8 @@ export class FormActions extends BaseActionClass {
         const feedback = document.createElement('div');
         feedback.className = `absolute top-full left-0 mt-1 px-2 py-1 text-xs rounded shadow-lg z-10 pointer-events-none ${
             type === 'success'
-                ? 'bg-success text-foreground-success'
-                : 'bg-danger text-foreground-danger'
+                ? 'bg-success text-white'
+                : 'bg-danger text-white'
         }`;
         feedback.textContent = message;
 

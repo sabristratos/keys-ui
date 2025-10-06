@@ -5,10 +5,12 @@ namespace Keys\UI\Components;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
+use Keys\UI\Constants\ComponentConstants;
 
 class Calendar extends Component
 {
-    private const VALID_SIZES = ['sm', 'md', 'lg'];
+    use HandlesValidationErrors;
 
     public function __construct(
         public ?string $name = null,
@@ -156,9 +158,7 @@ class Calendar extends Component
     private function validateProperties(): void
     {
         
-        if (! in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_SM_TO_LG, 'md');
     }
 
     /**
@@ -181,26 +181,6 @@ class Calendar extends Component
         return $this->hasError || $this->hasErrors();
     }
 
-    public function hasErrors(): bool
-    {
-        if (is_null($this->errors)) {
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            return ! empty(trim($this->errors));
-        }
-
-        if (is_array($this->errors)) {
-            return ! empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        return false;
-    }
 
     public function getWeekdays(): array
     {

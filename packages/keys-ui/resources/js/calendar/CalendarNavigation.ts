@@ -354,14 +354,14 @@ export class CalendarNavigation {
         const baseClasses = 'w-full p-3 rounded-md text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent';
 
         if (isDisabled) {
-            return `${baseClasses} bg-surface text-muted cursor-not-allowed opacity-50`;
+            return `${baseClasses} bg-elevation-1 text-muted cursor-not-allowed opacity-50`;
         }
 
         if (isSelected) {
-            return `${baseClasses} bg-brand text-white font-semibold shadow-sm`;
+            return `${baseClasses} bg-accent text-white font-semibold shadow-sm`;
         }
 
-        return `${baseClasses} text-text hover:bg-neutral-hover hover:scale-105`;
+        return `${baseClasses} text-primary hover:bg-neutral-hover hover:scale-105`;
     }
 
     /**
@@ -371,18 +371,18 @@ export class CalendarNavigation {
         const baseClasses = 'w-full p-3 rounded-md text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent';
 
         if (isDisabled) {
-            return `${baseClasses} bg-surface text-muted cursor-not-allowed opacity-50`;
+            return `${baseClasses} bg-elevation-1 text-muted cursor-not-allowed opacity-50`;
         }
 
         if (isSelected) {
-            return `${baseClasses} bg-brand text-white font-semibold shadow-sm`;
+            return `${baseClasses} bg-accent text-white font-semibold shadow-sm`;
         }
 
         if (isOutOfDecade) {
             return `${baseClasses} text-muted hover:bg-neutral-hover opacity-75`;
         }
 
-        return `${baseClasses} text-text hover:bg-neutral-hover hover:scale-105`;
+        return `${baseClasses} text-primary hover:bg-neutral-hover hover:scale-105`;
     }
 
     /**

@@ -445,11 +445,11 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
         thumbnails.forEach((thumb, i) => {
             const thumbElement = thumb as HTMLElement;
             if (i === index) {
-                thumbElement.classList.add('active', 'border-brand-500');
+                thumbElement.classList.add('active', 'border-accent-500');
                 thumbElement.classList.remove('border-transparent');
                 thumbElement.setAttribute('aria-current', 'true');
             } else {
-                thumbElement.classList.remove('active', 'border-brand-500');
+                thumbElement.classList.remove('active', 'border-accent-500');
                 thumbElement.classList.add('border-transparent');
                 thumbElement.removeAttribute('aria-current');
             }
@@ -779,7 +779,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      */
     private createImageErrorPlaceholder(container: HTMLElement): void {
         const placeholder = document.createElement('div');
-        placeholder.className = 'gallery-error-placeholder absolute inset-0 flex items-center justify-center bg-surface border border-border rounded-lg';
+        placeholder.className = 'gallery-error-placeholder absolute inset-0 flex items-center justify-center bg-elevation-1 border border-line rounded-lg';
         placeholder.innerHTML = `
             <div class="text-center">
                 <div class="w-16 h-16 mx-auto mb-3 text-muted opacity-50">
@@ -798,7 +798,7 @@ export class GalleryActions extends BaseActionClass<GalleryState> {
      */
     private createThumbnailErrorPlaceholder(container: HTMLElement): void {
         const placeholder = document.createElement('div');
-        placeholder.className = 'gallery-thumbnail-error-placeholder absolute inset-0 flex items-center justify-center bg-surface border border-border rounded text-muted';
+        placeholder.className = 'gallery-thumbnail-error-placeholder absolute inset-0 flex items-center justify-center bg-elevation-1 border border-line rounded text-muted';
         placeholder.innerHTML = `
             <svg xmlns="http:
                 <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />

@@ -27,7 +27,7 @@ trait HandlesValidationErrors
      *
      * @return bool
      */
-    public function hasError(): bool
+    public function hasErrors(): bool
     {
         if (is_null($this->errors)) {
             return false;
@@ -45,18 +45,18 @@ trait HandlesValidationErrors
             return $this->errors->isNotEmpty();
         }
 
-        
+
         if (is_object($this->errors) && method_exists($this->errors, 'any')) {
             return $this->errors->any();
         }
 
-        
+
         if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
             try {
                 $bag = $this->errors->getBag('default');
                 return $bag && $bag->any();
             } catch (\Exception $e) {
-                
+
                 return false;
             }
         }

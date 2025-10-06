@@ -4,10 +4,12 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
+use Keys\UI\Constants\ComponentConstants;
 
 class Rating extends Component
 {
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
+    use HandlesValidationErrors;
 
     public string $uniqueId;
 
@@ -47,9 +49,7 @@ class Rating extends Component
 
 
 
-        if (! in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_XS_TO_XL, 'md');
 
 
         $this->value = max(0, min($this->max, $this->value));
@@ -87,26 +87,6 @@ class Rating extends Component
         return $this->hasErrors();
     }
 
-    public function hasErrors(): bool
-    {
-        if (is_null($this->errors)) {
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            return ! empty(trim($this->errors));
-        }
-
-        if (is_array($this->errors)) {
-            return ! empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        return false;
-    }
 
     public function getDataAttributes(): array
     {

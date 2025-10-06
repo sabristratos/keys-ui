@@ -237,7 +237,7 @@ export class RatingActions extends BaseActionClass<RatingState> {
             const color = container.dataset.color || 'warning';
             const colorClass = `text-${color}`;
             const inactiveClasses = ['opacity-30', 'text-neutral-400', 'dark:text-neutral-500'];
-            const activeClasses = ['text-brand', 'text-warning', 'text-success', 'text-danger', 'text-neutral-500'];
+            const activeClasses = ['text-accent', 'text-warning', 'text-success', 'text-danger', 'text-neutral-500'];
 
             icon.classList.remove(
                 ...inactiveClasses,

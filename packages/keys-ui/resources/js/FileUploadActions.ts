@@ -590,7 +590,7 @@ function showMultipleFilesState(container: HTMLElement, files: File[]): void {
  */
 function createFileCard(container: HTMLElement, file: File, index: number): HTMLElement {
     const card = document.createElement('div');
-    card.className = 'file-card relative p-3 rounded-lg border-2 border-border bg-surface hover:border-brand transition-colors';
+    card.className = 'file-card relative p-3 rounded-lg border-2 border-line bg-elevation-1 hover:border-accent transition-colors';
     card.setAttribute('data-file-index', index.toString());
 
     const preview = document.createElement('div');
@@ -601,7 +601,7 @@ function createFileCard(container: HTMLElement, file: File, index: number): HTML
     img.alt = file.name;
 
     const icon = document.createElement('div');
-    icon.className = 'flex items-center justify-center w-full h-24 bg-surface border border-border rounded';
+    icon.className = 'flex items-center justify-center w-full h-24 bg-elevation-1 border border-line rounded';
     icon.innerHTML = `<svg class="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
     </svg>`;
@@ -645,7 +645,7 @@ function createFileCard(container: HTMLElement, file: File, index: number): HTML
     info.className = 'space-y-1';
 
     const name = document.createElement('div');
-    name.className = 'text-sm font-medium text-text truncate';
+    name.className = 'text-sm font-medium text-primary truncate';
     name.textContent = file.name;
     name.title = file.name;
 

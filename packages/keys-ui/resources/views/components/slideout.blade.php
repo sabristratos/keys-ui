@@ -1,6 +1,6 @@
 @php
 
-    $dialogClasses = 'fixed m-0 p-0 bg-surface shadow-xl overflow-y-auto';
+    $dialogClasses = 'fixed m-0 p-0 bg-elevation-1 shadow-xl overflow-y-auto';
     if ($animate) {
         $dialogClasses .= ' transition-transform transition-discrete duration-300 ease-out';
     }
@@ -13,9 +13,9 @@
     };
 
     $positionClasses = match ($position) {
-        'left' => 'mr-auto border-r border-border min-h-dvh max-h-dvh' . ($animate ? ' starting:-translate-x-full' : ''),
-        'right' => 'ml-auto border-l border-border min-h-dvh max-h-dvh' . ($animate ? ' starting:translate-x-full' : ''),
-        default => 'ml-auto border-l border-border min-h-dvh max-h-dvh' . ($animate ? ' starting:translate-x-full' : '')
+        'left' => 'mr-auto border-r border-line min-h-dvh max-h-dvh' . ($animate ? ' starting:-translate-x-full' : ''),
+        'right' => 'ml-auto border-l border-line min-h-dvh max-h-dvh' . ($animate ? ' starting:translate-x-full' : ''),
+        default => 'ml-auto border-l border-line min-h-dvh max-h-dvh' . ($animate ? ' starting:translate-x-full' : '')
     };
 
     if ($width) {
@@ -34,7 +34,7 @@
 
     $allDialogClasses = "$dialogClasses $positionClasses $sizeClasses $backdropClasses";
 
-    $headerClasses = 'flex items-center justify-between p-6 border-b border-border';
+    $headerClasses = 'flex items-center justify-between p-6 border-b border-line';
     if ($scrollable) {
         $headerClasses .= ' flex-shrink-0';
     }
@@ -44,7 +44,7 @@
         $bodyClasses .= ' flex-1 overflow-y-auto';
     }
 
-    $footerClasses = 'flex items-center justify-end gap-3 p-6 border-t border-border';
+    $footerClasses = 'flex items-center justify-end gap-3 p-6 border-t border-line';
     if ($scrollable) {
         $footerClasses .= ' flex-shrink-0';
     }

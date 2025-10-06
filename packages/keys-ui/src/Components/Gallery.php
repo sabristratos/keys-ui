@@ -3,10 +3,10 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Gallery extends Component
 {
-    private const VALID_THUMBNAIL_SIZES = ['xs', 'sm', 'md', 'lg'];
 
     public function __construct(
         public array $images = [],
@@ -57,9 +57,7 @@ class Gallery extends Component
 
 
 
-        if (!in_array($this->thumbnailSize, self::VALID_THUMBNAIL_SIZES)) {
-            $this->thumbnailSize = 'sm';
-        }
+        $this->thumbnailSize = ComponentConstants::validate($this->thumbnailSize, ComponentConstants::SIZES_THUMBNAIL, 'sm');
 
         
         if (empty($this->id)) {

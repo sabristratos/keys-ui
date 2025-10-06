@@ -4,12 +4,14 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
+use Keys\UI\Concerns\HasActions;
+use Keys\UI\Constants\ComponentConstants;
 
 class Radio extends Component
 {
-    private const VALID_VARIANTS = ['standard', 'bordered', 'colored', 'card'];
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
-    private const VALID_COLORS = ['brand', 'success', 'warning', 'danger', 'neutral', 'info'];
+    use HandlesValidationErrors;
+    use HasActions;
 
     public function __construct(
         public ?string $name = null,
@@ -41,17 +43,9 @@ class Radio extends Component
             $this->hasError = true;
         }
 
-        if (! in_array($this->variant, self::VALID_VARIANTS)) {
-            $this->variant = 'standard';
-        }
-
-        if (! in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
-
-        if (! in_array($this->color, self::VALID_COLORS)) {
-            $this->color = 'brand';
-        }
+        $this->variant = ComponentConstants::validate($this->variant, ComponentConstants::FORM_CONTROL_VARIANTS, 'standard');
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_XS_TO_XL, 'md');
+        $this->color = ComponentConstants::validate($this->color, ComponentConstants::COLORS, 'brand');
 
         if ($this->variant === 'card' && ! $this->title && $this->label) {
             $this->title = $this->label;
@@ -64,43 +58,6 @@ class Radio extends Component
         return $this->hasError || $this->hasErrors();
     }
 
-    public function hasErrors(): bool
-    {
-        if (is_null($this->errors)) {
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            return ! empty(trim($this->errors));
-        }
-
-        if (is_array($this->errors)) {
-            return ! empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        
-        if (is_object($this->errors) && method_exists($this->errors, 'any')) {
-            return $this->errors->any();
-        }
-
-        
-        if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
-            try {
-                $bag = $this->errors->getBag('default');
-
-                return $bag && $bag->any();
-            } catch (\Exception $e) {
-                
-                return false;
-            }
-        }
-
-        return false;
-    }
 
     public function iconSize(): string
     {
@@ -110,50 +67,6 @@ class Radio extends Component
             'lg' => 'lg',
             default => 'md'
         };
-    }
-
-    public function hasActions(): bool
-    {
-        return ! empty($this->actions);
-    }
-
-    public function getComputedActionSize(): string
-    {
-        return match ($this->actionSize) {
-            'xs' => 'xs',
-            'sm' => 'sm',
-            'md' => 'md',
-            default => 'xs'
-        };
-    }
-
-    public function getComputedActionData(): array
-    {
-        $actions = [];
-
-        foreach ($this->actions as $action) {
-            $computedAction = [
-                'type' => $action['type'],
-                'icon' => $action['icon'],
-                'label' => $action['label'],
-                'is_multi_state' => isset($action['icon_toggle']) || isset($action['icon_success']),
-                'data_action' => $action['type'],
-                'data_icon_default' => $action['icon'],
-                'icon_toggle' => $action['icon_toggle'] ?? null,
-                'icon_success' => $action['icon_success'] ?? null,
-                'label_toggle' => $action['label_toggle'] ?? null,
-                'label_success' => $action['label_success'] ?? null,
-                'data_url' => $action['url'] ?? null,
-                'data_icon_toggle' => $action['icon_toggle'] ?? null,
-                'data_icon_success' => $action['icon_success'] ?? null,
-                'data_label_toggle' => $action['label_toggle'] ?? null,
-                'data_label_success' => $action['label_success'] ?? null,
-            ];
-
-            $actions[] = $computedAction;
-        }
-
-        return $actions;
     }
 
     public function isCard(): bool

@@ -25,7 +25,7 @@
             <x-keys::icon
                 name="{{ $icon }}"
                 size="{{ $iconSize }}"
-                class="text-foreground"
+                class="text-primary"
                 data-icon
             />
         @endif

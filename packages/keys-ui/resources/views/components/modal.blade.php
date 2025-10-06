@@ -20,7 +20,7 @@
         $containerClasses .= ' items-start justify-center pt-16';
     }
 
-    $modalClasses = 'relative bg-surface border border-border shadow-xl rounded-lg';
+    $modalClasses = 'relative bg-elevation-1 border border-line shadow-xl rounded-lg';
 
     $sizeClasses = match ($size) {
         'xs' => 'max-w-xs',
@@ -38,7 +38,7 @@
 
     $modalClasses .= ' ' . $sizeClasses;
 
-    $headerClasses = 'flex items-center justify-between p-6 border-b border-border';
+    $headerClasses = 'flex items-center justify-between p-6 border-b border-line';
     if ($scrollable) {
         $headerClasses .= ' flex-shrink-0';
     }
@@ -48,7 +48,7 @@
         $bodyClasses .= ' flex-1 overflow-y-auto';
     }
 
-    $footerClasses = 'flex items-center justify-end gap-3 p-6 border-t border-border';
+    $footerClasses = 'flex items-center justify-end gap-3 p-6 border-t border-line';
     if ($scrollable) {
         $footerClasses .= ' flex-shrink-0';
     }
@@ -194,7 +194,7 @@ dialog[data-keys-modal="true"]:focus-visible {
 
 /* Focus styling for close buttons and interactive elements */
 dialog[data-keys-modal="true"] [data-modal-close]:focus-visible {
-    outline: 2px solid var(--color-brand);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
 }

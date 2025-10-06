@@ -273,34 +273,117 @@ public function render() {
 ### Semantic Design System
 Components use CSS custom properties for theming:
 
-#### Elevation System
-Keys UI uses an explicit elevation scale for layered UI depth hierarchy:
-- **Base Layer** (`--color-base`): Body background
-- **Elevation 1** (`--color-elevation-1`): Cards, modals, alerts, sidebar sections
-- **Elevation 2** (`--color-elevation-2`): Inputs, textareas, selects, secondary buttons
-- **Elevation 3** (`--color-elevation-3`): Dropdowns, popovers, tooltips (overlays)
-- **Elevation 4** (`--color-elevation-4`): Items inside elevation-3 (resets to elevation-1 styling for visual distinction)
+#### Background Layers (Elevation System)
+Keys UI uses semantic background tokens for layered UI depth hierarchy:
 
-**Semantic Aliases:**
-- `--color-card`: Alias for `--color-elevation-1`
-- `--color-dropdown`: Alias for `--color-elevation-3`
-- `--color-input`: Uses `--color-elevation-2`
+- **`--color-base`**: Page/body background (lowest elevation)
+  - **Utilities**: `bg-base`, `text-base`, `border-base`
+  - **Usage**: `<body class="bg-base">`, page wrapper backgrounds
 
-**Legacy Tokens (deprecated):**
-- `--color-body` → Use `--color-base`
-- `--color-surface` → Use `--color-elevation-1`
-- `--color-foreground` → Use `--color-elevation-2`
+- **`--color-surface`**: Cards, panels, sections (elevation 1)
+  - **Utilities**: `bg-surface`, `text-surface`, `border-surface`
+  - **Usage**: `<div class="bg-surface">` for cards, panels, containers
 
-#### Other Color Tokens
-- **Typography Tokens**: `--color-heading` (primary headings), `--color-text` (body text), `--color-muted` (secondary/muted text)
-- **Contextual Colors**: `--color-success`, `--color-warning`, `--color-danger`, `--color-info`, `--color-accent`
-- **Border System**: `--color-border`, `--color-border-subtle`
-- **Auto-generated Utilities**: Tailwind v4 automatically generates utilities from design tokens:
-  - `bg-elevation-1`, `bg-elevation-2`, `bg-elevation-3`, `bg-elevation-4`, `bg-base`
-  - `text-heading`, `text-text`, `text-muted` for semantic typography colors
-  - `border-border`, `text-text` for UI elements
-  - All tokens support light/dark mode via `light-dark()` CSS function
-- Consistent spacing, typography scales, and transition timings
+- **`--color-input`**: Form fields (elevation 2)
+  - **Utilities**: `bg-input`, `text-input`, `border-input`
+  - **Usage**: `<input class="bg-input">` for inputs, textareas, selects
+
+- **`--color-overlay`**: Floating elements (elevation 3)
+  - **Utilities**: `bg-overlay`, `text-overlay`, `border-overlay`
+  - **Usage**: Dropdowns, popovers, modals, tooltips
+
+- **`--color-inverted`**: High-contrast inverted sections
+  - **Utilities**: `bg-inverted`, `text-inverted`, `border-inverted`
+  - **Usage**: Dark sections on light mode, light sections on dark mode
+
+#### Typography Colors
+Semantic text color hierarchy optimized for Tailwind v4 auto-generation:
+
+- **`--color-heading`**: Primary headings
+  - **Utilities**: `text-heading`, `bg-heading`, `border-heading`
+  - **Usage**: `<h1 class="text-heading">` for h1-h6 elements
+
+- **`--color-primary`**: Body text, primary content
+  - **Utilities**: `text-primary`, `bg-primary`, `border-primary`
+  - **Usage**: `<p class="text-primary">` for paragraphs, body text
+
+- **`--color-secondary`**: Supporting text, labels
+  - **Utilities**: `text-secondary`, `bg-secondary`, `border-secondary`
+  - **Usage**: Labels, supporting information
+
+- **`--color-muted`**: Captions, placeholders, hints
+  - **Utilities**: `text-muted`, `bg-muted`, `border-muted`
+  - **Usage**: `<span class="text-muted">` for low-emphasis text
+
+- **`--color-disabled`**: Disabled element text
+  - **Utilities**: `text-disabled`, `bg-disabled`, `border-disabled`
+  - **Usage**: Disabled form fields and components
+
+#### Border Colors
+- **`--color-line`**: Default borders
+  - **Utilities**: `border-line`, `bg-line`, `text-line`
+  - **Usage**: `<div class="border border-line">` for standard borders
+
+- **`--color-line-subtle`**: Subtle dividers
+  - **Utilities**: `border-line-subtle`, `bg-line-subtle`, `text-line-subtle`
+  - **Usage**: Lightweight separators and dividers
+
+- **`--color-line-strong`**: Emphasized borders
+  - **Utilities**: `border-line-strong`, `bg-line-strong`, `text-line-strong`
+  - **Usage**: High-contrast border emphasis
+
+#### Interactive States
+- **`--color-hover`**: Hover state backgrounds
+  - **Utilities**: `bg-hover`, `text-hover`, `border-hover`
+  - **Usage**: `hover:bg-hover` on interactive elements
+
+- **`--color-active`**: Active/pressed state
+  - **Utilities**: `bg-active`, `text-active`, `border-active`
+  - **Usage**: `active:bg-active` on clickable elements
+
+- **`--color-selected`**: Selected items
+  - **Utilities**: `bg-selected`, `text-selected`, `border-selected`
+  - **Usage**: Selected rows, items, options
+
+- **`--color-focus`**: Focus rings
+  - **Utilities**: `ring-focus`, `border-focus`, `bg-focus`
+  - **Usage**: `focus-visible:ring-2 ring-focus` for focus indicators
+
+#### Accent/Brand Colors
+- **`--color-accent`**: Primary brand color
+  - **Utilities**: `bg-accent`, `text-accent`, `border-accent`
+  - **Usage**: Primary buttons, links, brand elements
+
+- **`--color-accent-contrast`**: Text on accent backgrounds
+  - **Utilities**: `text-accent-contrast`, `bg-accent-contrast`
+  - **Usage**: `<button class="bg-accent text-accent-contrast">`
+
+- **`--color-accent-hover`**: Accent hover state
+  - **Utilities**: `bg-accent-hover`, `text-accent-hover`, `border-accent-hover`
+
+- **`--color-accent-active`**: Accent active state
+  - **Utilities**: `bg-accent-active`, `text-accent-active`, `border-accent-active`
+
+- **`--color-accent-subtle`**: Subtle accent backgrounds
+  - **Utilities**: `bg-accent-subtle`, `text-accent-subtle`, `border-accent-subtle`
+  - **Usage**: Accent badges, subtle highlights
+
+#### Contextual Colors
+All contextual colors (success, warning, danger, info) follow the same pattern:
+- **Base**: `--color-{variant}` → `bg-success`, `text-success`, `border-success`
+- **Contrast**: `--color-{variant}-contrast` → Text on colored backgrounds
+- **Hover**: `--color-{variant}-hover` → Hover states
+- **Active**: `--color-{variant}-active` → Active states
+- **Subtle**: `--color-{variant}-subtle` → Subtle backgrounds for badges/alerts
+
+**Available Variants**: `success`, `warning`, `danger`, `info`
+
+#### Tailwind v4 Auto-Generation
+All `--color-*` tokens automatically generate Tailwind utilities:
+- `--color-surface` → `bg-surface`, `text-surface`, `border-surface`, `ring-surface`
+- `--color-primary` → `bg-primary`, `text-primary`, `border-primary`, `ring-primary`
+- All tokens support light/dark mode via the `light-dark()` CSS function
+- No redundant naming (avoided `--color-text`, `--color-border` to prevent `text-text`, `border-border`)
 
 ### Data Attributes System for Enhanced Customization
 

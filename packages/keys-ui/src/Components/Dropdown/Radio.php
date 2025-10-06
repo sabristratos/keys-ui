@@ -4,9 +4,12 @@ namespace Keys\UI\Components\Dropdown;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
 
 class Radio extends Component
 {
+    use HandlesValidationErrors;
+
     public function __construct(
         public ?string $name = null,
         public ?string $id = null,
@@ -29,27 +32,6 @@ class Radio extends Component
     public function hasIcon(): bool
     {
         return ! empty($this->icon);
-    }
-
-    public function hasError(): bool
-    {
-        if (is_null($this->errors)) {
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            return ! empty(trim($this->errors));
-        }
-
-        if (is_array($this->errors)) {
-            return ! empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        return false;
     }
 
     public function getDataAttributes(): array

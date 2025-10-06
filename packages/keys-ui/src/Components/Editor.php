@@ -4,9 +4,12 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
 
 class Editor extends Component
 {
+    use HandlesValidationErrors;
+
     public function __construct(
         public ?string $name = null,
         public ?string $id = null,
@@ -166,26 +169,6 @@ class Editor extends Component
         return $this->hasError || $this->hasErrors();
     }
 
-    public function hasErrors(): bool
-    {
-        if (is_null($this->errors)) {
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            return !empty(trim($this->errors));
-        }
-
-        if (is_array($this->errors)) {
-            return !empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        return false;
-    }
 
     public function render()
     {

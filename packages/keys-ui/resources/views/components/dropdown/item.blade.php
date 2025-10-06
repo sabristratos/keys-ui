@@ -12,7 +12,7 @@
         'warning' => 'text-warning hover:bg-warning-subtle',
         'brand' => 'text-accent hover:bg-accent-subtle',
         'info' => 'text-info hover:bg-info-subtle',
-        default => 'text-text hover:bg-neutral-hover'
+        default => 'text-primary hover:bg-neutral-hover'
     };
 
     $iconClasses = 'flex-shrink-0 mr-3';

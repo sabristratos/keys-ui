@@ -224,15 +224,15 @@ export class CalendarRenderer {
         let stateClasses = '';
 
         if (day.isDisabled) {
-            stateClasses = 'bg-surface text-muted border-transparent cursor-not-allowed opacity-40 hover:bg-surface hover:border-transparent';
+            stateClasses = 'bg-elevation-1 text-muted border-transparent cursor-not-allowed opacity-40 hover:bg-elevation-1 hover:border-transparent';
         } else if (day.isSelected && !state.isRange) {
-            stateClasses = 'bg-brand text-white border-brand-600 font-bold shadow-sm';
+            stateClasses = 'bg-accent text-white border-accent-600 font-bold shadow-sm';
         } else if (day.isToday) {
-            stateClasses = 'bg-neutral-50 text-brand border-brand font-semibold';
+            stateClasses = 'bg-neutral-50 text-accent border-accent font-semibold';
         } else if (!day.isCurrentMonth) {
-            stateClasses = 'text-muted border-transparent hover:bg-neutral-hover hover:border-border';
+            stateClasses = 'text-muted border-transparent hover:bg-neutral-hover hover:border-line';
         } else {
-            stateClasses = 'text-text border-transparent hover:bg-neutral-hover hover:border-border';
+            stateClasses = 'text-primary border-transparent hover:bg-neutral-hover hover:border-line';
         }
 
         return `${baseClasses} ${sizeClasses} ${stateClasses}`.trim();

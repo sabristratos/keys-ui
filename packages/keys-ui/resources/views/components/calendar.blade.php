@@ -2,7 +2,7 @@
     $wireAttributes = $attributes->whereStartsWith('wire:');
 
     $baseWidth = $monthsToShow > 1 ? 'min-w-[560px] w-full' : 'min-w-[280px] w-max';
-    $baseClasses = 'user-select-none text-text';
+    $baseClasses = 'user-select-none text-primary';
 
     $sizeClasses = match ($size) {
         'sm' => 'text-sm',
@@ -17,7 +17,7 @@
     } elseif ($hasError()) {
         $stateClasses = 'border-danger';
     } else {
-        $stateClasses = 'border-border hover:border-neutral-300 dark:hover:border-neutral-600';
+        $stateClasses = 'border-line hover:border-neutral-300 dark:hover:border-neutral-600';
     }
 
     $cellClasses = match ($size) {
@@ -36,12 +36,268 @@
 @if($isShorthand())
     <x-keys::field :label="$label" :optional="$optional" :required="$required" :errors="$errors" :showErrors="$showErrors">
         <div {{ $containerAttributes }}>
-            @include('keys::partials.calendar-body')
+            <div class="calendar-header flex items-center justify-between px-4 py-3 border-b border-line">
+                <x-keys::button
+                    variant="ghost"
+                    size="sm"
+                    data-calendar-nav="prev"
+                    :disabled="$disabled"
+                    icon-left="heroicon-o-chevron-left"
+                >
+                    <span class="sr-only">{{ __('keys-ui::keys-ui.calendar.previous_month') }}</span>
+                </x-keys::button>
+
+                <div class="calendar-month-year-container relative">
+                    <x-keys::button
+                        variant="ghost"
+                        size="sm"
+                        data-calendar-month-year-btn
+                        :disabled="$disabled"
+                    >
+                        <span class="calendar-month-year-display">{{ $monthYearDisplay }}</span>
+                    </x-keys::button>
+                </div>
+
+                <x-keys::button
+                    variant="ghost"
+                    size="sm"
+                    data-calendar-nav="next"
+                    :disabled="$disabled"
+                    icon-left="heroicon-o-chevron-right"
+                >
+                    <span class="sr-only">{{ __('keys-ui::keys-ui.calendar.next_month') }}</span>
+                </x-keys::button>
+            </div>
+
+            <div class="calendar-main-content flex flex-col md:flex-row gap-4" data-calendar-main-content>
+
+                @if(isset($quickSelectors) && is_array($quickSelectors) && count($quickSelectors) > 0)
+                    <div class="calendar-quick-selectors md:w-max flex-shrink-0 order-first p-2" data-view-mode-show="calendar">
+                        <div class="text-xs font-medium text-muted mb-2">{{ __('keys-ui::keys-ui.datepicker.quick_select_label') }}</div>
+                        <div class="flex flex-wrap md:flex-col gap-1">
+                            @foreach($quickSelectors as $selector)
+                                <x-keys::button
+                                    variant="ghost"
+                                    size="xs"
+                                    data-quick-selector="{{ $selector['value'] }}"
+                                    :title="$selector['description'] ?? $selector['label']"
+                                    aria-label="{{ $selector['description'] ?? $selector['label'] }}"
+                                >
+                                    {{ $selector['label'] }}
+                                </x-keys::button>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+
+                <div class="calendar-grid-wrapper flex-1 py-2" data-calendar-grid-wrapper>
+                    @if($monthsToShow > 1)
+                        <div class="calendar-multi-month-grid grid gap-8"
+                             style="grid-template-columns: repeat({{ min($monthsToShow, 3) }}, 1fr);">
+                            @for($i = 0; $i < $monthsToShow; $i++)
+                                <div class="calendar-grid" data-calendar-grid-container data-month-index="{{ $i }}">
+
+                                </div>
+                            @endfor
+                        </div>
+                    @else
+                        <div class="calendar-grid" data-calendar-grid-container>
+
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="calendar-footer flex items-center justify-between px-4 py-3 border-t border-line">
+                <div class="flex items-center gap-2">
+                    <x-keys::button
+                        variant="ghost"
+                        color="danger"
+                        size="sm"
+                        data-calendar-action="clear"
+                        :disabled="$disabled"
+                        title="Clear selected {{ $isRange ? 'date range' : 'date' }}"
+                        icon-left="heroicon-o-trash"
+                    >
+{{ $isRange ? __('keys-ui::keys-ui.datepicker.clear_range') : __('keys-ui::keys-ui.datepicker.clear') }}
+                    </x-keys::button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <x-keys::button
+                        variant="ghost"
+                        color="primary"
+                        size="sm"
+                        data-calendar-action="today"
+                        :disabled="$disabled"
+                        title="Select today's date"
+                        icon-left="heroicon-o-map-pin"
+                    >
+{{ __('keys-ui::keys-ui.datepicker.go_to_today') }}
+                    </x-keys::button>
+                </div>
+            </div>
+
+            @if($name)
+                @if($isRange)
+                    <input type="hidden"
+                           name="{{ $name }}_start"
+                           value="{{ $startDate instanceof \Carbon\Carbon ? $startDate->format('Y-m-d') : '' }}"
+                           class="calendar-hidden-input calendar-start-input"
+                           @if($required) required @endif>
+                    <input type="hidden"
+                           name="{{ $name }}_end"
+                           value="{{ $endDate instanceof \Carbon\Carbon ? $endDate->format('Y-m-d') : '' }}"
+                           class="calendar-hidden-input calendar-end-input"
+                           @if($required) required @endif
+                           {{ $wireAttributes }}>
+                    <input type="hidden"
+                           name="{{ $name }}"
+                           value="{{ $formattedValue }}"
+                           class="calendar-hidden-input calendar-range-input">
+                @else
+                    <input type="hidden"
+                           name="{{ $name }}"
+                           value="{{ $formattedValue }}"
+                           class="calendar-hidden-input"
+                           @if($required) required @endif
+                           {{ $wireAttributes }}>
+                @endif
+            @endif
         </div>
     </x-keys::field>
 @else
     <div {{ $containerAttributes }}>
-        @include('keys::partials.calendar-body')
+        <div class="calendar-header flex items-center justify-between px-4 py-3 border-b border-line">
+            <x-keys::button
+                variant="ghost"
+                size="sm"
+                data-calendar-nav="prev"
+                :disabled="$disabled"
+                icon-left="heroicon-o-chevron-left"
+            >
+                <span class="sr-only">{{ __('keys-ui::keys-ui.calendar.previous_month') }}</span>
+            </x-keys::button>
+
+            <div class="calendar-month-year-container relative">
+                <x-keys::button
+                    variant="ghost"
+                    size="sm"
+                    data-calendar-month-year-btn
+                    :disabled="$disabled"
+                >
+                    <span class="calendar-month-year-display">{{ $monthYearDisplay }}</span>
+                </x-keys::button>
+            </div>
+
+            <x-keys::button
+                variant="ghost"
+                size="sm"
+                data-calendar-nav="next"
+                :disabled="$disabled"
+                icon-left="heroicon-o-chevron-right"
+            >
+                <span class="sr-only">{{ __('keys-ui::keys-ui.calendar.next_month') }}</span>
+            </x-keys::button>
+        </div>
+
+        <div class="calendar-main-content flex flex-col md:flex-row gap-4" data-calendar-main-content>
+
+            @if(isset($quickSelectors) && is_array($quickSelectors) && count($quickSelectors) > 0)
+                <div class="calendar-quick-selectors md:w-max flex-shrink-0 order-first p-2" data-view-mode-show="calendar">
+                    <div class="text-xs font-medium text-muted mb-2">{{ __('keys-ui::keys-ui.datepicker.quick_select_label') }}</div>
+                    <div class="flex flex-wrap md:flex-col gap-1">
+                        @foreach($quickSelectors as $selector)
+                            <x-keys::button
+                                variant="ghost"
+                                size="xs"
+                                data-quick-selector="{{ $selector['value'] }}"
+                                :title="$selector['description'] ?? $selector['label']"
+                                aria-label="{{ $selector['description'] ?? $selector['label'] }}"
+                            >
+                                {{ $selector['label'] }}
+                            </x-keys::button>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+
+            <div class="calendar-grid-wrapper flex-1 py-2" data-calendar-grid-wrapper>
+                @if($monthsToShow > 1)
+                    <div class="calendar-multi-month-grid grid gap-8"
+                         style="grid-template-columns: repeat({{ min($monthsToShow, 3) }}, 1fr);">
+                        @for($i = 0; $i < $monthsToShow; $i++)
+                            <div class="calendar-grid" data-calendar-grid-container data-month-index="{{ $i }}">
+
+                            </div>
+                        @endfor
+                    </div>
+                @else
+                    <div class="calendar-grid" data-calendar-grid-container>
+
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="calendar-footer flex items-center justify-between px-4 py-3 border-t border-line">
+            <div class="flex items-center gap-2">
+                <x-keys::button
+                    variant="ghost"
+                    color="danger"
+                    size="sm"
+                    data-calendar-action="clear"
+                    :disabled="$disabled"
+                    title="Clear selected {{ $isRange ? 'date range' : 'date' }}"
+                    icon-left="heroicon-o-trash"
+                >
+{{ $isRange ? __('keys-ui::keys-ui.datepicker.clear_range') : __('keys-ui::keys-ui.datepicker.clear') }}
+                </x-keys::button>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <x-keys::button
+                    variant="ghost"
+                    color="primary"
+                    size="sm"
+                    data-calendar-action="today"
+                    :disabled="$disabled"
+                    title="Select today's date"
+                    icon-left="heroicon-o-map-pin"
+                >
+{{ __('keys-ui::keys-ui.datepicker.go_to_today') }}
+                </x-keys::button>
+            </div>
+        </div>
+
+        @if($name)
+            @if($isRange)
+                <input type="hidden"
+                       name="{{ $name }}_start"
+                       value="{{ $startDate instanceof \Carbon\Carbon ? $startDate->format('Y-m-d') : '' }}"
+                       class="calendar-hidden-input calendar-start-input"
+                       @if($required) required @endif>
+                <input type="hidden"
+                       name="{{ $name }}_end"
+                       value="{{ $endDate instanceof \Carbon\Carbon ? $endDate->format('Y-m-d') : '' }}"
+                       class="calendar-hidden-input calendar-end-input"
+                       @if($required) required @endif
+                       {{ $wireAttributes }}>
+                <input type="hidden"
+                       name="{{ $name }}"
+                       value="{{ $formattedValue }}"
+                       class="calendar-hidden-input calendar-range-input">
+            @else
+                <input type="hidden"
+                       name="{{ $name }}"
+                       value="{{ $formattedValue }}"
+                       class="calendar-hidden-input"
+                       @if($required) required @endif
+                       {{ $wireAttributes }}>
+            @endif
+        @endif
     </div>
 @endif
 
@@ -59,39 +315,39 @@
     /* === IMPROVED RANGE SELECTION STYLES === */
     /* In-range dates - subtle background */
     [data-keys-calendar="true"][data-is-range="true"] .calendar-day button[data-is-in-range="true"] {
-        background-color: var(--color-brand-50) !important;
-        color: var(--color-brand-700) !important;
-        border: 1px solid var(--color-brand-100) !important;
+        background-color: var(--color-accent-50) !important;
+        color: var(--color-accent-700) !important;
+        border: 1px solid var(--color-accent-100) !important;
         position: relative;
     }
 
     [data-keys-calendar="true"][data-is-range="true"] .calendar-day button[data-is-in-range="true"]:hover {
-        background-color: var(--color-brand-100) !important;
-        color: var(--color-brand-800) !important;
-        border-color: var(--color-brand-200) !important;
+        background-color: var(--color-accent-100) !important;
+        color: var(--color-accent-800) !important;
+        border-color: var(--color-accent-200) !important;
     }
 
     /* Range start date - distinct styling with gradient */
     [data-keys-calendar="true"][data-is-range="true"] .calendar-day button[data-is-range-start="true"] {
-        background: linear-gradient(135deg, var(--color-brand), var(--color-brand-600)) !important;
+        background: linear-gradient(135deg, var(--color-accent), var(--color-accent-600)) !important;
         color: white !important;
         font-weight: 700;
-        border: 2px solid var(--color-brand-700) !important;
+        border: 2px solid var(--color-accent-700) !important;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     /* Range end date - distinct styling with different gradient */
     [data-keys-calendar="true"][data-is-range="true"] .calendar-day button[data-is-range-end="true"] {
-        background: linear-gradient(135deg, var(--color-brand-600), var(--color-brand)) !important;
+        background: linear-gradient(135deg, var(--color-accent-600), var(--color-accent)) !important;
         color: white !important;
         font-weight: 700;
-        border: 2px solid var(--color-brand-700) !important;
+        border: 2px solid var(--color-accent-700) !important;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     [data-keys-calendar="true"][data-is-range="true"] .calendar-day button[data-is-range-start="true"]:hover,
     [data-keys-calendar="true"][data-is-range="true"] .calendar-day button[data-is-range-end="true"]:hover {
-        background: var(--color-brand-hover) !important;
+        background: var(--color-accent-hover) !important;
         color: white !important;
         transform: scale(1.05);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -99,57 +355,57 @@
 
     /* Range hover preview - clearer feedback */
     [data-keys-calendar="true"][data-is-range="true"] .calendar-day button[data-is-hover-range="true"] {
-        background-color: var(--color-brand-100);
-        color: var(--color-brand-800);
-        border: 1px dashed var(--color-brand-300);
+        background-color: var(--color-accent-100);
+        color: var(--color-accent-800);
+        border: 1px dashed var(--color-accent-300);
     }
 
     /* === IMPROVED DARK MODE RANGE STYLES === */
     /* In-range dates - dark mode */
     [data-keys-calendar="true"][data-is-range="true"]:where(.dark, .dark *) .calendar-day button[data-is-in-range="true"] {
-        background-color: var(--color-brand-900) !important;
-        color: var(--color-brand-300) !important;
-        border: 1px solid var(--color-brand-800) !important;
+        background-color: var(--color-accent-900) !important;
+        color: var(--color-accent-300) !important;
+        border: 1px solid var(--color-accent-800) !important;
     }
 
     [data-keys-calendar="true"][data-is-range="true"]:where(.dark, .dark *) .calendar-day button[data-is-in-range="true"]:hover {
-        background-color: var(--color-brand-800) !important;
-        color: var(--color-brand-200) !important;
-        border-color: var(--color-brand-700) !important;
+        background-color: var(--color-accent-800) !important;
+        color: var(--color-accent-200) !important;
+        border-color: var(--color-accent-700) !important;
     }
 
     /* Range start date - dark mode */
     [data-keys-calendar="true"][data-is-range="true"]:where(.dark, .dark *) .calendar-day button[data-is-range-start="true"] {
-        background: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-500)) !important;
+        background: linear-gradient(135deg, var(--color-accent-600), var(--color-accent-500)) !important;
         color: white !important;
         font-weight: 700;
-        border: 2px solid var(--color-brand-400) !important;
+        border: 2px solid var(--color-accent-400) !important;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     /* Range end date - dark mode */
     [data-keys-calendar="true"][data-is-range="true"]:where(.dark, .dark *) .calendar-day button[data-is-range-end="true"] {
-        background: linear-gradient(135deg, var(--color-brand-500), var(--color-brand-600)) !important;
+        background: linear-gradient(135deg, var(--color-accent-500), var(--color-accent-600)) !important;
         color: white !important;
         font-weight: 700;
-        border: 2px solid var(--color-brand-400) !important;
+        border: 2px solid var(--color-accent-400) !important;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     [data-keys-calendar="true"][data-is-range="true"]:where(.dark, .dark *) .calendar-day button[data-is-range-start="true"]:hover,
     [data-keys-calendar="true"][data-is-range="true"]:where(.dark, .dark *) .calendar-day button[data-is-range-end="true"]:hover {
-        background: var(--color-brand-500) !important;
+        background: var(--color-accent-500) !important;
         color: white !important;
         transform: scale(1.05);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-        border-color: var(--color-brand-300) !important;
+        border-color: var(--color-accent-300) !important;
     }
 
     /* Range hover preview - dark mode */
     [data-keys-calendar="true"][data-is-range="true"]:where(.dark, .dark *) .calendar-day button[data-is-hover-range="true"] {
-        background-color: var(--color-brand-800);
-        color: var(--color-brand-200);
-        border: 1px dashed var(--color-brand-600);
+        background-color: var(--color-accent-800);
+        color: var(--color-accent-200);
+        border: 1px dashed var(--color-accent-600);
     }
 
     /* === MONTH/YEAR SELECTION GRIDS === */
@@ -177,7 +433,7 @@
         text-align: center;
         font-weight: 600;
         padding: 0.5rem;
-        border-bottom: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--color-line);
         margin-bottom: 0.5rem;
     }
 </style>

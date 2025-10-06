@@ -65,11 +65,11 @@
     $indicatorClasses = '';
     if ($parentVariant === 'numbered') {
         if ($isComplete) {
-            $indicatorClasses = "flex items-center justify-center rounded-full bg-success text-foreground-success {$indicatorSize}";
+            $indicatorClasses = "flex items-center justify-center rounded-full bg-success text-white {$indicatorSize}";
         } elseif ($isCurrent) {
-            $indicatorClasses = "flex items-center justify-center rounded-full bg-brand ring-2 ring-accent ring-offset-background ring-offset-2 text-foreground-brand {$indicatorSize}";
+            $indicatorClasses = "flex items-center justify-center rounded-full bg-accent ring-2 ring-accent ring-offset-base ring-offset-2 text-white {$indicatorSize}";
         } else {
-            $indicatorClasses = "flex items-center justify-center rounded-full bg-surface ring-1 ring-inset ring-border text-muted {$indicatorSize}";
+            $indicatorClasses = "flex items-center justify-center rounded-full bg-elevation-1 ring-1 ring-inset ring-line text-muted {$indicatorSize}";
         }
     } elseif ($parentVariant === 'icon') {
         $iconBoxSize = match ($parentSize) {
@@ -79,19 +79,19 @@
             default => 'size-12'
         };
         if ($isComplete) {
-            $indicatorClasses = "relative flex shrink-0 items-center justify-center *:data-icon:size-6 bg-surface shadow-xs-skeumorphic ring-1 ring-inset ring-success {$iconBoxSize} rounded-[10px] text-success";
+            $indicatorClasses = "relative flex shrink-0 items-center justify-center *:data-icon:size-6 bg-elevation-1 shadow-xs-skeumorphic ring-1 ring-inset ring-success {$iconBoxSize} rounded-[10px] text-success";
         } elseif ($isCurrent) {
-            $indicatorClasses = "relative flex shrink-0 items-center justify-center *:data-icon:size-6 bg-surface shadow-xs-skeumorphic ring-1 ring-inset ring-accent {$iconBoxSize} rounded-[10px] text-brand";
+            $indicatorClasses = "relative flex shrink-0 items-center justify-center *:data-icon:size-6 bg-elevation-1 shadow-xs-skeumorphic ring-1 ring-inset ring-accent {$iconBoxSize} rounded-[10px] text-accent";
         } else {
-            $indicatorClasses = "relative flex shrink-0 items-center justify-center *:data-icon:size-6 bg-surface shadow-xs-skeumorphic ring-1 ring-inset ring-border {$iconBoxSize} rounded-[10px] text-muted";
+            $indicatorClasses = "relative flex shrink-0 items-center justify-center *:data-icon:size-6 bg-elevation-1 shadow-xs-skeumorphic ring-1 ring-inset ring-line {$iconBoxSize} rounded-[10px] text-muted";
         }
     } elseif ($parentVariant === 'dots') {
         if ($isComplete) {
             $indicatorClasses = "flex items-center justify-center rounded-full bg-success {$indicatorSize}";
         } elseif ($isCurrent) {
-            $indicatorClasses = "flex items-center justify-center rounded-full bg-brand ring-2 ring-accent ring-offset-background ring-offset-2 {$indicatorSize}";
+            $indicatorClasses = "flex items-center justify-center rounded-full bg-accent ring-2 ring-accent ring-offset-base ring-offset-2 {$indicatorSize}";
         } else {
-            $indicatorClasses = "flex items-center justify-center rounded-full bg-border {$indicatorSize}";
+            $indicatorClasses = "flex items-center justify-center rounded-full bg-line {$indicatorSize}";
         }
     }
 
@@ -102,7 +102,7 @@
     } else {
 
         $showConnector = !$isLastStep;
-        $connectorClasses .= $isComplete ? ' border-l-2 border-success' : ' border-l-2 border-border';
+        $connectorClasses .= $isComplete ? ' border-l-2 border-success' : ' border-l-2 border-line';
     }
 
     $contentPaddingClasses = $isLastStep ? '' : 'not-group-last:pb-6';
@@ -145,7 +145,7 @@
                             <path d="M10 3L4.5 8.5L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg>
                     @elseif($isCurrent)
-                        <span class="rounded-full bg-foreground-brand {{ match($parentSize) { 'sm' => 'size-1.5', 'md' => 'size-2', 'lg' => 'size-2.5', default => 'size-2' } }}"></span>
+                        <span class="rounded-full bg-white {{ match($parentSize) { 'sm' => 'size-1.5', 'md' => 'size-2', 'lg' => 'size-2.5', default => 'size-2' } }}"></span>
                     @else
                         <span class="font-semibold {{ $textSize }}">{{ $index }}</span>
                     @endif
@@ -157,7 +157,7 @@
                     @endif
                 @elseif($parentVariant === 'dots')
                     @if($isCurrent)
-                        <span class="rounded-full bg-foreground-brand {{ match($parentSize) { 'sm' => 'size-1.5', 'md' => 'size-2', 'lg' => 'size-2.5', default => 'size-2' } }}"></span>
+                        <span class="rounded-full bg-white {{ match($parentSize) { 'sm' => 'size-1.5', 'md' => 'size-2', 'lg' => 'size-2.5', default => 'size-2' } }}"></span>
                     @endif
                 @endif
             </span>
@@ -168,7 +168,7 @@
                     <div class="relative flex h-full w-full justify-center self-center overflow-hidden {{ $opacityClasses }} my-1 md:hidden">
                         <svg class="absolute" width="3">
                             <line x1="1.2" y1="1.2" x2="1.2" y2="100%"
-                                  class="{{ $isComplete ? 'stroke-success' : 'stroke-border' }}"
+                                  class="{{ $isComplete ? 'stroke-success' : 'stroke-line' }}"
                                   stroke="currentColor"
                                   stroke-width="2.4"
                                   stroke-dasharray="{{ $isComplete ? '0' : '0,6' }}"
@@ -181,10 +181,10 @@
                     <span class="{{ $connectorClasses }} md:hidden"></span>
                 @endif
 
-                
+
                 <svg class="absolute top-1/2 left-[53%] z-0 h-[2.5px] w-full flex-1 -translate-y-1/2 hidden md:block">
                     <line x1="1.2" y1="1.2" x2="100%" y2="1.2"
-                          class="{{ $isComplete ? 'stroke-success' : 'stroke-border' }}"
+                          class="{{ $isComplete ? 'stroke-success' : 'stroke-line' }}"
                           stroke="currentColor"
                           stroke-width="2.4"
                           stroke-dasharray="{{ $isComplete ? '0' : '0,6' }}"
@@ -218,7 +218,7 @@
                             <path d="M10 3L4.5 8.5L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg>
                     @elseif($isCurrent)
-                        <span class="rounded-full bg-foreground-brand {{ match($parentSize) { 'sm' => 'size-1.5', 'md' => 'size-2', 'lg' => 'size-2.5', default => 'size-2' } }}"></span>
+                        <span class="rounded-full bg-white {{ match($parentSize) { 'sm' => 'size-1.5', 'md' => 'size-2', 'lg' => 'size-2.5', default => 'size-2' } }}"></span>
                     @else
                         <span class="font-semibold {{ $textSize }}">{{ $index }}</span>
                     @endif
@@ -230,18 +230,18 @@
                     @endif
                 @elseif($parentVariant === 'dots')
                     @if($isCurrent)
-                        <span class="rounded-full bg-foreground-brand {{ match($parentSize) { 'sm' => 'size-1.5', 'md' => 'size-2', 'lg' => 'size-2.5', default => 'size-2' } }}"></span>
+                        <span class="rounded-full bg-white {{ match($parentSize) { 'sm' => 'size-1.5', 'md' => 'size-2', 'lg' => 'size-2.5', default => 'size-2' } }}"></span>
                     @endif
                 @endif
             </div>
 
             @if($showConnector)
                 @if($parentVariant === 'numbered' || $parentVariant === 'dots')
-                    
+
                     <div class="relative flex h-full w-full justify-center self-center overflow-hidden {{ $opacityClasses }} my-1">
                         <svg class="absolute" width="3">
                             <line x1="1.2" y1="1.2" x2="1.2" y2="100%"
-                                  class="{{ $isComplete ? 'stroke-success' : 'stroke-border' }}"
+                                  class="{{ $isComplete ? 'stroke-success' : 'stroke-line' }}"
                                   stroke="currentColor"
                                   stroke-width="2.4"
                                   stroke-dasharray="{{ $isComplete ? '0' : '0,6' }}"

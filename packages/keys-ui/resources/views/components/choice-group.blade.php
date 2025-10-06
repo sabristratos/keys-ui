@@ -8,7 +8,7 @@
         'lg' => 'text-lg',
         default => 'text-base'
     };
-    $legendColorClasses = $disabled ? 'text-neutral-500 dark:text-neutral-400' : 'text-foreground';
+    $legendColorClasses = $disabled ? 'text-neutral-500 dark:text-neutral-400' : 'text-primary';
     $legendClasses = trim('font-medium mb-2 ' . $legendSizeClasses . ' ' . $legendColorClasses);
 
     $descriptionSizeClasses = match ($size) {

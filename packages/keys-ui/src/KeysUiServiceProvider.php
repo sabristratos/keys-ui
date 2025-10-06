@@ -4,91 +4,11 @@ namespace Keys\UI;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Keys\UI\Components\Accordion;
-use Keys\UI\Components\AddToCart;
-use Keys\UI\Components\Alert;
-use Keys\UI\Components\Avatar;
-use Keys\UI\Components\Avatar\Stack;
-use Keys\UI\Components\Badge;
-use Keys\UI\Components\Badge\Group as BadgeGroup;
-use Keys\UI\Components\Breadcrumbs;
-use Keys\UI\Components\Breadcrumbs\Item;
-use Keys\UI\Components\Button;
-use Keys\UI\Components\Button\Group;
-use Keys\UI\Components\Calendar;
-use Keys\UI\Components\Card;
-use Keys\UI\Components\Card\Actions as CardActions;
-use Keys\UI\Components\Card\Body as CardBody;
-use Keys\UI\Components\Card\Footer as CardFooter;
-use Keys\UI\Components\Card\Header as CardHeader;
-use Keys\UI\Components\Checkbox;
-use Keys\UI\Components\Chart;
-use Keys\UI\Components\ChoiceGroup;
-use Keys\UI\Components\ColorPicker;
-use Keys\UI\Components\DatePicker;
-use Keys\UI\Components\Dropdown;
-use Keys\UI\Components\Editor;
-use Keys\UI\Components\EmptyState;
-use Keys\UI\Components\Error;
-use Keys\UI\Components\Field;
-use Keys\UI\Components\FileUpload;
-use Keys\UI\Components\Gallery;
-use Keys\UI\Components\HeadingDecorator;
-use Keys\UI\Components\Icon;
-use Keys\UI\Components\Image;
-use Keys\UI\Components\Input;
-use Keys\UI\Components\Kbd;
-use Keys\UI\Components\Label;
-use Keys\UI\Components\Loading;
-use Keys\UI\Components\Main;
-use Keys\UI\Components\Dropdown\Menu as DropdownMenu;
-use Keys\UI\Components\Dropdown\Checkbox as DropdownCheckbox;
-use Keys\UI\Components\Dropdown\Item as DropdownItem;
-use Keys\UI\Components\Dropdown\Radio as DropdownRadio;
-use Keys\UI\Components\Dropdown\Separator as DropdownSeparator;
-use Keys\UI\Components\Dropdown\Submenu as DropdownSubmenu;
-use Keys\UI\Components\Modal;
-use Keys\UI\Components\Popover;
-use Keys\UI\Components\Progress;
-use Keys\UI\Components\Radio;
-use Keys\UI\Components\Range;
-use Keys\UI\Components\Rating;
-use Keys\UI\Components\Scripts;
-use Keys\UI\Components\Select;
-use Keys\UI\Components\Select\Chip;
-use Keys\UI\Components\Select\Option;
-use Keys\UI\Components\Separator;
-use Keys\UI\Components\Sidebar;
-use Keys\UI\Components\Sidebar\Divider as SidebarDivider;
-use Keys\UI\Components\Sidebar\Item as SidebarItem;
-use Keys\UI\Components\Sidebar\Section as SidebarSection;
-use Keys\UI\Components\Sidebar\Toggle as SidebarToggle;
-use Keys\UI\Components\Slideout;
-use Keys\UI\Components\Social\Links as SocialLinks;
-use Keys\UI\Components\Social\Share as SocialShare;
-use Keys\UI\Components\Steps;
-use Keys\UI\Components\Steps\Step;
-use Keys\UI\Components\Table;
-use Keys\UI\Components\Table\Body;
-use Keys\UI\Components\Table\Cell;
-use Keys\UI\Components\Table\EmptyState as TableEmpty;
-use Keys\UI\Components\Table\Head;
-use Keys\UI\Components\Table\Header;
-use Keys\UI\Components\Table\Loading as TableLoading;
-use Keys\UI\Components\Table\Row;
-use Keys\UI\Components\Tabs;
-use Keys\UI\Components\Tabs\Panel;
-use Keys\UI\Components\Tabs\Tab;
-use Keys\UI\Components\Text;
-use Keys\UI\Components\Textarea;
-use Keys\UI\Components\Heading;
-use Keys\UI\Components\TimePicker;
-use Keys\UI\Components\Toast;
-use Keys\UI\Components\Toggle;
-use Keys\UI\Components\Tooltip;
 use Keys\UI\Services\KeysManager;
 use Keys\UI\Services\ModalManager;
 use Keys\UI\Services\ToastManager;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class KeysUiServiceProvider extends ServiceProvider
 {
@@ -151,93 +71,81 @@ class KeysUiServiceProvider extends ServiceProvider
             __DIR__.'/../dist/style.css' => public_path('vendor/keys-ui/keys-ui.css'),
         ], 'keys-ui-assets');
 
-        Blade::component('keys::accordion', Accordion::class);
-        Blade::component('keys::icon', Icon::class);
-        Blade::component('keys::loading', Loading::class);
-        Blade::component('keys::button', Button::class);
-        Blade::component('keys::button.group', Group::class);
-        Blade::component('keys::calendar', Calendar::class);
-        Blade::component('keys::date-picker', DatePicker::class);
-        Blade::component('keys::card', Card::class);
-        Blade::component('keys::card.header', CardHeader::class);
-        Blade::component('keys::card.body', CardBody::class);
-        Blade::component('keys::card.footer', CardFooter::class);
-        Blade::component('keys::card.actions', CardActions::class);
-        Blade::component('keys::label', Label::class);
-        Blade::component('keys::error', Error::class);
-        Blade::component('keys::input', Input::class);
-        Blade::component('keys::textarea', Textarea::class);
-        Blade::component('keys::text', Text::class);
-        Blade::component('keys::heading', Heading::class);
-        Blade::component('keys::checkbox', Checkbox::class);
-        Blade::component('keys::kbd', Kbd::class);
-        Blade::component('keys::chart', Chart::class);
-        Blade::component('keys::color-picker', ColorPicker::class);
-        Blade::component('keys::radio', Radio::class);
-        Blade::component('keys::range', Range::class);
-        Blade::component('keys::rating', Rating::class);
-        Blade::component('keys::choice-group', ChoiceGroup::class);
-        Blade::component('keys::field', Field::class);
-        Blade::component('keys::alert', Alert::class);
-        Blade::component('keys::select', Select::class);
-        Blade::component('keys::select.option', Option::class);
-        Blade::component('keys::select.chip', Chip::class);
-        Blade::component('keys::tabs', Tabs::class);
-        Blade::component('keys::tabs.tab', Tab::class);
-        Blade::component('keys::tabs.panel', Panel::class);
-        Blade::component('keys::toggle', Toggle::class);
-        Blade::component('keys::avatar', Avatar::class);
-        Blade::component('keys::avatar.stack', Stack::class);
-        Blade::component('keys::badge', Badge::class);
-        Blade::component('keys::badge.group', BadgeGroup::class);
-        Blade::component('keys::breadcrumbs', Breadcrumbs::class);
-        Blade::component('keys::breadcrumbs.item', Item::class);
-        Blade::component('keys::modal', Modal::class);
-        Blade::component('keys::slideout', Slideout::class);
-        Blade::component('keys::toast', Toast::class);
-        Blade::component('keys::dropdown', Dropdown::class);
-        Blade::component('keys::editor', Editor::class);
-        Blade::component('keys::empty-state', EmptyState::class);
-        Blade::component('keys::dropdown.menu', DropdownMenu::class);
-        Blade::component('keys::dropdown.item', DropdownItem::class);
-        Blade::component('keys::dropdown.checkbox', DropdownCheckbox::class);
-        Blade::component('keys::dropdown.radio', DropdownRadio::class);
-        Blade::component('keys::dropdown.separator', DropdownSeparator::class);
-        Blade::component('keys::dropdown.submenu', DropdownSubmenu::class);
-        Blade::component('keys::table', Table::class);
-        Blade::component('keys::table.head', Head::class);
-        Blade::component('keys::table.body', Body::class);
-        Blade::component('keys::table.row', Row::class);
-        Blade::component('keys::table.cell', Cell::class);
-        Blade::component('keys::table.header', Header::class);
-        Blade::component('keys::table.empty', TableEmpty::class);
-        Blade::component('keys::table.loading', TableLoading::class);
-        Blade::component('keys::tooltip', Tooltip::class);
-        Blade::component('keys::heading-decorator', HeadingDecorator::class);
-        Blade::component('keys::gallery', Gallery::class);
-        Blade::component('keys::image', Image::class);
-        Blade::component('keys::timepicker', TimePicker::class);
-        Blade::component('keys::add-to-cart', AddToCart::class);
-        Blade::component('keys::progress', Progress::class);
-        Blade::component('keys::separator', Separator::class);
-        Blade::component('keys::steps', Steps::class);
-        Blade::component('keys::steps.step', Step::class);
-        Blade::component('keys::popover', Popover::class);
-        Blade::component('keys::scripts', Scripts::class);
-        Blade::component('keys::file-upload', FileUpload::class);
-        Blade::component('keys::sidebar', Sidebar::class);
-        Blade::component('keys::sidebar.section', SidebarSection::class);
-        Blade::component('keys::sidebar.item', SidebarItem::class);
-        Blade::component('keys::sidebar.divider', SidebarDivider::class);
-        Blade::component('keys::sidebar.toggle', SidebarToggle::class);
-        Blade::component('keys::main', Main::class);
-        Blade::component('keys::social.share', SocialShare::class);
-        Blade::component('keys::social.links', SocialLinks::class);
-
-        
+        // Auto-discover and register all Blade components
+        $this->registerComponents();
 
         Blade::anonymousComponentPath(__DIR__.'/../resources/views/layouts', 'keys-layouts');
 
         $this->app->alias(KeysManager::class, 'keys');
+    }
+
+    /**
+     * Auto-discover and register all Blade components from the Components directory.
+     */
+    protected function registerComponents(): void
+    {
+        $componentsPath = __DIR__.'/Components';
+        $baseNamespace = 'Keys\\UI\\Components\\';
+
+        if (!is_dir($componentsPath)) {
+            return;
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($componentsPath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $file) {
+            if (!$file->isFile() || $file->getExtension() !== 'php') {
+                continue;
+            }
+
+            // Get relative path from Components directory
+            $relativePath = str_replace($componentsPath.DIRECTORY_SEPARATOR, '', $file->getPathname());
+            $relativePath = str_replace('.php', '', $relativePath);
+            $relativePath = str_replace(DIRECTORY_SEPARATOR, '\\', $relativePath);
+
+            // Build full class name
+            $className = $baseNamespace.$relativePath;
+
+            // Convert to component name (kebab-case with dots for nesting)
+            $componentName = $this->convertToComponentName($relativePath);
+
+            // Register with Blade
+            if (class_exists($className)) {
+                Blade::component('keys::'.$componentName, $className);
+            }
+        }
+    }
+
+    /**
+     * Convert a class path to a kebab-case component name.
+     * Examples:
+     *   Button -> button
+     *   Button\Group -> button.group
+     *   Dropdown\Menu -> dropdown.menu
+     *   ColorPicker -> color-picker
+     */
+    protected function convertToComponentName(string $classPath): string
+    {
+        // Split by namespace separator
+        $parts = explode('\\', $classPath);
+
+        // Convert each part to kebab-case
+        $parts = array_map(function ($part) {
+            return $this->toKebabCase($part);
+        }, $parts);
+
+        // Join with dots for nested components
+        return implode('.', $parts);
+    }
+
+    /**
+     * Convert a string from PascalCase to kebab-case.
+     */
+    protected function toKebabCase(string $string): string
+    {
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $string));
     }
 }

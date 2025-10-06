@@ -3,17 +3,10 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Badge extends Component
 {
-    private const VALID_VARIANTS = ['filled', 'outlined', 'subtle'];
-    private const VALID_SIZES = ['xs', 'sm', 'md'];
-    private const VALID_COLORS = [
-        'brand', 'success', 'warning', 'danger', 'neutral', 'info',
-        'red', 'green', 'blue', 'purple', 'yellow', 'indigo',
-        'pink', 'gray', 'teal', 'orange', 'dark'
-    ];
-
     public function __construct(
         public string $variant = 'filled',
         public string $color = 'blue',
@@ -26,17 +19,9 @@ class Badge extends Component
             $this->id = 'badge-' . uniqid();
         }
 
-        if (!in_array($this->variant, self::VALID_VARIANTS)) {
-            $this->variant = 'filled';
-        }
-
-        if (!in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'sm';
-        }
-
-        if (!in_array($this->color, self::VALID_COLORS)) {
-            $this->color = 'blue';
-        }
+        $this->variant = ComponentConstants::validate($this->variant, ComponentConstants::BADGE_VARIANTS, 'filled');
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_XS_TO_MD, 'sm');
+        $this->color = ComponentConstants::validate($this->color, ComponentConstants::COLORS_EXTENDED, 'blue');
 
         if ($this->dismissible && $this->variant === 'subtle') {
             $this->dismissible = false;

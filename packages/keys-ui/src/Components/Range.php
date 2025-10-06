@@ -4,9 +4,12 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
 
 class Range extends Component
 {
+    use HandlesValidationErrors;
+
     public function __construct(
         public ?string $name = null,
         public ?string $id = null,
@@ -76,43 +79,6 @@ class Range extends Component
         return $this->hasError || $this->hasErrors();
     }
 
-    public function hasErrors(): bool
-    {
-        if (is_null($this->errors)) {
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            return ! empty(trim($this->errors));
-        }
-
-        if (is_array($this->errors)) {
-            return ! empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        
-        if (is_object($this->errors) && method_exists($this->errors, 'any')) {
-            return $this->errors->any();
-        }
-
-        
-        if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
-            try {
-                $bag = $this->errors->getBag('default');
-
-                return $bag && $bag->any();
-            } catch (\Exception $e) {
-                
-                return false;
-            }
-        }
-
-        return false;
-    }
 
     public function getComputedValue(): mixed
     {

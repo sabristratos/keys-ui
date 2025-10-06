@@ -5,6 +5,8 @@ namespace Keys\UI\Components;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * DatePicker Component
@@ -26,7 +28,7 @@ use Illuminate\View\Component;
  */
 class DatePicker extends Component
 {
-    private const VALID_SIZES = ['sm', 'md', 'lg'];
+    use HandlesValidationErrors;
 
     public function __construct(
 
@@ -103,9 +105,7 @@ class DatePicker extends Component
         $this->maxDate = $this->parseDate($this->maxDate);
 
         
-        if (!in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_SM_TO_LG, 'md');
         if ($this->monthsToShow < 1 || $this->monthsToShow > 12) {
             $this->monthsToShow = 1;
         }
@@ -176,72 +176,6 @@ class DatePicker extends Component
         return $result;
     }
 
-    public function hasErrors(): bool
-    {
-        \Log::debug("DatePicker Debug [{$this->name}] - hasErrors() called", [
-            'errors_is_null' => is_null($this->errors),
-            'errors_type' => is_object($this->errors) ? get_class($this->errors) : gettype($this->errors)
-        ]);
-
-        if (is_null($this->errors)) {
-            \Log::debug("DatePicker Debug [{$this->name}] - errors is null, returning false");
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            $result = !empty(trim($this->errors));
-            \Log::debug("DatePicker Debug [{$this->name}] - errors is string", [
-                'string_value' => $this->errors,
-                'result' => $result
-            ]);
-            return $result;
-        }
-
-        if (is_array($this->errors)) {
-            $result = !empty($this->errors);
-            \Log::debug("DatePicker Debug [{$this->name}] - errors is array", [
-                'array_count' => count($this->errors),
-                'result' => $result
-            ]);
-            return $result;
-        }
-
-        if ($this->errors instanceof Collection) {
-            $result = $this->errors->isNotEmpty();
-            \Log::debug("DatePicker Debug [{$this->name}] - errors is Collection", [
-                'collection_count' => $this->errors->count(),
-                'result' => $result
-            ]);
-            return $result;
-        }
-
-        
-        if (is_object($this->errors) && method_exists($this->errors, 'any')) {
-            \Log::debug("DatePicker Debug [{$this->name}] - errors is ViewErrorBag-like object", [
-                'has_method_exists' => method_exists($this->errors, 'has'),
-                'name_provided' => !empty($this->name),
-                'errors_any' => $this->errors->any(),
-                'errors_count' => method_exists($this->errors, 'count') ? $this->errors->count() : 'no count method'
-            ]);
-
-            
-            if (method_exists($this->errors, 'has') && $this->name) {
-                $result = $this->errors->has($this->name);
-                \Log::debug("DatePicker Debug [{$this->name}] - checking field-specific errors", [
-                    'field_has_errors' => $result
-                ]);
-                return $result;
-            }
-
-            
-            
-            \Log::debug("DatePicker Debug [{$this->name}] - no field name or no has method, returning false");
-            return false;
-        }
-
-        \Log::debug("DatePicker Debug [{$this->name}] - no conditions matched, returning false");
-        return false;
-    }
 
     /**
      * Get formatted value for display (simplified)

@@ -156,7 +156,7 @@
             @endif
         </div>
 
-        <figcaption class="mt-2 text-sm text-foreground/70">
+        <figcaption class="mt-2 text-sm text-muted">
             {{ $caption }}
         </figcaption>
     </figure>

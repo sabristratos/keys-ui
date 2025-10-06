@@ -841,7 +841,7 @@ export class TimePickerActions extends BaseActionClass<TimePickerState> {
             const button = document.createElement('button');
             button.type = 'button';
             button.dataset.timepickerHour = hour.toString();
-            button.className = 'w-full px-3 py-2 text-sm text-text text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-accent [&.selected]:text-accent-foreground transition-colors';
+            button.className = 'w-full px-3 py-2 text-sm text-primary text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-accent [&.selected]:text-accent-foreground transition-colors';
             button.textContent = hour.toString().padStart(2, '0');
             hourContainer.appendChild(button);
         });

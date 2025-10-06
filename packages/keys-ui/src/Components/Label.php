@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Label Component
@@ -20,11 +21,6 @@ use Illuminate\View\Component;
  */
 class Label extends Component
 {
-    private const VALID_TOOLTIP_PLACEMENTS = [
-        'top', 'bottom', 'left', 'right', 'top-start', 'top-end',
-        'bottom-start', 'bottom-end', 'left-start', 'left-end',
-        'right-start', 'right-end'
-    ];
 
     /**
      * Create a new Label component instance.
@@ -62,9 +58,7 @@ class Label extends Component
 
 
 
-        if (!in_array($this->tooltipPlacement, self::VALID_TOOLTIP_PLACEMENTS)) {
-            $this->tooltipPlacement = 'top';
-        }
+        $this->tooltipPlacement = ComponentConstants::validate($this->tooltipPlacement, ComponentConstants::PLACEMENTS, 'top');
 
         if (!in_array($this->tooltipColor, ['dark', 'light'])) {
             $this->tooltipColor = 'dark';

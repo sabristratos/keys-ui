@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Tooltip Component - Pure Popover API Implementation
@@ -20,13 +21,6 @@ use Illuminate\View\Component;
  */
 class Tooltip extends Component
 {
-    private const VALID_PLACEMENTS = [
-        'top', 'top-start', 'top-end',
-        'bottom', 'bottom-start', 'bottom-end',
-        'left', 'left-start', 'left-end',
-        'right', 'right-start', 'right-end'
-    ];
-    private const VALID_SIZES = ['sm', 'md', 'lg'];
 
     /**
      * Create a new Tooltip component instance.
@@ -46,17 +40,9 @@ class Tooltip extends Component
     ) {
         $this->id = $this->id ?? 'tooltip-'.uniqid();
 
-        if (! in_array($this->placement, self::VALID_PLACEMENTS)) {
-            $this->placement = 'top';
-        }
-
-        if (! in_array($this->color, ['dark', 'light'])) {
-            $this->color = 'dark';
-        }
-
-        if (! in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
+        $this->placement = ComponentConstants::validate($this->placement, ComponentConstants::PLACEMENTS, 'top');
+        $this->color = ComponentConstants::validate($this->color, ['dark', 'light'], 'dark');
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_SM_TO_LG, 'md');
     }
 
     /**
@@ -68,44 +54,10 @@ class Tooltip extends Component
     }
 
     /**
-     * Get base tooltip classes using Tailwind utilities.
-     */
-    public function getTooltipClasses(): string
-    {
-        $baseClasses = 'rounded-md font-medium pointer-events-none shadow-lg';
-
-        $sizeClasses = match ($this->size) {
-            'sm' => 'px-2 py-1 text-xs',
-            'md' => 'px-3 py-2 text-sm',
-            'lg' => 'px-4 py-3 text-base',
-            default => 'px-3 py-2 text-sm'
-        };
-
-        $colorClasses = match ($this->color) {
-            'dark' => 'bg-neutral-900 text-white border border-neutral-700 dark:bg-neutral-800 dark:border-neutral-600',
-            'light' => 'bg-surface text-foreground border border-border',
-            default => 'bg-neutral-900 text-white border border-neutral-700 dark:bg-neutral-800 dark:border-neutral-600'
-        };
-
-        return "{$baseClasses} {$sizeClasses} {$colorClasses}";
-    }
-
-    /**
-     * Get anchor name for CSS positioning.
-     */
-    public function getAnchorName(): string
-    {
-        return "--tooltip-{$this->id}";
-    }
-
-    /**
      * Render the tooltip component.
      */
     public function render()
     {
-        return view('keys::components.tooltip', [
-            'tooltipClasses' => $this->getTooltipClasses(),
-            'anchorName' => $this->getAnchorName(),
-        ]);
+        return view('keys::components.tooltip');
     }
 }

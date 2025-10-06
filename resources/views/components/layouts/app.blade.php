@@ -15,7 +15,7 @@
 
     @livewireStyles
 </head>
-<body class="bg-body text-foreground font-sans antialiased">
+<body class="bg-base text-primary font-sans antialiased">
     <script>
 
         (function() {
@@ -49,10 +49,10 @@
             document.querySelectorAll('.theme-btn').forEach(btn => {
                 const theme = btn.getAttribute('data-theme');
                 if (theme === currentTheme) {
-                    btn.classList.add('bg-brand', 'text-white');
+                    btn.classList.add('bg-accent', 'text-white');
                     btn.classList.remove('hover:bg-neutral/10');
                 } else {
-                    btn.classList.remove('bg-brand', 'text-white');
+                    btn.classList.remove('bg-accent', 'text-white');
                     btn.classList.add('hover:bg-neutral/10');
                 }
             });
@@ -63,13 +63,13 @@
 
     <div class="min-h-screen">
         
-        <header class="bg-surface border-b border-border sticky top-0 z-40">
+        <header class="bg-surface border-b border-line sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+                            <div class="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
                                 <x-keys::icon name="heroicon-o-squares-2x2" size="sm" class="text-white" />
                             </div>
                             <h1 class="text-xl font-bold">Keys UI Demo</h1>
@@ -99,7 +99,7 @@
                         <x-keys::separator orientation="vertical" spacing="none" class="h-6" />
 
                         
-                        <div class="flex gap-1 p-1 bg-surface rounded-lg border border-border">
+                        <div class="flex gap-1 p-1 bg-surface rounded-lg border border-line">
                             <button
                                 onclick="setTheme('light')"
                                 class="theme-btn px-2 py-1 text-xs font-medium rounded transition-colors flex items-center gap-1"
@@ -130,7 +130,7 @@
         </main>
 
         
-        <footer class="bg-surface border-t border-border mt-12">
+        <footer class="bg-surface border-t border-line mt-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div class="text-center text-sm text-muted">
                     <p class="mb-2">

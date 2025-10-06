@@ -32,7 +32,7 @@
 
     $editorClasses = trim("$editorBaseClasses quill-editor-{$size} $editorSizeClasses $editorStateClasses");
 
-    $containerClasses = "quill-container quill-container-{$size} border border-border bg-surface";
+    $containerClasses = "quill-container quill-container-{$size} border border-line bg-elevation-1";
 
     $editorContainerAttributes = $editorAttributes->merge([
         'class' => $editorClasses

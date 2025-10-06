@@ -19,7 +19,7 @@
         ->merge($dataAttributes)
         ->merge(['data-keys-date-picker-config' => json_encode($calendarData)]);
 
-    $baseClasses = 'flex items-center shadow-xs justify-between gap-2.5 bg-input border border-border rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+    $baseClasses = 'flex items-center shadow-xs justify-between gap-2.5 bg-input border border-line rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
 
     $sizeClasses = match ($size) {
         'sm' => 'min-h-[32px] text-sm',
@@ -50,11 +50,11 @@
     $hasErrorBool = $hasError();
 
     if ($disabled) {
-        $stateClasses = 'opacity-50 cursor-not-allowed bg-surface text-muted';
+        $stateClasses = 'opacity-50 cursor-not-allowed bg-elevation-1 text-muted';
     } elseif ($hasErrorBool) {
-        $stateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20 text-text';
+        $stateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20 text-primary';
     } else {
-        $stateClasses = 'text-text';
+        $stateClasses = 'text-primary';
     }
     $iconSize = match ($size) { 'sm' => 'xs', 'lg' => 'md', default => 'sm' };
 
@@ -70,7 +70,13 @@
         </x-keys::label>
 
         <div class="relative mt-1" {{ $datePickerAttributes }}>
-            @include('keys::partials.date-picker-inputs')
+            {{-- Hidden input for date picker value with Livewire support --}}
+            <input type="hidden"
+                   name="{{ $name }}"
+                   value="{{ $getSubmitValue() }}"
+                   data-date-picker-value
+                   @if($required ?? false) required @endif
+                   {{ $wireOnlyAttributes ?? collect() }}>
 
             @if(!$inline)
                 <div wire:ignore>
@@ -122,7 +128,7 @@
                                         @endif
 
 
-                                        <span class="date-picker-value truncate pointer-events-none text-text" data-date-picker-display>
+                                        <span class="date-picker-value truncate pointer-events-none text-primary" data-date-picker-display>
                                             @if($formattedValue)
                                                 {{ $formattedValue }}
                                             @else
@@ -225,7 +231,7 @@
                                 variant="ghost"
                                 size="xs"
                                 icon="heroicon-o-calendar"
-                                class="text-muted hover:text-brand"
+                                class="text-muted hover:text-accent"
                                 data-date-picker-trigger
                                 aria-label="Open calendar"
                                 :disabled="$disabled"
@@ -263,7 +269,13 @@
     </div>
 @else
     <div {{ $attributes->only('class') }} {{ $datePickerAttributes }}>
-        @include('keys::partials.date-picker-inputs')
+        {{-- Hidden input for date picker value with Livewire support --}}
+        <input type="hidden"
+               name="{{ $name }}"
+               value="{{ $getSubmitValue() }}"
+               data-date-picker-value
+               @if($required ?? false) required @endif
+               {{ $wireOnlyAttributes ?? collect() }}>
 
         @if(!$inline)
             <div wire:ignore>
@@ -313,7 +325,7 @@
                                         </div>
                                     @endif
 
-                                    <span class="date-picker-value truncate pointer-events-none text-text" data-date-picker-display>
+                                    <span class="date-picker-value truncate pointer-events-none text-primary" data-date-picker-display>
                                         @if($formattedValue)
                                             {{ $formattedValue }}
                                         @else
@@ -416,7 +428,7 @@
                             variant="ghost"
                             size="xs"
                             icon="heroicon-o-calendar"
-                            class="text-muted hover:text-brand"
+                            class="text-muted hover:text-accent"
                             data-date-picker-trigger
                             aria-label="Open calendar"
                             :disabled="$disabled"

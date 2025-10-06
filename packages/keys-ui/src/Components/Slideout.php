@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Slideout Component
@@ -13,7 +14,6 @@ use Illuminate\View\Component;
  */
 class Slideout extends Component
 {
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl', 'full'];
 
     /**
      * Create a new Slideout component instance.
@@ -54,9 +54,7 @@ class Slideout extends Component
         }
 
 
-        if (!in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_EXTENDED, 'md');
 
 
         if (!in_array($this->closedby, ['any', 'closerequest', 'none'])) {

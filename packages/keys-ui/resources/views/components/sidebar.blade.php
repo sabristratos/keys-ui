@@ -3,10 +3,10 @@
     $baseClasses = 'flex flex-col h-screen transition-all duration-300 ease-in-out';
 
     $variantClasses = match ($variant) {
-        'bordered' => 'bg-surface border-r border-border',
-        'elevated' => 'bg-surface shadow-lg',
+        'bordered' => 'bg-elevation-1 border-r border-line',
+        'elevated' => 'bg-elevation-1 shadow-lg',
         'transparent' => 'bg-transparent',
-        default => 'bg-surface'
+        default => 'bg-elevation-1'
     };
 
     $positionClasses = match ($position) {
@@ -37,7 +37,7 @@
                 {{-- Title and subtitle - hidden on mobile and when collapsed --}}
                 @if($title)
                     <div class="flex-1 min-w-0" data-sidebar-branding>
-                        <h2 class="font-bold text-lg text-foreground truncate">{{ $title }}</h2>
+                        <h2 class="font-bold text-lg text-primary truncate">{{ $title }}</h2>
                         @if($subtitle)
                             <p class="text-xs text-muted truncate">{{ $subtitle }}</p>
                         @endif
@@ -70,7 +70,7 @@
     </div>
 
     @isset($footer)
-        <div class="flex-shrink-0 border-t border-border" data-sidebar-footer>
+        <div class="flex-shrink-0 border-t border-line" data-sidebar-footer>
             {{ $footer }}
         </div>
     @endisset

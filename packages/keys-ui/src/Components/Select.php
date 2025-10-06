@@ -4,6 +4,7 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
 
 /**
  * Select Component
@@ -14,6 +15,8 @@ use Illuminate\View\Component;
  */
 class Select extends Component
 {
+    use HandlesValidationErrors;
+
     /**
      * Create a new Select component instance.
      *
@@ -75,44 +78,6 @@ class Select extends Component
         return ! is_null($this->label);
     }
 
-    /**
-     * Check if validation errors exist.
-     * Handles multiple error formats: string, array, Collection, MessageBag, ViewErrorBag.
-     */
-    public function hasErrors(): bool
-    {
-        if (is_null($this->errors)) {
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            return ! empty(trim($this->errors));
-        }
-
-        if (is_array($this->errors)) {
-            return ! empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        if (is_object($this->errors) && method_exists($this->errors, 'any')) {
-            return $this->errors->any();
-        }
-
-        if (is_object($this->errors) && method_exists($this->errors, 'getBag')) {
-            try {
-                $bag = $this->errors->getBag('default');
-
-                return $bag && $bag->any();
-            } catch (\Exception $e) {
-                return false;
-            }
-        }
-
-        return false;
-    }
 
     /**
      * Get array of selected values.

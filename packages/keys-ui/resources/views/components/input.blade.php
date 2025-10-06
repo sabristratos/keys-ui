@@ -1,5 +1,5 @@
 @php
-    $wrapperClasses = 'relative shadow-xs flex items-center gap-2.5 bg-input border border-border transition-colors duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+    $wrapperClasses = 'relative shadow-xs flex items-center gap-2.5 bg-input border border-line transition-colors duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
 
     $wrapperSizeClasses = match ($size) {
         'xs' => 'px-2 rounded-sm',
@@ -11,7 +11,7 @@
     };
 
     if ($disabled) {
-        $wrapperStateClasses = 'opacity-50 cursor-not-allowed bg-surface';
+        $wrapperStateClasses = 'opacity-50 cursor-not-allowed bg-elevation-1';
     } elseif ($hasError()) {
         $wrapperStateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20';
     } else {
@@ -36,7 +36,7 @@
         default => 'text-sm py-2'
     };
 
-    $inputColorClasses = $disabled ? 'text-muted' : 'text-text';
+    $inputColorClasses = $disabled ? 'text-muted' : 'text-primary';
 
     $wireAndAlpineAttributes = $attributes->filter(fn($value, $key) => str_starts_with($key, 'wire:') || str_starts_with($key, 'x-'))->getAttributes();
     $dataOnlyAttributes = $attributes->filter(fn($value, $key) => str_starts_with($key, 'data-'))->getAttributes();
@@ -83,7 +83,50 @@
         </x-keys::label>
 
         <div class="mt-1">
-            @include('keys::partials.input-field')
+            <div {{ $wrapperAttributes }}>
+                @if($iconLeft)
+                    <div class="flex items-center text-muted pointer-events-none">
+                        <x-keys::icon name="{{ $iconLeft }}" size="{{ $iconSize }}" data-icon />
+                    </div>
+                @endif
+
+                <input {{ $inputAttributes }} data-input-actions="{{ $hasActions() ? 'true' : 'false' }}" />
+
+                @if($hasActions())
+                    <div class="flex items-center gap-1">
+                        @foreach($computedActionData as $action)
+                            <div
+                                data-action="{{ $action['data_action'] }}"
+                                data-icon-default="{{ $action['data_icon_default'] }}"
+                                @if(isset($action['data_url'])) data-url="{{ $action['data_url'] }}" @endif
+                                @if(isset($action['data_icon_toggle'])) data-icon-toggle="{{ $action['data_icon_toggle'] }}" @endif
+                                @if(isset($action['data_icon_success'])) data-icon-success="{{ $action['data_icon_success'] }}" @endif
+                                @if(isset($action['data_label_toggle'])) data-label-toggle="{{ $action['data_label_toggle'] }}" @endif
+                                @if(isset($action['data_label_success'])) data-label-success="{{ $action['data_label_success'] }}" @endif
+                            >
+                                <x-keys::button
+                                    variant="{{ $actionVariant }}"
+                                    size="{{ $computedActionSize }}"
+                                    type="button"
+                                    icon="{{ $action['icon'] }}"
+                                    icon-toggle="{{ $action['icon_toggle'] }}"
+                                    icon-success="{{ $action['icon_success'] }}"
+                                    label-toggle="{{ $action['label_toggle'] }}"
+                                    label-success="{{ $action['label_success'] }}"
+                                    data-action="{{ $action['data_action'] }}"
+                                    data-url="{{ $action['data_url'] }}"
+                                >
+                                    <span class="sr-only">{{ $action['label'] }}</span>
+                                </x-keys::button>
+                            </div>
+                        @endforeach
+                    </div>
+                @elseif($iconRight)
+                    <div class="flex items-center text-muted pointer-events-none">
+                        <x-keys::icon name="{{ $iconRight }}" size="{{ $iconSize }}" data-icon />
+                    </div>
+                @endif
+            </div>
         </div>
 
         @if($hint)
@@ -95,5 +138,48 @@
         @endif
     </div>
 @else
-    @include('keys::partials.input-field')
+    <div {{ $wrapperAttributes }}>
+        @if($iconLeft)
+            <div class="flex items-center text-muted pointer-events-none">
+                <x-keys::icon name="{{ $iconLeft }}" size="{{ $iconSize }}" data-icon />
+            </div>
+        @endif
+
+        <input {{ $inputAttributes }} data-input-actions="{{ $hasActions() ? 'true' : 'false' }}" />
+
+        @if($hasActions())
+            <div class="flex items-center gap-1">
+                @foreach($computedActionData as $action)
+                    <div
+                        data-action="{{ $action['data_action'] }}"
+                        data-icon-default="{{ $action['data_icon_default'] }}"
+                        @if(isset($action['data_url'])) data-url="{{ $action['data_url'] }}" @endif
+                        @if(isset($action['data_icon_toggle'])) data-icon-toggle="{{ $action['data_icon_toggle'] }}" @endif
+                        @if(isset($action['data_icon_success'])) data-icon-success="{{ $action['data_icon_success'] }}" @endif
+                        @if(isset($action['data_label_toggle'])) data-label-toggle="{{ $action['data_label_toggle'] }}" @endif
+                        @if(isset($action['data_label_success'])) data-label-success="{{ $action['data_label_success'] }}" @endif
+                    >
+                        <x-keys::button
+                            variant="{{ $actionVariant }}"
+                            size="{{ $computedActionSize }}"
+                            type="button"
+                            icon="{{ $action['icon'] }}"
+                            icon-toggle="{{ $action['icon_toggle'] }}"
+                            icon-success="{{ $action['icon_success'] }}"
+                            label-toggle="{{ $action['label_toggle'] }}"
+                            label-success="{{ $action['label_success'] }}"
+                            data-action="{{ $action['data_action'] }}"
+                            data-url="{{ $action['data_url'] }}"
+                        >
+                            <span class="sr-only">{{ $action['label'] }}</span>
+                        </x-keys::button>
+                    </div>
+                @endforeach
+            </div>
+        @elseif($iconRight)
+            <div class="flex items-center text-muted pointer-events-none">
+                <x-keys::icon name="{{ $iconRight }}" size="{{ $iconSize }}" data-icon />
+            </div>
+        @endif
+    </div>
 @endif

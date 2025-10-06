@@ -4,6 +4,7 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
 
 /**
  * TimePicker Component
@@ -14,6 +15,8 @@ use Illuminate\View\Component;
  */
 class TimePicker extends Component
 {
+    use HandlesValidationErrors;
+
     /**
      * Create a new TimePicker component instance.
      *
@@ -119,29 +122,6 @@ class TimePicker extends Component
         return $this->hasError || $this->hasErrors();
     }
 
-    /**
-     * Check if there are validation errors.
-     */
-    public function hasErrors(): bool
-    {
-        if (is_null($this->errors)) {
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            return ! empty(trim($this->errors));
-        }
-
-        if (is_array($this->errors)) {
-            return ! empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        return false;
-    }
 
     public function getHourOptions(): array
     {

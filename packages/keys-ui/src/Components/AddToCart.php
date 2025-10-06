@@ -7,10 +7,10 @@ use Keys\UI\Components\Button;
 class AddToCart extends Button
 {
     public function __construct(
-        
+
         public string $variant = 'brand',
         public string $size = 'md',
-        public ?string $type = null,
+        public string $type = 'button',
         public ?string $href = null,
         public bool $disabled = false,
         public bool $loading = false,

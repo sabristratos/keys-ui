@@ -17,7 +17,7 @@
         {{ $attributes->merge($dataAttributes) }}
     >
         @if($heading)
-            <summary class="{{ $headingClasses }} flex items-center justify-between cursor-pointer list-none select-none transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 lg:[.sidebar-collapsed_&]:hidden">
+            <summary class="{{ $headingClasses }} flex items-center justify-between cursor-pointer list-none select-none transition-colors duration-150 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 lg:[.sidebar-collapsed_&]:hidden">
                 <x-keys::text element="span" size="xs" weight="semibold" color="muted" uppercase class="tracking-wider">{{ $heading }}</x-keys::text>
 
                 @if($icon && $collapsible)

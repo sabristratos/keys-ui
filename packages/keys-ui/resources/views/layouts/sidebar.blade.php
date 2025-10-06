@@ -20,7 +20,7 @@
         @livewireStyles
     @endif
 </head>
-<body class="h-full overflow-hidden bg-body text-foreground font-sans antialiased">
+<body class="h-full overflow-hidden bg-base text-primary font-sans antialiased">
     {{-- Full-height Layout Container --}}
     <div class="h-full flex">
         @isset($sidebar)
@@ -41,7 +41,7 @@
             >
                 {{-- Built-in default logo (always present for consistency) --}}
                 <x-slot:logo>
-                    <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
                         <x-keys::icon :name="$sidebarLogoIcon ?? 'heroicon-o-squares-2x2'" size="sm" class="text-white" />
                     </div>
                 </x-slot:logo>
@@ -75,7 +75,7 @@
 
                 {{-- Sidebar Footer --}}
                 <x-slot:footer>
-                    <div class="p-4 border-t border-border">
+                    <div class="p-4 border-t border-line">
                         <p class="text-xs text-muted">{{ config('app.name', 'App') }} v1.0</p>
                     </div>
                 </x-slot:footer>

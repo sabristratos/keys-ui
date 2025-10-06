@@ -1,5 +1,5 @@
 @php
-    $containerClasses = 'overflow-hidden min-w-0 text-sm text-foreground';
+    $containerClasses = 'overflow-hidden min-w-0 text-sm text-primary';
     $navClasses = 'flex min-w-0';
     $listClasses = 'flex items-center space-x-1 min-w-0 flex-wrap sm:flex-nowrap';
 @endphp

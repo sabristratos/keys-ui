@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Button Component
@@ -13,10 +14,6 @@ use Illuminate\View\Component;
  */
 class Button extends Component
 {
-    private const VALID_COLORS = ['primary', 'secondary', 'danger', 'warning', 'success', 'info'];
-    private const VALID_VARIANTS = ['solid', 'outlined', 'ghost', 'subtle'];
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
-    private const VALID_LOADING_ANIMATIONS = ['spinner', 'dots', 'pulse'];
 
     /**
      * Create a new Button component instance.
@@ -60,21 +57,10 @@ class Button extends Component
             $this->iconLeft = $this->icon;
         }
 
-        if (! in_array($this->color, self::VALID_COLORS)) {
-            $this->color = 'primary';
-        }
-
-        if (! in_array($this->variant, self::VALID_VARIANTS)) {
-            $this->variant = 'solid';
-        }
-
-        if (! in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
-
-        if (! in_array($this->loadingAnimation, self::VALID_LOADING_ANIMATIONS)) {
-            $this->loadingAnimation = 'spinner';
-        }
+        $this->color = ComponentConstants::validate($this->color, ComponentConstants::BUTTON_COLORS, 'primary');
+        $this->variant = ComponentConstants::validate($this->variant, ComponentConstants::BUTTON_VARIANTS, 'solid');
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_XS_TO_XL, 'md');
+        $this->loadingAnimation = ComponentConstants::validate($this->loadingAnimation, ComponentConstants::LOADING_ANIMATIONS, 'spinner');
     }
 
     /**

@@ -18,7 +18,7 @@
     $colorClasses = '';
     if (!$hasImage()) {
         $colorClasses = match ($color) {
-            'brand' => 'bg-brand text-brand-foreground',
+            'brand' => 'bg-accent text-white',
             'success' => 'bg-success text-success-foreground',
             'warning' => 'bg-warning text-warning-foreground',
             'danger' => 'bg-danger text-danger-foreground',
@@ -35,7 +35,7 @@
     }
 
     $fallbackColorClasses = match ($color) {
-        'brand' => 'bg-brand text-brand-foreground',
+        'brand' => 'bg-accent text-white',
         'success' => 'bg-success text-success-foreground',
         'warning' => 'bg-warning text-warning-foreground',
         'danger' => 'bg-danger text-danger-foreground',

@@ -3,25 +3,10 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Text extends Component
 {
-    private const VALID_ELEMENTS = ['p', 'span', 'div', 'label', 'small'];
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
-    private const VALID_COLORS = [
-        'heading',   // --color-heading
-        'text',      // --color-text
-        'muted',     // --color-muted
-        'brand',
-        'success',
-        'warning',
-        'danger',
-        'info',
-    ];
-    private const VALID_WEIGHTS = ['light', 'normal', 'medium', 'semibold', 'bold'];
-    private const VALID_ALIGNMENTS = ['', 'left', 'center', 'right', 'justify'];
-    private const VALID_LEADING = ['tight', 'normal', 'relaxed', 'loose'];
-    private const VALID_LINE_CLAMP = ['none', '1', '2', '3', '4', '5', '6'];
 
     public function __construct(
         public string $element = 'p',
@@ -37,40 +22,13 @@ class Text extends Component
         public bool $lowercase = false,
         public bool $capitalize = false
     ) {
-        // Validate element
-        if (!in_array($this->element, self::VALID_ELEMENTS)) {
-            $this->element = 'p';
-        }
-
-        // Validate size
-        if (!in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
-
-        // Validate color
-        if (!in_array($this->color, self::VALID_COLORS)) {
-            $this->color = 'text';
-        }
-
-        // Validate weight
-        if (!in_array($this->weight, self::VALID_WEIGHTS)) {
-            $this->weight = 'normal';
-        }
-
-        // Validate alignment
-        if (!in_array($this->align, self::VALID_ALIGNMENTS)) {
-            $this->align = '';
-        }
-
-        // Validate leading
-        if (!in_array($this->leading, self::VALID_LEADING)) {
-            $this->leading = 'normal';
-        }
-
-        // Validate line clamp
-        if (!in_array($this->lineClamp, self::VALID_LINE_CLAMP)) {
-            $this->lineClamp = 'none';
-        }
+        $this->element = ComponentConstants::validate($this->element, ComponentConstants::TEXT_ELEMENTS, 'p');
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_TYPOGRAPHY, 'md');
+        $this->color = ComponentConstants::validate($this->color, ComponentConstants::TEXT_COLORS, 'text');
+        $this->weight = ComponentConstants::validate($this->weight, ComponentConstants::FONT_WEIGHTS, 'normal');
+        $this->align = ComponentConstants::validate($this->align, ComponentConstants::TEXT_ALIGNMENTS, '');
+        $this->leading = ComponentConstants::validate($this->leading, ComponentConstants::LINE_HEIGHT, 'normal');
+        $this->lineClamp = ComponentConstants::validate($this->lineClamp, ComponentConstants::LINE_CLAMP, 'none');
     }
 
     public function getDataAttributes(): array

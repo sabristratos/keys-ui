@@ -1,5 +1,4 @@
 @php
-
     $sizeClasses = match ($size) {
         'xs' => 'w-3 h-3',
         'sm' => 'w-4 h-4',
@@ -10,14 +9,7 @@
     };
 @endphp
 
-@if($iconExists)
-    <x-dynamic-component
-        :component="$iconName"
-        {{ $attributes->merge(['class' => $sizeClasses])->merge($dataAttributes) }}
-    />
-@else
-    <x-dynamic-component
-        :component="$fallback"
-        {{ $attributes->merge(['class' => $sizeClasses])->merge($dataAttributes) }}
-    />
-@endif
+<x-dynamic-component
+    :component="$iconExists ? $resolvedIcon : $fallback"
+    {{ $attributes->class($sizeClasses)->merge($dataAttributes) }}
+/>

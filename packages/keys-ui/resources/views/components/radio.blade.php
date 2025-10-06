@@ -23,26 +23,26 @@
         $radioStateClasses = 'bg-input border-danger text-danger focus-visible:border-danger focus-visible:ring-danger';
     } else {
         $colorClasses = match ($color) {
-            'brand' => 'text-brand focus-visible:ring-accent',
+            'brand' => 'text-accent focus-visible:ring-accent',
             'success' => 'text-success focus-visible:ring-success',
             'warning' => 'text-warning focus-visible:ring-warning',
             'danger' => 'text-danger focus-visible:ring-danger',
             'neutral' => 'text-neutral-600 focus-visible:ring-neutral-500',
-            default => 'text-brand focus-visible:ring-accent'
+            default => 'text-accent focus-visible:ring-accent'
         };
 
         if ($variant === 'colored') {
             $borderColor = match ($color) {
-                'brand' => 'border-brand',
+                'brand' => 'border-accent',
                 'success' => 'border-success',
                 'warning' => 'border-warning',
                 'danger' => 'border-danger',
                 'neutral' => 'border-neutral-400',
-                default => 'border-brand'
+                default => 'border-accent'
             };
-            $radioStateClasses = "bg-input border-border hover:$borderColor $colorClasses";
+            $radioStateClasses = "bg-input border-line hover:$borderColor $colorClasses";
         } else {
-            $radioStateClasses = 'bg-input border-border hover:border-neutral-300 dark:hover:border-neutral-600 ' . $colorClasses;
+            $radioStateClasses = 'bg-input border-line hover:border-neutral-300 dark:hover:border-neutral-600 ' . $colorClasses;
         }
     }
 
@@ -52,32 +52,32 @@
 
     $wrapperBaseClasses = match ($variant) {
         'standard' => "flex items-center {$gap} cursor-pointer",
-        'bordered' => "flex items-center {$gap} p-4 border border-border rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
+        'bordered' => "flex items-center {$gap} p-4 border border-line rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
         'colored' => "flex items-center {$gap} p-4 border-2 rounded-lg transition-colors duration-200 cursor-pointer",
-        'card' => "flex items-center {$gap} p-4 border border-border rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
+        'card' => "flex items-center {$gap} p-4 border border-line rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
         default => "flex items-center {$gap} cursor-pointer"
     };
 
     if ($variant === 'colored') {
         $borderColor = match ($color) {
-            'brand' => 'border-border has-[:checked]:border-brand has-[:checked]:bg-brand/5',
-            'success' => 'border-border has-[:checked]:border-success has-[:checked]:bg-success/5',
-            'warning' => 'border-border has-[:checked]:border-warning has-[:checked]:bg-warning/5',
-            'danger' => 'border-border has-[:checked]:border-danger has-[:checked]:bg-danger/5',
-            'neutral' => 'border-border has-[:checked]:border-neutral-400 has-[:checked]:bg-neutral-100 dark:has-[:checked]:bg-neutral-800',
-            default => 'border-border has-[:checked]:border-brand has-[:checked]:bg-brand/5'
+            'brand' => 'border-line has-[:checked]:border-accent has-[:checked]:bg-accent/5',
+            'success' => 'border-line has-[:checked]:border-success has-[:checked]:bg-success/5',
+            'warning' => 'border-line has-[:checked]:border-warning has-[:checked]:bg-warning/5',
+            'danger' => 'border-line has-[:checked]:border-danger has-[:checked]:bg-danger/5',
+            'neutral' => 'border-line has-[:checked]:border-neutral-400 has-[:checked]:bg-neutral-100 dark:has-[:checked]:bg-neutral-800',
+            default => 'border-line has-[:checked]:border-accent has-[:checked]:bg-accent/5'
         };
         $wrapperBaseClasses .= ' ' . $borderColor;
     }
 
     if ($variant === 'card') {
         $bgColor = match ($color) {
-            'brand' => 'has-[:checked]:bg-brand/5 has-[:checked]:border-brand',
+            'brand' => 'has-[:checked]:bg-accent/5 has-[:checked]:border-accent',
             'success' => 'has-[:checked]:bg-success/5 has-[:checked]:border-success',
             'warning' => 'has-[:checked]:bg-warning/5 has-[:checked]:border-warning',
             'danger' => 'has-[:checked]:bg-danger/5 has-[:checked]:border-danger',
             'neutral' => 'has-[:checked]:bg-neutral-100 has-[:checked]:border-neutral-400 dark:has-[:checked]:bg-neutral-800',
-            default => 'has-[:checked]:bg-brand/5 has-[:checked]:border-brand'
+            default => 'has-[:checked]:bg-accent/5 has-[:checked]:border-accent'
         };
         $wrapperBaseClasses .= ' ' . $bgColor;
     }

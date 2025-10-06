@@ -21,7 +21,7 @@
         ->except(['class'])
         ->merge($dataAttributes);
 
-    $baseClasses = 'flex items-center shadow-xs justify-between gap-2.5 bg-input border border-border rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+    $baseClasses = 'flex items-center shadow-xs justify-between gap-2.5 bg-input border border-line rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
 
     $sizeClasses = match ($size) {
         'sm' => 'min-h-[32px] text-sm',
@@ -51,11 +51,11 @@
     };
 
     if ($disabled) {
-        $stateClasses = 'opacity-50 cursor-not-allowed bg-surface text-muted';
+        $stateClasses = 'opacity-50 cursor-not-allowed bg-elevation-1 text-muted';
     } elseif ($hasError()) {
-        $stateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20 text-text';
+        $stateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20 text-primary';
     } else {
-        $stateClasses = 'text-text';
+        $stateClasses = 'text-primary';
     }
 
     $iconSize = match ($size) {
@@ -131,7 +131,7 @@
                     <div class="flex items-center gap-2.5 flex-1 min-w-0">
 
 
-                        <span class="timepicker-value truncate pointer-events-none text-text" data-timepicker-display>
+                        <span class="timepicker-value truncate pointer-events-none text-primary" data-timepicker-display>
                             @if($value)
                                 {{ $value }}
                             @else
@@ -173,12 +173,12 @@
         <div class="{{ $dropdownWidthClasses }}">
 
             @if($formatMode === 'flexible')
-                <div class="flex items-center justify-between px-4 py-3 mb-3 border-b border-border">
-                    <span class="text-sm font-medium text-text">{{ __('keys-ui::keys-ui.timepicker.time_format') }}</span>
+                <div class="flex items-center justify-between px-4 py-3 mb-3 border-b border-line">
+                    <span class="text-sm font-medium text-primary">{{ __('keys-ui::keys-ui.timepicker.time_format') }}</span>
                     <x-keys::button.group :attached="true">
                         <x-keys::button
                             size="xs"
-                            :variant="$format === '24' ? 'brand' : 'outline'"
+                            :variant="$format === '24' ? 'solid' : 'outline'"
                             data-timepicker-format="24"
                             :data-selected="$format === '24' ? 'true' : 'false'"
                             aria-pressed="{{ $format === '24' ? 'true' : 'false' }}"
@@ -187,7 +187,7 @@
                         </x-keys::button>
                         <x-keys::button
                             size="xs"
-                            :variant="$format === '12' ? 'brand' : 'outline'"
+                            :variant="$format === '12' ? 'solid' : 'outline'"
                             data-timepicker-format="12"
                             :data-selected="$format === '12' ? 'true' : 'false'"
                             aria-pressed="{{ $format === '12' ? 'true' : 'false' }}"
@@ -220,7 +220,7 @@
                 <div class="flex flex-col">
                     <label class="text-xs font-medium text-muted mb-2">{{ $format === '12' ? __('keys-ui::keys-ui.timepicker.hour') : __('keys-ui::keys-ui.timepicker.hours') }}</label>
                     <div
-                        class="h-32 overflow-y-auto border border-border rounded bg-surface scrollbar-thin py-1"
+                        class="h-32 overflow-y-auto border border-line rounded bg-elevation-1 scrollbar-thin py-1"
                         data-timepicker-hours
                         role="listbox"
                         aria-label="Select hour"
@@ -229,7 +229,7 @@
                             <button
                                 type="button"
                                 data-timepicker-hour="{{ $hour }}"
-                                class="w-full px-3 py-2 text-sm text-text text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-brand [&.selected]:text-white [&.selected]:font-medium transition-colors"
+                                class="w-full px-3 py-2 text-sm text-primary text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-accent [&.selected]:text-white [&.selected]:font-medium transition-colors"
                                 role="option"
                                 aria-selected="false"
                             >
@@ -248,7 +248,7 @@
                         @endif
                     </div>
                     <div
-                        class="h-32 overflow-y-auto border border-border rounded bg-input scrollbar-thin py-1"
+                        class="h-32 overflow-y-auto border border-line rounded bg-input scrollbar-thin py-1"
                         role="listbox"
                         aria-label="Select minutes"
                     >
@@ -256,7 +256,7 @@
                             <button
                                 type="button"
                                 data-timepicker-minute="{{ $minute }}"
-                                class="w-full px-3 py-2 text-sm text-text text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-brand [&.selected]:text-white [&.selected]:font-medium transition-colors"
+                                class="w-full px-3 py-2 text-sm text-primary text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-accent [&.selected]:text-white [&.selected]:font-medium transition-colors"
                                 role="option"
                                 aria-selected="false"
                             >
@@ -271,7 +271,7 @@
                     <div class="flex flex-col">
                         <label class="text-xs font-medium text-muted mb-2">{{ __('keys-ui::keys-ui.timepicker.seconds') }}</label>
                         <div
-                            class="h-32 overflow-y-auto border border-border rounded bg-input scrollbar-thin py-1"
+                            class="h-32 overflow-y-auto border border-line rounded bg-input scrollbar-thin py-1"
                             role="listbox"
                             aria-label="Select seconds"
                         >
@@ -279,7 +279,7 @@
                                 <button
                                     type="button"
                                     data-timepicker-second="{{ $second }}"
-                                    class="w-full px-3 py-2 text-sm text-text text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-brand [&.selected]:text-white [&.selected]:font-medium transition-colors"
+                                    class="w-full px-3 py-2 text-sm text-primary text-left hover:bg-hover focus-visible:bg-accent focus-visible:text-accent-foreground [&.selected]:bg-accent [&.selected]:text-white [&.selected]:font-medium transition-colors"
                                     role="option"
                                     aria-selected="false"
                                 >
@@ -299,7 +299,7 @@
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                class="w-full justify-start [&.selected]:bg-brand [&.selected]:text-white [&.selected]:border-brand"
+                                class="w-full justify-start [&.selected]:bg-accent [&.selected]:text-white [&.selected]:border-accent"
                                 data-timepicker-period="{{ $period }}"
                                 role="radio"
                                 aria-checked="false"
@@ -312,7 +312,7 @@
             </div>
 
 
-            <div class="flex items-center justify-between px-4 py-3 mt-3 border-t border-border">
+            <div class="flex items-center justify-between px-4 py-3 mt-3 border-t border-line">
                 <x-keys::button
                     variant="outline"
                     size="sm"
@@ -329,7 +329,7 @@
 {{ __('keys-ui::keys-ui.timepicker.cancel') }}
                     </x-keys::button>
                     <x-keys::button
-                        variant="brand"
+                        variant="solid"
                         size="sm"
                         data-timepicker-apply
                     >

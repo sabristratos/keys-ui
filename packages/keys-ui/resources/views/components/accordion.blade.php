@@ -27,12 +27,12 @@ details[data-keys-accordion] summary::-webkit-details-marker {
     $baseClasses = 'group overflow-hidden transition-all duration-200';
 
     $variantClasses = match ($variant) {
-        'default' => 'bg-surface border border-border',
+        'default' => 'bg-elevation-1 border border-line',
         'flush' => 'bg-transparent border-0',
-        'spaced' => 'bg-surface border border-border mb-3',
-        'outlined' => 'bg-transparent border border-border',
-        'elevated' => 'bg-surface border border-border shadow-md',
-        default => 'bg-surface border border-border'
+        'spaced' => 'bg-elevation-1 border border-line mb-3',
+        'outlined' => 'bg-transparent border border-line',
+        'elevated' => 'bg-elevation-1 border border-line shadow-md',
+        default => 'bg-elevation-1 border border-line'
     };
 
     $roundedClasses = match ($rounded) {
@@ -57,18 +57,18 @@ details[data-keys-accordion] summary::-webkit-details-marker {
 
     $summaryColorClasses = $variant === 'flush'
         ? match ($color) {
-            'brand' => 'hover:bg-brand/5 text-brand',
+            'brand' => 'hover:bg-accent/5 text-accent',
             'success' => 'hover:bg-success/5 text-success',
             'warning' => 'hover:bg-warning/5 text-warning',
             'danger' => 'hover:bg-danger/5 text-danger',
-            default => 'hover:bg-neutral/5 text-foreground'
+            default => 'hover:bg-neutral/5 text-primary'
         }
         : match ($color) {
-            'brand' => 'bg-brand/5 hover:bg-brand/10 text-brand',
+            'brand' => 'bg-accent/5 hover:bg-accent/10 text-accent',
             'success' => 'bg-success/5 hover:bg-success/10 text-success',
             'warning' => 'bg-warning/5 hover:bg-warning/10 text-warning',
             'danger' => 'bg-danger/5 hover:bg-danger/10 text-danger',
-            default => 'bg-surface hover:bg-neutral/5 text-foreground'
+            default => 'bg-elevation-1 hover:bg-neutral/5 text-primary'
         };
 
     $contentWrapperClasses = 'grid grid-rows-[0fr] opacity-0 transition-all duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-open:grid-rows-[1fr] group-open:opacity-100';
@@ -77,18 +77,18 @@ details[data-keys-accordion] summary::-webkit-details-marker {
 
     $contentColorClasses = $variant === 'flush'
         ? match ($color) {
-            'brand' => 'text-brand',
+            'brand' => 'text-accent',
             'success' => 'text-success',
             'warning' => 'text-warning',
             'danger' => 'text-danger',
             default => 'text-muted'
         }
         : match ($color) {
-            'brand' => 'bg-brand/5 text-brand',
+            'brand' => 'bg-accent/5 text-accent',
             'success' => 'bg-success/5 text-success',
             'warning' => 'bg-warning/5 text-warning',
             'danger' => 'bg-danger/5 text-danger',
-            default => 'bg-surface text-muted'
+            default => 'bg-elevation-1 text-muted'
         };
 
     $contentSizeClasses = match ($size) {
@@ -110,7 +110,7 @@ details[data-keys-accordion] summary::-webkit-details-marker {
     $disabledClasses = $disabled ? 'opacity-50 cursor-not-allowed' : '';
     $summaryDisabledClasses = $disabled ? 'cursor-not-allowed' : 'cursor-pointer';
 
-    $contentBorderClass = $variant === 'flush' ? '' : 'border-t border-border';
+    $contentBorderClass = $variant === 'flush' ? '' : 'border-t border-line';
 
     $preparedActionData = [];
     foreach ($computedActionData as $action) {

@@ -7,14 +7,14 @@
         : 'cursor-pointer';
 
     $activeClasses = $active && !$disabled
-        ? 'bg-brand/10 text-brand font-medium hover:bg-brand/15'
-        : (!$disabled ? 'text-muted hover:text-foreground hover:bg-neutral-hover' : '');
+        ? 'bg-accent/10 text-accent font-medium hover:bg-accent/15'
+        : (!$disabled ? 'text-muted hover:text-primary hover:bg-neutral-hover' : '');
 
     $iconClasses = 'flex-shrink-0 w-5 h-5';
     $contentClasses = 'flex-1 min-w-0 truncate';
 
     $badgeClasses = match ($badgeVariant) {
-        'brand' => 'bg-brand/10 text-brand',
+        'brand' => 'bg-accent/10 text-accent',
         'success' => 'bg-success/10 text-success',
         'warning' => 'bg-warning/10 text-warning',
         'danger' => 'bg-danger/10 text-danger',

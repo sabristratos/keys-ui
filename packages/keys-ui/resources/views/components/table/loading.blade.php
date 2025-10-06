@@ -16,7 +16,7 @@
 @endphp
 
 <tr {{ $attributes->merge($dataAttributes) }}>
-    <td colspan="{{ $colspan }}" class="px-6 py-4 bg-surface border-t border-border">
+    <td colspan="{{ $colspan }}" class="px-6 py-4 bg-elevation-1 border-t border-line">
         <div class="{{ $loadingContainerClasses }}">
             <div class="flex flex-col items-center">
                 <x-keys::loading

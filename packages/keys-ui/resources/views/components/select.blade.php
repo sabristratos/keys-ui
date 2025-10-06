@@ -17,7 +17,7 @@
         }
     }
 
-    $baseClasses = 'flex shadow-xs items-center justify-between gap-2.5 bg-input border border-border rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+    $baseClasses = 'flex shadow-xs items-center justify-between gap-2.5 bg-input border border-line rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
 
     $sizeClasses = match ($size) {
         'sm' => 'min-h-[32px] text-sm',
@@ -47,11 +47,11 @@
     };
 
     if ($disabled) {
-        $stateClasses = 'opacity-50 cursor-not-allowed bg-surface text-muted';
+        $stateClasses = 'opacity-50 cursor-not-allowed bg-elevation-1 text-muted';
     } elseif ($hasError) {
-        $stateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20 text-text';
+        $stateClasses = 'border-danger focus-within:border-danger focus-within:ring-danger/20 text-primary';
     } else {
-        $stateClasses = 'text-text';
+        $stateClasses = 'text-primary';
     }
 
     $triggerClasses = trim("$baseClasses $widthClasses $stateClasses");
@@ -81,8 +81,60 @@
 
         <div class="relative mt-1" {{ $selectAttributes }}>
 
-            @include('keys::partials.select-inputs')
+            @if($isLivewireEnabled ?? false)
+                @if($multiple)
+                    <input
+                        type="hidden"
+                        name="{{ $name }}"
+                        class="select-stable-input select-livewire-input"
+                        data-livewire-input="true"
+                        data-livewire-multiple="true"
+                        {{ $wireOnlyAttributes ?? collect() }}
+                    >
+                @else
+                    <input
+                        type="hidden"
+                        name="{{ $name }}"
+                        class="select-stable-input select-livewire-input"
+                        data-livewire-input="true"
+                        data-livewire-multiple="false"
+                        {{ $wireOnlyAttributes ?? collect() }}
+                    >
+                @endif
+            @else
+                @if($multiple)
+                    @php
+                        $selectedValues = $getSelectedValues();
+                        $maxInputs = 15;
+                    @endphp
 
+                    @for($i = 0; $i < $maxInputs; $i++)
+                        @php
+                            $currentValue = $selectedValues[$i] ?? '';
+                            $isActive = $i < count($selectedValues);
+                            $isFirst = $i === 0;
+                        @endphp
+
+                        <input
+                            type="hidden"
+                            name="{{ $name }}[]"
+                            value="{{ $currentValue }}"
+                            class="select-stable-input select-pool-input"
+                            data-pool-index="{{ $i }}"
+                            data-pool-active="{{ $isActive ? 'true' : 'false' }}"
+                            style="{{ $isActive ? '' : 'display: none;' }}"
+                        >
+                    @endfor
+                @else
+                    <input
+                        type="hidden"
+                        name="{{ $name }}"
+                        value="{{ $value ?? '' }}"
+                        class="select-stable-input select-single-input"
+                        data-single-input="true"
+                    >
+                @endif
+            @endif
 
             <div wire:ignore>
                 <x-keys::popover
@@ -134,7 +186,7 @@
                                     </span>
                                 @else
 
-                                    <div class="flex items-center gap-2.5 select-value truncate pointer-events-none text-text" data-select-display>
+                                    <div class="flex items-center gap-2.5 select-value truncate pointer-events-none text-primary" data-select-display>
                                         @if($value)
                                             {{ $value }}
                                         @else
@@ -206,7 +258,60 @@
 @else
     <div {{ $attributes->only('class') }} {{ $selectAttributes }}>
 
-        @include('keys::partials.select-inputs')
+        @if($isLivewireEnabled ?? false)
+            @if($multiple)
+                <input
+                    type="hidden"
+                    name="{{ $name }}"
+                    class="select-stable-input select-livewire-input"
+                    data-livewire-input="true"
+                    data-livewire-multiple="true"
+                    {{ $wireOnlyAttributes ?? collect() }}
+                >
+            @else
+                <input
+                    type="hidden"
+                    name="{{ $name }}"
+                    class="select-stable-input select-livewire-input"
+                    data-livewire-input="true"
+                    data-livewire-multiple="false"
+                    {{ $wireOnlyAttributes ?? collect() }}
+                >
+            @endif
+        @else
+            @if($multiple)
+                @php
+                    $selectedValues = $getSelectedValues();
+                    $maxInputs = 15;
+                @endphp
+
+                @for($i = 0; $i < $maxInputs; $i++)
+                    @php
+                        $currentValue = $selectedValues[$i] ?? '';
+                        $isActive = $i < count($selectedValues);
+                        $isFirst = $i === 0;
+                    @endphp
+
+                    <input
+                        type="hidden"
+                        name="{{ $name }}[]"
+                        value="{{ $currentValue }}"
+                        class="select-stable-input select-pool-input"
+                        data-pool-index="{{ $i }}"
+                        data-pool-active="{{ $isActive ? 'true' : 'false' }}"
+                        style="{{ $isActive ? '' : 'display: none;' }}"
+                    >
+                @endfor
+            @else
+                <input
+                    type="hidden"
+                    name="{{ $name }}"
+                    value="{{ $value ?? '' }}"
+                    class="select-stable-input select-single-input"
+                    data-single-input="true"
+                >
+            @endif
+        @endif
 
 
         <div wire:ignore>
@@ -259,7 +364,7 @@
                                 </span>
                             @else
 
-                                <div class="flex items-center gap-2 select-value truncate pointer-events-none text-text" data-select-display>
+                                <div class="flex items-center gap-2 select-value truncate pointer-events-none text-primary" data-select-display>
                                     @if($value)
                                         {{ $value }}
                                     @else

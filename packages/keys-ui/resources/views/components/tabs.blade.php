@@ -20,10 +20,10 @@
         default => $stretch ? 'w-full gap-1' : 'space-x-1'
     };
     $tabListVariantClasses = match ($variant) {
-        'pills' => 'bg-body p-1 rounded-lg',
-        'underline' => 'border-b border-border',
-        'default' => 'border-b border-border',
-        default => 'border-b border-border'
+        'pills' => 'bg-base p-1 rounded-lg',
+        'underline' => 'border-b border-line',
+        'default' => 'border-b border-line',
+        default => 'border-b border-line'
     };
     $tabListClasses = "$tabListBaseClasses $tabListOrientationClasses $tabListVariantClasses";
 
@@ -72,7 +72,7 @@
     bottom: 0;
     left: 0;
     border-radius: var(--radius-sm);
-    background: var(--color-brand);
+    background: var(--color-accent);
 }
 
 /* Vertical tabs marker */
@@ -81,13 +81,13 @@
     top: 0;
     left: 0;
     border-radius: var(--radius-sm);
-    background: var(--color-brand);
+    background: var(--color-accent);
 }
 
 /* Pills variant marker - full height behind tab */
 [data-variant="pills"] .tab-marker {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    background: var(--color-elevation-1);
+    border: 1px solid var(--color-line);
     border-radius: var(--radius-lg);
     top: 0;
     left: 0;
@@ -111,7 +111,7 @@
 
 /* Focus ring only on keyboard navigation */
 [data-tabs-trigger="true"]:focus-visible {
-    outline: 2px solid var(--color-border);
+    outline: 2px solid var(--color-line);
     outline-offset: 2px;
 }
 

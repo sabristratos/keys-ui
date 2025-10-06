@@ -9,7 +9,7 @@
 
     $iconClasses = 'mx-auto mb-4';
     $iconClasses .= match ($variant) {
-        'brand' => ' text-brand',
+        'brand' => ' text-accent',
         'success' => ' text-success',
         'warning' => ' text-warning',
         'danger' => ' text-danger',

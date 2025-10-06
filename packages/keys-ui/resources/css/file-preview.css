@@ -24,8 +24,8 @@
     }
 
     .file-preview-item.uploading {
-        border-color: var(--color-brand);
-        background-color: color-mix(in srgb, var(--color-brand) 5%, transparent);
+        border-color: var(--color-accent);
+        background-color: color-mix(in srgb, var(--color-accent) 5%, transparent);
     }
 
     /* Progress bar animation - Custom keyframe */

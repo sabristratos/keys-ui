@@ -3,10 +3,10 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 class Dropdown extends Component
 {
-    private const VALID_SIZES = ['sm', 'md', 'lg'];
 
     public function __construct(
         public ?string $id = null,
@@ -30,30 +30,7 @@ class Dropdown extends Component
             $this->align = 'start';
         }
 
-        if (!in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
-    }
-
-    public function dropdownClasses(): string
-    {
-        
-        return '';
-    }
-
-    public function panelClasses(): string
-    {
-        
-        $base = 'bg-surface border border-border rounded-lg shadow-lg space-y-1 max-w-[90vw] w-max';
-
-        $sizeClasses = match ($this->size) {
-            'sm' => 'min-w-40 sm:min-w-40 p-1',
-            'md' => 'min-w-48 sm:min-w-48 p-1',
-            'lg' => 'min-w-56 sm:min-w-56 p-1',
-            default => 'min-w-48 sm:min-w-48 p-1'
-        };
-
-        return trim($base . ' ' . $sizeClasses);
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_SM_TO_LG, 'md');
     }
 
     public function getComputedPlacement(): string
@@ -94,14 +71,7 @@ class Dropdown extends Component
             'data-offset' => $this->offset,
             'data-disabled' => $this->disabled ? 'true' : 'false',
             'data-modal' => $this->modal ? 'true' : 'false',
-            'class' => $this->panelClasses() 
         ];
-    }
-
-    public function triggerClasses(): string
-    {
-        
-        return '';
     }
 
     public function isDisabled(): bool
@@ -112,9 +82,6 @@ class Dropdown extends Component
     public function render()
     {
         return view('keys::components.dropdown', [
-            'computedDropdownClasses' => $this->dropdownClasses(),
-            'computedPanelClasses' => $this->panelClasses(),
-            'computedTriggerClasses' => $this->triggerClasses(),
             'computedDataAttributes' => $this->getDataAttributes(),
             'computedPlacement' => $this->getComputedPlacement(),
         ]);

@@ -3,7 +3,7 @@
 
     $rowVariantClasses = '';
     if ($selected) {
-        $rowVariantClasses = 'bg-brand/10 border-l-2 border-brand';
+        $rowVariantClasses = 'bg-accent/10 border-l-2 border-accent';
     } else {
         $rowVariantClasses = match ($variant) {
             'danger' => 'bg-danger-subtle',

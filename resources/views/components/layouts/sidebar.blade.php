@@ -17,68 +17,9 @@
 
         @livewireStyles
 </head>
-<body class="h-full overflow-hidden bg-body text-foreground font-sans antialiased">
+<body class="h-full overflow-hidden bg-base text-primary font-sans antialiased">
     {{-- Full-height Layout Container --}}
     <div class="h-full flex">
-        {{-- Built-in Sidebar Structure with Demo Content --}}
-        @isset($sidebar)
-            {{-- Custom sidebar content provided by page --}}
-            {{ $sidebar }}
-        @else
-            {{-- Default sidebar with new header pattern --}}
-            <x-keys::sidebar
-                :id="$sidebarId ?? 'main-sidebar'"
-                :width="$sidebarWidth ?? 'md'"
-                :collapsible="$sidebarCollapsible ?? true"
-                :collapsed="$sidebarCollapsed ?? true"
-                :variant="$sidebarVariant ?? 'default'"
-                :sticky="$sidebarSticky ?? false"
-                :aria-label="$sidebarAriaLabel ?? 'Main navigation'"
-                :title="$sidebarTitle ?? config('app.name', 'App')"
-                :subtitle="$sidebarSubtitle ?? 'Dashboard'"
-            >
-                {{-- Built-in default logo (always present for consistency) --}}
-                <x-slot:logo>
-                    <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center">
-                        <x-keys::icon :name="$sidebarLogoIcon ?? 'heroicon-o-squares-2x2'" size="sm" class="text-white" />
-                    </div>
-                </x-slot:logo>
-
-            {{-- Navigation Content --}}
-            <x-keys::sidebar.section heading="Main">
-                <x-keys::sidebar.item href="#" icon="heroicon-o-home" active>
-                    Dashboard
-                </x-keys::sidebar.item>
-                <x-keys::sidebar.item href="#" icon="heroicon-o-inbox">
-                    Inbox
-                </x-keys::sidebar.item>
-                <x-keys::sidebar.item href="#" icon="heroicon-o-document-text">
-                    Documents
-                </x-keys::sidebar.item>
-                <x-keys::sidebar.item href="#" icon="heroicon-o-calendar">
-                    Calendar
-                </x-keys::sidebar.item>
-            </x-keys::sidebar.section>
-
-            <x-keys::sidebar.divider />
-
-            <x-keys::sidebar.section heading="Settings">
-                <x-keys::sidebar.item href="#" icon="heroicon-o-cog-6-tooth">
-                    Settings
-                </x-keys::sidebar.item>
-                <x-keys::sidebar.item href="#" icon="heroicon-o-question-mark-circle">
-                    Help
-                </x-keys::sidebar.item>
-            </x-keys::sidebar.section>
-
-                {{-- Sidebar Footer --}}
-                <x-slot:footer>
-                    <div class="p-4 border-t border-border">
-                        <p class="text-xs text-muted">{{ config('app.name', 'App') }} v1.0</p>
-                    </div>
-                </x-slot:footer>
-            </x-keys::sidebar>
-        @endisset
 
         {{-- Main Content Area (auto-wrapped with Main component) --}}
         <x-keys::main

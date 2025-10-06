@@ -3,6 +3,7 @@
 namespace Keys\UI\Components;
 
 use Illuminate\View\Component;
+use Keys\UI\Constants\ComponentConstants;
 
 /**
  * Chart Component
@@ -13,7 +14,6 @@ use Illuminate\View\Component;
  */
 class Chart extends Component
 {
-    private const VALID_SIZES = ['xs', 'sm', 'md', 'lg', 'xl'];
 
     public array $processedData = [];
     public array $processedSeries = [];
@@ -94,9 +94,7 @@ class Chart extends Component
         }
 
         
-        if (!in_array($this->size, self::VALID_SIZES)) {
-            $this->size = 'md';
-        }
+        $this->size = ComponentConstants::validate($this->size, ComponentConstants::SIZES_XS_TO_XL, 'md');
 
         
         if (empty($this->colors)) {

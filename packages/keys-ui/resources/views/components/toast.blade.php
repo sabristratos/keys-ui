@@ -1,14 +1,14 @@
 
 @php
 
-    $baseClasses = 'max-w-sm w-fit h-fit rounded-lg shadow-lg text-text z-[9999] p-0 overflow-visible opacity-100';
+    $baseClasses = 'max-w-sm w-fit h-fit rounded-lg shadow-lg text-primary z-[9999] p-0 overflow-visible opacity-100';
 
     $variantClasses = match ($variant) {
         'success' => 'border border-success bg-success-subtle',
         'warning' => 'border border-warning bg-warning-subtle',
         'danger' => 'border border-danger bg-danger-subtle',
         'info' => 'border border-info bg-info-subtle',
-        'neutral' => 'border border-border bg-surface',
+        'neutral' => 'border border-line bg-elevation-1',
         default => 'border border-info bg-info-subtle'
     };
 

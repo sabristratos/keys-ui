@@ -4,9 +4,14 @@ namespace Keys\UI\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
+use Keys\UI\Concerns\HandlesValidationErrors;
+use Keys\UI\Concerns\HasActions;
 
 class Toggle extends Component
 {
+    use HandlesValidationErrors;
+    use HasActions;
+
     public function __construct(
         public ?string $name = null,
         public ?string $id = null,
@@ -37,61 +42,6 @@ class Toggle extends Component
     public function hasError(): bool
     {
         return $this->hasError || $this->hasErrors();
-    }
-
-    public function hasErrors(): bool
-    {
-        if (is_null($this->errors)) {
-            return false;
-        }
-
-        if (is_string($this->errors)) {
-            return ! empty(trim($this->errors));
-        }
-
-        if (is_array($this->errors)) {
-            return ! empty($this->errors);
-        }
-
-        if ($this->errors instanceof Collection) {
-            return $this->errors->isNotEmpty();
-        }
-
-        return false;
-    }
-
-    public function hasActions(): bool
-    {
-        return ! empty($this->actions);
-    }
-
-    public function getComputedActionData(): array
-    {
-        $actions = [];
-
-        foreach ($this->actions as $action) {
-            $computedAction = [
-                'type' => $action['type'],
-                'icon' => $action['icon'],
-                'label' => $action['label'],
-                'is_multi_state' => isset($action['icon_toggle']) || isset($action['icon_success']),
-                'data_action' => $action['type'],
-                'data_icon_default' => $action['icon'],
-                'icon_toggle' => $action['icon_toggle'] ?? null,
-                'icon_success' => $action['icon_success'] ?? null,
-                'label_toggle' => $action['label_toggle'] ?? null,
-                'label_success' => $action['label_success'] ?? null,
-                'data_url' => $action['url'] ?? null,
-                'data_icon_toggle' => $action['icon_toggle'] ?? null,
-                'data_icon_success' => $action['icon_success'] ?? null,
-                'data_label_toggle' => $action['label_toggle'] ?? null,
-                'data_label_success' => $action['label_success'] ?? null,
-            ];
-
-            $actions[] = $computedAction;
-        }
-
-        return $actions;
     }
 
     public function hasContent(): bool

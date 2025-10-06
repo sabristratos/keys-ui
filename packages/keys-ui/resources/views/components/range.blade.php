@@ -57,7 +57,7 @@
         'xl' => 'h-4',
         default => 'h-2'
     };
-    $fillStateClasses = $hasError() ? 'bg-danger' : 'bg-brand';
+    $fillStateClasses = $hasError() ? 'bg-danger' : 'bg-accent';
     $fillClasses = "$fillBaseClasses $fillHeightClasses $fillStateClasses";
 @endphp
 
@@ -363,12 +363,12 @@
             transform: translateX(-50%) translateY(-4px);
             margin-bottom: 8px;
             padding: 6px 10px;
-            background: var(--color-surface);
-            color: var(--color-foreground);
+            background: var(--color-elevation-1);
+            color: var(--color-primary);
             font-size: 12px;
             font-weight: 500;
             border-radius: 6px;
-            border: 1px solid var(--color-border);
+            border: 1px solid var(--color-line);
             white-space: nowrap;
             opacity: 0;
             transition: all 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -410,7 +410,7 @@
             left: 0;
             width: 2px;
             height: 100%;
-            background: var(--color-border);
+            background: var(--color-line);
             transform: translateX(-50%);
         }
 

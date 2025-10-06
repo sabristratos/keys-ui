@@ -48,7 +48,7 @@
     };
 
     $checkedColor = match ($color) {
-        'brand' => 'peer-checked:bg-brand',
+        'brand' => 'peer-checked:bg-accent',
         'success' => 'peer-checked:bg-success',
         'warning' => 'peer-checked:bg-warning',
         'danger' => 'peer-checked:bg-danger',
@@ -59,7 +59,7 @@
         'yellow' => 'peer-checked:bg-yellow-400',
         'teal' => 'peer-checked:bg-teal-600',
         'orange' => 'peer-checked:bg-orange-500',
-        default => 'peer-checked:bg-brand'
+        default => 'peer-checked:bg-accent'
     };
 
     $thumbSize = match ($size) {
@@ -118,7 +118,7 @@
 
     
     @if($hasContent())
-        <div class="flex-1 min-w-0 focus-within:[&_[data-icon]]:text-brand">
+        <div class="flex-1 min-w-0 focus-within:[&_[data-icon]]:text-accent">
             <div class="flex items-start justify-between">
                 <div class="flex-1 min-w-0">
                     @if($label)

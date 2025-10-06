@@ -10,14 +10,14 @@
     };
 
     $dropzoneStateClasses = match (true) {
-        $disabled => 'border-neutral bg-surface cursor-not-allowed opacity-50',
+        $disabled => 'border-neutral bg-elevation-1 cursor-not-allowed opacity-50',
         $hasError() => 'border-danger bg-danger/5 hover:border-danger-hover cursor-pointer',
-        default => 'border-border bg-surface hover:border-brand hover:bg-brand/5 has-[:focus-visible]:border-brand has-[:focus-visible]:bg-brand/5 cursor-pointer'
+        default => 'border-line bg-elevation-1 hover:border-accent hover:bg-accent/5 has-[:focus-visible]:border-accent has-[:focus-visible]:bg-accent/5 cursor-pointer'
     };
 
     $dropzoneClasses = "$dropzoneBaseClasses $sizeClasses $dropzoneStateClasses";
 
-    $filePreviewClasses = 'hidden p-4 rounded-lg border-2 border-border bg-surface transition-all duration-300 ease-in-out';
+    $filePreviewClasses = 'hidden p-4 rounded-lg border-2 border-line bg-elevation-1 transition-all duration-300 ease-in-out';
 @endphp
 
 <div @if($isShorthand()) class="space-y-2" @endif>
@@ -83,15 +83,15 @@
                 <div class="flex items-center space-x-4">
                     
                     <div class="flex-shrink-0">
-                        <img class="file-preview-image hidden w-20 h-20 object-cover rounded-lg border-2 border-border" alt="" />
-                        <div class="file-icon flex items-center justify-center w-20 h-20 bg-surface border-2 border-border rounded-lg">
+                        <img class="file-preview-image hidden w-20 h-20 object-cover rounded-lg border-2 border-line" alt="" />
+                        <div class="file-icon flex items-center justify-center w-20 h-20 bg-elevation-1 border-2 border-line rounded-lg">
                             <x-keys::icon name="heroicon-o-document" size="lg" />
                         </div>
                     </div>
 
                     
                     <div class="flex-1 min-w-0">
-                        <div class="file-name text-sm font-medium text-text truncate"></div>
+                        <div class="file-name text-sm font-medium text-primary truncate"></div>
                         <div class="file-size text-xs text-muted mt-1"></div>
 
                         
@@ -114,8 +114,8 @@
                 </div>
 
                 
-                <div class="upload-progress hidden mt-4 w-full bg-surface rounded-full overflow-hidden h-1.5">
-                    <div class="upload-progress-bar bg-brand h-full transition-all duration-300 ease-out" style="width: 0%"></div>
+                <div class="upload-progress hidden mt-4 w-full bg-elevation-1 rounded-full overflow-hidden h-1.5">
+                    <div class="upload-progress-bar bg-accent h-full transition-all duration-300 ease-out" style="width: 0%"></div>
                 </div>
             </div>
 

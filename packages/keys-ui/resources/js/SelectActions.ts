@@ -427,13 +427,13 @@ export class SelectActions extends BaseActionClass<SelectState> {
         const richContent = option ? option.htmlContent : displayLabel;
 
         const chip = document.createElement('span');
-        chip.className = 'inline-flex items-center font-medium px-2 py-0.5 text-xs rounded-full bg-surface text-text border border-border gap-1.5';
+        chip.className = 'inline-flex items-center font-medium px-2 py-0.5 text-xs rounded-full bg-elevation-1 text-primary border border-line gap-1.5';
         chip.setAttribute('data-select-chip', 'true');
         chip.setAttribute('data-chip-value', value);
 
         chip.innerHTML = `
             <span class="chip-content inline-flex items-center gap-1.5">${richContent}</span>
-            <button type="button" class="w-4 h-4 flex items-center justify-center rounded-full hover:bg-hover transition-colors focus:outline-none focus:ring-1 focus:ring-border ml-0.5" data-chip-remove data-chip-value="${value}">
+            <button type="button" class="w-4 h-4 flex items-center justify-center rounded-full hover:bg-hover transition-colors focus:outline-none focus:ring-1 focus:ring-line ml-0.5" data-chip-remove data-chip-value="${value}">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
