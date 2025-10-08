@@ -2,7 +2,7 @@
     $textareaAttributes = $attributes->whereStartsWith('wire:');
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:');
 
-    $baseClasses = 'block shadow-xs w-full bg-input border border-line rounded-md transition-colors duration-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 placeholder:text-muted';
+    $baseClasses = 'block w-full bg-input border border-line rounded-md transition-colors duration-200 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 placeholder:text-muted';
 
     $sizeClasses = match ($size) {
         'xs' => 'px-2.5 py-1 text-xs',

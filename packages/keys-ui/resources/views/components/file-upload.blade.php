@@ -11,7 +11,7 @@
 
     $dropzoneStateClasses = match (true) {
         $disabled => 'border-neutral bg-elevation-1 cursor-not-allowed opacity-50',
-        $hasError() => 'border-danger bg-danger/5 hover:border-danger-hover cursor-pointer',
+        $hasErrors() => 'border-danger bg-danger/5 hover:border-danger-hover cursor-pointer',
         default => 'border-line bg-elevation-1 hover:border-accent hover:bg-accent/5 has-[:focus-visible]:border-accent has-[:focus-visible]:bg-accent/5 cursor-pointer'
     };
 
@@ -78,10 +78,10 @@
                 <div class="file-total-size text-sm text-muted"></div>
             </div>
 
-            
+
             <div class="single-file-preview">
                 <div class="flex items-center space-x-4">
-                    
+
                     <div class="flex-shrink-0">
                         <img class="file-preview-image hidden w-20 h-20 object-cover rounded-lg border-2 border-line" alt="" />
                         <div class="file-icon flex items-center justify-center w-20 h-20 bg-elevation-1 border-2 border-line rounded-lg">
@@ -89,12 +89,12 @@
                         </div>
                     </div>
 
-                    
+
                     <div class="flex-1 min-w-0">
                         <div class="file-name text-sm font-medium text-primary truncate"></div>
                         <div class="file-size text-xs text-muted mt-1"></div>
 
-                        
+
                         <div class="flex items-center space-x-2 mt-3">
                             <x-keys::button
                                 variant="outline"
@@ -113,18 +113,18 @@
                     </div>
                 </div>
 
-                
+
                 <div class="upload-progress hidden mt-4 w-full bg-elevation-1 rounded-full overflow-hidden h-1.5">
                     <div class="upload-progress-bar bg-accent h-full transition-all duration-300 ease-out" style="width: 0%"></div>
                 </div>
             </div>
 
-            
+
             <div class="multiple-files-preview hidden grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 gap-3">
-                
+
             </div>
 
-            
+
             <div class="add-more-files hidden mt-4">
                 <x-keys::button
                     variant="outline"

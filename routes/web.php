@@ -28,3 +28,7 @@ Route::get('/test-sidebar-default', function () {
     return view('test-sidebar-default');
 })->name('test.sidebar.default');
 
+Route::get('/test', function () {
+    return view('test');
+})->name('test.components');
+

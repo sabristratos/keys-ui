@@ -2,87 +2,102 @@
     $checkboxAttributes = $attributes->whereStartsWith('wire:model');
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:model');
 
-    $checkboxBaseClasses = 'border transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 shrink-0';
-
-    $checkboxSizeClasses = match ($size) {
-        'sm' => 'h-3 w-3 text-xs',
-        'md' => 'h-3.5 w-3.5 text-sm',
-        'lg' => 'h-4 w-4 text-base',
-        default => 'h-3.5 w-3.5 text-sm'
+    // Custom checkbox box size
+    $boxSizeClasses = match ($size) {
+        'sm' => 'w-4 h-4',
+        'md' => 'w-5 h-5',
+        'lg' => 'w-6 h-6',
+        default => 'w-5 h-5'
     };
 
-    $checkboxVariantClasses = match ($variant) {
-        'standard', 'bordered', 'card' => 'rounded',
-        'colored' => 'rounded border-2',
-        default => 'rounded'
+    // SVG checkmark size
+    $iconSizeClasses = match ($size) {
+        'sm' => 'w-2.5 h-2.5',
+        'md' => 'w-3 h-3',
+        'lg' => 'w-4 h-4',
+        default => 'w-3 h-3'
     };
 
+    // Base checkbox box styling - custom visual element
     if ($disabled) {
-        $checkboxStateClasses = 'bg-neutral-100 border-neutral-300 text-neutral-400 cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-700';
+        $checkboxBoxClasses = 'border-2 border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-700/30 rounded-md flex items-center justify-center cursor-not-allowed shadow-xs';
+        $checkmarkClasses = 'text-neutral-400 dark:text-neutral-600';
     } elseif ($hasError()) {
-        $checkboxStateClasses = 'bg-input border-danger text-danger focus-visible:border-danger focus-visible:ring-danger';
+        $checkboxBoxClasses = 'border-2 rounded-md flex items-center justify-center transition-all duration-300 border-danger group-hover:border-danger group-has-[:focus-visible]:ring-2 group-has-[:focus-visible]:ring-offset-2 group-has-[:focus-visible]:ring-danger dark:group-has-[:focus-visible]:ring-offset-neutral-900 shadow-xs';
+        $checkmarkClasses = 'text-white opacity-0 transform scale-0 transition-all duration-200 ease-out group-has-[:checked]:opacity-100 group-has-[:checked]:scale-100';
+        $checkboxBoxClasses .= ' group-has-[:checked]:border-transparent group-has-[:checked]:bg-danger';
     } else {
-        $colorClasses = match ($color) {
-            'brand' => 'text-accent focus-visible:ring-accent',
-            'success' => 'text-success focus-visible:ring-success',
-            'warning' => 'text-warning focus-visible:ring-warning',
-            'danger' => 'text-danger focus-visible:ring-danger',
-            'neutral' => 'text-neutral-600 focus-visible:ring-neutral-500',
-            default => 'text-accent focus-visible:ring-accent'
+        // Color-based solid backgrounds and states
+        $bgClasses = match ($color) {
+            'brand' => 'group-has-[:checked]:bg-indigo-500',
+            'success' => 'group-has-[:checked]:bg-green-500',
+            'warning' => 'group-has-[:checked]:bg-amber-500',
+            'danger' => 'group-has-[:checked]:bg-red-500',
+            'neutral' => 'group-has-[:checked]:bg-neutral-500 dark:group-has-[:checked]:bg-neutral-600',
+            default => 'group-has-[:checked]:bg-indigo-500'
         };
 
-        if ($variant === 'colored') {
-            $borderColor = match ($color) {
-                'brand' => 'border-accent',
-                'success' => 'border-success',
-                'warning' => 'border-warning',
-                'danger' => 'border-danger',
-                'neutral' => 'border-neutral-400',
-                default => 'border-accent'
-            };
-            $checkboxStateClasses = "bg-input border-line hover:$borderColor $colorClasses";
-        } else {
-            $checkboxStateClasses = 'bg-input border-line hover:border-neutral-300 dark:hover:border-neutral-600 ' . $colorClasses;
-        }
-    }
+        $hoverColor = match ($color) {
+            'brand' => 'group-hover:border-indigo-500',
+            'success' => 'group-hover:border-green-500',
+            'warning' => 'group-hover:border-amber-500',
+            'danger' => 'group-hover:border-red-500',
+            'neutral' => 'group-hover:border-neutral-400',
+            default => 'group-hover:border-indigo-500'
+        };
 
-    $checkboxClasses = "$checkboxBaseClasses $checkboxSizeClasses $checkboxVariantClasses $checkboxStateClasses";
+        $focusRing = match ($color) {
+            'brand' => 'group-has-[:focus-visible]:ring-indigo-500',
+            'success' => 'group-has-[:focus-visible]:ring-green-500',
+            'warning' => 'group-has-[:focus-visible]:ring-amber-500',
+            'danger' => 'group-has-[:focus-visible]:ring-red-500',
+            'neutral' => 'group-has-[:focus-visible]:ring-neutral-500',
+            default => 'group-has-[:focus-visible]:ring-indigo-500'
+        };
+
+        $checkboxBoxClasses = "border-2 border-neutral-400 dark:border-neutral-500 rounded-md flex items-center justify-center transition-all duration-300 {$hoverColor} {$bgClasses} group-has-[:checked]:border-transparent group-has-[:focus-visible]:ring-2 group-has-[:focus-visible]:ring-offset-2 {$focusRing} dark:group-has-[:focus-visible]:ring-offset-neutral-900 shadow-xs";
+        $checkmarkClasses = 'text-white opacity-0 transform scale-0 transition-all duration-200 ease-out group-has-[:checked]:opacity-100 group-has-[:checked]:scale-100';
+    }
 
     $gap = ($variant === 'card' && !$showInput) ? 'gap-0' : 'gap-3';
 
     $wrapperBaseClasses = match ($variant) {
-        'standard' => "flex items-center {$gap} cursor-pointer",
-        'bordered' => "flex items-center {$gap} p-4 border border-line rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
-        'colored' => "flex items-center {$gap} p-4 border-2 rounded-lg transition-colors duration-200 cursor-pointer",
-        'card' => "flex items-center {$gap} p-4 border border-line rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
-        default => "flex items-center {$gap} cursor-pointer"
+        'standard' => "group flex items-center {$gap} cursor-pointer",
+        'bordered' => "group flex items-center {$gap} p-4 border border-line rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
+        'colored' => "group flex items-center {$gap} p-4 border-2 rounded-lg transition-colors duration-200 cursor-pointer",
+        'card' => "group flex items-center {$gap} p-4 border border-line rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
+        default => "group flex items-center {$gap} cursor-pointer"
     };
+
+    if ($disabled) {
+        $wrapperBaseClasses = str_replace('cursor-pointer', 'cursor-not-allowed', $wrapperBaseClasses);
+    }
 
     if ($variant === 'colored') {
         $borderColor = match ($color) {
-            'brand' => 'border-line has-[:checked]:border-accent has-[:checked]:bg-accent/5',
-            'success' => 'border-line has-[:checked]:border-success has-[:checked]:bg-success/5',
-            'warning' => 'border-line has-[:checked]:border-warning has-[:checked]:bg-warning/5',
-            'danger' => 'border-line has-[:checked]:border-danger has-[:checked]:bg-danger/5',
+            'brand' => 'border-line has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-950/30',
+            'success' => 'border-line has-[:checked]:border-green-500 has-[:checked]:bg-green-50 dark:has-[:checked]:bg-green-950/30',
+            'warning' => 'border-line has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 dark:has-[:checked]:bg-amber-950/30',
+            'danger' => 'border-line has-[:checked]:border-red-500 has-[:checked]:bg-red-50 dark:has-[:checked]:bg-red-950/30',
             'neutral' => 'border-line has-[:checked]:border-neutral-400 has-[:checked]:bg-neutral-100 dark:has-[:checked]:bg-neutral-800',
-            default => 'border-line has-[:checked]:border-accent has-[:checked]:bg-accent/5'
+            default => 'border-line has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-950/30'
         };
         $wrapperBaseClasses .= ' ' . $borderColor;
     }
 
     if ($variant === 'card') {
         $bgColor = match ($color) {
-            'brand' => 'has-[:checked]:bg-accent/5 has-[:checked]:border-accent',
-            'success' => 'has-[:checked]:bg-success/5 has-[:checked]:border-success',
-            'warning' => 'has-[:checked]:bg-warning/5 has-[:checked]:border-warning',
-            'danger' => 'has-[:checked]:bg-danger/5 has-[:checked]:border-danger',
+            'brand' => 'has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 dark:has-[:checked]:bg-indigo-950/30',
+            'success' => 'has-[:checked]:bg-green-50 has-[:checked]:border-green-500 dark:has-[:checked]:bg-green-950/30',
+            'warning' => 'has-[:checked]:bg-amber-50 has-[:checked]:border-amber-500 dark:has-[:checked]:bg-amber-950/30',
+            'danger' => 'has-[:checked]:bg-red-50 has-[:checked]:border-red-500 dark:has-[:checked]:bg-red-950/30',
             'neutral' => 'has-[:checked]:bg-neutral-100 has-[:checked]:border-neutral-400 dark:has-[:checked]:bg-neutral-800',
-            default => 'has-[:checked]:bg-accent/5 has-[:checked]:border-accent'
+            default => 'has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 dark:has-[:checked]:bg-indigo-950/30'
         };
         $wrapperBaseClasses .= ' ' . $bgColor;
     }
 
-    if ($hasError()) {
+    if ($hasError() && in_array($variant, ['bordered', 'colored', 'card'])) {
         $wrapperBaseClasses .= ' border-danger';
     }
 
@@ -98,32 +113,27 @@
 @endphp
 
 <label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $wrapperBaseClasses])->merge($dataAttributes) }}>
+    {{-- Hidden native checkbox input --}}
+    <input
+        type="checkbox"
+        id="{{ $id }}"
+        name="{{ $name }}"
+        value="{{ $value }}"
+        {{ $checked ? 'checked' : '' }}
+        {{ $disabled ? 'disabled' : '' }}
+        {{ $required ? 'required' : '' }}
+        {{ $indeterminate ? 'data-indeterminate=true' : '' }}
+        class="absolute opacity-0 w-0 h-0"
+        {{ $checkboxAttributes }}
+    />
+
     @if($showInput)
-        <input
-            type="checkbox"
-            id="{{ $id }}"
-            name="{{ $name }}"
-            value="{{ $value }}"
-            {{ $checked ? 'checked' : '' }}
-            {{ $disabled ? 'disabled' : '' }}
-            {{ $required ? 'required' : '' }}
-            {{ $indeterminate ? 'data-indeterminate=true' : '' }}
-            class="{{ $checkboxClasses }}"
-            {{ $checkboxAttributes }}
-        />
-    @else
-        <input
-            type="checkbox"
-            id="{{ $id }}"
-            name="{{ $name }}"
-            value="{{ $value }}"
-            {{ $checked ? 'checked' : '' }}
-            {{ $disabled ? 'disabled' : '' }}
-            {{ $required ? 'required' : '' }}
-            {{ $indeterminate ? 'data-indeterminate=true' : '' }}
-            class="sr-only"
-            {{ $checkboxAttributes }}
-        />
+        {{-- Custom visual checkbox with animated checkmark --}}
+        <div class="{{ $boxSizeClasses }} {{ $checkboxBoxClasses }} shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="{{ $iconSizeClasses }} {{ $checkmarkClasses }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
     @endif
 
     @if($hasContent())
@@ -131,7 +141,7 @@
             <div class="flex items-start justify-between">
                 <div class="flex-1 min-w-0">
                     @if($isCard())
-                        
+
                         @if($icon)
                             <div class="flex items-center gap-2 mb-1 text-muted">
                                 <x-keys::icon :name="$icon" :size="$iconSize()" class="shrink-0" />
@@ -157,7 +167,7 @@
                             <x-keys::text size="sm" color="muted">{{ $description }}</x-keys::text>
                         @endif
                     @else
-                        
+
                         @if($label)
                             <x-keys::text element="span" :size="$labelSize" :color="$labelColor" :weight="$labelWeight">
                                 {{ $label }}

@@ -86,7 +86,7 @@
                 </x-keys::heading>
             @endif
 
-            <x-keys::text color="muted" :size="$textSize" :class="$hasTitle ? 'mt-1' : ''">
+            <x-keys::text color="text" :size="$textSize" :class="$hasTitle ? 'mt-1' : ''">
                 {{ $slot }}
             </x-keys::text>
 

@@ -71,7 +71,8 @@
       "WebFetch(domain:markus.oberlehner.net)",
       "WebFetch(domain:frontendmasters.com)",
       "WebFetch(domain:cdn.jsdelivr.net)",
-      "WebFetch(domain:sinnbeck.dev)"
+      "WebFetch(domain:sinnbeck.dev)",
+      "WebFetch(domain:ui.shadcn.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -1,712 +1,1206 @@
-<x-layouts.sidebar title="Keys UI - Component Library">
-    <div class="space-y-16">
-        {{-- Button Component Showcase --}}
-        <section class="space-y-8">
+<x-layouts.sidebar title="Keys UI - Dashboard">
+
+    {{-- Toast Container --}}
+    <x-keys::toast />
+
+    {{-- Main Dashboard Content --}}
+    <div class="space-y-6">
+
+        {{-- Header Section --}}
+        <div class="flex items-center justify-between">
             <div>
-                <x-keys::heading level="h1" size="3xl">Button Component</x-keys::heading>
-                <x-keys::text color="muted" size="lg" class="mt-2">
-                    Versatile button component with multiple variants, sizes, and states using the refactored design token system.
+                <x-keys::heading level="h1" size="3xl">
+                    Welcome back, Sarah
+                </x-keys::heading>
+                <x-keys::text color="muted" size="sm">
+                    Here's what's happening with your projects today
                 </x-keys::text>
             </div>
 
-            {{-- Variants Showcase --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Variants</x-keys::heading>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="bg-surface p-6 rounded-lg space-y-3">
-                        <x-keys::text weight="medium">Solid</x-keys::text>
-                        <x-keys::button>Primary Button</x-keys::button>
-                    </div>
-                    <div class="bg-surface p-6 rounded-lg space-y-3">
-                        <x-keys::text weight="medium">Outlined</x-keys::text>
-                        <x-keys::button variant="outlined">Primary Button</x-keys::button>
-                    </div>
-                    <div class="bg-surface p-6 rounded-lg space-y-3">
-                        <x-keys::text weight="medium">Ghost</x-keys::text>
-                        <x-keys::button variant="ghost">Primary Button</x-keys::button>
-                    </div>
-                    <div class="bg-surface p-6 rounded-lg space-y-3">
-                        <x-keys::text weight="medium">Subtle</x-keys::text>
-                        <x-keys::button variant="subtle">Primary Button</x-keys::button>
-                    </div>
-                </div>
-            </div>
+            <div class="flex items-center gap-3">
+                {{-- Quick Actions --}}
+                <x-keys::group attached>
+                    <x-keys::button variant="outlined" icon-left="heroicon-o-plus" onclick="document.getElementById('create-project-modal').showModal()">
+                        New Project
+                    </x-keys::button>
+                    <x-keys::button variant="outlined" icon-left="heroicon-o-cog-6-tooth" onclick="document.getElementById('settings-slideout').showModal()">
+                        Settings
+                    </x-keys::button>
+                </x-keys::group>
 
-            {{-- Colors Showcase --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Colors</x-keys::heading>
-                <div class="bg-surface p-6 rounded-lg">
-                    <div class="flex flex-wrap gap-3">
-                        <x-keys::button color="primary">Primary</x-keys::button>
-                        <x-keys::button color="secondary">Secondary</x-keys::button>
-                        <x-keys::button color="success">Success</x-keys::button>
-                        <x-keys::button color="warning">Warning</x-keys::button>
-                        <x-keys::button color="danger">Danger</x-keys::button>
-                        <x-keys::button color="info">Info</x-keys::button>
+                {{-- Notifications Dropdown --}}
+                <x-keys::dropdown position="bottom" align="end">
+                    <x-slot:trigger>
+                        <x-keys::button variant="ghost" icon="heroicon-o-bell">
+                            <span class="sr-only">Notifications</span>
+                        </x-keys::button>
+                    </x-slot:trigger>
+
+                    <x-keys::dropdown.item icon="heroicon-o-inbox">
+                        3 new messages
+                    </x-keys::dropdown.item>
+                    <x-keys::dropdown.item icon="heroicon-o-check-circle">
+                        Task completed
+                    </x-keys::dropdown.item>
+                    <x-keys::dropdown.separator />
+                    <x-keys::dropdown.item icon="heroicon-o-cog">
+                        Notification settings
+                    </x-keys::dropdown.item>
+                </x-keys::dropdown>
+
+                {{-- User Profile --}}
+                <x-keys::dropdown position="bottom" align="end">
+                    <x-slot:trigger>
+                        <x-keys::avatar
+                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150"
+                            name="Sarah Johnson"
+                            size="md"
+                            status="online"
+                        />
+                    </x-slot:trigger>
+
+                    <x-keys::dropdown.item icon="heroicon-o-user">Profile</x-keys::dropdown.item>
+                    <x-keys::dropdown.item icon="heroicon-o-cog">Settings</x-keys::dropdown.item>
+                    <x-keys::dropdown.separator />
+                    <x-keys::dropdown.item icon="heroicon-o-arrow-right-on-rectangle" variant="danger">
+                        Sign out
+                    </x-keys::dropdown.item>
+                </x-keys::dropdown>
+            </div>
+        </div>
+
+        {{-- Stats Overview --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {{-- Revenue Card --}}
+            <x-keys::card>
+                <x-keys::card.body>
+                    <div class="flex items-center justify-between mb-2">
+                        <x-keys::text size="sm" color="muted">Total Revenue</x-keys::text>
+                        <x-keys::tooltip content="Revenue from last 30 days">
+                            <x-keys::icon name="heroicon-o-information-circle" size="sm" />
+                        </x-keys::tooltip>
                     </div>
-                </div>
-            </div>
-
-            {{-- Sizes Showcase --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Sizes</x-keys::heading>
-                <div class="bg-surface p-6 rounded-lg">
-                    <div class="flex flex-wrap items-center gap-3">
-                        <x-keys::button size="xs">Extra Small</x-keys::button>
-                        <x-keys::button size="sm">Small</x-keys::button>
-                        <x-keys::button size="md">Medium</x-keys::button>
-                        <x-keys::button size="lg">Large</x-keys::button>
-                        <x-keys::button size="xl">Extra Large</x-keys::button>
+                    <x-keys::heading level="h3" size="2xl">$45,231</x-keys::heading>
+                    <div class="flex items-center gap-2 mt-2">
+                        <x-keys::badge color="success" size="xs">+12.5%</x-keys::badge>
+                        <x-keys::text size="xs" color="muted">vs last month</x-keys::text>
                     </div>
-                </div>
-            </div>
+                </x-keys::card.body>
+            </x-keys::card>
 
-            {{-- With Icons --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">With Icons</x-keys::heading>
-                <div class="bg-surface p-6 rounded-lg">
-                    <div class="flex flex-wrap gap-3">
-                        <x-keys::button icon-left="heart">Left Icon</x-keys::button>
-                        <x-keys::button icon-right="arrow-right">Right Icon</x-keys::button>
-                        <x-keys::button icon-left="plus" icon-right="arrow-right">Both Icons</x-keys::button>
-                        <x-keys::button icon-left="heart" variant="outlined">Outlined</x-keys::button>
-                        <x-keys::button icon-left="star" variant="ghost">Ghost</x-keys::button>
+            {{-- Active Users Card --}}
+            <x-keys::card>
+                <x-keys::card.body>
+                    <div class="flex items-center justify-between mb-2">
+                        <x-keys::text size="sm" color="muted">Active Users</x-keys::text>
+                        <x-keys::icon name="heroicon-o-users" size="sm" />
                     </div>
-                </div>
-            </div>
+                    <x-keys::heading level="h3" size="2xl">2,345</x-keys::heading>
+                    <x-keys::progress :value="75" :max="100" size="sm" color="brand" class="mt-2" />
+                    <x-keys::text size="xs" color="muted" class="mt-1">75% of target</x-keys::text>
+                </x-keys::card.body>
+            </x-keys::card>
 
-            {{-- Icon Only --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Icon Only</x-keys::heading>
-                <div class="bg-surface p-6 rounded-lg">
-                    <div class="flex flex-wrap items-center gap-3">
-                        <x-keys::button icon-left="heart" size="xs"><span class="sr-only">Like</span></x-keys::button>
-                        <x-keys::button icon-left="heart" size="sm"><span class="sr-only">Like</span></x-keys::button>
-                        <x-keys::button icon-left="heart"><span class="sr-only">Like</span></x-keys::button>
-                        <x-keys::button icon-left="heart" size="lg"><span class="sr-only">Like</span></x-keys::button>
-                        <x-keys::button icon-left="heart" size="xl"><span class="sr-only">Like</span></x-keys::button>
+            {{-- Pending Tasks Card --}}
+            <x-keys::card>
+                <x-keys::card.body>
+                    <div class="flex items-center justify-between mb-2">
+                        <x-keys::text size="sm" color="muted">Pending Tasks</x-keys::text>
+                        <x-keys::badge color="warning">15</x-keys::badge>
                     </div>
-                </div>
-            </div>
-
-            {{-- States --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">States</x-keys::heading>
-                <div class="bg-surface p-6 rounded-lg">
-                    <div class="flex flex-wrap gap-3">
-                        <x-keys::button>Default</x-keys::button>
-                        <x-keys::button disabled>Disabled</x-keys::button>
-                        <x-keys::button loading>Loading</x-keys::button>
-                        <x-keys::button loading loading-animation="dots">Loading Dots</x-keys::button>
-                        <x-keys::button loading loading-animation="pulse">Loading Pulse</x-keys::button>
+                    <x-keys::heading level="h3" size="2xl">142</x-keys::heading>
+                    <div class="flex items-center gap-2 mt-2">
+                        <x-keys::badge color="info" size="xs">23 urgent</x-keys::badge>
+                        <x-keys::text size="xs" color="muted">32 due today</x-keys::text>
                     </div>
-                </div>
-            </div>
+                </x-keys::card.body>
+            </x-keys::card>
 
-            {{-- Color Matrix --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Color × Variant Matrix</x-keys::heading>
-                <div class="bg-surface p-6 rounded-lg overflow-x-auto">
-                    <table class="w-full border-collapse">
-                        <thead>
-                            <tr>
-                                <th class="text-left p-2 border-b border-line">
-                                    <x-keys::text weight="semibold" size="sm">Color</x-keys::text>
-                                </th>
-                                <th class="text-center p-2 border-b border-line">
-                                    <x-keys::text weight="semibold" size="sm">Solid</x-keys::text>
-                                </th>
-                                <th class="text-center p-2 border-b border-line">
-                                    <x-keys::text weight="semibold" size="sm">Outlined</x-keys::text>
-                                </th>
-                                <th class="text-center p-2 border-b border-line">
-                                    <x-keys::text weight="semibold" size="sm">Ghost</x-keys::text>
-                                </th>
-                                <th class="text-center p-2 border-b border-line">
-                                    <x-keys::text weight="semibold" size="sm">Subtle</x-keys::text>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach(['primary', 'secondary', 'success', 'warning', 'danger', 'info'] as $color)
-                                <tr>
-                                    <td class="p-2 border-b border-line-subtle">
-                                        <x-keys::text size="sm" class="capitalize">{{ $color }}</x-keys::text>
-                                    </td>
-                                    <td class="p-2 border-b border-line-subtle text-center">
-                                        <x-keys::button :color="$color" variant="solid" size="sm">Button</x-keys::button>
-                                    </td>
-                                    <td class="p-2 border-b border-line-subtle text-center">
-                                        <x-keys::button :color="$color" variant="outlined" size="sm">Button</x-keys::button>
-                                    </td>
-                                    <td class="p-2 border-b border-line-subtle text-center">
-                                        <x-keys::button :color="$color" variant="ghost" size="sm">Button</x-keys::button>
-                                    </td>
-                                    <td class="p-2 border-b border-line-subtle text-center">
-                                        <x-keys::button :color="$color" variant="subtle" size="sm">Button</x-keys::button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- Link Buttons --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Link Buttons</x-keys::heading>
-                <div class="bg-surface p-6 rounded-lg">
-                    <div class="flex flex-wrap gap-3">
-                        <x-keys::button href="#" icon-left="arrow-top-right-on-square">External Link</x-keys::button>
-                        <x-keys::button href="#" variant="outlined">Outlined Link</x-keys::button>
-                        <x-keys::button href="#" disabled>Disabled Link</x-keys::button>
+            {{-- Success Rate Card --}}
+            <x-keys::card>
+                <x-keys::card.body>
+                    <div class="flex items-center justify-between mb-2">
+                        <x-keys::text size="sm" color="muted">Success Rate</x-keys::text>
+                        <x-keys::rating :value="4.5" :max="5" readonly size="xs" />
                     </div>
-                </div>
-            </div>
-
-            {{-- Design Token Showcase --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">New Design Tokens in Action</x-keys::heading>
-                <div class="bg-surface p-6 rounded-lg space-y-4">
-                    <x-keys::text color="muted">
-                        The button component now uses the refactored design token system:
+                    <x-keys::heading level="h3" size="2xl">94.2%</x-keys::heading>
+                    <x-keys::text size="xs" color="success" class="mt-2">
+                        Excellent performance
                     </x-keys::text>
-                    <ul class="space-y-2 ml-4">
-                        <li class="flex items-start gap-2">
-                            <x-keys::icon name="check" size="sm" class="text-success mt-0.5" />
-                            <x-keys::text size="sm"><code class="bg-accent-subtle text-accent px-1.5 py-0.5 rounded">text-accent-contrast</code> for text on accent backgrounds</x-keys::text>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <x-keys::icon name="check" size="sm" class="text-success mt-0.5" />
-                            <x-keys::text size="sm"><code class="bg-accent-subtle text-accent px-1.5 py-0.5 rounded">text-primary</code> instead of redundant <code class="bg-danger-subtle text-danger px-1.5 py-0.5 rounded line-through">text-text</code></x-keys::text>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <x-keys::icon name="check" size="sm" class="text-success mt-0.5" />
-                            <x-keys::text size="sm"><code class="bg-accent-subtle text-accent px-1.5 py-0.5 rounded">border-line</code> instead of redundant <code class="bg-danger-subtle text-danger px-1.5 py-0.5 rounded line-through">border-border</code></x-keys::text>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <x-keys::icon name="check" size="sm" class="text-success mt-0.5" />
-                            <x-keys::text size="sm"><code class="bg-accent-subtle text-accent px-1.5 py-0.5 rounded">ring-focus</code> for unified focus ring styling</x-keys::text>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <x-keys::icon name="check" size="sm" class="text-success mt-0.5" />
-                            <x-keys::text size="sm">Simple icon names: <code class="bg-accent-subtle text-accent px-1.5 py-0.5 rounded">heart</code> instead of <code class="bg-danger-subtle text-danger px-1.5 py-0.5 rounded line-through">heroicon-o-heart</code></x-keys::text>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <x-keys::icon name="check" size="sm" class="text-success mt-0.5" />
-                            <x-keys::text size="sm">Accent color palette (no more brand duplication)</x-keys::text>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </section>
+                </x-keys::card.body>
+            </x-keys::card>
+        </div>
 
-        {{-- Form Components Showcase --}}
-        <section class="space-y-8">
-            <div>
-                <x-keys::heading level="h1" size="3xl">Form Components</x-keys::heading>
-                <x-keys::text color="muted" size="lg" class="mt-2">
-                    Comprehensive form components with the new design token system, full JavaScript functionality, and consistent styling.
+        {{-- Countdown Examples --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {{-- Product Launch Countdown --}}
+            <x-keys::card>
+                <x-keys::card.body>
+                    <x-keys::heading level="h4" size="sm" class="mb-3">Product Launch</x-keys::heading>
+                    <x-keys::countdown
+                        :days="15"
+                        :hours="10"
+                        :minutes="24"
+                        :seconds="30"
+                        variant="boxed"
+                        size="sm"
+                        color="brand"
+                    />
+                </x-keys::card.body>
+            </x-keys::card>
+
+            {{-- Sale Ending Countdown --}}
+            <x-keys::card>
+                <x-keys::card.body>
+                    <x-keys::heading level="h4" size="sm" class="mb-3">Flash Sale Ends In</x-keys::heading>
+                    <x-keys::countdown
+                        :hours="2"
+                        :minutes="45"
+                        :seconds="30"
+                        variant="inline"
+                        size="md"
+                        color="danger"
+                        :show-days="false"
+                    />
+                </x-keys::card.body>
+            </x-keys::card>
+
+            {{-- Event Timer --}}
+            <x-keys::card>
+                <x-keys::card.body>
+                    <x-keys::heading level="h4" size="sm" class="mb-3">Next Meeting</x-keys::heading>
+                    <x-keys::countdown
+                        target="{{ now()->addMinutes(30)->format('Y-m-d H:i:s') }}"
+                        variant="minimal"
+                        size="lg"
+                        color="info"
+                        :show-days="false"
+                        complete-message="Meeting has started!"
+                    />
+                </x-keys::card.body>
+            </x-keys::card>
+        </div>
+
+        {{-- Main Content Grid --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            {{-- Left Column (2/3 width) --}}
+            <div class="lg:col-span-2 space-y-6">
+
+                {{-- Recent Activity Table --}}
+                <x-keys::card>
+                    <x-keys::card.header>
+                        <div class="flex items-center justify-between">
+                            <x-keys::heading level="h3" size="lg">Recent Activity</x-keys::heading>
+                            <x-keys::button variant="ghost" size="sm" icon-right="heroicon-o-arrow-right">
+                                View all
+                            </x-keys::button>
+                        </div>
+                    </x-keys::card.header>
+                    <x-keys::card.body>
+                        <x-keys::table hover>
+                            <x-keys::table.head>
+                                <x-keys::table.row>
+                                    <x-keys::table.header>User</x-keys::table.header>
+                                    <x-keys::table.header>Project</x-keys::table.header>
+                                    <x-keys::table.header>Status</x-keys::table.header>
+                                    <x-keys::table.header>Date</x-keys::table.header>
+                                    <x-keys::table.header>Actions</x-keys::table.header>
+                                </x-keys::table.row>
+                            </x-keys::table.head>
+                            <x-keys::table.body>
+                                <x-keys::table.row>
+                                    <x-keys::table.cell>
+                                        <div class="flex items-center gap-2">
+                                            <x-keys::avatar
+                                                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100"
+                                                name="Alex Chen"
+                                                size="sm"
+                                            />
+                                            <div>
+                                                <x-keys::text size="sm" weight="medium">Alex Chen</x-keys::text>
+                                                <x-keys::text size="xs" color="muted">alex@example.com</x-keys::text>
+                                            </div>
+                                        </div>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::text size="sm">Website Redesign</x-keys::text>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::badge color="success">Completed</x-keys::badge>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::text size="sm" color="muted">2 hours ago</x-keys::text>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::dropdown size="sm">
+                                            <x-slot:trigger>
+                                                <x-keys::button variant="ghost" size="xs" icon="heroicon-o-ellipsis-horizontal">
+                                                    <span class="sr-only">Actions</span>
+                                                </x-keys::button>
+                                            </x-slot:trigger>
+                                            <x-keys::dropdown.item icon="heroicon-o-eye">View</x-keys::dropdown.item>
+                                            <x-keys::dropdown.item icon="heroicon-o-pencil">Edit</x-keys::dropdown.item>
+                                            <x-keys::dropdown.separator />
+                                            <x-keys::dropdown.item icon="heroicon-o-trash" variant="danger">Delete</x-keys::dropdown.item>
+                                        </x-keys::dropdown>
+                                    </x-keys::table.cell>
+                                </x-keys::table.row>
+
+                                <x-keys::table.row>
+                                    <x-keys::table.cell>
+                                        <div class="flex items-center gap-2">
+                                            <x-keys::avatar
+                                                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100"
+                                                name="Maria Garcia"
+                                                size="sm"
+                                            />
+                                            <div>
+                                                <x-keys::text size="sm" weight="medium">Maria Garcia</x-keys::text>
+                                                <x-keys::text size="xs" color="muted">maria@example.com</x-keys::text>
+                                            </div>
+                                        </div>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::text size="sm">Mobile App</x-keys::text>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::badge color="warning">In Progress</x-keys::badge>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::text size="sm" color="muted">5 hours ago</x-keys::text>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::dropdown size="sm">
+                                            <x-slot:trigger>
+                                                <x-keys::button variant="ghost" size="xs" icon="heroicon-o-ellipsis-horizontal">
+                                                    <span class="sr-only">Actions</span>
+                                                </x-keys::button>
+                                            </x-slot:trigger>
+                                            <x-keys::dropdown.item icon="heroicon-o-eye">View</x-keys::dropdown.item>
+                                            <x-keys::dropdown.item icon="heroicon-o-pencil">Edit</x-keys::dropdown.item>
+                                            <x-keys::dropdown.separator />
+                                            <x-keys::dropdown.item icon="heroicon-o-trash" variant="danger">Delete</x-keys::dropdown.item>
+                                        </x-keys::dropdown>
+                                    </x-keys::table.cell>
+                                </x-keys::table.row>
+
+                                <x-keys::table.row>
+                                    <x-keys::table.cell>
+                                        <div class="flex items-center gap-2">
+                                            <x-keys::avatar
+                                                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100"
+                                                name="James Wilson"
+                                                size="sm"
+                                            />
+                                            <div>
+                                                <x-keys::text size="sm" weight="medium">James Wilson</x-keys::text>
+                                                <x-keys::text size="xs" color="muted">james@example.com</x-keys::text>
+                                            </div>
+                                        </div>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::text size="sm">API Integration</x-keys::text>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::badge color="info">Review</x-keys::badge>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::text size="sm" color="muted">1 day ago</x-keys::text>
+                                    </x-keys::table.cell>
+                                    <x-keys::table.cell>
+                                        <x-keys::dropdown size="sm">
+                                            <x-slot:trigger>
+                                                <x-keys::button variant="ghost" size="xs" icon="heroicon-o-ellipsis-horizontal">
+                                                    <span class="sr-only">Actions</span>
+                                                </x-keys::button>
+                                            </x-slot:trigger>
+                                            <x-keys::dropdown.item icon="heroicon-o-eye">View</x-keys::dropdown.item>
+                                            <x-keys::dropdown.item icon="heroicon-o-pencil">Edit</x-keys::dropdown.item>
+                                            <x-keys::dropdown.separator />
+                                            <x-keys::dropdown.item icon="heroicon-o-trash" variant="danger">Delete</x-keys::dropdown.item>
+                                        </x-keys::dropdown>
+                                    </x-keys::table.cell>
+                                </x-keys::table.row>
+                            </x-keys::table.body>
+                        </x-keys::table>
+                    </x-keys::card.body>
+                </x-keys::card>
+
+                {{-- Filters Accordion --}}
+                <x-keys::card>
+                    <x-keys::card.header>
+                        <x-keys::heading level="h3" size="lg">Quick Filters</x-keys::heading>
+                    </x-keys::card.header>
+                    <x-keys::card.body>
+                        <x-keys::accordion title="Date Range" collapsed>
+                            <div class="space-y-4 pt-2">
+                                <x-keys::date-picker
+                                    name="start_date"
+                                    label="Start Date"
+                                    clearable
+                                />
+                                <x-keys::date-picker
+                                    name="end_date"
+                                    label="End Date"
+                                    clearable
+                                />
+                            </div>
+                        </x-keys::accordion>
+
+                        <x-keys::separator />
+
+                        <x-keys::accordion title="Status Filter" collapsed>
+                            <div class="space-y-3 pt-2">
+                                <x-keys::checkbox name="status[]" value="completed" label="Completed" />
+                                <x-keys::checkbox name="status[]" value="in_progress" label="In Progress" />
+                                <x-keys::checkbox name="status[]" value="pending" label="Pending" />
+                                <x-keys::checkbox name="status[]" value="review" label="Under Review" />
+                            </div>
+                        </x-keys::accordion>
+
+                        <x-keys::separator />
+
+                        <x-keys::accordion title="Priority Settings" collapsed>
+                            <div class="space-y-3 pt-2">
+                                <x-keys::toggle
+                                    name="high_priority"
+                                    label="High Priority Only"
+                                    description="Show only high priority items"
+                                />
+                                <x-keys::toggle
+                                    name="urgent"
+                                    label="Urgent Tasks"
+                                    description="Include urgent tasks"
+                                />
+                            </div>
+                        </x-keys::accordion>
+                    </x-keys::card.body>
+                </x-keys::card>
+
+            </div>
+
+            {{-- Right Column (1/3 width) --}}
+            <div class="space-y-6">
+
+                {{-- Notifications Panel --}}
+                <x-keys::card>
+                    <x-keys::card.header>
+                        <x-keys::heading level="h3" size="lg">Notifications</x-keys::heading>
+                    </x-keys::card.header>
+                    <x-keys::card.body>
+                        <div class="space-y-3">
+                            <x-keys::alert variant="success" dismissible size="sm">
+                                <strong>Success!</strong> Your project was deployed.
+                            </x-keys::alert>
+
+                            <x-keys::alert variant="warning" dismissible size="sm">
+                                <strong>Warning!</strong> System maintenance scheduled.
+                            </x-keys::alert>
+
+                            <x-keys::alert variant="info" dismissible size="sm">
+                                <strong>Info:</strong> New features available.
+                            </x-keys::alert>
+
+                            <div class="pt-2">
+                                <x-keys::button
+                                    variant="ghost"
+                                    size="sm"
+                                    class="w-full"
+                                    onclick="window.ToastActions.success('Profile updated successfully!', { position: 'top-right' }); setTimeout(() => window.ToastActions.info('You have 3 new notifications', { position: 'top-center' }), 300); setTimeout(() => window.ToastActions.warning('Your session will expire in 5 minutes', { position: 'bottom-right' }), 600); setTimeout(() => window.ToastActions.error('Failed to save changes', { position: 'bottom-left' }), 900);"
+                                >
+                                    Test Toast Notifications
+                                </x-keys::button>
+                            </div>
+                        </div>
+                    </x-keys::card.body>
+                </x-keys::card>
+
+                {{-- Team Members --}}
+                <x-keys::card>
+                    <x-keys::card.header>
+                        <x-keys::heading level="h3" size="lg">Team Members</x-keys::heading>
+                    </x-keys::card.header>
+                    <x-keys::card.body>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <x-keys::avatar
+                                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100"
+                                        name="Sarah Johnson"
+                                        size="sm"
+                                        status="online"
+                                    />
+                                    <div>
+                                        <x-keys::text size="sm" weight="medium">Sarah Johnson</x-keys::text>
+                                        <x-keys::text size="xs" color="muted">Product Manager</x-keys::text>
+                                    </div>
+                                </div>
+                                <x-keys::badge color="success" size="xs">Active</x-keys::badge>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <x-keys::avatar
+                                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100"
+                                        name="Alex Chen"
+                                        size="sm"
+                                        status="away"
+                                    />
+                                    <div>
+                                        <x-keys::text size="sm" weight="medium">Alex Chen</x-keys::text>
+                                        <x-keys::text size="xs" color="muted">Lead Developer</x-keys::text>
+                                    </div>
+                                </div>
+                                <x-keys::badge color="warning" size="xs">Away</x-keys::badge>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <x-keys::avatar
+                                        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100"
+                                        name="Maria Garcia"
+                                        size="sm"
+                                        status="online"
+                                    />
+                                    <div>
+                                        <x-keys::text size="sm" weight="medium">Maria Garcia</x-keys::text>
+                                        <x-keys::text size="xs" color="muted">Designer</x-keys::text>
+                                    </div>
+                                </div>
+                                <x-keys::badge color="success" size="xs">Active</x-keys::badge>
+                            </div>
+
+                            <x-keys::separator variant="dashed" />
+
+                            <x-keys::avatar.stack>
+                                <x-keys::avatar src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100" name="James Wilson" />
+                                <x-keys::avatar src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" name="Robert Lee" />
+                                <x-keys::avatar src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" name="Emma Davis" />
+                                <x-keys::avatar name="+12" />
+                            </x-keys::avatar.stack>
+                            <x-keys::text size="xs" color="muted" class="text-center block">15 team members total</x-keys::text>
+                        </div>
+                    </x-keys::card.body>
+                </x-keys::card>
+
+                {{-- File Upload --}}
+                <x-keys::card>
+                    <x-keys::card.header>
+                        <x-keys::heading level="h3" size="lg">Upload Files</x-keys::heading>
+                    </x-keys::card.header>
+                    <x-keys::card.body>
+                        <x-keys::file-upload
+                            name="documents[]"
+                            multiple
+                            accept=".pdf,.doc,.docx,.jpg,.png"
+                            max-size="10MB"
+                            drag-drop
+                        />
+                    </x-keys::card.body>
+                </x-keys::card>
+
+                {{-- Calendar Widget --}}
+                <x-keys::card>
+                    <x-keys::card.header>
+                        <x-keys::heading level="h3" size="lg">Calendar</x-keys::heading>
+                    </x-keys::card.header>
+                    <x-keys::card.body>
+                        <x-keys::calendar />
+                    </x-keys::card.body>
+                </x-keys::card>
+
+            </div>
+
+        </div>
+
+        {{-- Component Groups Showcase --}}
+        <x-keys::card>
+            <x-keys::card.header>
+                <x-keys::heading level="h2" size="xl">Component Groups</x-keys::heading>
+                <x-keys::text color="muted" size="sm" class="mt-1">
+                    Combine multiple components with shared borders and consistent styling
                 </x-keys::text>
-            </div>
-
-            {{-- Text Inputs --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Text Inputs</x-keys::heading>
-
-                <x-keys::card>
+            </x-keys::card.header>
+            <x-keys::card.body>
+                <div class="space-y-8">
+                    {{-- Search Patterns --}}
                     <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Sizes</x-keys::heading>
-                        <x-keys::input label="Extra Small" size="xs" placeholder="Extra small input..." />
-                        <x-keys::input label="Small" size="sm" placeholder="Small input..." />
-                        <x-keys::input label="Medium (Default)" size="md" placeholder="Medium input..." />
-                        <x-keys::input label="Large" size="lg" placeholder="Large input..." />
-                        <x-keys::input label="Extra Large" size="xl" placeholder="Extra large input..." />
-                    </div>
-                </x-keys::card>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">With Icons</x-keys::heading>
-                        <x-keys::input label="Email" icon-left="envelope" placeholder="your@email.com" />
-                        <x-keys::input label="Search" icon-right="magnifying-glass" placeholder="Search..." />
-                        <x-keys::input label="Password" type="password" icon-left="lock-closed" placeholder="Enter password..." />
-                    </div>
-                </x-keys::card>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">States</x-keys::heading>
-                        <x-keys::input label="Normal Input" placeholder="Type something..." />
-                        <x-keys::input label="Disabled Input" disabled value="Cannot edit this field" />
-                        <x-keys::input label="Required Input" required placeholder="This is required" />
-                    </div>
-                </x-keys::card>
-            </div>
-
-            {{-- Textareas --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Textareas</x-keys::heading>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::textarea label="Message" rows="4" placeholder="Enter your message..." />
-                        <x-keys::textarea label="Auto-resize" auto-resize placeholder="This textarea grows with content..." />
-                        <x-keys::textarea label="With Character Count" show-character-count max-length="200" placeholder="Limited to 200 characters..." />
-                    </div>
-                </x-keys::card>
-            </div>
-
-            {{-- Checkboxes & Radios --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Checkboxes & Radio Buttons</x-keys::heading>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h3" size="lg">Checkboxes</x-keys::heading>
-                            <x-keys::checkbox label="Standard Checkbox" />
-                            <x-keys::checkbox label="Checked by Default" checked />
-                            <x-keys::checkbox label="Success Color" color="success" checked />
-                            <x-keys::checkbox label="Danger Color" color="danger" />
-                            <x-keys::checkbox variant="bordered" label="Bordered Variant" description="With description text" />
-                            <x-keys::checkbox variant="card" title="Card Variant" description="Full card clickable area" icon="check-circle" />
-                        </div>
-                    </x-keys::card>
-
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h3" size="lg">Radio Buttons</x-keys::heading>
-                            <x-keys::radio name="radio-demo" value="1" label="Option 1" />
-                            <x-keys::radio name="radio-demo" value="2" label="Option 2" checked />
-                            <x-keys::radio name="radio-demo" value="3" label="Option 3" />
-                            <x-keys::radio name="radio-demo2" value="1" variant="bordered" label="Bordered Option" description="With description" />
-                            <x-keys::radio name="radio-demo2" value="2" variant="card" title="Card Option" description="Full card clickable" icon="check-badge" checked />
-                        </div>
-                    </x-keys::card>
-                </div>
-            </div>
-
-            {{-- Toggle Switches --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Toggle Switches</x-keys::heading>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Sizes & Colors</x-keys::heading>
-                        <x-keys::toggle size="sm" label="Small Toggle" />
-                        <x-keys::toggle size="md" label="Medium Toggle (Default)" checked />
-                        <x-keys::toggle size="lg" label="Large Toggle" />
-
-                        <div class="border-t border-line pt-4 mt-4">
-                            <x-keys::toggle label="Accent Color" color="brand" checked />
-                            <x-keys::toggle label="Success Color" color="success" checked />
-                            <x-keys::toggle label="Warning Color" color="warning" checked />
-                            <x-keys::toggle label="Danger Color" color="danger" checked />
-                        </div>
-
-                        <div class="border-t border-line pt-4 mt-4">
-                            <x-keys::toggle label="Enable Notifications" description="Receive email notifications for updates" checked />
-                            <x-keys::toggle label="Dark Mode" description="Switch between light and dark themes" />
-                        </div>
-                    </div>
-                </x-keys::card>
-            </div>
-
-            {{-- Complete Form Example --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Complete Form Example</x-keys::heading>
-
-                <x-keys::card>
-                    <form class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Contact Form</x-keys::heading>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <x-keys::input label="First Name" required placeholder="John" />
-                            <x-keys::input label="Last Name" required placeholder="Doe" />
-                        </div>
-
-                        <x-keys::input type="email" label="Email Address" required icon-left="envelope" placeholder="john.doe@example.com" />
-
-                        <x-keys::textarea label="Message" required rows="4" show-character-count max-length="500" placeholder="Tell us what you think..." />
+                        <x-keys::heading level="h3" size="lg">Search Patterns</x-keys::heading>
 
                         <div class="space-y-3">
-                            <x-keys::checkbox label="Subscribe to newsletter" />
-                            <x-keys::checkbox label="I agree to the terms and conditions" required />
-                        </div>
-
-                        <div class="flex gap-3">
-                            <x-keys::button type="submit" icon-right="paper-airplane">Submit Form</x-keys::button>
-                            <x-keys::button type="button" variant="outlined">Cancel</x-keys::button>
-                        </div>
-                    </form>
-                </x-keys::card>
-            </div>
-
-            {{-- Form States Showcase --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Form States & Validation</x-keys::heading>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::input label="Normal State" placeholder="Everything is fine" />
-                        <x-keys::input label="Disabled State" disabled value="This field is disabled" />
-                        <x-keys::input label="Required Field" required placeholder="This field is required" hint="Make sure to fill this out" />
-                    </div>
-                </x-keys::card>
-            </div>
-        </section>
-
-        {{-- Advanced Form Components Showcase --}}
-        <section class="space-y-8">
-            <div>
-                <x-keys::heading level="h1" size="3xl">Advanced Form Components</x-keys::heading>
-                <x-keys::text color="muted" size="lg" class="mt-2">
-                    Advanced form controls including selects, date pickers, time pickers, and dropdowns with rich functionality.
-                </x-keys::text>
-            </div>
-
-            {{-- Select Components --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Select Components</x-keys::heading>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Basic Select</x-keys::heading>
-                        <x-keys::select name="basic-select" label="Choose an option" placeholder="Select an option...">
-                            <x-keys::select.option value="1">Option 1</x-keys::select.option>
-                            <x-keys::select.option value="2">Option 2</x-keys::select.option>
-                            <x-keys::select.option value="3">Option 3</x-keys::select.option>
-                            <x-keys::select.option value="4">Option 4</x-keys::select.option>
-                        </x-keys::select>
-                    </div>
-                </x-keys::card>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Searchable Select</x-keys::heading>
-                        <x-keys::select name="searchable-select" label="Search for a country" placeholder="Type to search..." searchable>
-                            <x-keys::select.option value="us">United States</x-keys::select.option>
-                            <x-keys::select.option value="uk">United Kingdom</x-keys::select.option>
-                            <x-keys::select.option value="ca">Canada</x-keys::select.option>
-                            <x-keys::select.option value="au">Australia</x-keys::select.option>
-                            <x-keys::select.option value="de">Germany</x-keys::select.option>
-                            <x-keys::select.option value="fr">France</x-keys::select.option>
-                            <x-keys::select.option value="it">Italy</x-keys::select.option>
-                            <x-keys::select.option value="es">Spain</x-keys::select.option>
-                        </x-keys::select>
-                    </div>
-                </x-keys::card>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Multiple Select with Chips</x-keys::heading>
-                        <x-keys::select name="multiple-select" label="Select multiple tags" placeholder="Choose tags..." multiple searchable clearable>
-                            <x-keys::select.option value="laravel">Laravel</x-keys::select.option>
-                            <x-keys::select.option value="vue">Vue.js</x-keys::select.option>
-                            <x-keys::select.option value="react">React</x-keys::select.option>
-                            <x-keys::select.option value="tailwind">Tailwind CSS</x-keys::select.option>
-                            <x-keys::select.option value="alpine">Alpine.js</x-keys::select.option>
-                            <x-keys::select.option value="livewire">Livewire</x-keys::select.option>
-                        </x-keys::select>
-                    </div>
-                </x-keys::card>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h4" size="md">Small Size</x-keys::heading>
-                            <x-keys::select name="small-select" size="sm" placeholder="Small select...">
-                                <x-keys::select.option value="1">Option 1</x-keys::select.option>
-                                <x-keys::select.option value="2">Option 2</x-keys::select.option>
-                            </x-keys::select>
-                        </div>
-                    </x-keys::card>
-
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h4" size="md">Medium Size</x-keys::heading>
-                            <x-keys::select name="medium-select" size="md" placeholder="Medium select...">
-                                <x-keys::select.option value="1">Option 1</x-keys::select.option>
-                                <x-keys::select.option value="2">Option 2</x-keys::select.option>
-                            </x-keys::select>
-                        </div>
-                    </x-keys::card>
-
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h4" size="md">Large Size</x-keys::heading>
-                            <x-keys::select name="large-select" size="lg" placeholder="Large select...">
-                                <x-keys::select.option value="1">Option 1</x-keys::select.option>
-                                <x-keys::select.option value="2">Option 2</x-keys::select.option>
-                            </x-keys::select>
-                        </div>
-                    </x-keys::card>
-                </div>
-            </div>
-
-            {{-- DatePicker Components --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">DatePicker Components</x-keys::heading>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h3" size="lg">Single Date Picker</x-keys::heading>
-                            <x-keys::date-picker
-                                name="single-date"
-                                label="Select a date"
-                                placeholder="Choose date..."
-                                clearable
-                            />
-                        </div>
-                    </x-keys::card>
-
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h3" size="lg">Date Range Picker</x-keys::heading>
-                            <x-keys::date-picker
-                                name="date-range"
-                                label="Select date range"
-                                placeholder="Choose dates..."
-                                is-range
-                                clearable
-                            />
-                        </div>
-                    </x-keys::card>
-                </div>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">With Quick Selectors</x-keys::heading>
-                        <x-keys::date-picker
-                            name="quick-select-date"
-                            label="Date with quick selections"
-                            placeholder="Pick a date..."
-                            :quick-selectors="true"
-                            clearable
-                        />
-                    </div>
-                </x-keys::card>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Inline Calendar</x-keys::heading>
-                        <x-keys::date-picker
-                            name="inline-date"
-                            inline
-                        />
-                    </div>
-                </x-keys::card>
-            </div>
-
-            {{-- TimePicker Components --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">TimePicker Components</x-keys::heading>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h3" size="lg">12-Hour Format</x-keys::heading>
-                            <x-keys::time-picker
-                                name="time-12"
-                                label="Select time (12-hour)"
-                                placeholder="Select time..."
-                                format="12"
-                                clearable
-                            />
-                        </div>
-                    </x-keys::card>
-
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h3" size="lg">24-Hour Format</x-keys::heading>
-                            <x-keys::time-picker
-                                name="time-24"
-                                label="Select time (24-hour)"
-                                placeholder="Select time..."
-                                format="24"
-                                clearable
-                            />
-                        </div>
-                    </x-keys::card>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h3" size="lg">With 15-Minute Steps</x-keys::heading>
-                            <x-keys::time-picker
-                                name="time-steps"
-                                label="Time with intervals"
-                                placeholder="Select time..."
-                                :step="15"
-                                clearable
-                            />
-                        </div>
-                    </x-keys::card>
-
-                    <x-keys::card>
-                        <div class="space-y-4">
-                            <x-keys::heading level="h3" size="lg">With Min/Max Time</x-keys::heading>
-                            <x-keys::time-picker
-                                name="time-range"
-                                label="Business hours (9 AM - 5 PM)"
-                                placeholder="Select time..."
-                                min-time="09:00"
-                                max-time="17:00"
-                                clearable
-                            />
-                        </div>
-                    </x-keys::card>
-                </div>
-            </div>
-
-            {{-- Dropdown Components --}}
-            <div class="space-y-4">
-                <x-keys::heading level="h2" size="xl">Dropdown Components</x-keys::heading>
-
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Basic Dropdown</x-keys::heading>
-                        <div class="flex gap-4">
-                            <x-keys::dropdown>
-                                <x-slot:trigger>
-                                    <x-keys::button variant="outlined" icon-right="chevron-down">
-                                        Actions
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">Input + Button (Attached)</x-keys::text>
+                                <x-keys::group attached>
+                                    <x-keys::input placeholder="Search projects..." />
+                                    <x-keys::button icon="heroicon-o-magnifying-glass">
+                                        <span class="sr-only">Search</span>
                                     </x-keys::button>
-                                </x-slot:trigger>
-                                <x-slot:panel>
-                                    <button type="button" class="w-full text-left px-3 py-2 text-sm text-primary hover:bg-hover rounded-md transition-colors">
-                                        Edit
-                                    </button>
-                                    <button type="button" class="w-full text-left px-3 py-2 text-sm text-primary hover:bg-hover rounded-md transition-colors">
-                                        Duplicate
-                                    </button>
-                                    <button type="button" class="w-full text-left px-3 py-2 text-sm text-primary hover:bg-hover rounded-md transition-colors">
-                                        Archive
-                                    </button>
-                                    <div class="border-t border-line my-1"></div>
-                                    <button type="button" class="w-full text-left px-3 py-2 text-sm text-danger hover:bg-danger-subtle rounded-md transition-colors">
-                                        Delete
-                                    </button>
-                                </x-slot:panel>
-                            </x-keys::dropdown>
-                        </div>
-                    </div>
-                </x-keys::card>
+                                </x-keys::group>
+                            </div>
 
-                <x-keys::card>
-                    <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Dropdown with Icons</x-keys::heading>
-                        <div class="flex gap-4">
-                            <x-keys::dropdown>
-                                <x-slot:trigger>
-                                    <x-keys::button icon-left="ellipsis-vertical" variant="ghost">
-                                        <span class="sr-only">More options</span>
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">With Button Label</x-keys::text>
+                                <x-keys::group attached>
+                                    <x-keys::input placeholder="Enter keywords..." />
+                                    <x-keys::button icon-left="heroicon-o-magnifying-glass">
+                                        Search
                                     </x-keys::button>
-                                </x-slot:trigger>
-                                <x-slot:panel>
-                                    <button type="button" class="w-full text-left px-3 py-2 text-sm text-primary hover:bg-hover rounded-md transition-colors flex items-center gap-2">
-                                        <x-keys::icon name="pencil" size="xs" />
-                                        <span>Edit</span>
-                                    </button>
-                                    <button type="button" class="w-full text-left px-3 py-2 text-sm text-primary hover:bg-hover rounded-md transition-colors flex items-center gap-2">
-                                        <x-keys::icon name="document-duplicate" size="xs" />
-                                        <span>Duplicate</span>
-                                    </button>
-                                    <button type="button" class="w-full text-left px-3 py-2 text-sm text-primary hover:bg-hover rounded-md transition-colors flex items-center gap-2">
-                                        <x-keys::icon name="share" size="xs" />
-                                        <span>Share</span>
-                                    </button>
-                                    <div class="border-t border-line my-1"></div>
-                                    <button type="button" class="w-full text-left px-3 py-2 text-sm text-danger hover:bg-danger-subtle rounded-md transition-colors flex items-center gap-2">
-                                        <x-keys::icon name="trash" size="xs" />
-                                        <span>Delete</span>
-                                    </button>
-                                </x-slot:panel>
-                            </x-keys::dropdown>
+                                </x-keys::group>
+                            </div>
                         </div>
                     </div>
-                </x-keys::card>
 
-                <x-keys::card>
+                    <x-keys::separator />
+
+                    {{-- Filter Patterns --}}
                     <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Position & Alignment</x-keys::heading>
-                        <div class="flex flex-wrap gap-4">
-                            <x-keys::dropdown position="bottom" align="start">
-                                <x-slot:trigger>
-                                    <x-keys::button variant="outlined" size="sm">Bottom Start</x-keys::button>
-                                </x-slot:trigger>
-                                <x-slot:panel>
-                                    <div class="px-3 py-2 text-sm text-primary">Bottom start aligned</div>
-                                </x-slot:panel>
-                            </x-keys::dropdown>
+                        <x-keys::heading level="h3" size="lg">Filter & Action Patterns</x-keys::heading>
 
-                            <x-keys::dropdown position="bottom" align="end">
-                                <x-slot:trigger>
-                                    <x-keys::button variant="outlined" size="sm">Bottom End</x-keys::button>
-                                </x-slot:trigger>
-                                <x-slot:panel>
-                                    <div class="px-3 py-2 text-sm text-primary">Bottom end aligned</div>
-                                </x-slot:panel>
-                            </x-keys::dropdown>
+                        <div class="space-y-3">
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">Select + Apply Button</x-keys::text>
+                                <x-keys::group attached>
+                                    <x-keys::select name="filter_status">
+                                        <x-keys::select.option value="">All Status</x-keys::select.option>
+                                        <x-keys::select.option value="active">Active</x-keys::select.option>
+                                        <x-keys::select.option value="pending">Pending</x-keys::select.option>
+                                        <x-keys::select.option value="completed">Completed</x-keys::select.option>
+                                    </x-keys::select>
+                                    <x-keys::button color="primary">Apply</x-keys::button>
+                                </x-keys::group>
+                            </div>
 
-                            <x-keys::dropdown position="top" align="start">
-                                <x-slot:trigger>
-                                    <x-keys::button variant="outlined" size="sm">Top Start</x-keys::button>
-                                </x-slot:trigger>
-                                <x-slot:panel>
-                                    <div class="px-3 py-2 text-sm text-primary">Top start aligned</div>
-                                </x-slot:panel>
-                            </x-keys::dropdown>
-
-                            <x-keys::dropdown position="right" align="start">
-                                <x-slot:trigger>
-                                    <x-keys::button variant="outlined" size="sm">Right</x-keys::button>
-                                </x-slot:trigger>
-                                <x-slot:panel>
-                                    <div class="px-3 py-2 text-sm text-primary">Right aligned</div>
-                                </x-slot:panel>
-                            </x-keys::dropdown>
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">Multiple Filters with Actions</x-keys::text>
+                                <x-keys::group attached>
+                                    <x-keys::select name="category">
+                                        <x-keys::select.option value="">Category</x-keys::select.option>
+                                        <x-keys::select.option value="web">Web</x-keys::select.option>
+                                        <x-keys::select.option value="mobile">Mobile</x-keys::select.option>
+                                    </x-keys::select>
+                                    <x-keys::select name="priority">
+                                        <x-keys::select.option value="">Priority</x-keys::select.option>
+                                        <x-keys::select.option value="high">High</x-keys::select.option>
+                                        <x-keys::select.option value="medium">Medium</x-keys::select.option>
+                                        <x-keys::select.option value="low">Low</x-keys::select.option>
+                                    </x-keys::select>
+                                    <x-keys::button variant="outlined" icon="heroicon-o-funnel">Filter</x-keys::button>
+                                </x-keys::group>
+                            </div>
                         </div>
                     </div>
-                </x-keys::card>
 
-                <x-keys::card>
+                    <x-keys::separator />
+
+                    {{-- Date & Time Inputs --}}
                     <div class="space-y-4">
-                        <x-keys::heading level="h3" size="lg">Size Variants</x-keys::heading>
-                        <div class="flex gap-4">
-                            <x-keys::dropdown size="sm">
-                                <x-slot:trigger>
-                                    <x-keys::button size="sm">Small Dropdown</x-keys::button>
-                                </x-slot:trigger>
-                                <x-slot:panel>
-                                    <div class="px-2 py-1.5 text-xs text-primary">Small dropdown content</div>
-                                </x-slot:panel>
-                            </x-keys::dropdown>
+                        <x-keys::heading level="h3" size="lg">Date & Time Ranges</x-keys::heading>
 
-                            <x-keys::dropdown size="md">
-                                <x-slot:trigger>
-                                    <x-keys::button size="md">Medium Dropdown</x-keys::button>
-                                </x-slot:trigger>
-                                <x-slot:panel>
-                                    <div class="px-3 py-2 text-sm text-primary">Medium dropdown content</div>
-                                </x-slot:panel>
-                            </x-keys::dropdown>
+                        <div class="space-y-3">
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">Date Range Inputs</x-keys::text>
+                                <x-keys::group attached>
+                                    <x-keys::input type="date" name="start_date" placeholder="Start Date" />
+                                    <x-keys::input type="date" name="end_date" placeholder="End Date" />
+                                </x-keys::group>
+                            </div>
 
-                            <x-keys::dropdown size="lg">
-                                <x-slot:trigger>
-                                    <x-keys::button size="lg">Large Dropdown</x-keys::button>
-                                </x-slot:trigger>
-                                <x-slot:panel>
-                                    <div class="px-4 py-3 text-base text-primary">Large dropdown content</div>
-                                </x-slot:panel>
-                            </x-keys::dropdown>
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">Time Range with Button</x-keys::text>
+                                <x-keys::group attached>
+                                    <x-keys::input type="time" name="start_time" />
+                                    <x-keys::input type="time" name="end_time" />
+                                    <x-keys::button icon="heroicon-o-check">Confirm</x-keys::button>
+                                </x-keys::group>
+                            </div>
                         </div>
                     </div>
-                </x-keys::card>
-            </div>
-        </section>
+
+                    <x-keys::separator />
+
+                    {{-- Pagination & Navigation --}}
+                    <div class="space-y-4">
+                        <x-keys::heading level="h3" size="lg">Pagination & Navigation</x-keys::heading>
+
+                        <div class="space-y-3">
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">Pagination Controls</x-keys::text>
+                                <x-keys::group attached>
+                                    <x-keys::button variant="outlined" icon="heroicon-o-chevron-left">
+                                        <span class="sr-only">Previous</span>
+                                    </x-keys::button>
+                                    <x-keys::input type="number" value="1" class="text-center" style="max-width: 80px;" />
+                                    <x-keys::button variant="outlined" icon="heroicon-o-chevron-right">
+                                        <span class="sr-only">Next</span>
+                                    </x-keys::button>
+                                </x-keys::group>
+                            </div>
+
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">View Switcher</x-keys::text>
+                                <x-keys::group attached>
+                                    <x-keys::button variant="outlined" icon="heroicon-o-squares-2x2" data-selected="true">
+                                        Grid
+                                    </x-keys::button>
+                                    <x-keys::button variant="outlined" icon="heroicon-o-list-bullet">
+                                        List
+                                    </x-keys::button>
+                                    <x-keys::button variant="outlined" icon="heroicon-o-table-cells">
+                                        Table
+                                    </x-keys::button>
+                                </x-keys::group>
+                            </div>
+                        </div>
+                    </div>
+
+                    <x-keys::separator />
+
+                    {{-- Vertical Groups --}}
+                    <div class="space-y-4">
+                        <x-keys::heading level="h3" size="lg">Vertical Orientation</x-keys::heading>
+
+                        <div class="flex gap-6">
+                            <div class="flex-1">
+                                <x-keys::text size="sm" color="muted" class="mb-2">Vertical Button Stack</x-keys::text>
+                                <x-keys::group orientation="vertical" attached>
+                                    <x-keys::button variant="outlined" icon-left="heroicon-o-document-text">View Details</x-keys::button>
+                                    <x-keys::button variant="outlined" icon-left="heroicon-o-pencil">Edit</x-keys::button>
+                                    <x-keys::button variant="outlined" icon-left="heroicon-o-trash" class="text-danger">Delete</x-keys::button>
+                                </x-keys::group>
+                            </div>
+
+                            <div class="flex-1">
+                                <x-keys::text size="sm" color="muted" class="mb-2">Vertical Form Controls</x-keys::text>
+                                <x-keys::group orientation="vertical" attached>
+                                    <x-keys::input placeholder="Name" />
+                                    <x-keys::input type="email" placeholder="Email" />
+                                    <x-keys::button color="primary">Submit</x-keys::button>
+                                </x-keys::group>
+                            </div>
+                        </div>
+                    </div>
+
+                    <x-keys::separator />
+
+                    {{-- Detached Mode --}}
+                    <div class="space-y-4">
+                        <x-keys::heading level="h3" size="lg">Detached Mode (With Spacing)</x-keys::heading>
+
+                        <div class="space-y-3">
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">Default Gap (Medium)</x-keys::text>
+                                <x-keys::group :attached="false">
+                                    <x-keys::button variant="outlined">First</x-keys::button>
+                                    <x-keys::button variant="outlined">Second</x-keys::button>
+                                    <x-keys::button variant="outlined">Third</x-keys::button>
+                                </x-keys::group>
+                            </div>
+
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">Small Gap</x-keys::text>
+                                <x-keys::group :attached="false" gap="sm">
+                                    <x-keys::input placeholder="First Name" />
+                                    <x-keys::input placeholder="Last Name" />
+                                    <x-keys::button color="primary">Save</x-keys::button>
+                                </x-keys::group>
+                            </div>
+
+                            <div>
+                                <x-keys::text size="sm" color="muted" class="mb-2">Large Gap</x-keys::text>
+                                <x-keys::group :attached="false" gap="lg">
+                                    <x-keys::button variant="solid" color="primary">Confirm</x-keys::button>
+                                    <x-keys::button variant="outlined">Cancel</x-keys::button>
+                                </x-keys::group>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </x-keys::card.body>
+        </x-keys::card>
+
+        {{-- Forms Section with Tabs --}}
+        <x-keys::card>
+            <x-keys::card.header>
+                <x-keys::heading level="h2" size="xl">Settings</x-keys::heading>
+            </x-keys::card.header>
+            <x-keys::card.body>
+                <x-keys::tabs
+                    :items="[
+                        ['value' => 'profile', 'label' => 'Profile'],
+                        ['value' => 'preferences', 'label' => 'Preferences'],
+                        ['value' => 'advanced', 'label' => 'Advanced'],
+                    ]"
+                    variant="pills"
+                    default-value="profile"
+                >
+                    {{-- Profile Panel --}}
+                    <div data-tab-panel="profile">
+                        <div class="space-y-4 pt-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <x-keys::input
+                                    name="first_name"
+                                    label="First Name"
+                                    value="Sarah"
+                                    required
+                                />
+                                <x-keys::input
+                                    name="last_name"
+                                    label="Last Name"
+                                    value="Johnson"
+                                    required
+                                />
+                            </div>
+
+                            <x-keys::input
+                                name="email"
+                                type="email"
+                                label="Email Address"
+                                value="sarah@example.com"
+                                icon-left="heroicon-o-envelope"
+                                required
+                            />
+
+                            <x-keys::textarea
+                                name="bio"
+                                label="Bio"
+                                rows="4"
+                                placeholder="Tell us about yourself..."
+                                show-character-count
+                                max-length="500"
+                            />
+
+                            <x-keys::select name="role" label="Role">
+                                <x-keys::select.option value="admin">Administrator</x-keys::select.option>
+                                <x-keys::select.option value="manager" selected>Manager</x-keys::select.option>
+                                <x-keys::select.option value="developer">Developer</x-keys::select.option>
+                                <x-keys::select.option value="designer">Designer</x-keys::select.option>
+                            </x-keys::select>
+
+                            <x-keys::button type="button" color="primary">
+                                Save Profile
+                            </x-keys::button>
+                        </div>
+                    </div>
+
+                    {{-- Preferences Panel --}}
+                    <div data-tab-panel="preferences">
+                        <div class="space-y-6 pt-4">
+                            <div>
+                                <x-keys::heading level="h4" size="md" class="mb-3">Notifications</x-keys::heading>
+                                <div class="space-y-3">
+                                    <x-keys::toggle
+                                        name="email_notifications"
+                                        label="Email Notifications"
+                                        description="Receive notifications via email"
+                                        checked
+                                    />
+                                    <x-keys::toggle
+                                        name="push_notifications"
+                                        label="Push Notifications"
+                                        description="Receive push notifications in browser"
+                                        checked
+                                    />
+                                    <x-keys::toggle
+                                        name="sms_notifications"
+                                        label="SMS Notifications"
+                                        description="Receive text message alerts"
+                                    />
+                                </div>
+                            </div>
+
+                            <x-keys::separator />
+
+                            <div>
+                                <x-keys::heading level="h4" size="md" class="mb-3">Theme</x-keys::heading>
+                                <x-keys::choice-group
+                                    name="theme"
+                                    type="radio"
+                                    layout="stacked"
+                                >
+                                    <x-keys::radio name="theme" value="light" label="Light Mode" checked />
+                                    <x-keys::radio name="theme" value="dark" label="Dark Mode" />
+                                    <x-keys::radio name="theme" value="auto" label="System Default" />
+                                </x-keys::choice-group>
+                            </div>
+
+                            <x-keys::separator />
+
+                            <div>
+                                <x-keys::heading level="h4" size="md" class="mb-3">Time & Date</x-keys::heading>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <x-keys::select name="timezone" label="Timezone">
+                                        <x-keys::select.option value="utc">UTC</x-keys::select.option>
+                                        <x-keys::select.option value="est" selected>Eastern (EST)</x-keys::select.option>
+                                        <x-keys::select.option value="pst">Pacific (PST)</x-keys::select.option>
+                                        <x-keys::select.option value="cst">Central (CST)</x-keys::select.option>
+                                    </x-keys::select>
+
+                                    <x-keys::time-picker
+                                        name="work_start"
+                                        label="Work Start Time"
+                                        format="12"
+                                        value="09:00"
+                                    />
+                                </div>
+                            </div>
+
+                            <x-keys::button type="button" color="primary">
+                                Save Preferences
+                            </x-keys::button>
+                        </div>
+                    </div>
+
+                    {{-- Advanced Panel --}}
+                    <div data-tab-panel="advanced">
+                        <div class="space-y-6 pt-4">
+                            <x-keys::alert variant="warning">
+                                <strong>Caution:</strong> These settings are for advanced users only.
+                            </x-keys::alert>
+
+                            <x-keys::input
+                                name="api_key"
+                                type="password"
+                                label="API Key"
+                                show-password
+                                copyable
+                                value="sk_test_abc123xyz"
+                            />
+
+                            <x-keys::range
+                                name="performance"
+                                label="Performance Level"
+                                :min="0"
+                                :max="100"
+                                :value="75"
+                                show-values
+                                :ticks="[0, 25, 50, 75, 100]"
+                                show-ticks
+                            />
+
+                            <x-keys::color-picker
+                                name="brand_color"
+                                label="Brand Color"
+                                value="#3b82f6"
+                            />
+
+                            <div>
+                                <x-keys::heading level="h4" size="md" class="mb-3">Feature Flags</x-keys::heading>
+                                <x-keys::choice-group
+                                    name="features[]"
+                                    type="checkbox"
+                                    layout="grid"
+                                >
+                                    <x-keys::checkbox
+                                        name="features[]"
+                                        value="beta"
+                                        variant="card"
+                                        title="Beta Features"
+                                        description="Enable experimental features"
+                                        icon="heroicon-o-beaker"
+                                    />
+                                    <x-keys::checkbox
+                                        name="features[]"
+                                        value="analytics"
+                                        variant="card"
+                                        title="Advanced Analytics"
+                                        description="Detailed insights and reports"
+                                        icon="heroicon-o-chart-bar"
+                                        checked
+                                    />
+                                    <x-keys::checkbox
+                                        name="features[]"
+                                        value="export"
+                                        variant="card"
+                                        title="Data Export"
+                                        description="Export your data anytime"
+                                        icon="heroicon-o-arrow-down-tray"
+                                        checked
+                                    />
+                                </x-keys::choice-group>
+                            </div>
+
+                            <x-keys::button type="button" color="primary">
+                                Save Advanced Settings
+                            </x-keys::button>
+                        </div>
+                    </div>
+                </x-keys::tabs>
+            </x-keys::card.body>
+        </x-keys::card>
+
+        {{-- Progress & Rating Section --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <x-keys::card>
+                <x-keys::card.header>
+                    <x-keys::heading level="h3" size="lg">Project Progress</x-keys::heading>
+                </x-keys::card.header>
+                <x-keys::card.body>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <x-keys::text size="sm">Website Redesign</x-keys::text>
+                                <x-keys::text size="sm" weight="medium">85%</x-keys::text>
+                            </div>
+                            <x-keys::progress :value="85" :max="100" color="success" />
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <x-keys::text size="sm">Mobile App</x-keys::text>
+                                <x-keys::text size="sm" weight="medium">60%</x-keys::text>
+                            </div>
+                            <x-keys::progress :value="60" :max="100" color="info" />
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <x-keys::text size="sm">API Integration</x-keys::text>
+                                <x-keys::text size="sm" weight="medium">40%</x-keys::text>
+                            </div>
+                            <x-keys::progress :value="40" :max="100" color="warning" />
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <x-keys::text size="sm">Testing Phase</x-keys::text>
+                                <x-keys::text size="sm" weight="medium">15%</x-keys::text>
+                            </div>
+                            <x-keys::progress :value="15" :max="100" color="brand" />
+                        </div>
+                    </div>
+                </x-keys::card.body>
+            </x-keys::card>
+
+            <x-keys::card>
+                <x-keys::card.header>
+                    <x-keys::heading level="h3" size="lg">Customer Satisfaction</x-keys::heading>
+                </x-keys::card.header>
+                <x-keys::card.body>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <x-keys::text size="sm">Product Quality</x-keys::text>
+                            <x-keys::rating :value="5" :max="5" readonly />
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <x-keys::text size="sm">Customer Support</x-keys::text>
+                            <x-keys::rating :value="4.5" :max="5" readonly />
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <x-keys::text size="sm">Delivery Time</x-keys::text>
+                            <x-keys::rating :value="4" :max="5" readonly />
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <x-keys::text size="sm">Value for Money</x-keys::text>
+                            <x-keys::rating :value="4.5" :max="5" readonly />
+                        </div>
+
+                        <x-keys::separator variant="dashed" />
+
+                        <div>
+                            <x-keys::text size="sm" weight="medium" class="mb-2 block">Rate Your Experience</x-keys::text>
+                            <x-keys::rating name="user_rating" :max="5" size="lg" show-count />
+                        </div>
+                    </div>
+                </x-keys::card.body>
+            </x-keys::card>
+        </div>
+
+        {{-- Image Gallery Section --}}
+        <x-keys::card>
+            <x-keys::card.header>
+                <x-keys::heading level="h3" size="lg">Recent Projects</x-keys::heading>
+            </x-keys::card.header>
+            <x-keys::card.body>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <x-keys::image
+                        src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600"
+                        alt="Analytics Dashboard"
+                        aspect-ratio="video"
+                        radius="lg"
+                        caption="Analytics Dashboard"
+                    />
+                    <x-keys::image
+                        src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600"
+                        alt="Data Visualization"
+                        aspect-ratio="video"
+                        radius="lg"
+                        caption="Data Visualization"
+                    />
+                    <x-keys::image
+                        src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600"
+                        alt="Mobile Development"
+                        aspect-ratio="video"
+                        radius="lg"
+                        caption="Mobile Development"
+                    />
+                </div>
+            </x-keys::card.body>
+        </x-keys::card>
+
+        {{-- Keyboard Shortcuts Info --}}
+        <x-keys::card>
+            <x-keys::card.header>
+                <x-keys::heading level="h3" size="lg">Keyboard Shortcuts</x-keys::heading>
+            </x-keys::card.header>
+            <x-keys::card.body>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-center justify-between">
+                        <x-keys::text size="sm">Create New Project</x-keys::text>
+                        <div class="flex gap-1">
+                            <x-keys::kbd keys="Ctrl" />
+                            <x-keys::text size="sm">+</x-keys::text>
+                            <x-keys::kbd keys="N" />
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <x-keys::text size="sm">Quick Search</x-keys::text>
+                        <div class="flex gap-1">
+                            <x-keys::kbd keys="Ctrl" />
+                            <x-keys::text size="sm">+</x-keys::text>
+                            <x-keys::kbd keys="K" />
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <x-keys::text size="sm">Save Changes</x-keys::text>
+                        <div class="flex gap-1">
+                            <x-keys::kbd keys="Ctrl" />
+                            <x-keys::text size="sm">+</x-keys::text>
+                            <x-keys::kbd keys="S" />
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <x-keys::text size="sm">Toggle Sidebar</x-keys::text>
+                        <div class="flex gap-1">
+                            <x-keys::kbd keys="Ctrl" />
+                            <x-keys::text size="sm">+</x-keys::text>
+                            <x-keys::kbd keys="B" />
+                        </div>
+                    </div>
+                </div>
+            </x-keys::card.body>
+        </x-keys::card>
+
+
+        {{-- Social Links Footer --}}
+        <x-keys::card>
+            <x-keys::card.body>
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <x-keys::text color="muted" size="sm">
+                        © 2025 Keys UI Dashboard. Built with Laravel & Keys UI.
+                    </x-keys::text>
+
+                    <x-keys::social.links
+                        :links="[
+                            'github' => 'https://github.com',
+                            'twitter' => 'https://twitter.com',
+                            'linkedin' => 'https://linkedin.com',
+                        ]"
+                        size="md"
+                    />
+                </div>
+            </x-keys::card.body>
+        </x-keys::card>
+
     </div>
+
+    {{-- Modals --}}
+
+    {{-- Create Project Modal --}}
+    <x-keys::modal id="create-project-modal" size="lg" backdrop="blur">
+        <x-slot:header>
+            <x-keys::heading level="h3" size="xl">Create New Project</x-keys::heading>
+        </x-slot:header>
+
+        <div class="space-y-4">
+            <x-keys::input
+                name="project_name"
+                label="Project Name"
+                placeholder="Enter project name"
+                required
+            />
+
+            <x-keys::textarea
+                name="project_description"
+                label="Description"
+                rows="4"
+                placeholder="Describe your project..."
+            />
+
+            <x-keys::select name="project_category" label="Category">
+                <x-keys::select.option value="web">Web Development</x-keys::select.option>
+                <x-keys::select.option value="mobile">Mobile App</x-keys::select.option>
+                <x-keys::select.option value="design">Design</x-keys::select.option>
+                <x-keys::select.option value="marketing">Marketing</x-keys::select.option>
+            </x-keys::select>
+
+            <x-keys::date-picker
+                name="project_deadline"
+                label="Deadline"
+                clearable
+            />
+        </div>
+
+        <x-slot:footer>
+            <x-keys::button variant="ghost" onclick="document.getElementById('create-project-modal').close()">
+                Cancel
+            </x-keys::button>
+            <x-keys::button color="primary">
+                Create Project
+            </x-keys::button>
+        </x-slot:footer>
+    </x-keys::modal>
+
+    {{-- Settings Slideout --}}
+    <x-keys::slideout id="settings-slideout" position="right">
+        <x-slot:header>
+            <x-keys::heading level="h3" size="xl">Quick Settings</x-keys::heading>
+        </x-slot:header>
+
+        <div class="space-y-6">
+            <div>
+                <x-keys::heading level="h4" size="md" class="mb-3">Display</x-keys::heading>
+                <div class="space-y-3">
+                    <x-keys::toggle
+                        name="compact_mode"
+                        label="Compact Mode"
+                        description="Reduce spacing for more content"
+                    />
+                    <x-keys::toggle
+                        name="animations"
+                        label="Animations"
+                        description="Enable smooth transitions"
+                        checked
+                    />
+                </div>
+            </div>
+
+            <x-keys::separator />
+
+            <div>
+                <x-keys::heading level="h4" size="md" class="mb-3">Editor</x-keys::heading>
+                <x-keys::editor
+                    name="notes"
+                    placeholder="Take some notes..."
+                    height="200px"
+                />
+            </div>
+        </div>
+
+        <x-slot:footer>
+            <x-keys::button variant="ghost" onclick="document.getElementById('settings-slideout').close()">
+                Close
+            </x-keys::button>
+            <x-keys::button color="primary">
+                Save Settings
+            </x-keys::button>
+        </x-slot:footer>
+    </x-keys::slideout>
+
 </x-layouts.sidebar>

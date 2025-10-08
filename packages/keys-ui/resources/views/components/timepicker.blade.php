@@ -17,11 +17,13 @@
         }
     }
 
-    $timePickerAttributes = $nonWireAttributes
-        ->except(['class'])
-        ->merge($dataAttributes);
+    $shorthandSpacing = ($isShorthand() && $label) ? ' mt-1' : '';
 
-    $baseClasses = 'flex items-center shadow-xs justify-between gap-2.5 bg-input border border-line rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+    // Wrapper gets all visual styling for group selector targeting
+    $wrapperVisualClasses = 'relative bg-input border border-line rounded-md transition-colors duration-200 hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+
+    // Button is just transparent click overlay
+    $buttonClasses = 'absolute inset-0 cursor-pointer';
 
     $sizeClasses = match ($size) {
         'sm' => 'min-h-[32px] text-sm',
@@ -65,7 +67,12 @@
         default => 'sm'
     };
 
-    $triggerClasses = trim("$baseClasses $widthClasses $stateClasses");
+    $timePickerAttributes = $nonWireAttributes
+        ->except(['class'])
+        ->merge(array_merge($dataAttributes, [
+            'class' => trim("$wrapperVisualClasses $widthClasses $stateClasses$shorthandSpacing")
+        ]));
+
     $overlayClasses = trim("$sizeClasses $paddingClasses");
 
     $dropdownWidthClasses = 'w-auto min-w-full max-w-md';
@@ -82,11 +89,13 @@
 
 <div {{ $attributes->only('class') }} @if(!$isShorthand()) {{ $timePickerAttributes }} @endif>
     @if($isShorthand())
-        <x-keys::label :for="$id" :required="$required" :optional="$optional">
-            {{ $label }}
-        </x-keys::label>
+        @if($label)
+            <x-keys::label :for="$id" :required="$required" :optional="$optional">
+                {{ $label }}
+            </x-keys::label>
+        @endif
 
-        <div class="relative mt-1" {{ $timePickerAttributes }}>
+        <div {{ $timePickerAttributes }}>
     @endif
 
 
@@ -95,7 +104,6 @@
 
     <div wire:ignore>
         <x-keys::popover
-        class="w-full"
         :id="'timepicker-dropdown-' . $id"
         placement="bottom-start"
         :manual="false"
@@ -107,7 +115,7 @@
                     type="button"
                     id="{{ $id }}"
                     popovertarget="timepicker-dropdown-{{ $id }}"
-                    class="absolute inset-0 {{ $triggerClasses }}"
+                    class="{{ $buttonClasses }}"
                     data-popover-trigger="timepicker-dropdown-{{ $id }}"
                     data-timepicker-trigger
                     role="combobox"
@@ -175,7 +183,7 @@
             @if($formatMode === 'flexible')
                 <div class="flex items-center justify-between px-4 py-3 mb-3 border-b border-line">
                     <span class="text-sm font-medium text-primary">{{ __('keys-ui::keys-ui.timepicker.time_format') }}</span>
-                    <x-keys::button.group :attached="true">
+                    <x-keys::group :attached="true">
                         <x-keys::button
                             size="xs"
                             :variant="$format === '24' ? 'solid' : 'outline'"
@@ -194,7 +202,7 @@
                         >
 {{ __('keys-ui::keys-ui.timepicker.format_12h') }}
                         </x-keys::button>
-                    </x-keys::button.group>
+                    </x-keys::group>
                 </div>
             @endif
 

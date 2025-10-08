@@ -111,6 +111,7 @@ class Select extends Component
     {
         $attributes = [
             'data-keys-select' => 'true',
+            'data-keys-group-target' => 'true',
             'data-select' => 'true',
             'data-size' => $this->size,
             'data-width' => $this->width,

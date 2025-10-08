@@ -14,12 +14,13 @@
         }
     }
 
-    $datePickerAttributes = $attributes->whereDoesntStartWith('wire:')
-        ->except(['class'])
-        ->merge($dataAttributes)
-        ->merge(['data-keys-date-picker-config' => json_encode($calendarData)]);
+    $shorthandSpacing = ($isShorthand && $label) ? ' mt-1' : '';
 
-    $baseClasses = 'flex items-center shadow-xs justify-between gap-2.5 bg-input border border-line rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+    // Wrapper gets all visual styling for group selector targeting
+    $wrapperVisualClasses = 'relative bg-input border border-line rounded-md transition-colors duration-200 hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+
+    // Button is just transparent click overlay
+    $buttonClasses = 'absolute inset-0 cursor-pointer';
 
     $sizeClasses = match ($size) {
         'sm' => 'min-h-[32px] text-sm',
@@ -58,18 +59,27 @@
     }
     $iconSize = match ($size) { 'sm' => 'xs', 'lg' => 'md', default => 'sm' };
 
-    $triggerClasses = trim("$baseClasses $widthClasses $stateClasses");
+    $datePickerAttributes = $attributes->whereDoesntStartWith('wire:')
+        ->except(['class'])
+        ->merge($dataAttributes)
+        ->merge([
+            'data-keys-date-picker-config' => json_encode($calendarData),
+            'class' => trim("$wrapperVisualClasses $widthClasses $stateClasses$shorthandSpacing")
+        ]);
+
     $overlayClasses = trim("$sizeClasses $paddingClasses");
     $inputClasses = "block w-full rounded-md transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-1 px-3 py-2 $sizeClasses $stateClasses";
 @endphp
 
 @if($isShorthand)
     <div {{ $attributes->only('class') }}>
-        <x-keys::label :for="$id" :required="$required" :optional="$optional">
-            {{ $label }}
-        </x-keys::label>
+        @if($label)
+            <x-keys::label :for="$id" :required="$required" :optional="$optional">
+                {{ $label }}
+            </x-keys::label>
+        @endif
 
-        <div class="relative mt-1" {{ $datePickerAttributes }}>
+        <div {{ $datePickerAttributes }}>
             {{-- Hidden input for date picker value with Livewire support --}}
             <input type="hidden"
                    name="{{ $name }}"
@@ -81,7 +91,6 @@
             @if(!$inline)
                 <div wire:ignore>
                     <x-keys::popover
-                    class="w-full"
                     :id="'date-picker-dropdown-' . $id"
                     placement="bottom-start"
                     :manual="false"
@@ -99,7 +108,7 @@
                                     type="button"
                                     id="{{ $id }}"
                                     popovertarget="date-picker-dropdown-{{ $id }}"
-                                    class="absolute inset-0 {{ $triggerClasses }}"
+                                    class="{{ $buttonClasses }}"
                                     data-popover-trigger="date-picker-dropdown-{{ $id }}"
                                     data-date-picker-trigger
                                     role="combobox"
@@ -280,7 +289,6 @@
         @if(!$inline)
             <div wire:ignore>
                 <x-keys::popover
-                class="w-full"
                 :id="'date-picker-dropdown-' . $id"
                 placement="bottom-start"
                 :manual="false"
@@ -297,7 +305,7 @@
                                 type="button"
                                 id="{{ $id }}"
                                 popovertarget="date-picker-dropdown-{{ $id }}"
-                                class="absolute inset-0 {{ $triggerClasses }}"
+                                class="{{ $buttonClasses }}"
                                 data-popover-trigger="date-picker-dropdown-{{ $id }}"
                                 data-date-picker-trigger
                                 role="combobox"

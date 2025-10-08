@@ -23,11 +23,11 @@
     $modalClasses = 'relative bg-elevation-1 border border-line shadow-xl rounded-lg';
 
     $sizeClasses = match ($size) {
-        'xs' => 'max-w-xs',
-        'sm' => 'max-w-sm',
-        'md' => 'max-w-md',
-        'lg' => 'max-w-lg',
-        'xl' => 'max-w-xl',
+        'xs' => 'w-full max-w-xs',
+        'sm' => 'w-full max-w-sm',
+        'md' => 'w-full max-w-md',
+        'lg' => 'w-full max-w-lg',
+        'xl' => 'w-full max-w-xl',
         'full' => 'max-w-full w-full max-h-full',
         default => 'max-w-md'
     };
@@ -87,7 +87,7 @@
         </div>
     </div>
 
-    
+
     @if($isLivewireEnabled)
         <script>
             document.addEventListener('DOMContentLoaded', function() {

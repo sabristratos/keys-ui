@@ -35,7 +35,7 @@
      tabindex="-1">
 
     <div class="px-4 pt-4 pb-3">
-        <div class="flex items-start gap-3">
+        <div class="flex {{ empty($title) ? 'items-center' : 'items-start' }} gap-3">
             
             @if($getVariantIcon())
                 <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center {{ $iconWrapperClasses }}">

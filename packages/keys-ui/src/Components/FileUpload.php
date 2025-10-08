@@ -34,10 +34,10 @@ class FileUpload extends Component
         public bool $multiple = false,
         public ?int $maxFiles = null
     ) {
-        
+
         $this->id = $this->id ?? $this->name ?? 'file-upload-' . uniqid();
 
-        
+
         if ($this->placeholder === null) {
             $this->placeholder = $this->multiple
                 ? 'Drop files here or click to browse'
@@ -144,7 +144,7 @@ class FileUpload extends Component
             $attributes['data-required'] = 'true';
         }
 
-        if ($this->hasError()) {
+        if ($this->hasErrors()) {
             $attributes['data-invalid'] = 'true';
         }
 

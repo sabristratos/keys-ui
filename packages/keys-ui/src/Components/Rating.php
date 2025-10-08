@@ -87,33 +87,10 @@ class Rating extends Component
         return $this->hasErrors();
     }
 
-
-    public function getDataAttributes(): array
-    {
-        $attributes = [
-            'data-keys-rating' => 'true',
-            'data-rating-id' => $this->uniqueId,
-            'data-max' => (string) $this->max,
-            'data-value' => (string) $this->value,
-            'data-size' => $this->size,
-            'data-color' => $this->color,
-            'data-readonly' => $this->readonly ? 'true' : 'false',
-            'data-disabled' => $this->disabled ? 'true' : 'false',
-            'data-allow-half' => $this->allowHalf ? 'true' : 'false',
-        ];
-
-        if ($this->hasError()) {
-            $attributes['data-error'] = 'true';
-        }
-
-        return $attributes;
-    }
-
     public function render()
     {
         return view('keys::components.rating', [
             'uniqueId' => $this->uniqueId,
-            'dataAttributes' => $this->getDataAttributes(),
             'filledIcon' => $this->iconFilled,
             'outlinedIcon' => $this->iconOutlined,
         ]);

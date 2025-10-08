@@ -18,6 +18,6 @@
 
     /* Table hover states - Complex selectors that can't be handled by Tailwind */
     [data-table="true"] tbody tr:hover:not(.table-row-selected) {
-        background-color: var(--color-base);
+        background-color: var(--color-hover);
     }
 }

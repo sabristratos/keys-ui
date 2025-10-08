@@ -22,7 +22,7 @@
         $tableVariantClasses .= '[&_tbody_tr:nth-child(odd)]:bg-base ';
     }
     if ($hover) {
-        $tableVariantClasses .= '[&_tbody_tr:not([data-selected="true"])]:hover:bg-base ';
+        $tableVariantClasses .= '[&_tbody_tr:not([data-selected="true"])]:hover:bg-hover ';
     }
 
     $tableClasses = trim("$tableBaseClasses $tableSizeClasses $tableVariantClasses");

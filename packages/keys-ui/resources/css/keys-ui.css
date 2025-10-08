@@ -8,6 +8,7 @@
 @import "./file-preview.css";
 @import "./scrollbar.css";
 @import "./sidebar.css";
+@import "./countdown.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -91,14 +92,14 @@
     --color-inverted: light-dark(var(--color-neutral-900), var(--color-neutral-50));
 
     --color-heading: light-dark(var(--color-neutral-950), var(--color-neutral-50));
-    --color-primary: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+    --color-primary: light-dark(var(--color-neutral-800), var(--color-neutral-100));
     --color-secondary: light-dark(var(--color-neutral-700), var(--color-neutral-300));
     --color-muted: light-dark(var(--color-neutral-600), var(--color-neutral-500));
     --color-disabled: light-dark(var(--color-neutral-400), var(--color-neutral-600));
 
-    --color-line: light-dark(var(--color-neutral-200), var(--color-neutral-800));
-    --color-line-subtle: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    --color-line-strong: light-dark(var(--color-neutral-400), var(--color-neutral-600));
+    --color-line: light-dark(var(--color-neutral-300), var(--color-neutral-800));
+    --color-line-subtle: light-dark(var(--color-neutral-400), var(--color-neutral-700));
+    --color-line-strong: light-dark(var(--color-neutral-500), var(--color-neutral-600));
 
     --color-hover: light-dark(var(--color-neutral-200), var(--color-neutral-700));
     --color-active: light-dark(var(--color-neutral-300), var(--color-neutral-600));
@@ -121,7 +122,7 @@
     --color-success-subtle-hover: light-dark(var(--color-success-200), var(--color-success-800));
     --color-success-subtle-active: light-dark(var(--color-success-300), var(--color-success-700));
 
-    --color-warning: light-dark(var(--color-warning-500), var(--color-warning-600));
+    --color-warning: light-dark(var(--color-warning-600), var(--color-warning-600));
     --color-warning-contrast: light-dark(var(--color-neutral-900), white);
     --color-warning-hover: light-dark(var(--color-warning-600), var(--color-warning-500));
     --color-warning-active: light-dark(var(--color-warning-700), var(--color-warning-400));
@@ -145,7 +146,7 @@
     --color-info-subtle-hover: light-dark(var(--color-info-200), var(--color-info-800));
     --color-info-subtle-active: light-dark(var(--color-info-300), var(--color-info-700));
 
-    --color-neutral: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+    --color-neutral: light-dark(var(--color-neutral-50), var(--color-neutral-900));
     --color-neutral-hover: light-dark(var(--color-neutral-200), var(--color-neutral-700));
     --color-neutral-active: light-dark(var(--color-neutral-300), var(--color-neutral-600));
 
@@ -209,6 +210,11 @@
         inset 0 1px 3px var(--shadow-highlight),
         0 12px 15px var(--shadow-dark),
         0 15px 25px var(--shadow-soft);
+}
+
+/* Prevent scroll behavior on hidden form inputs (sr-only) when focused */
+.sr-only {
+    position: fixed !important;
 }
 
 :root {

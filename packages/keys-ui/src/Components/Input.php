@@ -162,6 +162,7 @@ class Input extends Component
     {
         $attributes = [
             'data-keys-input' => 'true',
+            'data-keys-group-target' => 'true',
             'data-type' => $this->type,
             'data-size' => $this->size,
         ];

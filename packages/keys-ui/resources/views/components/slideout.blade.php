@@ -34,17 +34,17 @@
 
     $allDialogClasses = "$dialogClasses $positionClasses $sizeClasses $backdropClasses";
 
-    $headerClasses = 'flex items-center justify-between p-6 border-b border-line';
+    $headerClasses = 'flex items-center justify-between py-6 border-b border-line';
     if ($scrollable) {
         $headerClasses .= ' flex-shrink-0';
     }
 
-    $bodyClasses = 'p-6';
+    $bodyClasses = 'py-6';
     if ($scrollable) {
         $bodyClasses .= ' flex-1 overflow-y-auto';
     }
 
-    $footerClasses = 'flex items-center justify-end gap-3 p-6 border-t border-line';
+    $footerClasses = 'flex items-center justify-end gap-3 py-6 border-t border-line';
     if ($scrollable) {
         $footerClasses .= ' flex-shrink-0';
     }
@@ -90,7 +90,7 @@
         @endisset
     </div>
 
-    
+
     @if($isLivewireEnabled)
         <script>
             document.addEventListener('DOMContentLoaded', function() {

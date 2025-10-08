@@ -112,6 +112,18 @@ export class SelectActions extends BaseActionClass<SelectState> {
             return [];
         }
 
+        // First, try to read from selected option elements (server-side rendering)
+        const allOptions = this.getAllOptions(selectElement);
+        const selectedOptions = allOptions.filter(opt =>
+            opt.element.hasAttribute('selected') ||
+            opt.element.dataset.selected === 'true'
+        );
+
+        if (selectedOptions.length > 0) {
+            return selectedOptions.map(opt => opt.value);
+        }
+
+        // Fall back to reading from hidden inputs (client-side state)
         if (isMultiple) {
             const poolInputs = DOMUtils.querySelectorAll('.select-pool-input', selectElement) as unknown as NodeListOf<HTMLInputElement>;
             const values: string[] = [];

@@ -1,145 +1,105 @@
 @php
-
+    // Container classes based on orientation
     $containerClasses = match ($orientation) {
         'vertical' => 'flex gap-6',
-        'horizontal' => 'flex flex-col space-y-4',
-        default => 'flex flex-col space-y-4'
+        default => 'flex flex-col'
     };
 
+    // Size classes for text
     $sizeClasses = match ($size) {
-        'sm' => 'text-sm',
+        'sm' => 'text-xs',
         'md' => 'text-sm',
         'lg' => 'text-base',
         default => 'text-sm'
     };
 
-    $tabListBaseClasses = 'tabs-list flex relative';
-    $tabListOrientationClasses = match ($orientation) {
-        'vertical' => 'flex-col space-y-1 min-w-0',
-        'horizontal' => $stretch ? 'w-full gap-1' : 'space-x-1',
-        default => $stretch ? 'w-full gap-1' : 'space-x-1'
+    // Tab list base classes
+    $tabListBase = 'relative flex';
+
+    // Tab list orientation
+    $tabListOrientation = match ($orientation) {
+        'vertical' => 'flex-col gap-1',
+        default => 'gap-1'
     };
-    $tabListVariantClasses = match ($variant) {
-        'pills' => 'bg-base p-1 rounded-lg',
+
+    // Tab list variant styling
+    $tabListVariant = match ($variant) {
+        'pills' => 'bg-base p-1 rounded-xl border border-line',
         'underline' => 'border-b border-line',
-        'default' => 'border-b border-line',
         default => 'border-b border-line'
     };
-    $tabListClasses = "$tabListBaseClasses $tabListOrientationClasses $tabListVariantClasses";
 
-    $panelsContainerClasses = match ($orientation) {
-        'vertical' => 'flex-1 min-w-0',
-        'horizontal' => 'mt-4',
-        default => 'mt-4'
+    // Stretch modifier
+    $tabListStretch = $stretch ? 'w-full [&>button]:flex-1' : '';
+
+    $tabListClasses = trim("$tabListBase $tabListOrientation $tabListVariant $tabListStretch");
+
+    // Panels container classes
+    $panelsClasses = match ($orientation) {
+        'vertical' => 'flex-1',
+        default => 'mt-6 w-full'
     };
 
-    $finalContainerClasses = trim("tabs-container $containerClasses $sizeClasses");
+    // Tab button size classes
+    $tabSizeClasses = match ($size) {
+        'sm' => 'px-3 py-1 text-xs',
+        'md' => 'px-4 py-1.5 text-sm',
+        'lg' => 'px-5 py-2 text-base',
+        default => 'px-4 py-1.5 text-sm'
+    };
+
+    // Slider positioning based on variant
+    $sliderClasses = match ($variant) {
+        'pills' => 'inset-y-1 left-0 bg-overlay rounded-lg shadow-md',
+        'underline' => 'bottom-0 left-0 h-0.5 bg-accent',
+        default => 'bottom-0 left-0 h-0.5 bg-accent'
+    };
 @endphp
 
-<div {{ $attributes->merge(['class' => $finalContainerClasses])->merge($dataAttributes) }}>
-    <div class="{{ $tabListClasses }}" role="tablist" aria-label="Tabs" data-tabs-list="true">
-        {{ $slot }}
+<div {{ $attributes->merge(['class' => "$containerClasses $sizeClasses"])->merge($dataAttributes) }}>
+    {{-- Tabs Navigation --}}
+    <div class="{{ $tabListClasses }}" role="tablist" aria-label="Tabs">
+        {{-- Sliding Indicator --}}
+        <div
+            data-tab-slider
+            class="absolute {{ $sliderClasses }} transition-all duration-300 ease-in-out pointer-events-none"
+            aria-hidden="true"
+        ></div>
 
-        
-        <div class="tab-marker" data-tab-marker="true" aria-hidden="true"></div>
+        @if($hasItems())
+            {{-- Array-based tabs --}}
+            @foreach($items as $item)
+                @php
+                    $isDefault = $defaultValue === $item['value'];
+                    $tabClasses = 'relative z-10 flex items-center justify-center gap-2 font-medium leading-tight transition-colors duration-200 cursor-pointer rounded-lg';
+                    $tabClasses .= " $tabSizeClasses";
+                    $tabClasses .= $isDefault ? ' text-primary font-semibold' : ' text-muted hover:text-primary';
+                @endphp
+
+                <button
+                    type="button"
+                    data-tab="{{ $item['value'] }}"
+                    class="{{ $tabClasses }}"
+                    role="tab"
+                    aria-selected="{{ $isDefault ? 'true' : 'false' }}"
+                    tabindex="{{ $isDefault ? '0' : '-1' }}"
+                    @if($disabled || ($item['disabled'] ?? false)) disabled @endif
+                >
+                    @if(isset($item['icon']) && $item['icon'])
+                        <x-keys::icon :name="$item['icon']" class="w-4 h-4 flex-shrink-0" />
+                    @endif
+
+                    {{ $item['label'] }}
+                </button>
+            @endforeach
+        @else
+            {{-- Slot-based tabs --}}
+            {{ $tabs ?? '' }}
+        @endif
     </div>
 
-    
-    <div class="{{ $panelsContainerClasses }}" data-tabs-panels="true">
-        {{ $panels ?? '' }}
+    {{-- Panels Container --}}
+    <div class="{{ $panelsClasses }}">
+        {{ $slot }}
     </div>
 </div>
-
-<style>
-[data-tabs="true"] {
-    position: relative;
-}
-
-[data-tabs-list="true"] {
-    position: relative;
-}
-
-.tab-marker {
-    position: absolute;
-    transition: all 0.2s ease;
-    pointer-events: none;
-    z-index: 0;
-}
-
-/* Horizontal tabs marker */
-[data-orientation="horizontal"] .tab-marker {
-    height: 2px;
-    bottom: 0;
-    left: 0;
-    border-radius: var(--radius-sm);
-    background: var(--color-accent);
-}
-
-/* Vertical tabs marker */
-[data-orientation="vertical"] .tab-marker {
-    width: 2px;
-    top: 0;
-    left: 0;
-    border-radius: var(--radius-sm);
-    background: var(--color-accent);
-}
-
-/* Pills variant marker - full height behind tab */
-[data-variant="pills"] .tab-marker {
-    background: var(--color-elevation-1);
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-lg);
-    top: 0;
-    left: 0;
-    z-index: 0;
-}
-
-/* Tab states */
-[data-tabs-trigger="true"] {
-    position: relative;
-    transition: color 0.2s ease;
-    z-index: 1;
-}
-
-/* Hover state handled by Tailwind classes in Tab.php */
-
-/* Remove focus styles for non-keyboard users */
-[data-tabs-trigger="true"]:focus:not(:focus-visible) {
-    outline: 0;
-    box-shadow: none;
-}
-
-/* Focus ring only on keyboard navigation */
-[data-tabs-trigger="true"]:focus-visible {
-    outline: 2px solid var(--color-line);
-    outline-offset: 2px;
-}
-
-/* Active state handled by Tailwind classes in Tab.php */
-
-/* Panel states */
-[data-tabs-panel="true"] {
-    display: none;
-    outline: none;
-}
-
-[data-tabs-panel="true"][data-state="active"] {
-    display: block;
-}
-
-/* Vertical tabs alignment - left align content */
-[data-orientation="vertical"] [data-tabs-trigger="true"] {
-    justify-content: flex-start;
-    text-align: left;
-}
-
-/* Horizontal tabs - keep center alignment */
-[data-orientation="horizontal"] [data-tabs-trigger="true"] {
-    justify-content: center;
-}
-
-/* Stretched tabs - make tabs grow to fill available space */
-[data-stretch="true"] [data-tabs-trigger="true"] {
-    flex: 1;
-}
-</style>

@@ -220,6 +220,7 @@ class TimePicker extends Component
     {
         $attributes = [
             'data-keys-timepicker' => 'true',
+            'data-keys-group-target' => 'true',
             'data-format' => $this->format,
             'data-format-mode' => $this->formatMode,
             'data-step' => $this->step,

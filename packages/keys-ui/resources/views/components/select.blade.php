@@ -17,7 +17,11 @@
         }
     }
 
-    $baseClasses = 'flex shadow-xs items-center justify-between gap-2.5 bg-input border border-line rounded-md transition-colors duration-200 cursor-pointer hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+    // Wrapper gets all visual styling for group selector targeting
+    $wrapperVisualClasses = 'relative bg-input border border-line rounded-md transition-colors duration-200 hover:border-neutral-300 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+
+    // Button is just transparent click overlay
+    $buttonClasses = 'absolute inset-0 cursor-pointer';
 
     $sizeClasses = match ($size) {
         'sm' => 'min-h-[32px] text-sm',
@@ -54,7 +58,6 @@
         $stateClasses = 'text-primary';
     }
 
-    $triggerClasses = trim("$baseClasses $widthClasses $stateClasses");
     $overlayClasses = trim("$sizeClasses $paddingClasses");
 
     $iconSize = match ($size) {
@@ -68,18 +71,24 @@
 
     $hiddenInputName = $multiple ? ($name . '[]') : $name;
 
+    $shorthandSpacing = ($isShorthand() && $label) ? ' mt-1' : '';
+
     $selectAttributes = $nonWireAttributes
         ->except(['class'])
-        ->merge($dataAttributes);
+        ->merge(array_merge($dataAttributes, [
+            'class' => trim("$wrapperVisualClasses $widthClasses $stateClasses$shorthandSpacing")
+        ]));
 @endphp
 
 @if($isShorthand())
     <div {{ $attributes->only('class') }}>
-        <x-keys::label :for="$id" :required="$required" :optional="$optional">
-            {{ $label }}
-        </x-keys::label>
+        @if($label)
+            <x-keys::label :for="$id" :required="$required" :optional="$optional">
+                {{ $label }}
+            </x-keys::label>
+        @endif
 
-        <div class="relative mt-1" {{ $selectAttributes }}>
+        <div {{ $selectAttributes }}>
 
             @if($isLivewireEnabled ?? false)
                 @if($multiple)
@@ -138,7 +147,6 @@
 
             <div wire:ignore>
                 <x-keys::popover
-                class="w-full"
                 :id="'select-dropdown-' . $id"
                 placement="bottom-start"
                 :manual="false"
@@ -150,7 +158,7 @@
                             type="button"
                             id="{{ $id }}"
                             popovertarget="select-dropdown-{{ $id }}"
-                            class="absolute inset-0 {{ $triggerClasses }}"
+                            class="{{ $buttonClasses }}"
                             data-select-trigger
                             @if($disabled) disabled @endif
                             @if($ariaLabel) aria-label="{{ $ariaLabel }}" @endif
@@ -316,7 +324,6 @@
 
         <div wire:ignore>
             <x-keys::popover
-            class="w-full"
             :id="'select-dropdown-' . $id"
             placement="bottom-start"
             :manual="false"
@@ -328,7 +335,7 @@
                         type="button"
                         id="{{ $id }}"
                         popovertarget="select-dropdown-{{ $id }}"
-                        class="absolute inset-0 {{ $triggerClasses }}"
+                        class="{{ $buttonClasses }}"
                         data-select-trigger
                         @if($disabled) disabled @endif
                         @if($ariaLabel) aria-label="{{ $ariaLabel }}" @endif

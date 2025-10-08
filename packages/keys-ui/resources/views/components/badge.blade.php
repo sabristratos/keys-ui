@@ -50,7 +50,7 @@
         'filled' => match ($color) {
             'brand' => 'bg-accent text-white',
             'success' => 'bg-success text-white',
-            'warning' => 'bg-warning text-warning-foreground',
+            'warning' => 'bg-warning text-white',
             'danger' => 'bg-danger text-white',
             'info' => 'bg-info text-white',
             'neutral' => 'bg-muted text-white',

@@ -138,6 +138,7 @@
     @if($elementType === 'a') href="{{ $href }}" @endif
     @if($elementType === 'button' && ($disabled || $loading)) disabled @endif
     @if($elementType === 'button' && $popovertarget) popovertarget="{{ $popovertarget}}" @endif
+    data-keys-group-target
 >
     @if($loading)
         <x-keys::loading :animation="$loadingAnimation" :size="$iconSize" class="mr-2" />

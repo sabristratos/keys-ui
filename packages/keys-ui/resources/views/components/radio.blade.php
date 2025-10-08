@@ -2,87 +2,111 @@
     $radioAttributes = $attributes->whereStartsWith('wire:model');
     $wrapperAttributes = $attributes->whereDoesntStartWith('wire:model');
 
-    $radioBaseClasses = 'border transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 shrink-0';
-
-    $radioSizeClasses = match ($size) {
-        'sm' => 'h-3 w-3 text-xs',
-        'md' => 'h-3.5 w-3.5 text-sm',
-        'lg' => 'h-4 w-4 text-base',
-        default => 'h-3.5 w-3.5 text-sm'
+    // Custom radio circle size
+    $circleSizeClasses = match ($size) {
+        'sm' => 'w-4 h-4',
+        'md' => 'w-5 h-5',
+        'lg' => 'w-6 h-6',
+        default => 'w-5 h-5'
     };
 
-    $radioVariantClasses = match ($variant) {
-        'standard', 'bordered', 'card' => 'rounded-full',
-        'colored' => 'rounded-full border-2',
-        default => 'rounded-full'
+    // Inner dot size
+    $dotSizeClasses = match ($size) {
+        'sm' => 'w-2 h-2',
+        'md' => 'w-2.5 h-2.5',
+        'lg' => 'w-3 h-3',
+        default => 'w-2.5 h-2.5'
     };
 
+    // Base radio circle styling - custom visual element
     if ($disabled) {
-        $radioStateClasses = 'bg-neutral-100 border-neutral-300 text-neutral-400 cursor-not-allowed dark:bg-neutral-800 dark:border-neutral-700';
+        $radioCircleClasses = 'border-2 border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-700/30 rounded-full flex items-center justify-center cursor-not-allowed shadow-xs';
+        $dotClasses = 'bg-neutral-400 dark:bg-neutral-600 rounded-full';
     } elseif ($hasError()) {
-        $radioStateClasses = 'bg-input border-danger text-danger focus-visible:border-danger focus-visible:ring-danger';
+        $radioCircleClasses = 'border-2 rounded-full flex items-center justify-center transition-all duration-300 border-danger group-hover:border-danger group-has-[:focus-visible]:ring-2 group-has-[:focus-visible]:ring-offset-2 group-has-[:focus-visible]:ring-danger dark:group-has-[:focus-visible]:ring-offset-neutral-900 shadow-xs';
+        $dotClasses = 'bg-danger rounded-full transform scale-0 transition-transform duration-200 ease-out group-has-[:checked]:scale-100';
+        $radioCircleClasses .= ' group-has-[:checked]:border-danger';
     } else {
-        $colorClasses = match ($color) {
-            'brand' => 'text-accent focus-visible:ring-accent',
-            'success' => 'text-success focus-visible:ring-success',
-            'warning' => 'text-warning focus-visible:ring-warning',
-            'danger' => 'text-danger focus-visible:ring-danger',
-            'neutral' => 'text-neutral-600 focus-visible:ring-neutral-500',
-            default => 'text-accent focus-visible:ring-accent'
+        // Color-based solid backgrounds and states
+        $gradientClasses = match ($color) {
+            'brand' => 'group-has-[:checked]:border-indigo-600',
+            'success' => 'group-has-[:checked]:border-green-600',
+            'warning' => 'group-has-[:checked]:border-amber-600',
+            'danger' => 'group-has-[:checked]:border-red-600',
+            'neutral' => 'group-has-[:checked]:border-neutral-500',
+            default => 'group-has-[:checked]:border-indigo-600'
         };
 
-        if ($variant === 'colored') {
-            $borderColor = match ($color) {
-                'brand' => 'border-accent',
-                'success' => 'border-success',
-                'warning' => 'border-warning',
-                'danger' => 'border-danger',
-                'neutral' => 'border-neutral-400',
-                default => 'border-accent'
-            };
-            $radioStateClasses = "bg-input border-line hover:$borderColor $colorClasses";
-        } else {
-            $radioStateClasses = 'bg-input border-line hover:border-neutral-300 dark:hover:border-neutral-600 ' . $colorClasses;
-        }
-    }
+        $dotBackground = match ($color) {
+            'brand' => 'bg-indigo-500',
+            'success' => 'bg-green-500',
+            'warning' => 'bg-amber-500',
+            'danger' => 'bg-red-500',
+            'neutral' => 'bg-neutral-500 dark:bg-neutral-600',
+            default => 'bg-indigo-500'
+        };
 
-    $radioClasses = "$radioBaseClasses $radioSizeClasses $radioVariantClasses $radioStateClasses";
+        $hoverColor = match ($color) {
+            'brand' => 'group-hover:border-indigo-500',
+            'success' => 'group-hover:border-green-500',
+            'warning' => 'group-hover:border-amber-500',
+            'danger' => 'group-hover:border-red-500',
+            'neutral' => 'group-hover:border-neutral-400',
+            default => 'group-hover:border-indigo-500'
+        };
+
+        $focusRing = match ($color) {
+            'brand' => 'group-has-[:focus-visible]:ring-indigo-500',
+            'success' => 'group-has-[:focus-visible]:ring-green-500',
+            'warning' => 'group-has-[:focus-visible]:ring-amber-500',
+            'danger' => 'group-has-[:focus-visible]:ring-red-500',
+            'neutral' => 'group-has-[:focus-visible]:ring-neutral-500',
+            default => 'group-has-[:focus-visible]:ring-indigo-500'
+        };
+
+        $radioCircleClasses = "border-2 border-neutral-400 dark:border-neutral-500 rounded-full flex items-center justify-center transition-all duration-300 {$hoverColor} {$gradientClasses} group-has-[:focus-visible]:ring-2 group-has-[:focus-visible]:ring-offset-2 {$focusRing} dark:group-has-[:focus-visible]:ring-offset-neutral-900 shadow-xs";
+        $dotClasses = "{$dotBackground} rounded-full transform scale-0 transition-transform duration-200 ease-out group-has-[:checked]:scale-100";
+    }
 
     $gap = ($variant === 'card' && !$showInput) ? 'gap-0' : 'gap-3';
 
     $wrapperBaseClasses = match ($variant) {
-        'standard' => "flex items-center {$gap} cursor-pointer",
-        'bordered' => "flex items-center {$gap} p-4 border border-line rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
-        'colored' => "flex items-center {$gap} p-4 border-2 rounded-lg transition-colors duration-200 cursor-pointer",
-        'card' => "flex items-center {$gap} p-4 border border-line rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
-        default => "flex items-center {$gap} cursor-pointer"
+        'standard' => "group flex items-center {$gap} cursor-pointer",
+        'bordered' => "group flex items-center {$gap} p-4 border border-line rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
+        'colored' => "group flex items-center {$gap} p-4 border-2 rounded-lg transition-colors duration-200 cursor-pointer",
+        'card' => "group flex items-center {$gap} p-4 border border-line rounded-lg hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors duration-200 cursor-pointer",
+        default => "group flex items-center {$gap} cursor-pointer"
     };
+
+    if ($disabled) {
+        $wrapperBaseClasses = str_replace('cursor-pointer', 'cursor-not-allowed', $wrapperBaseClasses);
+    }
 
     if ($variant === 'colored') {
         $borderColor = match ($color) {
-            'brand' => 'border-line has-[:checked]:border-accent has-[:checked]:bg-accent/5',
-            'success' => 'border-line has-[:checked]:border-success has-[:checked]:bg-success/5',
-            'warning' => 'border-line has-[:checked]:border-warning has-[:checked]:bg-warning/5',
-            'danger' => 'border-line has-[:checked]:border-danger has-[:checked]:bg-danger/5',
+            'brand' => 'border-line has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-950/30',
+            'success' => 'border-line has-[:checked]:border-green-500 has-[:checked]:bg-green-50 dark:has-[:checked]:bg-green-950/30',
+            'warning' => 'border-line has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 dark:has-[:checked]:bg-amber-950/30',
+            'danger' => 'border-line has-[:checked]:border-red-500 has-[:checked]:bg-red-50 dark:has-[:checked]:bg-red-950/30',
             'neutral' => 'border-line has-[:checked]:border-neutral-400 has-[:checked]:bg-neutral-100 dark:has-[:checked]:bg-neutral-800',
-            default => 'border-line has-[:checked]:border-accent has-[:checked]:bg-accent/5'
+            default => 'border-line has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-950/30'
         };
         $wrapperBaseClasses .= ' ' . $borderColor;
     }
 
     if ($variant === 'card') {
         $bgColor = match ($color) {
-            'brand' => 'has-[:checked]:bg-accent/5 has-[:checked]:border-accent',
-            'success' => 'has-[:checked]:bg-success/5 has-[:checked]:border-success',
-            'warning' => 'has-[:checked]:bg-warning/5 has-[:checked]:border-warning',
-            'danger' => 'has-[:checked]:bg-danger/5 has-[:checked]:border-danger',
+            'brand' => 'has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 dark:has-[:checked]:bg-indigo-950/30',
+            'success' => 'has-[:checked]:bg-green-50 has-[:checked]:border-green-500 dark:has-[:checked]:bg-green-950/30',
+            'warning' => 'has-[:checked]:bg-amber-50 has-[:checked]:border-amber-500 dark:has-[:checked]:bg-amber-950/30',
+            'danger' => 'has-[:checked]:bg-red-50 has-[:checked]:border-red-500 dark:has-[:checked]:bg-red-950/30',
             'neutral' => 'has-[:checked]:bg-neutral-100 has-[:checked]:border-neutral-400 dark:has-[:checked]:bg-neutral-800',
-            default => 'has-[:checked]:bg-accent/5 has-[:checked]:border-accent'
+            default => 'has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 dark:has-[:checked]:bg-indigo-950/30'
         };
         $wrapperBaseClasses .= ' ' . $bgColor;
     }
 
-    if ($hasError()) {
+    if ($hasError() && in_array($variant, ['bordered', 'colored', 'card'])) {
         $wrapperBaseClasses .= ' border-danger';
     }
 
@@ -98,31 +122,24 @@
 @endphp
 
 <label for="{{ $id }}" {{ $wrapperAttributes->merge(['class' => $wrapperBaseClasses])->merge($dataAttributes) }}>
+    {{-- Hidden native radio input --}}
+    <input
+        type="radio"
+        id="{{ $id }}"
+        name="{{ $name }}"
+        value="{{ $value }}"
+        {{ $checked ? 'checked' : '' }}
+        {{ $disabled ? 'disabled' : '' }}
+        {{ $required ? 'required' : '' }}
+        class="absolute opacity-0 w-0 h-0"
+        {{ $radioAttributes }}
+    />
+
     @if($showInput)
-        <input
-            type="radio"
-            id="{{ $id }}"
-            name="{{ $name }}"
-            value="{{ $value }}"
-            {{ $checked ? 'checked' : '' }}
-            {{ $disabled ? 'disabled' : '' }}
-            {{ $required ? 'required' : '' }}
-            class="{{ $radioClasses }}"
-            {{ $radioAttributes }}
-        />
-    @else
-        
-        <input
-            type="radio"
-            id="{{ $id }}"
-            name="{{ $name }}"
-            value="{{ $value }}"
-            {{ $checked ? 'checked' : '' }}
-            {{ $disabled ? 'disabled' : '' }}
-            {{ $required ? 'required' : '' }}
-            class="sr-only"
-            {{ $radioAttributes }}
-        />
+        {{-- Custom visual radio with animated dot --}}
+        <div class="{{ $circleSizeClasses }} {{ $radioCircleClasses }} shrink-0">
+            <div class="{{ $dotSizeClasses }} {{ $dotClasses }}"></div>
+        </div>
     @endif
 
     @if($hasContent())

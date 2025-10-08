@@ -69,7 +69,7 @@
                         :errors="$errors->get('review_date')"
                     />
 
-                    <x-keys::timepicker
+                    <x-keys::time-picker
                         name="preferred_time"
                         wire:model="preferred_time"
                         label="Preferred Contact Time"

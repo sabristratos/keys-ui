@@ -104,18 +104,62 @@ All components automatically use these tokens through Tailwind's auto-generated 
 
 ---
 
+## Usage Guidelines
+
+### Prop Binding Syntax
+
+Keys UI components follow Laravel Blade component conventions. Understanding proper prop binding is essential:
+
+**Numeric Values** - Always use `:` binding for numbers:
+```blade
+{{-- ✅ Correct - passes numeric values --}}
+<x-keys::rating :value="4.5" :max="5" />
+<x-keys::progress :value="75" :max="100" />
+
+{{-- ❌ Incorrect - passes strings "4.5" and "5" --}}
+<x-keys::rating value="4.5" max="5" />
+```
+
+**Array Values** - Always use `:` binding for arrays:
+```blade
+{{-- ✅ Correct - passes array --}}
+<x-keys::range :ticks="[0, 25, 50, 75, 100]" />
+<x-keys::social.links :links="['github' => 'https://github.com']" />
+
+{{-- ❌ Incorrect - passes string --}}
+<x-keys::range ticks="[0, 25, 50, 75, 100]" />
+```
+
+**Boolean Values** - Use attribute presence for true, omit for false:
+```blade
+{{-- ✅ Correct --}}
+<x-keys::input readonly required />
+<x-keys::input /> {{-- No readonly/required --}}
+
+{{-- ❌ Incorrect - string "true" is always truthy --}}
+<x-keys::input readonly="true" />
+```
+
+**String Values** - No binding needed for static strings:
+```blade
+{{-- ✅ Correct --}}
+<x-keys::input name="email" placeholder="Enter email" />
+```
+
+---
+
 ## Table of Contents
 
 - [Forms](#forms)
   - Input, Textarea, Select, Checkbox, Radio, Toggle, DatePicker, TimePicker, ColorPicker, FileUpload, Range, Editor, Field, Label, Error
 - [Buttons & Actions](#buttons--actions)
-  - Button, Button.Group, AddToCart
+  - Button, AddToCart
 - [Navigation](#navigation)
   - Dropdown (+ Item, Separator, Checkbox, Radio, Submenu, Menu), Tabs (+ Tab, Panel), Breadcrumbs (+ Item), Sidebar (+ Item, Section, Divider, Toggle), Steps (+ Step)
 - [Feedback](#feedback)
   - Alert, Toast, Modal, Slideout, Progress, Loading, EmptyState
 - [Layout](#layout)
-  - Card (+ Header, Body, Footer, Actions), Separator, Accordion
+  - Group, Card (+ Header, Body, Footer, Actions), Separator, Accordion
 - [Data Display](#data-display)
   - Table (+ Head, Body, Row, Header, Cell, EmptyState, Loading), Badge (+ Group), Avatar (+ Stack), Rating, Kbd
 - [Typography](#typography)
@@ -938,28 +982,6 @@ Versatile button with variants, sizes, icons, and multi-state support.
 
 ---
 
-### Button.Group
-
-Group multiple buttons together.
-
-**Example:**
-```blade
-<x-keys::button.group>
-    <x-keys::button variant="outline">Left</x-keys::button>
-    <x-keys::button variant="outline">Center</x-keys::button>
-    <x-keys::button variant="outline">Right</x-keys::button>
-</x-keys::button.group>
-
-{{-- Vertical group --}}
-<x-keys::button.group orientation="vertical">
-    <x-keys::button>Top</x-keys::button>
-    <x-keys::button>Middle</x-keys::button>
-    <x-keys::button>Bottom</x-keys::button>
-</x-keys::button.group>
-```
-
----
-
 ### AddToCart
 
 Specialized button for e-commerce add-to-cart actions.
@@ -1439,6 +1461,74 @@ Empty state placeholder.
 ---
 
 ## Layout
+
+### Group
+
+Universal component grouping with unified borders and shared styling. Works with any component that has `data-keys-group-target` attribute.
+
+**Example:**
+```blade
+{{-- Input with action button --}}
+<x-keys::group>
+    <x-keys::input name="search" placeholder="Search..." />
+    <x-keys::button icon="heroicon-o-magnifying-glass">
+        <span class="sr-only">Search</span>
+    </x-keys::button>
+</x-keys::group>
+
+{{-- Select with action button --}}
+<x-keys::group>
+    <x-keys::select name="filter" placeholder="Filter by...">
+        <x-keys::select.option value="all">All</x-keys::select.option>
+        <x-keys::select.option value="active">Active</x-keys::select.option>
+    </x-keys::select>
+    <x-keys::button>Apply</x-keys::button>
+</x-keys::group>
+
+{{-- Date range inputs --}}
+<x-keys::group>
+    <x-keys::date-picker name="start_date" placeholder="Start date" />
+    <x-keys::date-picker name="end_date" placeholder="End date" />
+</x-keys::group>
+
+{{-- Time range with button --}}
+<x-keys::group>
+    <x-keys::timepicker name="start_time" placeholder="Start" />
+    <x-keys::timepicker name="end_time" placeholder="End" />
+    <x-keys::button>Confirm</x-keys::button>
+</x-keys::group>
+
+{{-- Vertical button group --}}
+<x-keys::group orientation="vertical">
+    <x-keys::button variant="outline">Option 1</x-keys::button>
+    <x-keys::button variant="outline">Option 2</x-keys::button>
+    <x-keys::button variant="outline">Option 3</x-keys::button>
+</x-keys::group>
+
+{{-- Detached mode with spacing --}}
+<x-keys::group :attached="false" gap="md">
+    <x-keys::button>First</x-keys::button>
+    <x-keys::button>Second</x-keys::button>
+    <x-keys::button>Third</x-keys::button>
+</x-keys::group>
+```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `orientation` | string | `'horizontal'` | Group orientation (`horizontal`, `vertical`) |
+| `attached` | bool | `true` | Whether components share borders (attached mode) |
+| `gap` | string | `'md'` | Gap size when detached (`xs`, `sm`, `md`, `lg`, `xl`) |
+| `size` | string\|null | `null` | Inherited size for child components via CSS custom property |
+
+**Supported Components:**
+- Input, Textarea
+- Select, DatePicker, TimePicker
+- Button
+- Any component with `data-keys-group-target` attribute
+
+---
 
 ### Card
 

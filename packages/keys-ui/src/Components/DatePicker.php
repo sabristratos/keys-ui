@@ -231,6 +231,7 @@ class DatePicker extends Component
         $attributes = [
 
             'data-keys-date-picker' => 'true',
+            'data-keys-group-target' => 'true',
 
 
             'data-size' => $this->size,

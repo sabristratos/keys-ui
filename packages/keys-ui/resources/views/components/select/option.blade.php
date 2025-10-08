@@ -46,7 +46,7 @@
         @endif
     </div>
 
-    <div class="flex-shrink-0 ml-2 text-accent transition-opacity duration-150 {{ $selected ? 'opacity-100' : 'opacity-0' }}">
+    <div class="flex-shrink-0 ml-2 text-accent transition-opacity duration-150 opacity-0 aria-[selected=true]:opacity-100">
         <x-keys::icon name="heroicon-o-check" size="sm" />
     </div>
 </div>

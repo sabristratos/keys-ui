@@ -71,22 +71,22 @@ class Links extends Component
     protected function buildPlatformIcons(): array
     {
         return [
-            'facebook' => 'icons.facebook',
-            'instagram' => 'icons.instagram',
-            'twitter' => 'icons.x',
-            'x' => 'icons.x',
-            'linkedin' => 'icons.linkedin',
-            'youtube' => 'icons.youtube',
-            'tiktok' => 'icons.tiktok',
-            'whatsapp' => 'icons.whatsapp',
-            'pinterest' => 'icons.pinterest',
-            'reddit' => 'icons.reddit',
-            'telegram' => 'icons.telegram',
-            'github' => 'icons.github',
+            'facebook' => 'keys::icons.facebook',
+            'instagram' => 'keys::icons.instagram',
+            'twitter' => 'keys::icons.x',
+            'x' => 'keys::icons.x',
+            'linkedin' => 'keys::icons.linkedin',
+            'youtube' => 'keys::icons.youtube',
+            'tiktok' => 'keys::icons.tiktok',
+            'whatsapp' => 'keys::icons.whatsapp',
+            'pinterest' => 'keys::icons.pinterest',
+            'reddit' => 'keys::icons.reddit',
+            'telegram' => 'keys::icons.telegram',
+            'github' => 'keys::icons.github',
             'dribbble' => 'heroicon-o-paint-brush',
             'behance' => 'heroicon-o-sparkles',
-            'figma' => 'icons.figma',
-            'google' => 'icons.google',
+            'figma' => 'keys::icons.figma',
+            'google' => 'keys::icons.google',
         ];
     }
 

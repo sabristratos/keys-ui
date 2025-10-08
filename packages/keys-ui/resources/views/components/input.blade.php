@@ -1,5 +1,5 @@
 @php
-    $wrapperClasses = 'relative shadow-xs flex items-center gap-2.5 bg-input border border-line transition-colors duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
+    $wrapperClasses = 'relative flex items-center gap-2.5 bg-input border border-line transition-colors duration-200 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/20';
 
     $wrapperSizeClasses = match ($size) {
         'xs' => 'px-2 rounded-sm',
@@ -18,11 +18,13 @@
         $wrapperStateClasses = '';
     }
 
+    $shorthandSpacing = ($isShorthand && $label) ? ' mt-1' : '';
+
     $wrapperAttributes = $attributes
         ->except(['type', 'name', 'id', 'value', 'placeholder', 'disabled', 'readonly', 'required'])
         ->filter(fn($value, $key) => !str_starts_with($key, 'wire:'))
         ->merge(array_merge([
-            'class' => trim("$wrapperClasses $wrapperSizeClasses $wrapperStateClasses"),
+            'class' => trim("$wrapperClasses $wrapperSizeClasses $wrapperStateClasses$shorthandSpacing"),
         ], $dataAttributes));
 
     $inputClasses = 'flex-1 bg-transparent border-0 outline-none focus:outline-none placeholder:text-muted';
@@ -78,12 +80,13 @@
 
 @if($isShorthand)
     <div {{ $outerWrapperAttributes->only('class') }}>
-        <x-keys::label :for="$id" :required="$required" :optional="$optional">
-            {{ $label }}
-        </x-keys::label>
+        @if($label)
+            <x-keys::label :for="$id" :required="$required" :optional="$optional">
+                {{ $label }}
+            </x-keys::label>
+        @endif
 
-        <div class="mt-1">
-            <div {{ $wrapperAttributes }}>
+        <div {{ $wrapperAttributes }}>
                 @if($iconLeft)
                     <div class="flex items-center text-muted pointer-events-none">
                         <x-keys::icon name="{{ $iconLeft }}" size="{{ $iconSize }}" data-icon />
@@ -126,7 +129,6 @@
                         <x-keys::icon name="{{ $iconRight }}" size="{{ $iconSize }}" data-icon />
                     </div>
                 @endif
-            </div>
         </div>
 
         @if($hint)
@@ -138,7 +140,7 @@
         @endif
     </div>
 @else
-    <div {{ $wrapperAttributes }}>
+    <div {{ $wrapperAttributes }} data-keys-group-target>
         @if($iconLeft)
             <div class="flex items-center text-muted pointer-events-none">
                 <x-keys::icon name="{{ $iconLeft }}" size="{{ $iconSize }}" data-icon />

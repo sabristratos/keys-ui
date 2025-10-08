@@ -191,6 +191,13 @@ class ComponentConstants
     ];
 
     /**
+     * Tabs variants
+     */
+    public const TABS_VARIANTS = [
+        'default', 'pills', 'underline'
+    ];
+
+    /**
      * Tooltip-specific placements (Label component)
      */
     public const TOOLTIP_PLACEMENTS = [

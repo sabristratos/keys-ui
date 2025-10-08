@@ -1,5 +1,5 @@
 
-<x-keys::button.group
+<x-keys::group
     :orientation="$layout"
     :attached="$attached"
     {{ $attributes->merge($dataAttributes) }}
@@ -21,4 +21,4 @@
             </x-keys::button>
         @endif
     @endforeach
-</x-keys::button.group>
+</x-keys::group>

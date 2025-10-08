@@ -8,5 +8,5 @@
         {{ $trigger }}
     </x-slot:trigger>
 
-    {{ $panel }}
+    {{ $slot }}
 </x-keys::popover>

@@ -122,6 +122,7 @@ class Button extends Component
     {
         $attributes = [
             'data-keys-button' => 'true',
+            'data-keys-group-target' => 'true',
             'data-color' => $this->color,
             'data-variant' => $this->variant,
             'data-size' => $this->size,

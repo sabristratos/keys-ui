@@ -15,9 +15,7 @@ import { ButtonActions } from './ButtonActions';
 import { CalendarCore } from './calendar/CalendarCore';
 import { RadioActions } from './RadioActions';
 import { RangeActions } from './RangeActions';
-import { RatingActions } from './RatingActions';
 import { SelectActions } from './SelectActions';
-import { TabsActions } from './TabsActions';
 import { ModalActions } from './ModalActions';
 import { ToastActions } from './ToastActions';
 import { DropdownActions } from './DropdownActions';
@@ -33,7 +31,9 @@ import { LightboxActions } from './LightboxActions';
 import { ChartActions } from './ChartActions';
 import ColorPickerActions from './ColorPickerActions';
 import { SidebarActions } from './SidebarActions';
+import { CountdownActions } from './CountdownActions';
 import './FileUploadActions';
+import './TabsActions';
 
 import Quill from 'quill';
 
@@ -45,7 +45,7 @@ import { RTLUtils } from './utils/RTLUtils';
 
 import polyfill from '@oddbird/css-anchor-positioning/fn';
 
-export { FormActions, TextareaActions, AlertActions, AvatarActions, BadgeActions, BadgeGroupActions, ButtonActions, CalendarCore, RadioActions, RangeActions, RatingActions, SelectActions, TabsActions, ModalActions, ToastActions, DropdownActions, TableActions, TimePickerActions, EditorActions, DatePickerActions, AddToCartActions, GalleryActions, PopoverActions, ImageActions, LightboxActions, ChartActions, ColorPickerActions, SidebarActions };
+export { FormActions, TextareaActions, AlertActions, AvatarActions, BadgeActions, BadgeGroupActions, ButtonActions, CalendarCore, RadioActions, RangeActions, SelectActions, ModalActions, ToastActions, DropdownActions, TableActions, TimePickerActions, EditorActions, DatePickerActions, AddToCartActions, GalleryActions, PopoverActions, ImageActions, LightboxActions, ChartActions, ColorPickerActions, SidebarActions, CountdownActions };
 
 export { BaseActionClass, DOMUtils, EventUtils, RTLUtils };
 
@@ -84,8 +84,6 @@ export function initializeKeysUI(): void {
 
     SelectActions.getInstance().init();
 
-    TabsActions.getInstance().init();
-
     ModalActions.getInstance().init();
 
     ToastActions.getInstance().init();
@@ -119,7 +117,7 @@ export function initializeKeysUI(): void {
 
     SidebarActions.getInstance().init();
 
-    RatingActions.getInstance().init();
+    CountdownActions.getInstance().init();
 
     console.log('[Keys UI] Initialization complete!');
 }
@@ -139,7 +137,6 @@ const KeysUI = {
     RadioActions: RadioActions.getInstance(),
     RangeActions: RangeActions.getInstance(),
     SelectActions: SelectActions.getInstance(),
-    TabsActions: TabsActions.getInstance(),
     ModalActions: ModalActions.getInstance(),
     ToastActions: ToastActions.getInstance(),
     DropdownActions: DropdownActions.getInstance(),
@@ -154,6 +151,7 @@ const KeysUI = {
     ChartActions: ChartActions.getInstance(),
     PopoverActions: PopoverActions.getInstance(),
     SidebarActions: SidebarActions.getInstance(),
+    CountdownActions: CountdownActions.getInstance(),
     Quill: Quill,
     init: initializeKeysUI,
     initialize: initializeKeysUI
@@ -165,5 +163,4 @@ if (typeof window !== 'undefined') {
     (window as any).KeysUI = KeysUI;
     (window as any).Quill = Quill;
     (window as any).manualSyncEditor = () => KeysUI.EditorActions.manualSync();
-
 }

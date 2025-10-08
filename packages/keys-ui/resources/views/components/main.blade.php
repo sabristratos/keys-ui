@@ -8,7 +8,7 @@
     };
 @endphp
 
-<div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-elevation-1">
+<div class="flex-1 flex flex-col mt-2 min-w-0 overflow-hidden bg-elevation-1">
     {{-- Mobile Header with Logo and Sidebar Toggle (no border) --}}
     @if($showMobileToggle)
         <header class="flex-shrink-0 bg-elevation-1 lg:hidden">

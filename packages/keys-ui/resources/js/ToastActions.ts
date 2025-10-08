@@ -335,7 +335,7 @@ export class ToastActions extends BaseActionClass<ToastState> {
 
         toastPopover.innerHTML = `
             <div class="px-4 pt-4 pb-3">
-                <div class="flex items-start gap-3">
+                <div class="flex ${data.title ? 'items-start' : 'items-center'} gap-3">
                     <div class="flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center ${this.getIconWrapperClasses(alertVariant)}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-icon="true">
                             ${this.getIconPath(alertVariant)}
