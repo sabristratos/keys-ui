@@ -32,7 +32,7 @@ import { ChartActions } from './ChartActions';
 import ColorPickerActions from './ColorPickerActions';
 import { SidebarActions } from './SidebarActions';
 import { CountdownActions } from './CountdownActions';
-import './FileUploadActions';
+import { FileUploadActions} from "@/FileUploadActions";
 import './TabsActions';
 
 import Quill from 'quill';
@@ -42,12 +42,13 @@ import { BaseActionClass } from './utils/BaseActionClass';
 import { DOMUtils } from './utils/DOMUtils';
 import { EventUtils } from './utils/EventUtils';
 import { RTLUtils } from './utils/RTLUtils';
+import { LivewireUtils } from './utils/LivewireUtils';
 
 import polyfill from '@oddbird/css-anchor-positioning/fn';
 
-export { FormActions, TextareaActions, AlertActions, AvatarActions, BadgeActions, BadgeGroupActions, ButtonActions, CalendarCore, RadioActions, RangeActions, SelectActions, ModalActions, ToastActions, DropdownActions, TableActions, TimePickerActions, EditorActions, DatePickerActions, AddToCartActions, GalleryActions, PopoverActions, ImageActions, LightboxActions, ChartActions, ColorPickerActions, SidebarActions, CountdownActions };
+export { FileUploadActions, FormActions, TextareaActions, AlertActions, AvatarActions, BadgeActions, BadgeGroupActions, ButtonActions, CalendarCore, RadioActions, RangeActions, SelectActions, ModalActions, ToastActions, DropdownActions, TableActions, TimePickerActions, EditorActions, DatePickerActions, AddToCartActions, GalleryActions, PopoverActions, ImageActions, LightboxActions, ChartActions, ColorPickerActions, SidebarActions, CountdownActions };
 
-export { BaseActionClass, DOMUtils, EventUtils, RTLUtils };
+export { BaseActionClass, DOMUtils, EventUtils, RTLUtils, LivewireUtils };
 
 /**
  * Initialize all Keys UI components
@@ -67,6 +68,8 @@ export function initializeKeysUI(): void {
     TextareaActions.getInstance().init();
 
     AlertActions.getInstance().init();
+
+    FileUploadActions.getInstance().init();
 
     AvatarActions.getInstance().init();
 
@@ -152,6 +155,7 @@ const KeysUI = {
     PopoverActions: PopoverActions.getInstance(),
     SidebarActions: SidebarActions.getInstance(),
     CountdownActions: CountdownActions.getInstance(),
+    FileUploadActions: FileUploadActions.getInstance(),
     Quill: Quill,
     init: initializeKeysUI,
     initialize: initializeKeysUI

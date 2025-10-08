@@ -1,5 +1,4 @@
 @php
-
     $containerClasses = '';
     if ($responsive) {
         $containerClasses .= 'overflow-x-auto ';
@@ -17,12 +16,14 @@
         default => 'text-sm'
     };
 
+    // MODIFIED: Added hover variant directly here
     $tableVariantClasses = '';
     if ($striped) {
         $tableVariantClasses .= '[&_tbody_tr:nth-child(odd)]:bg-base ';
     }
     if ($hover) {
-        $tableVariantClasses .= '[&_tbody_tr:not([data-selected="true"])]:hover:bg-hover ';
+        // This arbitrary variant replaces the need for table.css
+        $tableVariantClasses .= '[&_tbody_tr:not([data-selected=true])]:hover:bg-hover ';
     }
 
     $tableClasses = trim("$tableBaseClasses $tableSizeClasses $tableVariantClasses");

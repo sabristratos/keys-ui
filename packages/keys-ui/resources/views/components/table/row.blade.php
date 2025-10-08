@@ -3,6 +3,7 @@
 
     $rowVariantClasses = '';
     if ($selected) {
+        // These classes are now applied directly based on the $selected prop
         $rowVariantClasses = 'bg-accent/10 border-l-2 border-accent';
     } else {
         $rowVariantClasses = match ($variant) {
@@ -15,7 +16,8 @@
 
     $rowInteractionClasses = '';
     if ($clickable || $href) {
-        $rowInteractionClasses = $selected ? 'cursor-pointer' : 'cursor-pointer hover:bg-neutral-hover';
+        // The hover state is now handled by the parent table component's classes
+        $rowInteractionClasses = 'cursor-pointer';
     }
 
     $rowClasses = trim("$rowBaseClasses $rowVariantClasses $rowInteractionClasses");

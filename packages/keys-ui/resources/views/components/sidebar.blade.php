@@ -1,5 +1,12 @@
-
 @php
+    $widthClass = match ($width) {
+        'xs' => 'w-48',
+        'sm' => 'w-56',
+        'lg' => 'w-72',
+        'xl' => 'w-80',
+        default => 'w-64',
+    };
+
     $baseClasses = 'flex flex-col h-screen transition-all duration-300 ease-in-out';
 
     $variantClasses = match ($variant) {
@@ -8,35 +15,48 @@
         'transparent' => 'bg-transparent',
         default => 'bg-elevation-1'
     };
+    if ($position === 'right') {
+        $variantClasses = str_replace('border-r', 'border-l', $variantClasses);
+    }
 
-    $positionClasses = match ($position) {
-        'right' => 'order-last',
-        default => ''
-    };
+    $responsiveClasses = 'fixed inset-y-0 z-50 lg:relative lg:z-auto lg:inset-y-auto';
+    if ($sticky) {
+        $responsiveClasses .= ' lg:sticky lg:top-0';
+    }
 
-    $stickyClasses = $sticky ? 'sticky top-0' : '';
+    $stateClasses = [
+        $widthClass,
+        'translate-x-0',
+        $position === 'right' ? '[.sidebar-collapsed&]:translate-x-full' : '[.sidebar-collapsed&]:-translate-x-full',
+        'lg:[.sidebar-collapsed&]:w-16',
+        'lg:[.sidebar-collapsed&]:translate-x-0',
+    ];
 
-    $sidebarClasses = trim("{$baseClasses} {$variantClasses} {$positionClasses} {$stickyClasses}");
+    $initialCollapsedClass = $collapsible && $collapsed ? 'sidebar-collapsed' : '';
+
+    $allClasses = collect([$baseClasses, $variantClasses, $responsiveClasses])
+        ->merge($stateClasses)
+        ->push($initialCollapsedClass)
+        ->filter()
+        ->all();
+
 @endphp
 
 <nav
     id="{{ $id }}"
-    {{ $attributes->merge(['class' => $sidebarClasses . ($collapsible && $collapsed ? ' sidebar-collapsed' : '')])->merge($dataAttributes)->merge($ariaAttributes) }}
+    {{ $attributes->class($allClasses)->merge($dataAttributes)->merge($ariaAttributes) }}
 >
-    {{-- Built-in header with title/subtitle or custom header slot --}}
     @if($title || isset($header))
         <div class="flex-shrink-0 p-2" data-sidebar-header>
-            <div class="flex items-center gap-2 flex-wrap justify-center">
-                {{-- Logo slot - shows on desktop when collapsed, always shows when expanded --}}
+            <div class="flex items-center gap-2 flex-wrap justify-between lg:justify-center lg:[.sidebar-collapsed_&]:flex-col">
                 @isset($logo)
                     <div data-sidebar-logo class="flex-shrink-0">
                         {{ $logo }}
                     </div>
-                @endif
+                @endisset
 
-                {{-- Title and subtitle - hidden on mobile and when collapsed --}}
                 @if($title)
-                    <div class="flex-1 min-w-0" data-sidebar-branding>
+                    <div class="flex-1 min-w-0 lg:[.sidebar-collapsed_&]:hidden" data-sidebar-branding>
                         <h2 class="font-bold text-lg text-primary truncate">{{ $title }}</h2>
                         @if($subtitle)
                             <p class="text-xs text-muted truncate">{{ $subtitle }}</p>
@@ -44,14 +64,12 @@
                     </div>
                 @endif
 
-                {{-- Custom header content - shown when title is not provided --}}
                 @if(!$title && isset($header))
-                    <div class="flex-1 min-w-0" data-sidebar-custom-header>
+                    <div class="flex-1 min-w-0 lg:[.sidebar-collapsed_&]:hidden" data-sidebar-custom-header>
                         {{ $header }}
                     </div>
                 @endif
 
-                {{-- Toggle button - always visible --}}
                 @if($collapsible)
                     <div class="flex-shrink-0" data-sidebar-toggle-wrapper>
                         <x-keys::sidebar.toggle
@@ -70,14 +88,13 @@
     </div>
 
     @isset($footer)
-        <div class="flex-shrink-0 border-t border-line" data-sidebar-footer>
+        <div class="flex-shrink-0 border-t border-line lg:[.sidebar-collapsed_&]:hidden" data-sidebar-footer>
             {{ $footer }}
         </div>
     @endisset
 </nav>
 
 @if($collapsible)
-    {{-- Mobile overlay --}}
     <div
         data-sidebar-overlay
         data-sidebar-target="{{ $id }}"
